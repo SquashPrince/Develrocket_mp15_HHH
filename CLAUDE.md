@@ -91,6 +91,7 @@
 - Github PR 작성 · 등록 : `/github-pr`
 - Commit 시점 권유 · 메시지 안내 : `/github-commit`
 - 작업 일지 작성 · 세션 시작 시 이전 작업일 일지 누락 확인 : `/worklog`
+- AI 활용 기록 (작업 시간 · Codex 작업 · AI 수정 사례 · 규칙 변경) 작성 : `/agentlog`
 - 미확정 프로젝트 값 확인 · 등록 : `/project-setup`
 - 메서드 · 클래스 기능 분리 · 병합 검토 : `/split-review`
 - 기술 문서 작성 · 갱신 : `/tech-doc`
