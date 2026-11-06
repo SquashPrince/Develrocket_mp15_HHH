@@ -31898,6 +31898,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   _moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   _dashAction: {fileID: 504704208043311331, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _attackAction: {fileID: -2737370060291335809, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   _cameraTransform: {fileID: 0}
   _animator: {fileID: 3735240450347513969}
   _walkSpeed: 5
@@ -31911,6 +31912,14 @@ MonoBehaviour:
   _dodgeDuration: 0.2
   _dashCooldown: 1
   _dashChainInterval: 0.2
+  _comboInputBuffers:
+  - 0.4
+  - 0.4
+  - 0.4
+  - 0
+  _chargeTime: 0.6
+  _hitBoxCenter: {x: 0, y: 1, z: 0.5}
+  _hitBoxSize: {x: 1.5, y: 1.5, z: 1}
 --- !u!1 &7306636993918616150
 GameObject:
   m_ObjectHideFlags: 0
@@ -35164,6 +35173,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7293036106077954571}
   - component: {fileID: 3735240450347513969}
+  - component: {fileID: 6802074989986978324}
   m_Layer: 0
   m_Name: Warrior_F
   m_TagString: Untagged
@@ -35210,6 +35220,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6802074989986978324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7961732052438464689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5c2020cff4ce5248b81b0ea78d18f20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimationEventRelay
+  _playerController: {fileID: 3848066476718012999}
 --- !u!1 &8006360393935405814
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// 플레이어의 공용 데이터(입력 · 수치 · 대시 스택 · 중력)와 상태 전환을 맡는다.
-// 실제 동작은 상태 클래스(이동 · 대시)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
+// 플레이어의 공용 데이터(입력 · 수치 · 대시 스택 · 콤보 · 차지 · 중력)와 상태 전환을 맡는다.
+// 실제 동작은 상태 클래스(이동 · 대시 · 공격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
@@ -10,6 +11,8 @@ public class PlayerController : MonoBehaviour
     private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
 
     private const int MAX_DASH_STACK = 2;
+    // 한 번의 타격 판정에서 검사할 수 있는 최대 콜라이더 수
+    private const int MAX_HIT_COLLIDERS = 16;
     // 애니메이션을 바꿀 때 이전 모션과 섞는 시간(초)
     private const float ANIMATION_FADE_TIME = 0.1f;
     // 이동 속도 파라미터가 목표값까지 부드럽게 따라가는 시간(초)
@@ -20,6 +23,7 @@ public class PlayerController : MonoBehaviour
     [Header("입력")]
     [SerializeField] private InputActionReference _moveAction;
     [SerializeField] private InputActionReference _dashAction;
+    [SerializeField] private InputActionReference _attackAction;
 
     [Header("참조")]
     [Tooltip("이동 방향의 기준이 되는 카메라 (Main Camera)")]
@@ -46,18 +50,35 @@ public class PlayerController : MonoBehaviour
     [Tooltip("대시 · 회피 시작 후 다음 대시를 쓸 수 있기까지의 시간. 지속시간보다 길게 설정하면 지속시간을 기준으로 한다")]
     [SerializeField, Min(0f)] private float _dashChainInterval = 0.2f;
 
+    [Header("공격")]
+    [Tooltip("콤보 단계별 입력 버퍼(초). 공격 동작이 끝난 뒤 이 시간 안에 공격하면 다음 단계로 이어진다. 배열 크기가 콤보 단수이며, Animator 에 \"BasicAttack 1\" 부터 단수만큼 상태가 있어야 한다")]
+    [SerializeField] private float[] _comboInputBuffers = { 0.4f, 0.4f, 0f };
+    [Tooltip("공격 키를 누르고 있으면 이 시간 뒤 강공격이 나간다")]
+    [SerializeField, Min(0.01f)] private float _chargeTime = 0.6f;
+    [Tooltip("타격 판정 상자의 중심 (캐릭터 기준 위치)")]
+    [SerializeField] private Vector3 _hitBoxCenter = new Vector3(0f, 1f, 1f);
+    [SerializeField] private Vector3 _hitBoxSize = new Vector3(1.5f, 1.5f, 2f);
+
+    private readonly HashSet<DummyEnemy> _hitTargets = new HashSet<DummyEnemy>();
+    private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
     private CharacterController _characterController;
     private PlayerStateMachine _stateMachine;
     private PlayerLocomotionState _locomotionState;
     private PlayerDashState _dashState;
+    private PlayerAttackState _attackState;
     private float _dashCooldownTimer;
     private float _verticalSpeed;
     private float _turnVelocity;
+    private float _comboExpireTime;
+    private float _chargeTimer;
     private int _dashStack;
+    private int _nextComboStep;
+    private bool _isCharging;
 
     // 상태가 이번 프레임에 정한 수평 속도. 매 프레임 상태 실행 뒤 중력과 함께 반영한다.
     public Vector3 HorizontalVelocity { get; set; }
     public bool WasDashPressed => _dashAction.action.WasPressedThisFrame();
+    public bool WasAttackPressed => _attackAction.action.WasPressedThisFrame();
     public float WalkSpeed => _walkSpeed;
     public float RunSpeed => _runSpeed;
     public float AutoRunDelay => _autoRunDelay;
@@ -71,6 +92,7 @@ public class PlayerController : MonoBehaviour
         _stateMachine.Tick();
         ApplyMovement();
     }
+    private void OnDrawGizmosSelected() => DrawHitBox();
 
     // 입력을 카메라 기준의 월드 수평 방향으로 바꾼다. 스틱을 살짝 기울이면 길이가 1보다 작다.
     // 이동 중 카메라가 캐릭터 뒤로 자동 복귀하면 기준이 바뀌어 원을 그리므로, 이동 중 복귀는 CameraRecenterBlocker 가 막는다.
@@ -90,7 +112,7 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, yaw, 0f);
     }
 
-    // 스택이 있으면 대시(방향 입력 있음) 또는 회피(방향 입력 없음)를 시작한다.
+    // 스택이 있으면 대시(방향 입력 있음) 또는 회피(방향 입력 없음)를 시작한다. 진행 중이던 차지는 끊는다.
     public bool TryStartDash(Vector3 moveDirection)
     {
         if(_dashStack <= 0) return false;
@@ -98,10 +120,8 @@ public class PlayerController : MonoBehaviour
         if(moveDirection != Vector3.zero)
         {
             // 방향 입력이 있으면 그 방향으로 즉시 돌아서 대시
-            Vector3 direction = moveDirection.normalized;
-            transform.rotation = Quaternion.LookRotation(direction);
-            _turnVelocity = 0f;
-            _dashState.Setup(direction, _dashDistance, _dashDuration, false);
+            FaceImmediately(moveDirection);
+            _dashState.Setup(transform.forward, _dashDistance, _dashDuration, false);
         }
         else
         {
@@ -110,9 +130,78 @@ public class PlayerController : MonoBehaviour
         }
 
         _dashStack--;
+        _isCharging = false;
         _stateMachine.ChangeState(_dashState);
 
         return true;
+    }
+
+    // 입력 버퍼 시간 안이면 다음 콤보 단계, 지났으면 1단부터 시작한다. 이동 입력이 있으면 그 방향으로 돌아서 공격한다.
+    public void StartBasicAttack(Vector3 moveDirection)
+    {
+        int step = Time.time <= _comboExpireTime ? _nextComboStep : 0;
+
+        _comboExpireTime = 0f;
+        FaceImmediately(moveDirection);
+        _attackState.Setup(step, false);
+        _stateMachine.ChangeState(_attackState);
+    }
+
+    // 공격 동작이 끝난 시점에 다음 단계와, 다음 단계로 이어갈 수 있는 마감 시각을 정한다. 마지막 단계 다음은 1단이다.
+    public void FinishComboStep(int step)
+    {
+        _nextComboStep = (step + 1) % _comboInputBuffers.Length;
+        _comboExpireTime = Time.time + _comboInputBuffers[step];
+    }
+
+    public void BeginCharge()
+    {
+        _isCharging = true;
+        _chargeTimer = 0f;
+    }
+
+    // 공격 키를 누르고 있는 동안 차지 시간을 재고, 차지 시간에 도달하면 진행 중인 공격을 끊고 강공격을 시작한다.
+    // 강공격을 시작했으면 true 를 돌려준다.
+    public bool UpdateCharge()
+    {
+        if(!_isCharging) return false;
+
+        if(!_attackAction.action.IsPressed())
+        {
+            _isCharging = false;
+            return false;
+        }
+
+        _chargeTimer += Time.deltaTime;
+
+        if(_chargeTimer < _chargeTime) return false;
+
+        StartHeavyAttack();
+        return true;
+    }
+
+    // 캐릭터 앞의 판정 상자 안에 있는 적에게 한 번씩 적중시킨다.
+    public void PerformHit()
+    {
+        Vector3 center = transform.TransformPoint(_hitBoxCenter);
+        int count = Physics.OverlapBoxNonAlloc(center, _hitBoxSize * 0.5f, _hitColliders, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+
+        // 콜라이더가 여러 개인 적도 한 번만 맞도록 이번 판정에서 맞은 적을 기억한다.
+        _hitTargets.Clear();
+
+        for(int i = 0; i < count; i++)
+        {
+            DummyEnemy enemy = _hitColliders[i].GetComponentInParent<DummyEnemy>();
+
+            if(enemy == null || !_hitTargets.Add(enemy)) continue;
+
+            enemy.TakeHit();
+        }
+    }
+
+    public void HandleAnimationEvent(PlayerAnimationEventType type, int stateHash)
+    {
+        _stateMachine.CurrentState.OnAnimationEvent(type, stateHash);
     }
 
     // Animator 의 상태를 이름(해시)으로 직접 재생한다. 전이선 대신 코드가 어떤 모션을 재생할지 정한다.
@@ -121,16 +210,36 @@ public class PlayerController : MonoBehaviour
         _animator.CrossFadeInFixedTime(stateHash, ANIMATION_FADE_TIME);
     }
 
-    // 실제 수평 이동 속도를 넘겨 Blend Tree 가 대기 · 걷기 · 달리기를 섞게 한다.
+    // 실제 수평 이동 속도를 넘겨 Blend Tree 가 걷기 · 달리기를 섞게 한다.
     public void SetMoveSpeedParameter(float speed)
     {
         _animator.SetFloat(SPEED_PARAMETER, speed, SPEED_DAMP_TIME, Time.deltaTime);
     }
 
+    // 이동 상태로 돌아가면 진행 중이던 차지는 끊는다.
     public void EnterLocomotion(bool startRunning)
     {
+        _isCharging = false;
         _locomotionState.SetStartRunning(startRunning);
         _stateMachine.ChangeState(_locomotionState);
+    }
+
+    // 강공격 뒤에는 콤보가 1단부터 다시 시작한다.
+    private void StartHeavyAttack()
+    {
+        _isCharging = false;
+        _comboExpireTime = 0f;
+        FaceImmediately(ReadMoveDirection());
+        _attackState.Setup(0, true);
+        _stateMachine.ChangeState(_attackState);
+    }
+
+    private void FaceImmediately(Vector3 direction)
+    {
+        if(direction == Vector3.zero) return;
+
+        transform.rotation = Quaternion.LookRotation(direction.normalized);
+        _turnVelocity = 0f;
     }
 
     // 스택이 최대치보다 적으면 대시 중에도 쿨타임이 계속 흐른다.
@@ -156,6 +265,14 @@ public class PlayerController : MonoBehaviour
         _characterController.Move((HorizontalVelocity + Vector3.up * _verticalSpeed) * Time.deltaTime);
     }
 
+    // Scene 창에서 플레이어를 선택하면 타격 판정 범위를 빨간 상자로 보여준다.
+    private void DrawHitBox()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.matrix = Matrix4x4.TRS(transform.TransformPoint(_hitBoxCenter), transform.rotation, Vector3.one);
+        Gizmos.DrawWireCube(Vector3.zero, _hitBoxSize);
+    }
+
     private void CacheComponent()
     {
         _characterController = GetComponent<CharacterController>();
@@ -166,6 +283,7 @@ public class PlayerController : MonoBehaviour
         _stateMachine = new PlayerStateMachine();
         _locomotionState = new PlayerLocomotionState(this);
         _dashState = new PlayerDashState(this);
+        _attackState = new PlayerAttackState(this);
         _dashStack = MAX_DASH_STACK;
 
         EnterLocomotion(false);
