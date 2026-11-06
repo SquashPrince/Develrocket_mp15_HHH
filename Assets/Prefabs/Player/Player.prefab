@@ -31836,6 +31836,7 @@ GameObject:
   - component: {fileID: 3907669777063714774}
   - component: {fileID: 2670921355424890680}
   - component: {fileID: 3848066476718012999}
+  - component: {fileID: 6322618722868687519}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -31899,27 +31900,84 @@ MonoBehaviour:
   _moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   _dashAction: {fileID: 504704208043311331, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   _attackAction: {fileID: -2737370060291335809, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _skillAction: {fileID: -3361557722714098977, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   _cameraTransform: {fileID: 0}
   _animator: {fileID: 3735240450347513969}
   _walkSpeed: 5
-  _runSpeed: 12
+  _runSpeed: 15
   _turnTime: 0.15
   _autoRunDelay: 1.5
   _gravity: -20
-  _dashDistance: 4
-  _dashDuration: 0.2
-  _dodgeDistance: 3
-  _dodgeDuration: 0.2
+  _dashDistance: 2.5
+  _dashDuration: 0.25
+  _dodgeDistance: 2.5
+  _dodgeDuration: 0.25
   _dashCooldown: 1
-  _dashChainInterval: 0.2
-  _comboInputBuffers:
-  - 0.4
-  - 0.4
-  - 0.4
-  - 0
+  _dashChainInterval: 0.25
+  _comboSteps:
+  - _energyGain: 1.25
+    _power: 10
+    _advanceDistance: 1.25
+    _advanceDuration: 0.35
+    _fadeTime: 0.1
+    _inputBuffer: 0.05
+  - _energyGain: 1.25
+    _power: 10
+    _advanceDistance: 0.75
+    _advanceDuration: 0.25
+    _fadeTime: 0.2
+    _inputBuffer: 0.1
+  - _energyGain: 1.25
+    _power: 10
+    _advanceDistance: 4.5
+    _advanceDuration: 0.85
+    _fadeTime: 0.1
+    _inputBuffer: 0.05
+  - _energyGain: 1.25
+    _power: 10
+    _advanceDistance: 1.5
+    _advanceDuration: 0.35
+    _fadeTime: 0.2
+    _inputBuffer: 0
+  _heavyAttack:
+    _energyGain: 5
+    _power: 10
+    _advanceDistance: 3.5
+    _advanceDuration: 1
+    _fadeTime: 0.1
+    _inputBuffer: 0.4
   _chargeTime: 0.6
   _hitBoxCenter: {x: 0, y: 1, z: 0.5}
   _hitBoxSize: {x: 1.5, y: 1.5, z: 1}
+  _skill:
+    _energyGain: 5
+    _power: 10
+    _advanceDistance: 5
+    _advanceDuration: 0.925
+    _fadeTime: 0.1
+    _inputBuffer: 0.4
+  _specialSkill:
+    _energyGain: 5
+    _power: 10
+    _advanceDistance: 5
+    _advanceDuration: 2
+    _fadeTime: 0.1
+    _inputBuffer: 0.4
+  _specialSkillEnergyCost: 60
+--- !u!114 &6322618722868687519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7306029376340620380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edceb998fa8d7c745aafd6751879ca64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerEnergy
+  _maxEnergy: 120
+  _regenPerSecond: 1
 --- !u!1 &7306636993918616150
 GameObject:
   m_ObjectHideFlags: 0
