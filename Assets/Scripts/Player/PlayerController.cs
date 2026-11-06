@@ -7,7 +7,13 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
+    private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
+
     private const int MAX_DASH_STACK = 2;
+    // 애니메이션을 바꿀 때 이전 모션과 섞는 시간(초)
+    private const float ANIMATION_FADE_TIME = 0.1f;
+    // 이동 속도 파라미터가 목표값까지 부드럽게 따라가는 시간(초)
+    private const float SPEED_DAMP_TIME = 0.1f;
     // 땅에 붙어 있도록 누르는 작은 아래 방향 속도 (0 이면 경사에서 isGrounded 가 흔들린다)
     private const float GROUNDED_VERTICAL_SPEED = -2f;
 
@@ -18,6 +24,8 @@ public class PlayerController : MonoBehaviour
     [Header("참조")]
     [Tooltip("이동 방향의 기준이 되는 카메라 (Main Camera)")]
     [SerializeField] private Transform _cameraTransform;
+    [Tooltip("캐릭터 모델의 Animator (Visual 아래 캐릭터 모델)")]
+    [SerializeField] private Animator _animator;
 
     [Header("이동")]
     [SerializeField, Min(0f)] private float _walkSpeed = 4f;
@@ -105,6 +113,18 @@ public class PlayerController : MonoBehaviour
         _stateMachine.ChangeState(_dashState);
 
         return true;
+    }
+
+    // Animator 의 상태를 이름(해시)으로 직접 재생한다. 전이선 대신 코드가 어떤 모션을 재생할지 정한다.
+    public void PlayAnimation(int stateHash)
+    {
+        _animator.CrossFadeInFixedTime(stateHash, ANIMATION_FADE_TIME);
+    }
+
+    // 실제 수평 이동 속도를 넘겨 Blend Tree 가 대기 · 걷기 · 달리기를 섞게 한다.
+    public void SetMoveSpeedParameter(float speed)
+    {
+        _animator.SetFloat(SPEED_PARAMETER, speed, SPEED_DAMP_TIME, Time.deltaTime);
     }
 
     public void EnterLocomotion(bool startRunning)

@@ -4,6 +4,10 @@ using UnityEngine;
 // 두 동작 모두 정해진 방향으로 정해진 시간 동안 같은 속도로 이동하고, 방향 · 거리 · 시간만 다르다.
 public class PlayerDashState : PlayerState
 {
+    // Animator Controller 의 상태 이름과 같아야 한다.
+    private static readonly int DASH_ANIMATION = Animator.StringToHash("Dash");
+    private static readonly int DODGE_ANIMATION = Animator.StringToHash("Dodge");
+
     private Vector3 _direction;
     private float _speed;
     private float _duration;
@@ -28,6 +32,7 @@ public class PlayerDashState : PlayerState
     {
         _timer = 0f;
         Controller.HorizontalVelocity = _direction * _speed;
+        Controller.PlayAnimation(IsDodge ? DODGE_ANIMATION : DASH_ANIMATION);
     }
 
     public override void Tick()

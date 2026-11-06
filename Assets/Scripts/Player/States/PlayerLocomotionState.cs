@@ -4,6 +4,11 @@ using UnityEngine;
 // 이동 입력을 일정 시간 유지하면 달리기로 전환하고, 이동 입력이 없으면 멈춘다.
 public class PlayerLocomotionState : PlayerState
 {
+    // Animator Controller 의 상태 이름과 같아야 한다.
+    // 대기는 멈출 때마다 처음부터 재생하기 위해 걷기 · 달리기(Move Blend Tree)와 상태를 나눈다.
+    private static readonly int IDLE_ANIMATION = Animator.StringToHash("Idle");
+    private static readonly int MOVE_ANIMATION = Animator.StringToHash("Move");
+
     private enum Gait
     {
         Idle,
@@ -27,6 +32,8 @@ public class PlayerLocomotionState : PlayerState
         _gait = _startRunning ? Gait.Run : Gait.Idle;
         _moveHoldTime = 0f;
         _startRunning = false;
+
+        Controller.PlayAnimation(_gait == Gait.Idle ? IDLE_ANIMATION : MOVE_ANIMATION);
     }
 
     public override void Tick()
@@ -36,21 +43,30 @@ public class PlayerLocomotionState : PlayerState
         if(Controller.WasDashPressed && Controller.TryStartDash(moveDirection)) return;
 
         Controller.HorizontalVelocity = UpdateGait(moveDirection);
+        Controller.SetMoveSpeedParameter(Controller.HorizontalVelocity.magnitude);
     }
 
     private Vector3 UpdateGait(Vector3 moveDirection)
     {
         if(moveDirection == Vector3.zero)
         {
+            // 움직이다 멈추는 순간 대기 모션을 처음부터 재생한다.
+            if(_gait != Gait.Idle) Controller.PlayAnimation(IDLE_ANIMATION);
+
             _gait = Gait.Idle;
             _moveHoldTime = 0f;
             return Vector3.zero;
         }
 
+        if(_gait == Gait.Idle)
+        {
+            _gait = Gait.Walk;
+            Controller.PlayAnimation(MOVE_ANIMATION);
+        }
+
         _moveHoldTime += Time.deltaTime;
 
         if(_gait != Gait.Run && _moveHoldTime >= Controller.AutoRunDelay) _gait = Gait.Run;
-        else if(_gait == Gait.Idle) _gait = Gait.Walk;
 
         Controller.TurnTowards(moveDirection);
 
