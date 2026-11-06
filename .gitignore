@@ -107,3 +107,6 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Claude Code 소요 시간 측정 훅의 마지막 입력 시각 (개인 상태 값)
+/.claude/state/last-prompt-time

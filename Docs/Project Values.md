@@ -8,10 +8,14 @@
 
 | 항목 | 값 | 출처·확인 날짜 |
 |---|---|---|
-| 장르 | 미정 | — |
-| 팀 구성 | 미정 | — |
-| Unity Editor 전체 버전 | 미정 | — |
-| 렌더 파이프라인 | 미정 | — |
-| 대상 플랫폼 | 미정 | — |
-| 입력 시스템 | 미정 | — |
-| 브랜치 구성 | 미정 | — |
+| 프로젝트 이름·경로 | 정식 이름 `Hollow Horizon Hunter` (`productName`과 같음), 약칭 `HHH`. 경로 `Project-HHH/Hollow Horizon Hunter` | `ProjectSettings.asset` · 사용자 답변 · 2026-11-06 |
+| 장르 | 3D 어반 판타지 액션 | 사용자 답변 · 2026-11-06 |
+| 팀 구성 | 1인 | 기획서 1장 · 사용자 답변 · 2026-11-06 |
+| Unity Editor 전체 버전 | 6000.3.9f1 LTS | `ProjectSettings/ProjectVersion.txt` · 사용자 답변 · 2026-11-06 |
+| 렌더 파이프라인 | URP (사용 에셋 `Assets/Settings/PC_RPAsset`) | `Packages/manifest.json` · `GraphicsSettings.asset` · 2026-11-06 |
+| 대상 플랫폼 | PC (Windows) | 기획서 1-1 · 사용자 답변 · 2026-11-06 |
+| 입력 시스템 | Input System (New), Active Input Handling: Input System Package (New) | `ProjectSettings.asset` · 사용자 답변 · 2026-11-06 |
+| 브랜치 구성 | `main` / `main-dev` / 작업 브랜치 (`종류/이름/작업명`, `main-dev`에서 생성) | Git 컨벤션 · 원격 저장소 · 사용자 답변 · 2026-11-06 |
+| C# 언어·API 호환 수준 | API 호환 수준 .NET Standard 2.1, 언어 버전은 Unity 기본값 | `ProjectSettings.asset` (`apiCompatibilityLevel: 6`) · 2026-11-06 |
+| 필수 패키지·버전 | URP 17.3.0, Input System 1.20.0, Cinemachine 3.1.7, Behavior 1.0.17, Timeline 1.8.10, UniTask 2.5.11 (git `a77a1b4`), 조이콘 `com.slenkerlab.switchcontrollerinput` (git `ba8fa4b`, schlenger 포크) | `Packages/manifest.json` · `packages-lock.json` · 2026-11-06 |
+| GitHub 저장소 URL·연결 상태 | https://github.com/SquashPrince/Develrocket_mp15_HHH (`origin` 연결됨) | `git remote` · 2026-11-06 |
