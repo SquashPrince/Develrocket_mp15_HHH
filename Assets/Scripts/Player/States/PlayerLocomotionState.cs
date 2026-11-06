@@ -42,11 +42,17 @@ public class PlayerLocomotionState : PlayerState
 
         if(Controller.WasDashPressed && Controller.TryStartDash(moveDirection)) return;
 
+        if(Controller.WasSkillPressed)
+        {
+            Controller.StartSkill();
+            return;
+        }
+
         // 공격 키를 누르는 즉시 기본 공격을 시작하고, 누르고 있는 동안 차지 시간을 잰다.
         if(Controller.WasAttackPressed)
         {
             Controller.BeginCharge();
-            Controller.StartBasicAttack(moveDirection);
+            Controller.StartBasicAttack();
             return;
         }
 

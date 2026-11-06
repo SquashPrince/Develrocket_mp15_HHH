@@ -68,7 +68,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 4542270011227178163, guid: 755f4644f86756745b95316a3d9333b3, type: 3}
+  - {fileID: 4542270011227178163, guid: 39e45c84118aded4aa018f185ed54cdf, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -127,4 +127,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DummyEnemy
   _renderer: {fileID: 572824357770333792}
   _hitColor: {r: 1, g: 0, b: 0, a: 1}
-  _flashDuration: 0.15
+  _flashDuration: 0.05

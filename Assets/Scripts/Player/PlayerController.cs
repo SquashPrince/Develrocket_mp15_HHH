@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// 플레이어의 공용 데이터(입력 · 수치 · 대시 스택 · 콤보 · 차지 · 중력)와 상태 전환을 맡는다.
+// 플레이어의 공용 데이터(입력 · 수치 · 대시 스택 · 콤보 · 차지 · 스킬 · 중력)와 상태 전환을 맡는다.
 // 실제 동작은 상태 클래스(이동 · 대시 · 공격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
-[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(CharacterController), typeof(PlayerEnergy))]
 public class PlayerController : MonoBehaviour
 {
     private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private InputActionReference _moveAction;
     [SerializeField] private InputActionReference _dashAction;
     [SerializeField] private InputActionReference _attackAction;
+    [SerializeField] private InputActionReference _skillAction;
 
     [Header("참조")]
     [Tooltip("이동 방향의 기준이 되는 카메라 (Main Camera)")]
@@ -51,17 +52,25 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float _dashChainInterval = 0.2f;
 
     [Header("공격")]
-    [Tooltip("콤보 단계별 입력 버퍼(초). 공격 동작이 끝난 뒤 이 시간 안에 공격하면 다음 단계로 이어진다. 배열 크기가 콤보 단수이며, Animator 에 \"BasicAttack 1\" 부터 단수만큼 상태가 있어야 한다")]
-    [SerializeField] private float[] _comboInputBuffers = { 0.4f, 0.4f, 0f };
+    [Tooltip("콤보 단계별 설정. 배열 크기가 콤보 단수이며, Animator 에 \"BasicAttack 1\" 부터 단수만큼 상태가 있어야 한다. 마지막 단계는 마무리 공격으로, 후딜이 끝날 때까지 공격 입력을 받지 않는다")]
+    [SerializeField] private PlayerAttackSetting[] _comboSteps = { new PlayerAttackSetting(), new PlayerAttackSetting(), new PlayerAttackSetting(), new PlayerAttackSetting() };
+    [SerializeField] private PlayerAttackSetting _heavyAttack = new PlayerAttackSetting();
     [Tooltip("공격 키를 누르고 있으면 이 시간 뒤 강공격이 나간다")]
     [SerializeField, Min(0.01f)] private float _chargeTime = 0.6f;
     [Tooltip("타격 판정 상자의 중심 (캐릭터 기준 위치)")]
     [SerializeField] private Vector3 _hitBoxCenter = new Vector3(0f, 1f, 1f);
     [SerializeField] private Vector3 _hitBoxSize = new Vector3(1.5f, 1.5f, 2f);
 
+    [Header("스킬")]
+    [SerializeField] private PlayerAttackSetting _skill = new PlayerAttackSetting();
+    [SerializeField] private PlayerAttackSetting _specialSkill = new PlayerAttackSetting();
+    [Tooltip("특수스킬에 필요한 에너지. 스킬 입력 시 에너지가 이보다 적으면 일반 스킬이 나간다")]
+    [SerializeField, Min(0f)] private float _specialSkillEnergyCost = 60f;
+
     private readonly HashSet<DummyEnemy> _hitTargets = new HashSet<DummyEnemy>();
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
     private CharacterController _characterController;
+    private PlayerEnergy _energy;
     private PlayerStateMachine _stateMachine;
     private PlayerLocomotionState _locomotionState;
     private PlayerDashState _dashState;
@@ -79,6 +88,8 @@ public class PlayerController : MonoBehaviour
     public Vector3 HorizontalVelocity { get; set; }
     public bool WasDashPressed => _dashAction.action.WasPressedThisFrame();
     public bool WasAttackPressed => _attackAction.action.WasPressedThisFrame();
+    public bool WasSkillPressed => _skillAction.action.WasPressedThisFrame();
+    public int ComboStepCount => _comboSteps.Length;
     public float WalkSpeed => _walkSpeed;
     public float RunSpeed => _runSpeed;
     public float AutoRunDelay => _autoRunDelay;
@@ -136,22 +147,40 @@ public class PlayerController : MonoBehaviour
         return true;
     }
 
-    // 입력 버퍼 시간 안이면 다음 콤보 단계, 지났으면 1단부터 시작한다. 이동 입력이 있으면 그 방향으로 돌아서 공격한다.
-    public void StartBasicAttack(Vector3 moveDirection)
+    // 입력 버퍼 시간 안이면 다음 콤보 단계, 지났으면 1단부터 시작한다. 방향을 바꾸지 않고 바라보는 방향으로 공격한다.
+    public void StartBasicAttack()
     {
         int step = Time.time <= _comboExpireTime ? _nextComboStep : 0;
 
         _comboExpireTime = 0f;
-        FaceImmediately(moveDirection);
-        _attackState.Setup(step, false);
+        _attackState.Setup(PlayerAttackState.AttackType.Basic, step, _comboSteps[step]);
         _stateMachine.ChangeState(_attackState);
     }
 
     // 공격 동작이 끝난 시점에 다음 단계와, 다음 단계로 이어갈 수 있는 마감 시각을 정한다. 마지막 단계 다음은 1단이다.
     public void FinishComboStep(int step)
     {
-        _nextComboStep = (step + 1) % _comboInputBuffers.Length;
-        _comboExpireTime = Time.time + _comboInputBuffers[step];
+        _nextComboStep = (step + 1) % _comboSteps.Length;
+        _comboExpireTime = Time.time + _comboSteps[step].InputBuffer;
+    }
+
+    // 에너지가 특수스킬 요구량 이상이면 소모하고 특수스킬, 모자라면 일반 스킬을 시작한다.
+    // 진행 중이던 차지는 끊고, 스킬 뒤의 콤보는 1단부터 다시 시작한다.
+    public void StartSkill()
+    {
+        bool isSpecial = _energy.TryConsume(_specialSkillEnergyCost);
+
+#if UNITY_EDITOR
+        if(isSpecial) Debug.Log($"[특수스킬] 에너지 -{_specialSkillEnergyCost} → {_energy.CurrentEnergy:F1}");
+#endif
+
+        _isCharging = false;
+        _comboExpireTime = 0f;
+
+        if(isSpecial) _attackState.Setup(PlayerAttackState.AttackType.SpecialSkill, 0, _specialSkill);
+        else _attackState.Setup(PlayerAttackState.AttackType.Skill, 0, _skill);
+
+        _stateMachine.ChangeState(_attackState);
     }
 
     public void BeginCharge()
@@ -180,8 +209,8 @@ public class PlayerController : MonoBehaviour
         return true;
     }
 
-    // 캐릭터 앞의 판정 상자 안에 있는 적에게 한 번씩 적중시킨다.
-    public void PerformHit()
+    // 캐릭터 앞의 판정 상자 안에 있는 적에게 한 번씩 적중시키고, 적중한 적마다 공격 설정의 에너지를 얻는다.
+    public void PerformHit(PlayerAttackState.AttackType type, PlayerAttackSetting setting)
     {
         Vector3 center = transform.TransformPoint(_hitBoxCenter);
         int count = Physics.OverlapBoxNonAlloc(center, _hitBoxSize * 0.5f, _hitColliders, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
@@ -196,6 +225,11 @@ public class PlayerController : MonoBehaviour
             if(enemy == null || !_hitTargets.Add(enemy)) continue;
 
             enemy.TakeHit();
+            _energy.Add(setting.EnergyGain);
+
+#if UNITY_EDITOR
+            Debug.Log($"[적중] {type} 위력 {setting.Power} / 에너지 +{setting.EnergyGain} → {_energy.CurrentEnergy:F1}");
+#endif
         }
     }
 
@@ -205,9 +239,10 @@ public class PlayerController : MonoBehaviour
     }
 
     // Animator 의 상태를 이름(해시)으로 직접 재생한다. 전이선 대신 코드가 어떤 모션을 재생할지 정한다.
-    public void PlayAnimation(int stateHash)
+    // fadeTime : 이전 모션과 섞는 시간(초). 공격은 공격 설정의 값을 넘기고, 그 외에는 기본값을 쓴다.
+    public void PlayAnimation(int stateHash, float fadeTime = ANIMATION_FADE_TIME)
     {
-        _animator.CrossFadeInFixedTime(stateHash, ANIMATION_FADE_TIME);
+        _animator.CrossFadeInFixedTime(stateHash, fadeTime);
     }
 
     // 실제 수평 이동 속도를 넘겨 Blend Tree 가 걷기 · 달리기를 섞게 한다.
@@ -229,8 +264,7 @@ public class PlayerController : MonoBehaviour
     {
         _isCharging = false;
         _comboExpireTime = 0f;
-        FaceImmediately(ReadMoveDirection());
-        _attackState.Setup(0, true);
+        _attackState.Setup(PlayerAttackState.AttackType.Heavy, 0, _heavyAttack);
         _stateMachine.ChangeState(_attackState);
     }
 
@@ -276,6 +310,7 @@ public class PlayerController : MonoBehaviour
     private void CacheComponent()
     {
         _characterController = GetComponent<CharacterController>();
+        _energy = GetComponent<PlayerEnergy>();
     }
 
     private void Init()
