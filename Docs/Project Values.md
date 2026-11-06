@@ -8,6 +8,7 @@
 
 | 항목 | 값 | 출처·확인 날짜 |
 |---|---|---|
+| 프로젝트 이름·경로 | 정식 이름 `Hollow Horizon Hunter` (`productName`과 같음), 약칭 `HHH`. 경로 `Project-HHH/Hollow Horizon Hunter` | `ProjectSettings.asset` · 사용자 답변 · 2026-11-06 |
 | 장르 | 3D 어반 판타지 액션 | 사용자 답변 · 2026-11-06 |
 | 팀 구성 | 1인 | 기획서 1장 · 사용자 답변 · 2026-11-06 |
 | Unity Editor 전체 버전 | 6000.3.9f1 LTS | `ProjectSettings/ProjectVersion.txt` · 사용자 답변 · 2026-11-06 |
