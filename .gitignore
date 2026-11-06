@@ -110,3 +110,9 @@ InitTestScene*.unity*
 
 # Claude Code 소요 시간 측정 훅의 마지막 입력 시각 (개인 상태 값)
 /.claude/state/last-prompt-time
+
+# 외부 에셋 원본은 올리지 않고 .meta 만 올린다 (다시 받았을 때 GUID 참조 유지)
+# 사용 에셋의 출처는 Docs/Planning/Used Assets.md 에 기록한다.
+/[Aa]ssets/[Ii]mports/**
+!/[Aa]ssets/[Ii]mports/**/
+!/[Aa]ssets/[Ii]mports/**/*.meta
