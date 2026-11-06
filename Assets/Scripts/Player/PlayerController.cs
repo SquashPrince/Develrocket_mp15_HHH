@@ -1,20 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// 플레이어의 걷기 · 달리기 · 대시 · 회피(백스텝)를 CharacterController 로 처리한다.
+// 플레이어의 공용 데이터(입력 · 수치 · 대시 스택 · 중력)와 상태 전환을 맡는다.
+// 실제 동작은 상태 클래스(이동 · 대시)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    private enum MoveState
-    {
-        Idle,
-        Walk,
-        Run,
-        Dash,
-        Dodge
-    }
-
     private const int MAX_DASH_STACK = 2;
     // 땅에 붙어 있도록 누르는 작은 아래 방향 속도 (0 이면 경사에서 isGrounded 가 흔들린다)
     private const float GROUNDED_VERTICAL_SPEED = -2f;
@@ -47,41 +39,34 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float _dashChainInterval = 0.2f;
 
     private CharacterController _characterController;
-    private MoveState _state;
-    private Vector3 _dashDirection;
-    private float _dashSpeed;
-    private float _dashActionDuration;
-    private float _dashActionTimer;
+    private PlayerStateMachine _stateMachine;
+    private PlayerLocomotionState _locomotionState;
+    private PlayerDashState _dashState;
     private float _dashCooldownTimer;
-    private float _moveHoldTime;
     private float _verticalSpeed;
     private float _turnVelocity;
     private int _dashStack;
 
-    private bool IsDashing => _state == MoveState.Dash || _state == MoveState.Dodge;
+    // 상태가 이번 프레임에 정한 수평 속도. 매 프레임 상태 실행 뒤 중력과 함께 반영한다.
+    public Vector3 HorizontalVelocity { get; set; }
+    public bool WasDashPressed => _dashAction.action.WasPressedThisFrame();
+    public float WalkSpeed => _walkSpeed;
+    public float RunSpeed => _runSpeed;
+    public float AutoRunDelay => _autoRunDelay;
+    public float DashChainInterval => _dashChainInterval;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
     private void Update()
     {
         RechargeDashStack();
-        HandleMovement();
-    }
-
-    private void HandleMovement()
-    {
-        Vector3 moveDirection = ReadMoveDirection();
-
-        if(_dashAction.action.WasPressedThisFrame()) TryStartDash(moveDirection);
-
-        Vector3 horizontalVelocity = IsDashing ? UpdateDash(moveDirection) : UpdateMove(moveDirection);
-
-        _characterController.Move((horizontalVelocity + Vector3.up * UpdateVerticalSpeed()) * Time.deltaTime);
+        _stateMachine.Tick();
+        ApplyMovement();
     }
 
     // 입력을 카메라 기준의 월드 수평 방향으로 바꾼다. 스틱을 살짝 기울이면 길이가 1보다 작다.
     // 이동 중 카메라가 캐릭터 뒤로 자동 복귀하면 기준이 바뀌어 원을 그리므로, 이동 중 복귀는 CameraRecenterBlocker 가 막는다.
-    private Vector3 ReadMoveDirection()
+    public Vector3 ReadMoveDirection()
     {
         Vector2 input = _moveAction.action.ReadValue<Vector2>();
         Vector3 localDirection = Vector3.ClampMagnitude(new Vector3(input.x, 0f, input.y), 1f);
@@ -89,29 +74,7 @@ public class PlayerController : MonoBehaviour
         return Quaternion.Euler(0f, _cameraTransform.eulerAngles.y, 0f) * localDirection;
     }
 
-    private Vector3 UpdateMove(Vector3 moveDirection)
-    {
-        if(moveDirection == Vector3.zero)
-        {
-            _state = MoveState.Idle;
-            _moveHoldTime = 0f;
-            return Vector3.zero;
-        }
-
-        _moveHoldTime += Time.deltaTime;
-
-        if(_state != MoveState.Run && _moveHoldTime >= _autoRunDelay) _state = MoveState.Run;
-        else if(_state == MoveState.Idle) _state = MoveState.Walk;
-
-        TurnTowards(moveDirection);
-
-        float speed = _state == MoveState.Run ? _runSpeed : _walkSpeed;
-
-        // 목표 방향이 아닌 현재 바라보는 방향으로 이동해 곡선으로 꺾는다. 스틱을 덜 기울이면 느려진다.
-        return transform.forward * (moveDirection.magnitude * speed);
-    }
-
-    private void TurnTowards(Vector3 direction)
+    public void TurnTowards(Vector3 direction)
     {
         float targetYaw = Quaternion.LookRotation(direction).eulerAngles.y;
         float yaw = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetYaw, ref _turnVelocity, _turnTime);
@@ -119,55 +82,35 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, yaw, 0f);
     }
 
-    private void TryStartDash(Vector3 moveDirection)
+    // 스택이 있으면 대시(방향 입력 있음) 또는 회피(방향 입력 없음)를 시작한다.
+    public bool TryStartDash(Vector3 moveDirection)
     {
-        if(_dashStack <= 0) return;
-
-        // 대시 · 회피 중에는 연속 사용 간격이 지나야 다음 대시를 쓸 수 있다.
-        if(IsDashing && _dashActionTimer < Mathf.Min(_dashChainInterval, _dashActionDuration)) return;
+        if(_dashStack <= 0) return false;
 
         if(moveDirection != Vector3.zero)
         {
             // 방향 입력이 있으면 그 방향으로 즉시 돌아서 대시
-            _dashDirection = moveDirection.normalized;
-            transform.rotation = Quaternion.LookRotation(_dashDirection);
+            Vector3 direction = moveDirection.normalized;
+            transform.rotation = Quaternion.LookRotation(direction);
             _turnVelocity = 0f;
-            StartDashAction(MoveState.Dash, _dashDistance, _dashDuration);
+            _dashState.Setup(direction, _dashDistance, _dashDuration, false);
         }
         else
         {
             // 방향 입력이 없으면 바라보는 방향을 유지한 채 뒤로 회피
-            _dashDirection = -transform.forward;
-            StartDashAction(MoveState.Dodge, _dodgeDistance, _dodgeDuration);
+            _dashState.Setup(-transform.forward, _dodgeDistance, _dodgeDuration, true);
         }
 
         _dashStack--;
+        _stateMachine.ChangeState(_dashState);
+
+        return true;
     }
 
-    private void StartDashAction(MoveState state, float distance, float duration)
+    public void EnterLocomotion(bool startRunning)
     {
-        _state = state;
-        _dashActionDuration = duration;
-        _dashSpeed = distance / duration;
-        _dashActionTimer = 0f;
-    }
-
-    private Vector3 UpdateDash(Vector3 moveDirection)
-    {
-        _dashActionTimer += Time.deltaTime;
-
-        if(_dashActionTimer < _dashActionDuration) return _dashDirection * _dashSpeed;
-
-        EndDash(moveDirection);
-
-        return UpdateMove(moveDirection);
-    }
-
-    // 끝날 때 이동 입력이 있으면 달리기로 이어가고, 없으면 멈춘다.
-    private void EndDash(Vector3 moveDirection)
-    {
-        _moveHoldTime = 0f;
-        _state = moveDirection == Vector3.zero ? MoveState.Idle : MoveState.Run;
+        _locomotionState.SetStartRunning(startRunning);
+        _stateMachine.ChangeState(_locomotionState);
     }
 
     // 스택이 최대치보다 적으면 대시 중에도 쿨타임이 계속 흐른다.
@@ -185,12 +128,12 @@ public class PlayerController : MonoBehaviour
         if(_dashStack >= MAX_DASH_STACK) _dashCooldownTimer = 0f;
     }
 
-    private float UpdateVerticalSpeed()
+    private void ApplyMovement()
     {
         if(_characterController.isGrounded && _verticalSpeed < 0f) _verticalSpeed = GROUNDED_VERTICAL_SPEED;
         else _verticalSpeed += _gravity * Time.deltaTime;
 
-        return _verticalSpeed;
+        _characterController.Move((HorizontalVelocity + Vector3.up * _verticalSpeed) * Time.deltaTime);
     }
 
     private void CacheComponent()
@@ -200,7 +143,11 @@ public class PlayerController : MonoBehaviour
 
     private void Init()
     {
-        _state = MoveState.Idle;
+        _stateMachine = new PlayerStateMachine();
+        _locomotionState = new PlayerLocomotionState(this);
+        _dashState = new PlayerDashState(this);
         _dashStack = MAX_DASH_STACK;
+
+        EnterLocomotion(false);
     }
 }
