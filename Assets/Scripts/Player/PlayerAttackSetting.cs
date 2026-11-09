@@ -18,6 +18,8 @@ public class PlayerAttackSetting
     [SerializeField, Min(0f)] private float _fadeTime = 0.1f;
     [Tooltip("[콤보 단계만 사용] 공격 동작이 끝난 뒤 이 시간 안에 공격하면 다음 단계로 이어진다")]
     [SerializeField, Min(0f)] private float _inputBuffer = 0.4f;
+    [Tooltip("대상에게 전진 거리보다 멀리 다가갈 때 하체에 달리기 모션을 덮을지 여부. 하체 동작이 중요한 모션이면 끈다")]
+    [SerializeField] private bool _useLegRun = true;
 
     public float EnergyGain => _energyGain;
     public float Power => _power;
@@ -25,4 +27,5 @@ public class PlayerAttackSetting
     public float AdvanceDuration => _advanceDuration;
     public float FadeTime => _fadeTime;
     public float InputBuffer => _inputBuffer;
+    public bool UseLegRun => _useLegRun;
 }

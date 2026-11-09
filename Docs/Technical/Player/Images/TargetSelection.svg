@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 640" width="680" height="640" font-family="sans-serif">
+  <rect x="0" y="0" width="680" height="640" fill="#f8f9fb"/>
+
+  <text x="24" y="34" font-size="18" font-weight="bold" fill="#1f2937">자동 조준 대상 선택 (위에서 본 모습)</text>
+
+  <!-- 록온 사거리 / 공격 사거리 -->
+  <circle cx="340" cy="300" r="200" fill="none" stroke="#0891b2" stroke-width="2" stroke-dasharray="8 6"/>
+  <circle cx="340" cy="300" r="115" fill="#fef3c7" fill-opacity="0.5" stroke="#d97706" stroke-width="2"/>
+  <text x="196" y="400" font-size="13" text-anchor="end" fill="#b45309">공격 사거리</text>
+  <text x="150" y="478" font-size="13" text-anchor="end" fill="#0e7490">록온 사거리</text>
+
+  <!-- 앞쪽 / 등 뒤 경계 -->
+  <line x1="110" y1="300" x2="570" y2="300" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="3 4"/>
+  <text x="96" y="292" font-size="14" font-weight="bold" fill="#374151">앞쪽</text>
+  <text x="96" y="320" font-size="14" font-weight="bold" fill="#374151">등 뒤</text>
+
+  <!-- 화면 중앙선 -->
+  <line x1="340" y1="520" x2="340" y2="70" stroke="#2563eb" stroke-width="2.5"/>
+  <polygon points="340,62 333,78 347,78" fill="#2563eb"/>
+  <text x="350" y="76" font-size="13" fill="#1d4ed8">화면 중앙선</text>
+
+  <!-- 카메라 -->
+  <rect x="324" y="505" width="32" height="22" rx="4" fill="#374151"/>
+  <text x="364" y="522" font-size="13" fill="#1f2937">카메라</text>
+
+  <!-- 플레이어 -->
+  <circle cx="340" cy="300" r="12" fill="#16a34a"/>
+  <text x="290" y="337" font-size="13" fill="#15803d">플레이어</text>
+
+  <!-- 적 A : 선택 -->
+  <line x1="385" y1="225" x2="340" y2="225" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="385" cy="225" r="17" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+  <circle cx="385" cy="225" r="10" fill="#dc2626"/>
+  <text x="408" y="221" font-size="13" font-weight="bold" fill="#b91c1c">적 A · 선택</text>
+  <text x="408" y="238" font-size="12" fill="#7f1d1d">중앙선까지 가장 가까움</text>
+
+  <!-- 적 B -->
+  <line x1="278" y1="215" x2="340" y2="215" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="278" cy="215" r="10" fill="#f87171"/>
+  <text x="258" y="212" font-size="13" text-anchor="end" fill="#7f1d1d">적 B</text>
+  <text x="258" y="228" font-size="12" text-anchor="end" fill="#6b7280">중앙선에서 멂</text>
+
+  <!-- 적 C : 등 뒤 -->
+  <circle cx="346" cy="385" r="10" fill="#fca5a5" stroke="#b91c1c" stroke-width="1.5"/>
+  <text x="364" y="381" font-size="13" fill="#7f1d1d">적 C · 등 뒤</text>
+  <text x="364" y="398" font-size="12" fill="#6b7280">앞쪽에 적이 없을 때만 선택</text>
+
+  <!-- 설명 -->
+  <rect x="24" y="552" width="632" height="70" rx="6" fill="#ffffff" stroke="#d1d5db"/>
+  <text x="40" y="576" font-size="12.5" fill="#1f2937">1. 공격 사거리 안의 적을 모은다</text>
+  <text x="40" y="598" font-size="12.5" fill="#1f2937">2. 앞쪽 적 중 중앙선에 가장 가까운 적을 고른다</text>
+  <text x="360" y="576" font-size="12.5" fill="#1f2937">3. 앞쪽이 비면 등 뒤에서 가장 가까운 적</text>
+  <text x="360" y="598" font-size="12" fill="#6b7280">점선 : 중앙선까지의 거리</text>
+</svg>

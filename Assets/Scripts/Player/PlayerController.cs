@@ -5,10 +5,14 @@ using UnityEngine.InputSystem;
 // 플레이어의 공용 데이터(입력 · 수치 · 대시 스택 · 콤보 · 차지 · 스킬 · 중력)와 상태 전환을 맡는다.
 // 실제 동작은 상태 클래스(이동 · 대시 · 공격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
-[RequireComponent(typeof(CharacterController), typeof(PlayerEnergy))]
+[RequireComponent(typeof(CharacterController), typeof(PlayerEnergy), typeof(PlayerTargeting))]
 public class PlayerController : MonoBehaviour
 {
     private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
+    private static readonly int LEG_RUN_ANIMATION = Animator.StringToHash("LegRun");
+
+    // Animator Controller 의 하체 달리기 레이어 이름과 같아야 한다. 하체만 덮는 Avatar Mask 를 씌운 레이어다.
+    private const string LEG_RUN_LAYER_NAME = "LegRun";
 
     private const int MAX_DASH_STACK = 2;
     // 한 번의 타격 판정에서 검사할 수 있는 최대 콜라이더 수
@@ -60,6 +64,8 @@ public class PlayerController : MonoBehaviour
     [Tooltip("타격 판정 상자의 중심 (캐릭터 기준 위치)")]
     [SerializeField] private Vector3 _hitBoxCenter = new Vector3(0f, 1f, 1f);
     [SerializeField] private Vector3 _hitBoxSize = new Vector3(1.5f, 1.5f, 2f);
+    [Tooltip("공격 대상에게 다가갈 때 대상 중심에서 이 거리만큼 앞에서 멈춘다")]
+    [SerializeField, Min(0f)] private float _attackStopDistance = 1.2f;
 
     [Header("스킬")]
     [SerializeField] private PlayerAttackSetting _skill = new PlayerAttackSetting();
@@ -71,6 +77,7 @@ public class PlayerController : MonoBehaviour
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
     private CharacterController _characterController;
     private PlayerEnergy _energy;
+    private PlayerTargeting _targeting;
     private PlayerStateMachine _stateMachine;
     private PlayerLocomotionState _locomotionState;
     private PlayerDashState _dashState;
@@ -80,6 +87,8 @@ public class PlayerController : MonoBehaviour
     private float _turnVelocity;
     private float _comboExpireTime;
     private float _chargeTimer;
+    private float _legRunTargetWeight;
+    private int _legRunLayer;
     private int _dashStack;
     private int _nextComboStep;
     private bool _isCharging;
@@ -102,6 +111,7 @@ public class PlayerController : MonoBehaviour
         RechargeDashStack();
         _stateMachine.Tick();
         ApplyMovement();
+        UpdateLegRunWeight();
     }
     private void OnDrawGizmosSelected() => DrawHitBox();
 
@@ -147,7 +157,7 @@ public class PlayerController : MonoBehaviour
         return true;
     }
 
-    // 입력 버퍼 시간 안이면 다음 콤보 단계, 지났으면 1단부터 시작한다. 방향을 바꾸지 않고 바라보는 방향으로 공격한다.
+    // 입력 버퍼 시간 안이면 다음 콤보 단계, 지났으면 1단부터 시작한다. 공격 방향은 공격 상태에 들어갈 때 AimAttack 이 정한다.
     public void StartBasicAttack()
     {
         int step = Time.time <= _comboExpireTime ? _nextComboStep : 0;
@@ -181,6 +191,28 @@ public class PlayerController : MonoBehaviour
         else _attackState.Setup(PlayerAttackState.AttackType.Skill, 0, _skill);
 
         _stateMachine.ChangeState(_attackState);
+    }
+
+    // 공격을 시작할 때 몸을 돌릴 방향과 전진 거리를 정하고, 전진 거리를 돌려준다.
+    // 대상은 록온 대상을 우선하고, 록온 중이 아니면 공격 사거리 안의 자동 조준 대상을 쓴다.
+    // 대상이 있으면 대상 쪽으로 즉시 돌고, 대상 앞 정지 거리까지 다가간다. 다가가는 거리는 공격 사거리를 넘지 않는다.
+    // 그래서 록온 대상이 공격 사거리 밖에 있으면 공격 사거리만큼만 다가가고, 공격이 닿지 않을 수 있다.
+    // 대상이 없으면 canTurnToInput 일 때만 이동 입력 방향으로 돌고(입력이 없으면 그대로), 공격 설정의 전진 거리를 쓴다.
+    public float AimAttack(PlayerAttackSetting setting, bool canTurnToInput)
+    {
+        DummyEnemy target = _targeting.LockTarget != null ? _targeting.LockTarget : _targeting.FindTarget(_targeting.AttackRange);
+
+        if(target == null)
+        {
+            if(canTurnToInput) FaceImmediately(ReadMoveDirection());
+            return setting.AdvanceDistance;
+        }
+
+        Vector3 toTarget = target.transform.position - transform.position;
+        toTarget.y = 0f;
+        FaceImmediately(toTarget);
+
+        return Mathf.Clamp(toTarget.magnitude - _attackStopDistance, 0f, _targeting.AttackRange);
     }
 
     public void BeginCharge()
@@ -251,6 +283,16 @@ public class PlayerController : MonoBehaviour
         _animator.SetFloat(SPEED_PARAMETER, speed, SPEED_DAMP_TIME, Time.deltaTime);
     }
 
+    // 공격 대상에게 멀리 다가가는 동안 하체에 달리기 모션을 덮는다. 상체는 공격 모션을 그대로 재생한다.
+    // 레이어 비중은 즉시 바꾸지 않고 UpdateLegRunWeight 가 섞는 시간에 걸쳐 따라가게 해 모션이 튀지 않게 한다.
+    public void SetLegRun(bool isRunning)
+    {
+        // 꺼져 있다가 켜질 때만 달리기를 처음부터 재생한다. 콤보가 이어지며 다시 켜질 때 발이 끊기지 않게 하기 위해서다.
+        if(isRunning && _legRunTargetWeight == 0f) _animator.Play(LEG_RUN_ANIMATION, _legRunLayer, 0f);
+
+        _legRunTargetWeight = isRunning ? 1f : 0f;
+    }
+
     // 이동 상태로 돌아가면 진행 중이던 차지는 끊는다.
     public void EnterLocomotion(bool startRunning)
     {
@@ -291,6 +333,13 @@ public class PlayerController : MonoBehaviour
         if(_dashStack >= MAX_DASH_STACK) _dashCooldownTimer = 0f;
     }
 
+    private void UpdateLegRunWeight()
+    {
+        float weight = Mathf.MoveTowards(_animator.GetLayerWeight(_legRunLayer), _legRunTargetWeight, Time.deltaTime / ANIMATION_FADE_TIME);
+
+        _animator.SetLayerWeight(_legRunLayer, weight);
+    }
+
     private void ApplyMovement()
     {
         if(_characterController.isGrounded && _verticalSpeed < 0f) _verticalSpeed = GROUNDED_VERTICAL_SPEED;
@@ -311,6 +360,7 @@ public class PlayerController : MonoBehaviour
     {
         _characterController = GetComponent<CharacterController>();
         _energy = GetComponent<PlayerEnergy>();
+        _targeting = GetComponent<PlayerTargeting>();
     }
 
     private void Init()
@@ -320,6 +370,7 @@ public class PlayerController : MonoBehaviour
         _dashState = new PlayerDashState(this);
         _attackState = new PlayerAttackState(this);
         _dashStack = MAX_DASH_STACK;
+        _legRunLayer = _animator.GetLayerIndex(LEG_RUN_LAYER_NAME);
 
         EnterLocomotion(false);
     }

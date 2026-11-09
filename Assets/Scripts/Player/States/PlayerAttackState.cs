@@ -3,7 +3,7 @@ using UnityEngine;
 // 공격 상태. 기본 공격(콤보) · 강공격 · 스킬 · 특수스킬이 같은 흐름을 쓴다.
 // 흐름 : 휘두르기 → (공격 동작 끝) → 선입력이 있으면 다음 단계 / 이동 입력이 있으면 이동 / 없으면 후딜 → (후딜 끝) → 대기
 // 후딜 중 공격 입력은 콤보를 이어가고, 스킬 입력은 스킬을 쓰며, 이동 입력은 후딜을 끊는다. 대시는 언제든 공격을 끊는다.
-// 휘두르기 시작부터 공격 설정의 전진 시간 동안 바라보는 방향으로 나아간다.
+// 시작할 때 대상 · 입력에 따라 방향과 전진 거리를 정하고, 휘두르기 시작부터 공격 설정의 전진 시간 동안 그 방향으로 나아간다.
 public class PlayerAttackState : PlayerState
 {
     // Animator Controller 의 상태 이름과 같아야 한다. 기본 공격은 "BasicAttack 1", "BasicAttack 2" ... 순서다.
@@ -60,11 +60,20 @@ public class PlayerAttackState : PlayerState
         _isComboInputOpen = false;
         _hasBufferedInput = false;
         _advanceTimer = 0f;
-        _advanceVelocity = Controller.transform.forward * (_setting.AdvanceDistance / _setting.AdvanceDuration);
 
+        // 콤보 2단부터는 이동 입력으로 방향을 바꾸지 않는다. 콤보 도중 방향이 휙휙 바뀌면 모션이 어색하기 때문이다.
+        bool canTurnToInput = _type != AttackType.Basic || _step == 0;
+        float advanceDistance = Controller.AimAttack(_setting, canTurnToInput);
+
+        _advanceVelocity = Controller.transform.forward * (advanceDistance / _setting.AdvanceDuration);
+
+        // 공격 설정의 전진 거리보다 멀리 다가가야 하면 다가가는 동안 하체에 달리기 모션을 보여준다. 공격마다 끌 수 있다.
+        Controller.SetLegRun(_setting.UseLegRun && advanceDistance > _setting.AdvanceDistance);
         Controller.HorizontalVelocity = _advanceVelocity;
         Controller.PlayAnimation(_animationHash, _setting.FadeTime);
     }
+
+    public override void Exit() => Controller.SetLegRun(false);
 
     public override void Tick()
     {
@@ -126,12 +135,15 @@ public class PlayerAttackState : PlayerState
         }
     }
 
-    // 전진 시간 동안만 앞으로 나아가고, 그 뒤에는 제자리에 멈춘다.
+    // 전진 시간 동안만 앞으로 나아가고, 그 뒤에는 제자리에 멈추며 하체 달리기도 끈다.
     private Vector3 UpdateAdvance()
     {
         _advanceTimer += Time.deltaTime;
 
-        return _advanceTimer < _setting.AdvanceDuration ? _advanceVelocity : Vector3.zero;
+        if(_advanceTimer < _setting.AdvanceDuration) return _advanceVelocity;
+
+        Controller.SetLegRun(false);
+        return Vector3.zero;
     }
 
     // 마무리 공격 중이거나 스킬을 휘두르는 중이면 공격 입력을 받지 않는다. 차지도 시작하지 않는다.
