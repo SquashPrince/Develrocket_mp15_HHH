@@ -192,10 +192,9 @@ public class PlayerController : MonoBehaviour
         _stateMachine.ChangeState(_attackState);
     }
 
-    // 완벽 회피 슬로모션 중 공격 입력으로 회피 반격을 시작한다. 반격을 시작하면 슬로모션은 바로 끝난다.
+    // 완벽 회피 슬로모션 중 공격 입력으로 회피 반격을 시작한다. 슬로모션은 공격 상태에 들어가면서 끝난다.
     public void StartDodgeCounter()
     {
-        _slowMotion.End();
         _isCharging = false;
         _comboExpireTime = 0f;
         _attackState.Setup(PlayerAttackState.AttackType.DodgeCounter, 0, _dodgeCounter);
@@ -258,6 +257,9 @@ public class PlayerController : MonoBehaviour
 
         return Mathf.Clamp(toTarget.magnitude - _attackStopDistance, 0f, _targeting.AttackRange);
     }
+
+    // 완벽 회피 슬로모션이 남아 있으면 끝낸다. 어떤 공격이든 시작하면 슬로모션은 끝난다.
+    public void EndSlowMotion() => _slowMotion.End();
 
     public void BeginCharge()
     {
