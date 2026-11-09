@@ -75,6 +75,46 @@
                     "interactions": "",
                     "initialStateCheck": false,
                     "priority": 0
+                },
+                {
+                    "name": "Ultimate",
+                    "type": "Button",
+                    "id": "e398fbfb-196b-479a-afd1-ba10d19fffb7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "ParryPrevious",
+                    "type": "Button",
+                    "id": "555dc427-d955-43cf-bdb1-8c68c0f0faf5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "ParryNext",
+                    "type": "Button",
+                    "id": "17ea26c2-3ac0-4048-8ecd-8944b8743723",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "DebugGroggy",
+                    "type": "Button",
+                    "id": "8749c8be-4f5a-49ca-aac1-76aceef66431",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
                 }
             ],
             "bindings": [
@@ -190,28 +230,6 @@
                 },
                 {
                     "name": "",
-                    "id": "1635d3fe-58b6-4ba9-a4e2-f4b964f6b5c8",
-                    "path": "<XRController>/{Primary2DAxis}",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "XR",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "3ea4d645-4504-4529-b061-ab81934c3752",
-                    "path": "<Joystick>/stick",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Joystick",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "c1f7a91b-d0fd-4a62-997e-7fb9b69bf235",
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
@@ -228,17 +246,6 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse;Touch",
-                    "action": "Look",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "3e5f5442-8668-4b27-a940-df99bad7e831",
-                    "path": "<Joystick>/{Hatswitch}",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Joystick",
                     "action": "Look",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -268,7 +275,7 @@
                 {
                     "name": "",
                     "id": "de6a0f51-d5a2-4f37-92d7-c8ff36341cc0",
-                    "path": "<Gamepad>/rightTrigger",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
@@ -304,7 +311,7 @@
                     "path": "<SwitchJoyConLHID>/leftStick",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Switch",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -315,7 +322,7 @@
                     "path": "<SwitchJoyConRHID>/rightStick",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Switch",
                     "action": "Look",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -323,10 +330,10 @@
                 {
                     "name": "",
                     "id": "15312368-b0e6-40db-a5fa-047671e1f682",
-                    "path": "<SwitchJoyConRHID>/rightTrigger",
+                    "path": "<SwitchJoyConRHID>/buttonSouth",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Switch",
                     "action": "Dash",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -337,7 +344,7 @@
                     "path": "<SwitchJoyConRHID>/start",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Switch",
                     "action": "Pause",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -356,7 +363,7 @@
                 {
                     "name": "",
                     "id": "4645e9a5-e80f-4b38-93a3-3281cc6f73c9",
-                    "path": "<Gamepad>/buttonWest",
+                    "path": "<Gamepad>/buttonEast",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
@@ -367,10 +374,10 @@
                 {
                     "name": "",
                     "id": "1d22a2d1-fdab-45d3-90bc-64c53d2113f6",
-                    "path": "<SwitchJoyConRHID>/buttonWest",
+                    "path": "<SwitchJoyConRHID>/buttonEast",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Switch",
                     "action": "Attack",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -392,7 +399,18 @@
                     "path": "<SwitchJoyConRHID>/buttonNorth",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Switch",
+                    "action": "Skill",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4c61b71f-3d0a-4a1b-95c5-b7bc71f388d9",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
                     "action": "Skill",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -405,6 +423,138 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "LockOn",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "407d7161-459f-4683-b68e-1538ab66cf8c",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "LockOn",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "70d57647-e016-41ec-8842-336f045396a4",
+                    "path": "<SwitchJoyConRHID>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Switch",
+                    "action": "LockOn",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9dcb8991-78ce-4f89-8e04-d65f7189786e",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Ultimate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "112b1928-1c7f-4c78-82fb-1de456888615",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Ultimate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "74537198-ee9d-428b-a69f-580ecc34e6ab",
+                    "path": "<SwitchJoyConRHID>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Switch",
+                    "action": "Ultimate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "af7a9768-5c40-45d7-8134-bcea1a6d54b0",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ParryPrevious",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "376a5a52-92c9-4a68-b6d1-23cc395bd8d0",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "ParryPrevious",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3a7f381f-4a2d-4081-8fe3-8c10b63418f8",
+                    "path": "<SwitchJoyConLHID>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Switch",
+                    "action": "ParryPrevious",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "dbc92770-115e-4a36-b0bf-1434348d58bc",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ParryNext",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "49c4cc47-0ee4-401d-94ab-4048ab542017",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "ParryNext",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0d51855d-127b-4ce2-aeb5-bbe9de162f1d",
+                    "path": "<SwitchJoyConRHID>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Switch",
+                    "action": "ParryNext",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5b2e8f43-7c1a-4d96-b0e7-3f9a6c4d2e81",
+                    "path": "<Keyboard>/0",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "DebugGroggy",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -960,6 +1110,22 @@
             "devices": [
                 {
                     "devicePath": "<Gamepad>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "Switch",
+            "bindingGroup": "Switch",
+            "devices": [
+                {
+                    "devicePath": "<SwitchJoyConLHID>",
+                    "isOptional": false,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<SwitchJoyConRHID>",
                     "isOptional": false,
                     "isOR": false
                 }

@@ -31923,6 +31923,8 @@ MonoBehaviour:
     _fadeTime: 0.1
     _inputBuffer: 0.05
     _useLegRun: 1
+    _alwaysLegRun: 0
+    _canDashCancel: 1
   - _energyGain: 1.25
     _power: 10
     _advanceDistance: 0.75
@@ -31930,6 +31932,8 @@ MonoBehaviour:
     _fadeTime: 0.2
     _inputBuffer: 0.1
     _useLegRun: 1
+    _alwaysLegRun: 0
+    _canDashCancel: 1
   - _energyGain: 1.25
     _power: 10
     _advanceDistance: 4.5
@@ -31937,6 +31941,8 @@ MonoBehaviour:
     _fadeTime: 0.1
     _inputBuffer: 0.1
     _useLegRun: 0
+    _alwaysLegRun: 0
+    _canDashCancel: 0
   - _energyGain: 1.25
     _power: 10
     _advanceDistance: 1.5
@@ -31944,6 +31950,8 @@ MonoBehaviour:
     _fadeTime: 0.2
     _inputBuffer: 0
     _useLegRun: 0
+    _alwaysLegRun: 0
+    _canDashCancel: 1
   _heavyAttack:
     _energyGain: 5
     _power: 10
@@ -31952,10 +31960,32 @@ MonoBehaviour:
     _fadeTime: 0.1
     _inputBuffer: 0
     _useLegRun: 0
+    _alwaysLegRun: 0
+    _canDashCancel: 0
   _chargeTime: 0.6
   _hitBoxCenter: {x: 0, y: 1, z: 0.5}
   _hitBoxSize: {x: 1.5, y: 1.5, z: 1}
   _attackStopDistance: 1.2
+  _dashAttack:
+    _energyGain: 1.25
+    _power: 10
+    _advanceDistance: 1.5
+    _advanceDuration: 0.25
+    _fadeTime: 0.2
+    _inputBuffer: 0.1
+    _useLegRun: 1
+    _alwaysLegRun: 1
+    _canDashCancel: 1
+  _dodgeCounter:
+    _energyGain: 5
+    _power: 10
+    _advanceDistance: 1.5
+    _advanceDuration: 0.15
+    _fadeTime: 0.1
+    _inputBuffer: 0.4
+    _useLegRun: 0
+    _alwaysLegRun: 0
+    _canDashCancel: 0
   _skill:
     _energyGain: 5
     _power: 10
@@ -31964,6 +31994,8 @@ MonoBehaviour:
     _fadeTime: 0.1
     _inputBuffer: 0.4
     _useLegRun: 0
+    _alwaysLegRun: 0
+    _canDashCancel: 1
   _specialSkill:
     _energyGain: 5
     _power: 10
@@ -31972,7 +32004,10 @@ MonoBehaviour:
     _fadeTime: 0.1
     _inputBuffer: 0.4
     _useLegRun: 0
+    _alwaysLegRun: 0
+    _canDashCancel: 1
   _specialSkillEnergyCost: 60
+  _testAlwaysPerfectDodge: 0
 --- !u!114 &6322618722868687519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32004,7 +32039,11 @@ MonoBehaviour:
   _lockOnMarker: {fileID: 0}
   _attackRange: 15
   _lockOnRange: 20
-  _markerHeight: 2.5
+  _obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  _sightHeight: 1.2
+  _markerHeight: 1.5
 --- !u!1 &7306636993918616150
 GameObject:
   m_ObjectHideFlags: 0
