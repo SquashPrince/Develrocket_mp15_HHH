@@ -17,6 +17,8 @@ public class LockOnCamera : MonoBehaviour
     [SerializeField, Min(0f)] private float _turnTime = 0.2f;
     [Tooltip("Target Group 에서 록온 대상의 반경. 화면에 담을 대상의 크기")]
     [SerializeField, Min(0f)] private float _targetRadius = 1f;
+    [Tooltip("벽에 가려졌던 록온 대상이 다시 보일 때 원래 구도로 돌아오는 시간(초). 가려질 때는 즉시 플레이어 기준으로 바뀐다")]
+    [SerializeField, Min(0.01f)] private float _blockedBlendTime = 0.5f;
 
     private Transform _groupedTarget;
     private float _yawVelocity;
@@ -37,6 +39,20 @@ public class LockOnCamera : MonoBehaviour
 
         // 각도를 -180 ~ 180 범위로 맞춰 축의 범위를 벗어나지 않게 한다.
         _orbitalFollow.HorizontalAxis.Value = Mathf.DeltaAngle(0f, yaw);
+
+        UpdateTargetWeight();
+    }
+
+    // 록온 대상이 벽에 가려지면 Target Group 에서 대상의 비중을 즉시 0 으로 내려 카메라가 플레이어를 바라보게 하고,
+    // 다시 보이면 서서히 1 로 되돌린다. 카메라 각도는 계속 대상 쪽을 향한다.
+    // 바라보는 지점(플레이어와 대상의 중간)이 벽 너머로 가면 Deoccluder 가 카메라를 벽 앞까지 당겨 플레이어가 화면에서 사라지기 때문이다.
+    // 가려질 때 서서히 내리면 그동안 바라보는 지점이 벽 너머에 남아 카메라가 벽 앞으로 갔다가 돌아오므로 즉시 내린다.
+    private void UpdateTargetWeight()
+    {
+        CinemachineTargetGroup.Target member = _targetGroup.Targets[_targetGroup.FindMember(_groupedTarget)];
+
+        if(_targeting.IsLockTargetBlocked) member.Weight = 0f;
+        else member.Weight = Mathf.MoveTowards(member.Weight, 1f, Time.deltaTime / _blockedBlendTime);
     }
 
     // 록온 대상이 바뀌면 Target Group 의 대상을 바꾸고, 록온 여부에 따라 록온 카메라를 켜고 끈다.

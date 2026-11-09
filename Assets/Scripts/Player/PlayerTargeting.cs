@@ -25,15 +25,25 @@ public class PlayerTargeting : MonoBehaviour
     [Tooltip("록온 사거리. 이 안의 적을 록온할 수 있고, 록온 대상이 이보다 멀어지면 록온이 풀린다")]
     [SerializeField, Min(0f)] private float _lockOnRange = 12f;
 
+    [Header("가림 판정")]
+    [Tooltip("플레이어와 적 사이를 막는 장애물 Layer. Player · Enemy Layer 는 빼야 플레이어 몸이나 다른 적을 벽으로 보지 않는다")]
+    [SerializeField] private LayerMask _obstacleLayers;
+    [Tooltip("가림 판정 선을 시작하는 높이 (플레이어 발밑 기준, 가슴 높이 정도)")]
+    [SerializeField, Min(0f)] private float _sightHeight = 1.2f;
+
     [Header("록온 표시")]
     [Tooltip("록온 표시를 대상 위치에서 이만큼 위에 띄운다")]
     [SerializeField] private float _markerHeight = 2.5f;
 
     private readonly Collider[] _candidateColliders = new Collider[MAX_CANDIDATE_COLLIDERS];
     private Camera _camera;
+    private Collider _lockTargetCollider;
     private DummyEnemy _lockTarget;
+    private bool _isLockTargetBlocked;
 
     public DummyEnemy LockTarget => _lockTarget;
+    // 록온 대상이 벽에 가려져 있는지. 가려져도 록온은 유지하며, 록온 카메라가 구도를 바꾸는 데 쓴다.
+    public bool IsLockTargetBlocked => _isLockTargetBlocked;
     public float AttackRange => _attackRange;
     public float LockOnRange => _lockOnRange;
 
@@ -46,6 +56,7 @@ public class PlayerTargeting : MonoBehaviour
     // 플레이어 앞쪽(카메라가 보는 방향 기준)의 적 중 카메라 중앙 레이와 가장 가까운 적을 우선한다.
     // 앞쪽에 적이 없을 때만 등 뒤의 적 중 플레이어와 가장 가까운 적을 고른다.
     // 등 뒤의 적은 카메라와 플레이어 사이에 있어 레이와의 거리가 거의 0 이 되므로, 같은 기준으로 비교하면 앞의 적보다 먼저 뽑히기 때문이다.
+    // 플레이어와 적 사이가 벽으로 막힌 적은 고르지 않는다. 막힌 적에게 다가가면 벽에 박히기 때문이다.
     // onlyOnScreen : true 면 중심이 화면 안에 보이는 적만 고른다. 록온에 쓴다.
     public DummyEnemy FindTarget(float range, bool onlyOnScreen = false)
     {
@@ -66,6 +77,8 @@ public class PlayerTargeting : MonoBehaviour
             Vector3 enemyCenter = _candidateColliders[i].bounds.center;
 
             if(onlyOnScreen && !IsOnScreen(enemyCenter)) continue;
+
+            if(IsBlocked(enemyCenter)) continue;
 
             // 크기 비교만 하므로 제곱근 없이 거리의 제곱으로 비교한다.
             if(Vector3.Dot(rayDirection, enemyCenter - transform.position) < 0f)
@@ -91,7 +104,7 @@ public class PlayerTargeting : MonoBehaviour
         return frontEnemy != null ? frontEnemy : backEnemy;
     }
 
-    // 록온 입력마다 록온과 해제를 번갈아 하고, 록온 중이면 거리 확인과 표시 위치 갱신을 한다.
+    // 록온 입력마다 록온과 해제를 번갈아 하고, 록온 중이면 거리 확인 · 가림 확인 · 표시 위치 갱신을 한다.
     // 록온 사거리 안에 적이 없으면 록온 입력은 아무 일도 하지 않는다.
     private void UpdateLockOn()
     {
@@ -109,6 +122,8 @@ public class PlayerTargeting : MonoBehaviour
             return;
         }
 
+        // 가림 판정은 대상 찾기와 같게 콜라이더 중심을 쓴다. 대상의 위치(발밑일 수 있음)를 쓰면 바닥에 막혀 항상 가려진 것으로 판정될 수 있다.
+        _isLockTargetBlocked = IsBlocked(_lockTargetCollider.bounds.center);
         _lockOnMarker.position = _lockTarget.transform.position + Vector3.up * _markerHeight;
     }
 
@@ -121,9 +136,19 @@ public class PlayerTargeting : MonoBehaviour
         return viewport.z > 0f && viewport.x >= 0f && viewport.x <= 1f && viewport.y >= 0f && viewport.y <= 1f;
     }
 
+    // 플레이어 가슴 높이에서 적 중심까지 선을 그어 장애물 Layer 에 닿으면 막힌 것으로 본다.
+    private bool IsBlocked(Vector3 position)
+    {
+        Vector3 sightOrigin = transform.position + Vector3.up * _sightHeight;
+
+        return Physics.Linecast(sightOrigin, position, _obstacleLayers, QueryTriggerInteraction.Ignore);
+    }
+
     private void SetLockTarget(DummyEnemy target)
     {
         _lockTarget = target;
+        _lockTargetCollider = target != null ? target.GetComponentInChildren<Collider>() : null;
+        _isLockTargetBlocked = false;
         _lockOnMarker.gameObject.SetActive(target != null);
     }
 

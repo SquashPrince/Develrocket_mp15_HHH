@@ -234,7 +234,7 @@ MonoBehaviour:
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
   TargetOffset: {x: 0, y: 1.25, z: 0}
-  Damping: {x: 0.5, y: 0.5}
+  Damping: {x: 0, y: 0}
   Lookahead:
     Enabled: 0
     Time: 0
@@ -255,7 +255,7 @@ MonoBehaviour:
   TargetOffset: {x: 0, y: 1.2, z: 0}
   TrackerSettings:
     BindingMode: 4
-    PositionDamping: {x: 0.5, y: 0.5, z: 0.5}
+    PositionDamping: {x: 0, y: 0, z: 0}
     AngularDampingMode: 0
     RotationDamping: {x: 1, y: 1, z: 1}
     QuaternionDamping: 1
@@ -1899,6 +1899,10 @@ PrefabInstance:
       propertyPath: _lockOnMarker
       value: 
       objectReference: {fileID: 661978076}
+    - target: {fileID: 7492969571146502241, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _markerHeight
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 7492969571146502241, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
       propertyPath: _cameraTransform
       value: 
