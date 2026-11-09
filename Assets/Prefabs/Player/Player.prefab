@@ -31837,9 +31837,10 @@ GameObject:
   - component: {fileID: 2670921355424890680}
   - component: {fileID: 3848066476718012999}
   - component: {fileID: 6322618722868687519}
-  m_Layer: 0
+  - component: {fileID: 7492969571146502241}
+  m_Layer: 7
   m_Name: Player
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -31905,8 +31906,8 @@ MonoBehaviour:
   _animator: {fileID: 3735240450347513969}
   _walkSpeed: 5
   _runSpeed: 15
-  _turnTime: 0.15
-  _autoRunDelay: 1.5
+  _turnTime: 0.1
+  _autoRunDelay: 1
   _gravity: -20
   _dashDistance: 2.5
   _dashDuration: 0.25
@@ -31921,48 +31922,56 @@ MonoBehaviour:
     _advanceDuration: 0.35
     _fadeTime: 0.1
     _inputBuffer: 0.05
+    _useLegRun: 1
   - _energyGain: 1.25
     _power: 10
     _advanceDistance: 0.75
     _advanceDuration: 0.25
     _fadeTime: 0.2
     _inputBuffer: 0.1
+    _useLegRun: 1
   - _energyGain: 1.25
     _power: 10
     _advanceDistance: 4.5
     _advanceDuration: 0.85
     _fadeTime: 0.1
-    _inputBuffer: 0.05
+    _inputBuffer: 0.1
+    _useLegRun: 0
   - _energyGain: 1.25
     _power: 10
     _advanceDistance: 1.5
     _advanceDuration: 0.35
     _fadeTime: 0.2
     _inputBuffer: 0
+    _useLegRun: 0
   _heavyAttack:
     _energyGain: 5
     _power: 10
     _advanceDistance: 3.5
     _advanceDuration: 1
     _fadeTime: 0.1
-    _inputBuffer: 0.4
+    _inputBuffer: 0
+    _useLegRun: 0
   _chargeTime: 0.6
   _hitBoxCenter: {x: 0, y: 1, z: 0.5}
   _hitBoxSize: {x: 1.5, y: 1.5, z: 1}
+  _attackStopDistance: 1.2
   _skill:
     _energyGain: 5
     _power: 10
-    _advanceDistance: 5
-    _advanceDuration: 0.925
+    _advanceDistance: 7.5
+    _advanceDuration: 0.6
     _fadeTime: 0.1
     _inputBuffer: 0.4
+    _useLegRun: 0
   _specialSkill:
     _energyGain: 5
     _power: 10
-    _advanceDistance: 5
-    _advanceDuration: 2
+    _advanceDistance: 7.5
+    _advanceDuration: 1.25
     _fadeTime: 0.1
     _inputBuffer: 0.4
+    _useLegRun: 0
   _specialSkillEnergyCost: 60
 --- !u!114 &6322618722868687519
 MonoBehaviour:
@@ -31978,6 +31987,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEnergy
   _maxEnergy: 120
   _regenPerSecond: 1
+--- !u!114 &7492969571146502241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7306029376340620380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d16b8cc6c2cb09b4990c4e01cbb45567, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerTargeting
+  _lockOnAction: {fileID: 694580335105051867, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _cameraTransform: {fileID: 0}
+  _lockOnMarker: {fileID: 0}
+  _attackRange: 15
+  _lockOnRange: 20
+  _markerHeight: 2.5
 --- !u!1 &7306636993918616150
 GameObject:
   m_ObjectHideFlags: 0

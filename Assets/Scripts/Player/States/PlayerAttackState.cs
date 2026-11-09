@@ -67,9 +67,13 @@ public class PlayerAttackState : PlayerState
 
         _advanceVelocity = Controller.transform.forward * (advanceDistance / _setting.AdvanceDuration);
 
+        // 공격 설정의 전진 거리보다 멀리 다가가야 하면 다가가는 동안 하체에 달리기 모션을 보여준다. 공격마다 끌 수 있다.
+        Controller.SetLegRun(_setting.UseLegRun && advanceDistance > _setting.AdvanceDistance);
         Controller.HorizontalVelocity = _advanceVelocity;
         Controller.PlayAnimation(_animationHash, _setting.FadeTime);
     }
+
+    public override void Exit() => Controller.SetLegRun(false);
 
     public override void Tick()
     {
@@ -131,12 +135,15 @@ public class PlayerAttackState : PlayerState
         }
     }
 
-    // 전진 시간 동안만 앞으로 나아가고, 그 뒤에는 제자리에 멈춘다.
+    // 전진 시간 동안만 앞으로 나아가고, 그 뒤에는 제자리에 멈추며 하체 달리기도 끈다.
     private Vector3 UpdateAdvance()
     {
         _advanceTimer += Time.deltaTime;
 
-        return _advanceTimer < _setting.AdvanceDuration ? _advanceVelocity : Vector3.zero;
+        if(_advanceTimer < _setting.AdvanceDuration) return _advanceVelocity;
+
+        Controller.SetLegRun(false);
+        return Vector3.zero;
     }
 
     // 마무리 공격 중이거나 스킬을 휘두르는 중이면 공격 입력을 받지 않는다. 차지도 시작하지 않는다.
