@@ -3,9 +3,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // 플레이어의 공용 데이터(입력 · 수치 · 대시 스택 · 콤보 · 차지 · 스킬 · 중력)와 상태 전환을 맡는다.
-// 실제 동작은 상태 클래스(이동 · 대시 · 공격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
+// 실제 동작은 상태 클래스(이동 · 대시 · 공격 · 피격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController), typeof(PlayerEnergy), typeof(PlayerTargeting))]
+[RequireComponent(typeof(PlayerHealth))]
 public class PlayerController : MonoBehaviour
 {
     private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
@@ -54,6 +55,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float _dashCooldown = 1f;
     [Tooltip("대시 · 회피 시작 후 다음 대시를 쓸 수 있기까지의 시간. 지속시간보다 길게 설정하면 지속시간을 기준으로 한다")]
     [SerializeField, Min(0f)] private float _dashChainInterval = 0.2f;
+    [Tooltip("대시 · 회피 시작부터 적 공격에 맞지 않는 시간(초). 대시와 회피가 같은 값을 쓴다")]
+    [SerializeField, Min(0f)] private float _dashInvincibleTime = 0.15f;
 
     [Header("공격")]
     [Tooltip("콤보 단계별 설정. 배열 크기가 콤보 단수이며, Animator 에 \"BasicAttack 1\" 부터 단수만큼 상태가 있어야 한다. 마지막 단계는 마무리 공격으로, 후딜이 끝날 때까지 공격 입력을 받지 않는다")]
@@ -92,6 +95,7 @@ public class PlayerController : MonoBehaviour
     private PlayerLocomotionState _locomotionState;
     private PlayerDashState _dashState;
     private PlayerAttackState _attackState;
+    private PlayerHitState _hitState;
     private float _dashCooldownTimer;
     private float _verticalSpeed;
     private float _turnVelocity;
@@ -105,6 +109,7 @@ public class PlayerController : MonoBehaviour
 
     // 상태가 이번 프레임에 정한 수평 속도. 매 프레임 상태 실행 뒤 중력과 함께 반영한다.
     public Vector3 HorizontalVelocity { get; set; }
+    public PlayerHealth Health { get; private set; }
     public bool WasDashPressed => _dashAction.action.WasPressedThisFrame();
     public bool WasAttackPressed => _attackAction.action.WasPressedThisFrame();
     public bool WasSkillPressed => _skillAction.action.WasPressedThisFrame();
@@ -113,6 +118,7 @@ public class PlayerController : MonoBehaviour
     public float RunSpeed => _runSpeed;
     public float AutoRunDelay => _autoRunDelay;
     public float DashChainInterval => _dashChainInterval;
+    public float DashInvincibleTime => _dashInvincibleTime;
     // 이번 대시 · 회피에서 완벽 회피에 성공했는지. 완벽 회피 구현 단계에서 실제 판정으로 바꾼다. 지금은 테스트 옵션 값이다.
     public bool IsPerfectDodge => _testAlwaysPerfectDodge;
 
@@ -196,6 +202,15 @@ public class PlayerController : MonoBehaviour
         _comboExpireTime = 0f;
         _attackState.Setup(PlayerAttackState.AttackType.DodgeCounter, 0, _dodgeCounter);
         _stateMachine.ChangeState(_attackState);
+    }
+
+    // 적 공격에 맞으면 어떤 상태에서든 피격 상태로 넘어간다. 진행 중이던 공격 · 차지는 끊고, 이후 콤보는 1단부터 시작한다.
+    public void StartHit(EnemyAttackSetting attack, Vector3 attackerPosition)
+    {
+        _isCharging = false;
+        _comboExpireTime = 0f;
+        _hitState.Setup(attack, attackerPosition);
+        _stateMachine.ChangeState(_hitState);
     }
 
     // 공격 동작이 끝난 시점에 다음 단계와, 다음 단계로 이어갈 수 있는 마감 시각을 정한다. 마지막 단계 다음은 1단이다.
@@ -341,7 +356,7 @@ public class PlayerController : MonoBehaviour
         _stateMachine.ChangeState(_attackState);
     }
 
-    private void FaceImmediately(Vector3 direction)
+    public void FaceImmediately(Vector3 direction)
     {
         if(direction == Vector3.zero) return;
 
@@ -392,6 +407,7 @@ public class PlayerController : MonoBehaviour
         _characterController = GetComponent<CharacterController>();
         _energy = GetComponent<PlayerEnergy>();
         _targeting = GetComponent<PlayerTargeting>();
+        Health = GetComponent<PlayerHealth>();
     }
 
     private void Init()
@@ -400,6 +416,7 @@ public class PlayerController : MonoBehaviour
         _locomotionState = new PlayerLocomotionState(this);
         _dashState = new PlayerDashState(this);
         _attackState = new PlayerAttackState(this);
+        _hitState = new PlayerHitState(this);
         _dashStack = MAX_DASH_STACK;
         _legRunLayer = _animator.GetLayerIndex(LEG_RUN_LAYER_NAME);
 
