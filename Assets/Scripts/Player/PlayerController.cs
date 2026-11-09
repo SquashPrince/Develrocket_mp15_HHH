@@ -67,11 +67,21 @@ public class PlayerController : MonoBehaviour
     [Tooltip("공격 대상에게 다가갈 때 대상 중심에서 이 거리만큼 앞에서 멈춘다")]
     [SerializeField, Min(0f)] private float _attackStopDistance = 1.2f;
 
+    [Header("대시 공격 · 회피 반격")]
+    [Tooltip("대시 · 회피 도중 공격 입력으로 나가는 공격")]
+    [SerializeField] private PlayerAttackSetting _dashAttack = new PlayerAttackSetting();
+    [Tooltip("완벽 회피 후 반격. 발동은 완벽 회피 구현 단계에서 연결한다")]
+    [SerializeField] private PlayerAttackSetting _dodgeCounter = new PlayerAttackSetting();
+
     [Header("스킬")]
     [SerializeField] private PlayerAttackSetting _skill = new PlayerAttackSetting();
     [SerializeField] private PlayerAttackSetting _specialSkill = new PlayerAttackSetting();
     [Tooltip("특수스킬에 필요한 에너지. 스킬 입력 시 에너지가 이보다 적으면 일반 스킬이 나간다")]
     [SerializeField, Min(0f)] private float _specialSkillEnergyCost = 60f;
+
+    [Header("테스트")]
+    [Tooltip("[완벽 회피 구현 전 임시] 켜면 대시 · 회피 중 공격 입력이 항상 완벽 회피에 성공한 것으로 보고 회피 반격이 나간다")]
+    [SerializeField] private bool _testAlwaysPerfectDodge;
 
     private readonly HashSet<DummyEnemy> _hitTargets = new HashSet<DummyEnemy>();
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
@@ -103,6 +113,8 @@ public class PlayerController : MonoBehaviour
     public float RunSpeed => _runSpeed;
     public float AutoRunDelay => _autoRunDelay;
     public float DashChainInterval => _dashChainInterval;
+    // 이번 대시 · 회피에서 완벽 회피에 성공했는지. 완벽 회피 구현 단계에서 실제 판정으로 바꾼다. 지금은 테스트 옵션 값이다.
+    public bool IsPerfectDodge => _testAlwaysPerfectDodge;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -164,6 +176,25 @@ public class PlayerController : MonoBehaviour
 
         _comboExpireTime = 0f;
         _attackState.Setup(PlayerAttackState.AttackType.Basic, step, _comboSteps[step]);
+        _stateMachine.ChangeState(_attackState);
+    }
+
+    // 대시 · 회피 도중 공격 입력으로 시작한다. 대시 공격 뒤의 콤보는 1단부터 다시 시작한다.
+    // 공격 키를 누르고 있으면 차지로 강공격이 이어지도록, 차지 시작은 호출한 쪽(대시 상태)이 한다.
+    public void StartDashAttack()
+    {
+        _isCharging = false;
+        _comboExpireTime = 0f;
+        _attackState.Setup(PlayerAttackState.AttackType.DashAttack, 0, _dashAttack);
+        _stateMachine.ChangeState(_attackState);
+    }
+
+    // 완벽 회피 후 회피 반격을 시작한다. 완벽 회피 구현 단계에서 회피 상태가 호출하도록 연결한다.
+    public void StartDodgeCounter()
+    {
+        _isCharging = false;
+        _comboExpireTime = 0f;
+        _attackState.Setup(PlayerAttackState.AttackType.DodgeCounter, 0, _dodgeCounter);
         _stateMachine.ChangeState(_attackState);
     }
 

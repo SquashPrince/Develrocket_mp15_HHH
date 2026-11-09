@@ -20,6 +20,10 @@ public class PlayerAttackSetting
     [SerializeField, Min(0f)] private float _inputBuffer = 0.4f;
     [Tooltip("대상에게 전진 거리보다 멀리 다가갈 때 하체에 달리기 모션을 덮을지 여부. 하체 동작이 중요한 모션이면 끈다")]
     [SerializeField] private bool _useLegRun = true;
+    [Tooltip("하체 달리기를 쓸 때, 대상과 거리에 상관없이 전진하는 동안 항상 하체 달리기를 보여줄지 여부 (대시 공격처럼 달려 나가는 공격)")]
+    [SerializeField] private bool _alwaysLegRun;
+    [Tooltip("휘두르는 중 대시 · 회피로 끊을 수 있는지. 끄면 휘두르기가 끝날 때까지 대시 입력을 무시한다. 후딜은 항상 끊을 수 있다")]
+    [SerializeField] private bool _canDashCancel = true;
 
     public float EnergyGain => _energyGain;
     public float Power => _power;
@@ -28,4 +32,6 @@ public class PlayerAttackSetting
     public float FadeTime => _fadeTime;
     public float InputBuffer => _inputBuffer;
     public bool UseLegRun => _useLegRun;
+    public bool AlwaysLegRun => _alwaysLegRun;
+    public bool CanDashCancel => _canDashCancel;
 }
