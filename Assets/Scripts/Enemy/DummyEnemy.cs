@@ -24,7 +24,8 @@ public class DummyEnemy : MonoBehaviour
     {
         if(_flashTimer <= 0f) return;
 
-        _flashTimer -= Time.deltaTime;
+        // 완벽 회피 슬로모션 동안 느려지도록 적 전용 시간을 쓴다.
+        _flashTimer -= EnemyTime.DeltaTime;
 
         if(_flashTimer <= 0f) _renderer.material.color = _originalColor;
     }

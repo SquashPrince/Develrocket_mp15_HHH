@@ -70,6 +70,9 @@ public class PlayerAttackState : PlayerState
         _hasBufferedInput = false;
         _advanceTimer = 0f;
 
+        // 완벽 회피 슬로모션은 피드백만 주고 과하지 않게, 회피 반격이든 다른 공격이든 공격을 시작하면 바로 끝낸다.
+        Controller.EndSlowMotion();
+
         // 콤보 2단부터는 이동 입력으로 방향을 바꾸지 않는다. 콤보 도중 방향이 휙휙 바뀌면 모션이 어색하기 때문이다.
         bool canTurnToInput = _type != AttackType.Basic || _step == 0;
         float advanceDistance = Controller.AimAttack(_setting, canTurnToInput);

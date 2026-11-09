@@ -38,7 +38,8 @@ public class DummyEnemyAttacker : MonoBehaviour
     {
         if(_attacks.Length == 0) return;
 
-        _timer -= Time.deltaTime;
+        // 완벽 회피 슬로모션 동안 느려지도록 적 전용 시간을 쓴다.
+        _timer -= EnemyTime.DeltaTime;
 
         if(_timer > 0f) return;
 

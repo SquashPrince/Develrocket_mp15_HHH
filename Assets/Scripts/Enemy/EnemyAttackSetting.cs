@@ -28,6 +28,8 @@ public class EnemyAttackSetting
     [Header("판정")]
     [Tooltip("패링할 수 있는 공격인지 여부 (패링 구현 단계에서 사용)")]
     [SerializeField] private bool _isParryable;
+    [Tooltip("대시 · 회피 무적 시간 안에 닿으면 완벽 회피(슬로모션)가 되는 공격인지 여부. 끄면 무적으로 무시만 된다")]
+    [SerializeField] private bool _canPerfectDodge = true;
     [Tooltip("판정 구의 중심 (적 기준 위치)")]
     [SerializeField] private Vector3 _hitCenter = new Vector3(0f, 1f, 1.2f);
     [SerializeField, Min(0f)] private float _hitRadius = 1.5f;
@@ -57,6 +59,7 @@ public class EnemyAttackSetting
     public Color TelegraphColor => _telegraphColor;
     public float TelegraphScale => _telegraphScale;
     public bool IsParryable => _isParryable;
+    public bool CanPerfectDodge => _canPerfectDodge;
     public Vector3 HitCenter => _hitCenter;
     public float HitRadius => _hitRadius;
     public float Power => _power;
