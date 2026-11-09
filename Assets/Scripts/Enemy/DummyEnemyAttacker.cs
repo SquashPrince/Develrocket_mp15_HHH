@@ -141,7 +141,7 @@ public class DummyEnemyAttacker : MonoBehaviour
 
             if(health == null) continue;
 
-            health.TakeHit(attack, transform.position);
+            health.TakeHit(attack, this);
             return;
         }
     }
@@ -150,7 +150,7 @@ public class DummyEnemyAttacker : MonoBehaviour
     {
         if(_isParryWindowOpen) return;
 
-        ParryWindow.Open();
+        ParryWindow.Open(this);
         _isParryWindowOpen = true;
     }
 
@@ -158,7 +158,7 @@ public class DummyEnemyAttacker : MonoBehaviour
     {
         if(!_isParryWindowOpen) return;
 
-        ParryWindow.Close();
+        ParryWindow.Close(this);
         _isParryWindowOpen = false;
     }
 

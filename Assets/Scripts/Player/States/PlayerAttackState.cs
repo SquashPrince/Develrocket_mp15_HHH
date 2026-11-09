@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// 공격 상태. 기본 공격(콤보) · 강공격 · 스킬 · 특수스킬 · 대시 공격 · 회피 반격이 같은 흐름을 쓴다.
+// 공격 상태. 기본 공격(콤보) · 강공격 · 스킬 · 특수스킬 · 대시 공격 · 회피 반격 · 패링 추격이 같은 흐름을 쓴다.
 // 흐름 : 휘두르기 → (공격 동작 끝) → 선입력이 있으면 다음 단계 / 이동 입력이 있으면 이동 / 없으면 후딜 → (후딜 끝) → 대기
 // 후딜 중 공격 입력은 콤보를 이어가고, 스킬 입력은 스킬을 쓰며, 이동 입력은 후딜을 끊는다.
 // 대시는 공격을 끊는다. 단, 공격 설정에서 대시 캔슬을 끈 공격은 휘두르는 동안 끊을 수 없다.
@@ -15,6 +15,7 @@ public class PlayerAttackState : PlayerState
     private static readonly int SPECIAL_SKILL_ANIMATION = Animator.StringToHash("SpecialSkill");
     private static readonly int DASH_ATTACK_ANIMATION = Animator.StringToHash("DashAttack");
     private static readonly int DODGE_COUNTER_ANIMATION = Animator.StringToHash("DodgeCounter");
+    private static readonly int PARRY_CHASE_ANIMATION = Animator.StringToHash("ParryChase");
 
     public enum AttackType
     {
@@ -23,7 +24,8 @@ public class PlayerAttackState : PlayerState
         Skill,
         SpecialSkill,
         DashAttack,
-        DodgeCounter
+        DodgeCounter,
+        ParryChase
     }
 
     private enum Phase
@@ -49,10 +51,10 @@ public class PlayerAttackState : PlayerState
     private bool IsSkill => _type == AttackType.Skill || _type == AttackType.SpecialSkill;
     // 콤보의 마지막 단계는 마무리 공격이다. 끝났다는 느낌을 주기 위해 후딜이 끝날 때까지 공격 입력을 받지 않는다.
     private bool IsFinisher => _type == AttackType.Basic && _step == Controller.ComboStepCount - 1;
-    // 휘두르는 중 선입력을 저장해 공격 동작이 끝나면 기본 공격으로 이어가는 공격. 대시 공격 뒤에는 콤보 1단으로 이어진다.
-    private bool CanBufferBasicAttack => _type == AttackType.Basic || _type == AttackType.DashAttack;
-    // 대시 공격 · 회피 반격은 휘두르는 중 공격 키를 눌러도 차지하지 않는다. 무적 · 후딜이 붙을 동작이라 강공격으로 끊지 못하게 한다.
-    private bool CanChargeInSwing => _type != AttackType.DashAttack && _type != AttackType.DodgeCounter;
+    // 휘두르는 중 선입력을 저장해 공격 동작이 끝나면 기본 공격으로 이어가는 공격. 대시 공격 · 패링 추격 뒤에는 콤보 1단으로 이어진다.
+    private bool CanBufferBasicAttack => _type == AttackType.Basic || _type == AttackType.DashAttack || _type == AttackType.ParryChase;
+    // 대시 공격 · 회피 반격 · 패링 추격은 휘두르는 중 공격 키를 눌러도 차지하지 않는다. 무적 · 후딜이 붙을 동작이라 강공격으로 끊지 못하게 한다.
+    private bool CanChargeInSwing => _type != AttackType.DashAttack && _type != AttackType.DodgeCounter && _type != AttackType.ParryChase;
 
     // step : 기본 공격 단계(0부터). 기본 공격이 아니면 사용하지 않는다.
     public void Setup(AttackType type, int step, PlayerAttackSetting setting)
@@ -157,6 +159,8 @@ public class PlayerAttackState : PlayerState
                 return DASH_ATTACK_ANIMATION;
             case AttackType.DodgeCounter:
                 return DODGE_COUNTER_ANIMATION;
+            case AttackType.ParryChase:
+                return PARRY_CHASE_ANIMATION;
             default:
                 return Animator.StringToHash(BASIC_ATTACK_ANIMATION_PREFIX + (step + 1));
         }

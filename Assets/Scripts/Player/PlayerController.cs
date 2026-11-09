@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 // 실제 동작은 상태 클래스(이동 · 대시 · 공격 · 피격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController), typeof(PlayerEnergy), typeof(PlayerTargeting))]
-[RequireComponent(typeof(PlayerHealth), typeof(PlayerSlowMotion))]
+[RequireComponent(typeof(PlayerHealth), typeof(PlayerSlowMotion), typeof(PlayerParry))]
 public class PlayerController : MonoBehaviour
 {
     private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
@@ -190,6 +190,14 @@ public class PlayerController : MonoBehaviour
         _comboExpireTime = 0f;
         _attackState.Setup(type, 0, setting);
         _stateMachine.ChangeState(_attackState);
+    }
+
+    // 다른 기능이 가진 상태(패링 등)로 넘긴다. 진행 중이던 차지는 끊고, 이후 콤보는 1단부터 다시 시작한다.
+    public void EnterState(PlayerState state)
+    {
+        _isCharging = false;
+        _comboExpireTime = 0f;
+        _stateMachine.ChangeState(state);
     }
 
     // 대시 · 회피 도중 공격 입력으로 시작한다.
