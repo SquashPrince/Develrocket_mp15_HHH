@@ -31,6 +31,8 @@ public class PlayerDashState : PlayerState
     public override void Enter()
     {
         _timer = 0f;
+        // 대시 · 회피 시작부터 정해진 시간 동안 무적이다. 연속 대시는 대시마다 다시 건다.
+        Controller.Health.BeginInvincible(Controller.DashInvincibleTime);
         Controller.HorizontalVelocity = _direction * _speed;
         Controller.PlayAnimation(IsDodge ? DODGE_ANIMATION : DASH_ANIMATION);
     }

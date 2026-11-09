@@ -1790,14 +1790,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DummyEnemy
       objectReference: {fileID: 0}
-    - target: {fileID: 1206866603110110876, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 1896030893427091369, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
-      propertyPath: _flashDuration
-      value: 0.025
-      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _target
+      value: 
+      objectReference: {fileID: 1675973285}
     - target: {fileID: 8041674962229910187, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1
