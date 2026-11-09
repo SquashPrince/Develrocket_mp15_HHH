@@ -41,6 +41,15 @@ public class PlayerDashState : PlayerState
 
         Vector3 moveDirection = Controller.ReadMoveDirection();
 
+        // 대시 · 회피 도중 공격 입력은 언제든 대시를 끊는다. 완벽 회피에 성공했으면 회피 반격, 아니면 대시 공격이 나간다.
+        // 대시 공격 · 회피 반격은 누르고 있어도 차지하지 않아 강공격으로 이어지지 않는다.
+        if(Controller.WasAttackPressed)
+        {
+            if(Controller.IsPerfectDodge) Controller.StartDodgeCounter();
+            else Controller.StartDashAttack();
+            return;
+        }
+
         // 연속 사용 간격이 지나야 다음 대시를 쓸 수 있다. 간격이 지속시간보다 길면 지속시간을 기준으로 한다.
         bool canChain = _timer >= Mathf.Min(Controller.DashChainInterval, _duration);
 

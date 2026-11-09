@@ -1722,6 +1722,7 @@ MonoBehaviour:
   _targetGroup: {fileID: 2145229457}
   _turnTime: 0.2
   _targetRadius: 1
+  _blockedBlendTime: 0.5
 --- !u!1001 &2043444286
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1851,6 +1852,66 @@ PrefabInstance:
       propertyPath: _cameraTransform
       value: 
       objectReference: {fileID: 330585546}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _dashAttack._fadeTime
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _dashAttack._useLegRun
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _dashAttack._energyGain
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _dashAttack._inputBuffer
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _dodgeCounter._useLegRun
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _dashAttack._alwaysLegRun
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _dashAttack._canDashCancel
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _heavyAttack._canDashCancel
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _dashAttack._advanceDistance
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _dashAttack._advanceDuration
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _dodgeCounter._canDashCancel
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _specialSkill._canDashCancel
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _dodgeCounter._advanceDistance
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _comboSteps.Array.data[2]._canDashCancel
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _comboSteps.Array.data[3]._canDashCancel
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3907669777063714774, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1907,6 +1968,10 @@ PrefabInstance:
       propertyPath: _cameraTransform
       value: 
       objectReference: {fileID: 330585546}
+    - target: {fileID: 7492969571146502241, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _obstacleLayers.m_Bits
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
