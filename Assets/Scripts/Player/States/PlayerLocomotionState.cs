@@ -49,8 +49,15 @@ public class PlayerLocomotionState : PlayerState
         }
 
         // 공격 키를 누르는 즉시 기본 공격을 시작하고, 누르고 있는 동안 차지 시간을 잰다.
+        // 완벽 회피 슬로모션이 남아 있으면 대시가 끝난 뒤라도 회피 반격이 나간다.
         if(Controller.WasAttackPressed)
         {
+            if(Controller.IsPerfectDodge)
+            {
+                Controller.StartDodgeCounter();
+                return;
+            }
+
             Controller.BeginCharge();
             Controller.StartBasicAttack();
             return;

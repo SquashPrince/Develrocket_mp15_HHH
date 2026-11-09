@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 // 실제 동작은 상태 클래스(이동 · 대시 · 공격 · 피격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController), typeof(PlayerEnergy), typeof(PlayerTargeting))]
-[RequireComponent(typeof(PlayerHealth))]
+[RequireComponent(typeof(PlayerHealth), typeof(PlayerSlowMotion))]
 public class PlayerController : MonoBehaviour
 {
     private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float _dashCooldown = 1f;
     [Tooltip("대시 · 회피 시작 후 다음 대시를 쓸 수 있기까지의 시간. 지속시간보다 길게 설정하면 지속시간을 기준으로 한다")]
     [SerializeField, Min(0f)] private float _dashChainInterval = 0.2f;
-    [Tooltip("대시 · 회피 시작부터 적 공격에 맞지 않는 시간(초). 대시와 회피가 같은 값을 쓴다")]
+    [Tooltip("대시 · 회피 시작부터 적 공격에 맞지 않는 시간(초). 이 시간 안에 닿은 공격은 완벽 회피가 된다. 대시와 회피가 같은 값을 쓴다")]
     [SerializeField, Min(0f)] private float _dashInvincibleTime = 0.15f;
 
     [Header("공격")]
@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviour
     [Header("대시 공격 · 회피 반격")]
     [Tooltip("대시 · 회피 도중 공격 입력으로 나가는 공격")]
     [SerializeField] private PlayerAttackSetting _dashAttack = new PlayerAttackSetting();
-    [Tooltip("완벽 회피 후 반격. 발동은 완벽 회피 구현 단계에서 연결한다")]
+    [Tooltip("완벽 회피 슬로모션 중 공격 입력으로 나가는 반격")]
     [SerializeField] private PlayerAttackSetting _dodgeCounter = new PlayerAttackSetting();
 
     [Header("스킬")]
@@ -82,15 +82,12 @@ public class PlayerController : MonoBehaviour
     [Tooltip("특수스킬에 필요한 에너지. 스킬 입력 시 에너지가 이보다 적으면 일반 스킬이 나간다")]
     [SerializeField, Min(0f)] private float _specialSkillEnergyCost = 60f;
 
-    [Header("테스트")]
-    [Tooltip("[완벽 회피 구현 전 임시] 켜면 대시 · 회피 중 공격 입력이 항상 완벽 회피에 성공한 것으로 보고 회피 반격이 나간다")]
-    [SerializeField] private bool _testAlwaysPerfectDodge;
-
     private readonly HashSet<DummyEnemy> _hitTargets = new HashSet<DummyEnemy>();
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
     private CharacterController _characterController;
     private PlayerEnergy _energy;
     private PlayerTargeting _targeting;
+    private PlayerSlowMotion _slowMotion;
     private PlayerStateMachine _stateMachine;
     private PlayerLocomotionState _locomotionState;
     private PlayerDashState _dashState;
@@ -119,8 +116,8 @@ public class PlayerController : MonoBehaviour
     public float AutoRunDelay => _autoRunDelay;
     public float DashChainInterval => _dashChainInterval;
     public float DashInvincibleTime => _dashInvincibleTime;
-    // 이번 대시 · 회피에서 완벽 회피에 성공했는지. 완벽 회피 구현 단계에서 실제 판정으로 바꾼다. 지금은 테스트 옵션 값이다.
-    public bool IsPerfectDodge => _testAlwaysPerfectDodge;
+    // 완벽 회피 후 슬로모션 중인지. 이 동안의 공격 입력은 대시 공격보다 회피 반격이 우선한다.
+    public bool IsPerfectDodge => _slowMotion.IsActive;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -195,9 +192,10 @@ public class PlayerController : MonoBehaviour
         _stateMachine.ChangeState(_attackState);
     }
 
-    // 완벽 회피 후 회피 반격을 시작한다. 완벽 회피 구현 단계에서 회피 상태가 호출하도록 연결한다.
+    // 완벽 회피 슬로모션 중 공격 입력으로 회피 반격을 시작한다. 반격을 시작하면 슬로모션은 바로 끝난다.
     public void StartDodgeCounter()
     {
+        _slowMotion.End();
         _isCharging = false;
         _comboExpireTime = 0f;
         _attackState.Setup(PlayerAttackState.AttackType.DodgeCounter, 0, _dodgeCounter);
@@ -407,6 +405,7 @@ public class PlayerController : MonoBehaviour
         _characterController = GetComponent<CharacterController>();
         _energy = GetComponent<PlayerEnergy>();
         _targeting = GetComponent<PlayerTargeting>();
+        _slowMotion = GetComponent<PlayerSlowMotion>();
         Health = GetComponent<PlayerHealth>();
     }
 
