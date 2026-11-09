@@ -10,9 +10,6 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerController), typeof(CharacterController), typeof(PlayerTargeting))]
 public class PlayerParry : MonoBehaviour
 {
-    // 순간 이동할 자리의 바닥을 찾을 때, 도착 지점에서 위아래로 이 높이만큼 검사한다.
-    private const float GROUND_SEARCH_HEIGHT = 3f;
-
     [Header("입력")]
     [SerializeField] private InputActionReference _parryPreviousAction;
     [SerializeField] private InputActionReference _parryNextAction;
@@ -22,7 +19,7 @@ public class PlayerParry : MonoBehaviour
     [SerializeField, Min(0.01f)] private float _readyTime = 1f;
     [Tooltip("패링을 시작할 때 패링 공격을 하는 적의 정면으로 이 거리만큼 떨어진 곳에 순간 이동한다")]
     [SerializeField, Min(0f)] private float _teleportDistance = 1.5f;
-    [Tooltip("순간 이동할 자리의 바닥과 막힘을 검사할 Layer. Player · Enemy 는 빼고 벽 · 지형만 넣는다")]
+    [Tooltip("순간 이동할 자리가 막혀 있는지 검사할 Layer. Player · Enemy 는 빼고 벽 · 지형만 넣는다")]
     [SerializeField] private LayerMask _teleportBlockLayers = 1;
     [Tooltip("패링 성공 후 공격 반대 방향으로 밀려나는 거리")]
     [SerializeField, Min(0f)] private float _reactDistance = 2f;
@@ -63,10 +60,10 @@ public class PlayerParry : MonoBehaviour
         return true;
     }
 
-    // 패링 공격을 하는 적의 정면, 정해진 거리만큼 떨어진 곳의 바닥으로 순간 이동하고 적 쪽을 본다.
+    // 패링 공격을 하는 적의 정면, 정해진 거리만큼 떨어진 곳으로 순간 이동하고 적 쪽을 본다.
     // 적은 예고를 시작할 때 플레이어 쪽으로 돌기 때문에, 적의 정면은 플레이어가 있던 쪽이다.
-    // 적의 기준점은 바닥이 아닐 수 있으므로 도착 높이는 그 자리의 바닥 높이로 맞춘다.
-    // 바닥이 없거나, 도착 지점이 벽 · 지형에 겹치거나, 적과 도착 지점 사이가 막혀 있으면 이동하지 않고 제자리에서 패링한다.
+    // 도착 높이는 적의 기준점 높이를 쓰므로, 적의 기준점은 플레이어처럼 발바닥에 있어야 한다.
+    // 도착 지점이 벽 · 지형에 겹치거나, 적과 도착 지점 사이가 막혀 있으면 이동하지 않고 제자리에서 패링한다.
     public void TeleportToAttacker()
     {
         DummyEnemyAttacker attacker = SelectAttacker();
@@ -76,19 +73,16 @@ public class PlayerParry : MonoBehaviour
         Vector3 attackerPosition = attacker.transform.position;
         Vector3 destination = attackerPosition + attacker.transform.forward * _teleportDistance;
 
-        if(!TryFindGround(destination, out destination)) return;
-
-        // 적과 벽 사이 검사는 적 위치를 도착 지점과 같은 바닥 높이로 내려서 한다.
-        Vector3 attackerGround = new Vector3(attackerPosition.x, destination.y, attackerPosition.z);
-
-        if(IsBlocked(attackerGround, destination)) return;
+        if(IsBlocked(attackerPosition, destination)) return;
 
         // CharacterController 가 켜져 있으면 위치를 직접 바꿔도 덮어쓰므로 잠깐 끄고 옮긴다.
         _characterController.enabled = false;
         transform.position = destination;
         _characterController.enabled = true;
 
-        _controller.FaceImmediately(attackerGround - destination);
+        Vector3 toAttacker = attackerPosition - destination;
+        toAttacker.y = 0f;
+        _controller.FaceImmediately(toAttacker);
     }
 
     // 패링 가능 시간을 연 적 중에서 공격 대상 기준으로 고른다. 록온 대상 → 자동 조준 대상 → 가장 최근에 예고를 시작한 적 순서다.
@@ -113,15 +107,6 @@ public class PlayerParry : MonoBehaviour
         return attacker != null && ParryWindow.IsOpenBy(attacker) ? attacker : null;
     }
 
-    // 지점 위에서 아래로 바닥을 찾는다. 찾으면 그 높이로 맞춘 지점을 돌려준다.
-    private bool TryFindGround(Vector3 point, out Vector3 ground)
-    {
-        Vector3 rayStart = point + Vector3.up * GROUND_SEARCH_HEIGHT;
-        bool hasGround = Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, GROUND_SEARCH_HEIGHT * 2f, _teleportBlockLayers, QueryTriggerInteraction.Ignore);
-
-        ground = hasGround ? hit.point : point;
-        return hasGround;
-    }
 
     private void TryStartParry()
     {
