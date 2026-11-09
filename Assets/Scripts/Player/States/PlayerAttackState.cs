@@ -73,6 +73,9 @@ public class PlayerAttackState : PlayerState
         // 완벽 회피 슬로모션은 피드백만 주고 과하지 않게, 회피 반격이든 다른 공격이든 공격을 시작하면 바로 끝낸다.
         Controller.EndSlowMotion();
 
+        // 시전 중 무적인 공격은 휘두르는 동안만 무적이고, 후딜에 들어가거나 상태를 나가면 풀린다.
+        Controller.Health.SetAttackInvincible(_setting.IsInvincibleOnSwing);
+
         // 콤보 2단부터는 이동 입력으로 방향을 바꾸지 않는다. 콤보 도중 방향이 휙휙 바뀌면 모션이 어색하기 때문이다.
         bool canTurnToInput = _type != AttackType.Basic || _step == 0;
         float advanceDistance = Controller.AimAttack(_setting, canTurnToInput);
@@ -87,7 +90,11 @@ public class PlayerAttackState : PlayerState
         Controller.PlayAnimation(_animationHash, _setting.FadeTime);
     }
 
-    public override void Exit() => Controller.SetLegRun(false);
+    public override void Exit()
+    {
+        Controller.SetLegRun(false);
+        Controller.Health.SetAttackInvincible(false);
+    }
 
     public override void Tick()
     {
@@ -194,6 +201,12 @@ public class PlayerAttackState : PlayerState
 
         if(_hasBufferedInput) Controller.StartBasicAttack();
         else if(moveDirection != Vector3.zero) Controller.EnterLocomotion(false);
-        else _phase = Phase.Recovery;
+        else EnterRecovery();
+    }
+
+    private void EnterRecovery()
+    {
+        _phase = Phase.Recovery;
+        Controller.Health.SetAttackInvincible(false);
     }
 }

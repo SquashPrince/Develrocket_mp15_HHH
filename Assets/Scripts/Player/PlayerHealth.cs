@@ -13,10 +13,13 @@ public class PlayerHealth : MonoBehaviour
     private float _currentHealth;
     private float _invincibleTimer;
     private float _perfectDodgeTimer;
+    private bool _isAttackInvincible;
 
     public float MaxHealth => _maxHealth;
     public float CurrentHealth => _currentHealth;
-    public bool IsInvincible => _invincibleTimer > 0f;
+    // 시간으로 거는 무적(대시 · 넉백)이나 시전 중 무적 공격의 무적 중인지
+    public bool IsInvincible => _invincibleTimer > 0f || _isAttackInvincible;
+    public bool IsAttackInvincible => _isAttackInvincible;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -34,6 +37,9 @@ public class PlayerHealth : MonoBehaviour
         BeginInvincible(duration);
         _perfectDodgeTimer = duration;
     }
+
+    // 시전 중 무적인 공격이 휘두르는 동안 켜고, 후딜에 들어가거나 공격 상태를 나가면 끈다.
+    public void SetAttackInvincible(bool isInvincible) => _isAttackInvincible = isInvincible;
 
     public void EndInvincible()
     {
