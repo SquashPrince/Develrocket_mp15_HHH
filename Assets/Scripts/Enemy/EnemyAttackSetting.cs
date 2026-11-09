@@ -17,8 +17,10 @@ public class EnemyAttackSetting
     [SerializeField] private string _name = "Attack";
 
     [Header("예고")]
-    [Tooltip("예고 시작부터 판정까지의 시간(초)")]
+    [Tooltip("예고(색 · 크기 변화)가 이어지는 시간(초)")]
     [SerializeField, Min(0f)] private float _telegraphTime = 0.6f;
+    [Tooltip("예고가 끝난 뒤 판정까지의 시간(초). 패링 공격은 이 시간까지 패링을 입력할 수 있다")]
+    [SerializeField, Min(0f)] private float _hitDelay;
     [Tooltip("예고 동안 몸 색을 바꿀지 여부. 패링 공격(노란색)만 켜고, 약 · 강공격은 색 없이 크기 · 예고 시간으로 구분한다")]
     [SerializeField] private bool _useTelegraphColor;
     [SerializeField] private Color _telegraphColor = Color.yellow;
@@ -26,8 +28,10 @@ public class EnemyAttackSetting
     [SerializeField, Min(0.1f)] private float _telegraphScale = 1.1f;
 
     [Header("판정")]
-    [Tooltip("패링할 수 있는 공격인지 여부 (패링 구현 단계에서 사용)")]
+    [Tooltip("패링할 수 있는 공격인지 여부. 켜면 예고 시작부터 판정까지 패링 가능 시간이 열린다")]
     [SerializeField] private bool _isParryable;
+    [Tooltip("[패링 공격] 패링당했을 때 적이 경직하는 시간(초)")]
+    [SerializeField, Min(0f)] private float _parryStaggerTime = 1.5f;
     [Tooltip("대시 · 회피 무적 시간 안에 닿으면 완벽 회피(슬로모션)가 되는 공격인지 여부. 끄면 무적으로 무시만 된다")]
     [SerializeField] private bool _canPerfectDodge = true;
     [Tooltip("판정 구의 중심 (적 기준 위치)")]
@@ -55,6 +59,8 @@ public class EnemyAttackSetting
 
     public string Name => _name;
     public float TelegraphTime => _telegraphTime;
+    public float HitDelay => _hitDelay;
+    public float ParryStaggerTime => _parryStaggerTime;
     public bool UseTelegraphColor => _useTelegraphColor;
     public Color TelegraphColor => _telegraphColor;
     public float TelegraphScale => _telegraphScale;

@@ -10,13 +10,17 @@ public class PlayerHealth : MonoBehaviour
 
     private PlayerController _controller;
     private PlayerSlowMotion _slowMotion;
+    private PlayerParry _parry;
     private float _currentHealth;
     private float _invincibleTimer;
     private float _perfectDodgeTimer;
+    private bool _isAttackInvincible;
 
     public float MaxHealth => _maxHealth;
     public float CurrentHealth => _currentHealth;
-    public bool IsInvincible => _invincibleTimer > 0f;
+    // 시간으로 거는 무적(대시 · 넉백)이나 시전 중 무적 공격의 무적 중인지
+    public bool IsInvincible => _invincibleTimer > 0f || _isAttackInvincible;
+    public bool IsAttackInvincible => _isAttackInvincible;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -35,17 +39,23 @@ public class PlayerHealth : MonoBehaviour
         _perfectDodgeTimer = duration;
     }
 
+    // 시전 중 무적인 공격이 휘두르는 동안 켜고, 후딜에 들어가거나 공격 상태를 나가면 끈다.
+    public void SetAttackInvincible(bool isInvincible) => _isAttackInvincible = isInvincible;
+
     public void EndInvincible()
     {
         _invincibleTimer = 0f;
         _perfectDodgeTimer = 0f;
     }
 
-    // 맞았으면 true 를 돌려준다. 완벽 회피했거나 무적이면 무시하고 false 를 돌려준다.
-    // attackerPosition : 넉백 방향을 정할 때 쓰는 공격한 적의 위치
-    public bool TakeHit(EnemyAttackSetting attack, Vector3 attackerPosition)
+    // 맞았으면 true 를 돌려준다. 완벽 회피 · 패링했거나 무적이면 무시하고 false 를 돌려준다.
+    // 판정 순서 : 완벽 회피 → 패링 → 무적 → 피격
+    // attacker : 패링 성공을 알리고, 넉백 방향을 정할 때 위치를 쓰는 공격한 적
+    //            일반 적을 만드는 단계에서 적 공통 계약이 필요한지 다시 검토한다.
+    public bool TakeHit(EnemyAttackSetting attack, DummyEnemyAttacker attacker)
     {
         if(TryPerfectDodge(attack)) return false;
+        if(_parry.TryParry(attack, attacker)) return false;
 
         if(IsInvincible)
         {
@@ -61,7 +71,7 @@ public class PlayerHealth : MonoBehaviour
         Debug.Log($"[피격] {attack.Name} ({attack.Reaction}) 위력 {attack.Power} → 체력 {_currentHealth:F0} / {_maxHealth:F0}");
 #endif
 
-        _controller.StartHit(attack, attackerPosition);
+        _controller.StartHit(attack, attacker.transform.position);
         return true;
     }
 
@@ -91,6 +101,7 @@ public class PlayerHealth : MonoBehaviour
     {
         _controller = GetComponent<PlayerController>();
         _slowMotion = GetComponent<PlayerSlowMotion>();
+        _parry = GetComponent<PlayerParry>();
     }
 
     private void Init()

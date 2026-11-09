@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 // 실제 동작은 상태 클래스(이동 · 대시 · 공격 · 피격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController), typeof(PlayerEnergy), typeof(PlayerTargeting))]
-[RequireComponent(typeof(PlayerHealth), typeof(PlayerSlowMotion))]
+[RequireComponent(typeof(PlayerHealth), typeof(PlayerSlowMotion), typeof(PlayerParry))]
 public class PlayerController : MonoBehaviour
 {
     private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
@@ -182,24 +182,29 @@ public class PlayerController : MonoBehaviour
         _stateMachine.ChangeState(_attackState);
     }
 
-    // 대시 · 회피 도중 공격 입력으로 시작한다. 대시 공격 뒤의 콤보는 1단부터 다시 시작한다.
-    // 공격 키를 누르고 있으면 차지로 강공격이 이어지도록, 차지 시작은 호출한 쪽(대시 상태)이 한다.
-    public void StartDashAttack()
+    // 기본 공격 외의 공격(강공격 · 스킬 · 특수스킬 · 대시 공격 · 회피 반격 · 패링 추격)을 시작한다.
+    // 진행 중이던 차지는 끊고, 이 공격들 뒤의 콤보는 1단부터 다시 시작한다.
+    public void StartAttack(PlayerAttackState.AttackType type, PlayerAttackSetting setting)
     {
         _isCharging = false;
         _comboExpireTime = 0f;
-        _attackState.Setup(PlayerAttackState.AttackType.DashAttack, 0, _dashAttack);
+        _attackState.Setup(type, 0, setting);
         _stateMachine.ChangeState(_attackState);
     }
 
-    // 완벽 회피 슬로모션 중 공격 입력으로 회피 반격을 시작한다. 슬로모션은 공격 상태에 들어가면서 끝난다.
-    public void StartDodgeCounter()
+    // 다른 기능이 가진 상태(패링 등)로 넘긴다. 진행 중이던 차지는 끊고, 이후 콤보는 1단부터 다시 시작한다.
+    public void EnterState(PlayerState state)
     {
         _isCharging = false;
         _comboExpireTime = 0f;
-        _attackState.Setup(PlayerAttackState.AttackType.DodgeCounter, 0, _dodgeCounter);
-        _stateMachine.ChangeState(_attackState);
+        _stateMachine.ChangeState(state);
     }
+
+    // 대시 · 회피 도중 공격 입력으로 시작한다.
+    public void StartDashAttack() => StartAttack(PlayerAttackState.AttackType.DashAttack, _dashAttack);
+
+    // 완벽 회피 슬로모션 중 공격 입력으로 회피 반격을 시작한다. 슬로모션은 공격 상태에 들어가면서 끝난다.
+    public void StartDodgeCounter() => StartAttack(PlayerAttackState.AttackType.DodgeCounter, _dodgeCounter);
 
     // 적 공격에 맞으면 어떤 상태에서든 피격 상태로 넘어간다. 진행 중이던 공격 · 차지는 끊고, 이후 콤보는 1단부터 시작한다.
     public void StartHit(EnemyAttackSetting attack, Vector3 attackerPosition)
@@ -218,7 +223,6 @@ public class PlayerController : MonoBehaviour
     }
 
     // 에너지가 특수스킬 요구량 이상이면 소모하고 특수스킬, 모자라면 일반 스킬을 시작한다.
-    // 진행 중이던 차지는 끊고, 스킬 뒤의 콤보는 1단부터 다시 시작한다.
     public void StartSkill()
     {
         bool isSpecial = _energy.TryConsume(_specialSkillEnergyCost);
@@ -227,13 +231,8 @@ public class PlayerController : MonoBehaviour
         if(isSpecial) Debug.Log($"[특수스킬] 에너지 -{_specialSkillEnergyCost} → {_energy.CurrentEnergy:F1}");
 #endif
 
-        _isCharging = false;
-        _comboExpireTime = 0f;
-
-        if(isSpecial) _attackState.Setup(PlayerAttackState.AttackType.SpecialSkill, 0, _specialSkill);
-        else _attackState.Setup(PlayerAttackState.AttackType.Skill, 0, _skill);
-
-        _stateMachine.ChangeState(_attackState);
+        if(isSpecial) StartAttack(PlayerAttackState.AttackType.SpecialSkill, _specialSkill);
+        else StartAttack(PlayerAttackState.AttackType.Skill, _skill);
     }
 
     // 공격을 시작할 때 몸을 돌릴 방향과 전진 거리를 정하고, 전진 거리를 돌려준다.
@@ -348,13 +347,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // 강공격 뒤에는 콤보가 1단부터 다시 시작한다.
-    private void StartHeavyAttack()
-    {
-        _isCharging = false;
-        _comboExpireTime = 0f;
-        _attackState.Setup(PlayerAttackState.AttackType.Heavy, 0, _heavyAttack);
-        _stateMachine.ChangeState(_attackState);
-    }
+    private void StartHeavyAttack() => StartAttack(PlayerAttackState.AttackType.Heavy, _heavyAttack);
 
     public void FaceImmediately(Vector3 direction)
     {
