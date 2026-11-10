@@ -1,13 +1,14 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// 패링 입력과 수치. 적의 패링 가능 시간이 열려 있을 때 패링 키를 누르면 어느 상태에서든 패링 상태로 넘긴다.
+// 패링 입력과 수치. 록온 사거리 안의 적이 패링 가능 시간을 열었을 때 패링 키를 누르면 어느 상태에서든 패링 상태로 넘긴다.
 // 코어 전투에서는 이전 · 다음 캐릭터 키 모두 현재 캐릭터가 직접 패링한다. 교체 방향 구분은 파티 전투 단계에서 한다.
-// 이미 패링 중이거나, 시전 중 무적인 공격(패링 추격 포함)을 휘두르는 중이면 입력을 무시한다.
-// 패링 가능 시간 밖의 입력도 무시한다. 파티 전투에서는 이 입력이 그냥 교체가 된다.
+// 이미 패링 중이거나, 시전 중 무적인 공격(패링 추격 · 필살기 포함) 중이면 입력을 무시한다.
+// 패링 가능 시간 밖이거나 록온 사거리 밖의 적만 연 경우의 입력도 무시한다. 파티 전투에서는 이 입력이 그냥 교체가 된다.
 // 패링을 시작하면 패링 공격을 하는 적 앞으로 순간 이동한다. 실제로 이동하면 벽 등에 걸리기 때문이다. 도착 지점이 막혀 있으면 제자리에서 패링한다.
-// 패링 공격을 하는 적이 여럿이면 공격 대상 기준(록온 대상 → 자동 조준 대상)을 따르고, 둘 다 아니면 가장 최근에 예고를 시작한 적을 고른다.
-[RequireComponent(typeof(PlayerController), typeof(CharacterController), typeof(PlayerTargeting))]
+// 패링 공격을 하는 적이 여럿이면 공격 대상 기준(록온 대상 → 자동 조준 대상)을 따르고, 둘 다 아니면 록온 사거리 안에서 가장 최근에 예고를 시작한 적을 고른다.
+[RequireComponent(typeof(PlayerController), typeof(PlayerTeleport), typeof(PlayerTargeting))]
+[RequireComponent(typeof(PlayerUltimate))]
 public class PlayerParry : MonoBehaviour
 {
     [Header("입력")]
@@ -19,8 +20,6 @@ public class PlayerParry : MonoBehaviour
     [SerializeField, Min(0.01f)] private float _readyTime = 1f;
     [Tooltip("패링을 시작할 때 패링 공격을 하는 적의 정면으로 이 거리만큼 떨어진 곳에 순간 이동한다")]
     [SerializeField, Min(0f)] private float _teleportDistance = 1.5f;
-    [Tooltip("순간 이동할 자리가 막혀 있는지 검사할 Layer. Player · Enemy 는 빼고 벽 · 지형만 넣는다")]
-    [SerializeField] private LayerMask _teleportBlockLayers = 1;
     [Tooltip("패링 성공 후 공격 반대 방향으로 밀려나는 거리")]
     [SerializeField, Min(0f)] private float _reactDistance = 2f;
     [Tooltip("패링 성공 후 반응 시간(초). 이 시간에 걸쳐 점점 느려지며 밀려나고, 이 동안 닿은 노란 공격은 자동으로 패링된다. 이 동안 공격 키를 누르면 끝난 뒤 추격 공격이 나간다")]
@@ -31,9 +30,12 @@ public class PlayerParry : MonoBehaviour
     [SerializeField] private PlayerAttackSetting _parryChase = new PlayerAttackSetting();
 
     private PlayerController _controller;
-    private CharacterController _characterController;
+    private PlayerTeleport _teleport;
     private PlayerTargeting _targeting;
+    private PlayerUltimate _ultimate;
     private PlayerParryState _parryState;
+    // 패링 키를 누른 순간 고른 패링 대상. 패링 상태에 들어가며 이 적 앞으로 순간 이동한다.
+    private DummyEnemyAttacker _selectedAttacker;
 
     public float ReadyTime => _readyTime;
     public float ReactDistance => _reactDistance;
@@ -56,36 +58,21 @@ public class PlayerParry : MonoBehaviour
 #endif
 
         attacker.Stagger(attack.ParryStaggerTime);
-        _parryState.OnParrySuccess(attacker.transform.position);
+        _ultimate.AddParryGauge();
+        _parryState.OnParrySuccess(attacker.GetComponent<DummyEnemy>());
         return true;
     }
 
-    // 패링 공격을 하는 적의 정면, 정해진 거리만큼 떨어진 곳으로 순간 이동하고 적 쪽을 본다.
+    // 패링 키를 누른 순간 고른 적의 정면, 정해진 거리만큼 떨어진 곳으로 순간 이동하고 적 쪽을 본다.
     // 적은 예고를 시작할 때 플레이어 쪽으로 돌기 때문에, 적의 정면은 플레이어가 있던 쪽이다.
-    // 도착 높이는 적의 기준점 높이를 쓰므로, 적의 기준점은 플레이어처럼 발바닥에 있어야 한다.
-    // 도착 지점이 벽 · 지형에 겹치거나, 적과 도착 지점 사이가 막혀 있으면 이동하지 않고 제자리에서 패링한다.
+    // 도착 지점이 막혀 있으면 이동하지 않고 제자리에서 패링한다.
     public void TeleportToAttacker()
     {
-        DummyEnemyAttacker attacker = SelectAttacker();
-
-        if(attacker == null) return;
-
-        Vector3 attackerPosition = attacker.transform.position;
-        Vector3 destination = attackerPosition + attacker.transform.forward * _teleportDistance;
-
-        if(IsBlocked(attackerPosition, destination)) return;
-
-        // CharacterController 가 켜져 있으면 위치를 직접 바꿔도 덮어쓰므로 잠깐 끄고 옮긴다.
-        _characterController.enabled = false;
-        transform.position = destination;
-        _characterController.enabled = true;
-
-        Vector3 toAttacker = attackerPosition - destination;
-        toAttacker.y = 0f;
-        _controller.FaceImmediately(toAttacker);
+        _teleport.TryTeleport(_selectedAttacker.transform.position, _selectedAttacker.transform.forward, _teleportDistance);
     }
 
-    // 패링 가능 시간을 연 적 중에서 공격 대상 기준으로 고른다. 록온 대상 → 자동 조준 대상 → 가장 최근에 예고를 시작한 적 순서다.
+    // 록온 사거리 안에서 패링 가능 시간을 연 적 중 공격 대상 기준으로 고른다. 록온 대상 → 자동 조준 대상 → 가장 최근에 예고를 시작한 적 순서다.
+    // 록온 사거리는 록온이 풀리는 거리와 같아, 록온할 수 있는 거리의 적만 패링할 수 있다. 없으면 null 이다.
     private DummyEnemyAttacker SelectAttacker()
     {
         DummyEnemyAttacker lockAttacker = GetOpenAttacker(_targeting.LockTarget);
@@ -94,47 +81,41 @@ public class PlayerParry : MonoBehaviour
 
         DummyEnemyAttacker aimAttacker = GetOpenAttacker(_targeting.FindTarget(_targeting.AttackRange));
 
-        return aimAttacker != null ? aimAttacker : ParryWindow.LatestAttacker;
+        return aimAttacker != null ? aimAttacker : ParryWindow.FindLatestWithin(transform.position, _targeting.LockOnRange);
     }
 
-    // 대상이 패링 가능 시간을 연 적이면 그 공격 기능을, 아니면 null 을 돌려준다.
-    private static DummyEnemyAttacker GetOpenAttacker(DummyEnemy target)
+    // 대상이 록온 사거리 안에서 패링 가능 시간을 연 적이면 그 공격 기능을, 아니면 null 을 돌려준다.
+    private DummyEnemyAttacker GetOpenAttacker(DummyEnemy target)
     {
         if(target == null) return null;
 
         DummyEnemyAttacker attacker = target.GetComponent<DummyEnemyAttacker>();
 
-        return attacker != null && ParryWindow.IsOpenBy(attacker) ? attacker : null;
-    }
+        if(attacker == null || !ParryWindow.IsOpenBy(attacker)) return null;
 
+        float lockOnRange = _targeting.LockOnRange;
+
+        return (attacker.transform.position - transform.position).sqrMagnitude <= lockOnRange * lockOnRange ? attacker : null;
+    }
 
     private void TryStartParry()
     {
-        if(!WasParryPressed || !ParryWindow.IsOpen) return;
+        if(!WasParryPressed) return;
         if(_parryState.IsActive || _controller.Health.IsAttackInvincible) return;
 
+        _selectedAttacker = SelectAttacker();
+
+        if(_selectedAttacker == null) return;
+
         _controller.EnterState(_parryState);
-    }
-
-    // 도착 지점에 플레이어 몸(캡슐)이 들어갈 자리가 있는지, 적에서 도착 지점까지 벽이 가로막지 않는지 본다.
-    // 캡슐은 바닥에 닿은 것을 겹침으로 보지 않도록 피부 두께만큼 띄워서 검사한다.
-    private bool IsBlocked(Vector3 attackerPosition, Vector3 destination)
-    {
-        Vector3 center = destination + _characterController.center + Vector3.up * _characterController.skinWidth;
-        float halfHeight = Mathf.Max(0f, _characterController.height * 0.5f - _characterController.radius);
-        Vector3 bottom = center - Vector3.up * halfHeight;
-        Vector3 top = center + Vector3.up * halfHeight;
-
-        if(Physics.CheckCapsule(bottom, top, _characterController.radius, _teleportBlockLayers, QueryTriggerInteraction.Ignore)) return true;
-
-        return Physics.Linecast(attackerPosition + _characterController.center, center, _teleportBlockLayers, QueryTriggerInteraction.Ignore);
     }
 
     private void CacheComponent()
     {
         _controller = GetComponent<PlayerController>();
-        _characterController = GetComponent<CharacterController>();
+        _teleport = GetComponent<PlayerTeleport>();
         _targeting = GetComponent<PlayerTargeting>();
+        _ultimate = GetComponent<PlayerUltimate>();
     }
 
     private void Init()

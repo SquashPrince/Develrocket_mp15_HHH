@@ -24,6 +24,8 @@ public class PlayerLocomotionState : PlayerState
     {
     }
 
+    public override bool CanUseUltimate => true;
+
     // 대시 · 회피가 끝날 때 이동 입력이 있으면 달리기로 시작하도록 미리 지정한다.
     public void SetStartRunning(bool startRunning) => _startRunning = startRunning;
 

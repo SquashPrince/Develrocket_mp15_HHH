@@ -11,6 +11,7 @@ public class PlayerHealth : MonoBehaviour
     private PlayerController _controller;
     private PlayerSlowMotion _slowMotion;
     private PlayerParry _parry;
+    private PlayerUltimate _ultimate;
     private float _currentHealth;
     private float _invincibleTimer;
     private float _perfectDodgeTimer;
@@ -88,6 +89,7 @@ public class PlayerHealth : MonoBehaviour
 #endif
 
         _slowMotion.Begin();
+        _ultimate.AddPerfectDodgeGauge();
         return true;
     }
 
@@ -102,6 +104,7 @@ public class PlayerHealth : MonoBehaviour
         _controller = GetComponent<PlayerController>();
         _slowMotion = GetComponent<PlayerSlowMotion>();
         _parry = GetComponent<PlayerParry>();
+        _ultimate = GetComponent<PlayerUltimate>();
     }
 
     private void Init()

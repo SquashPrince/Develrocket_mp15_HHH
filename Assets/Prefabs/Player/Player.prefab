@@ -31838,9 +31838,10 @@ GameObject:
   - component: {fileID: 3848066476718012999}
   - component: {fileID: 6322618722868687519}
   - component: {fileID: 7492969571146502241}
-  - component: {fileID: 5377382666987954038}
   - component: {fileID: 7823694639924144761}
   - component: {fileID: 3260304514223116691}
+  - component: {fileID: 8916903027818413115}
+  - component: {fileID: 8149544136973105350}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -31901,10 +31902,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9203f4226a7a84e47b14121d6a8d407a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  _moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  _dashAction: {fileID: 504704208043311331, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  _attackAction: {fileID: -2737370060291335809, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  _skillAction: {fileID: -3361557722714098977, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _dashAction: {fileID: 504704208043311331, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _attackAction: {fileID: -2737370060291335809, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _skillAction: {fileID: -3361557722714098977, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _cameraTransform: {fileID: 0}
   _animator: {fileID: 3735240450347513969}
   _walkSpeed: 5
@@ -31912,52 +31913,61 @@ MonoBehaviour:
   _turnTime: 0.1
   _autoRunDelay: 1
   _gravity: -20
-  _dashDistance: 2.5
+  _dashDistance: 5
   _dashDuration: 0.25
-  _dodgeDistance: 2.5
+  _dodgeDistance: 5
   _dodgeDuration: 0.25
   _dashCooldown: 1
   _dashChainInterval: 0.25
   _dashInvincibleTime: 0.15
   _comboSteps:
   - _energyGain: 1.25
-    _power: 10
-    _advanceDistance: 1.25
-    _advanceDuration: 0.35
-    _fadeTime: 0.1
-    _inputBuffer: 0.05
-    _useLegRun: 1
-    _alwaysLegRun: 0
-    _canDashCancel: 1
-  - _energyGain: 1.25
-    _power: 10
-    _advanceDistance: 0.75
-    _advanceDuration: 0.25
-    _fadeTime: 0.2
-    _inputBuffer: 0.1
-    _useLegRun: 1
-    _alwaysLegRun: 0
-    _canDashCancel: 1
-  - _energyGain: 1.25
-    _power: 10
-    _advanceDistance: 4.5
-    _advanceDuration: 0.85
-    _fadeTime: 0.1
-    _inputBuffer: 0.1
-    _useLegRun: 0
-    _alwaysLegRun: 0
-    _canDashCancel: 0
-  - _energyGain: 1.25
+    _ultimateGaugeGain: 50
     _power: 10
     _advanceDistance: 1.5
     _advanceDuration: 0.35
     _fadeTime: 0.2
-    _inputBuffer: 0
+    _inputBuffer: 0.2
+    _useLegRun: 1
+    _alwaysLegRun: 0
+    _canDashCancel: 1
+    _isInvincibleOnSwing: 0
+  - _energyGain: 1.25
+    _ultimateGaugeGain: 50
+    _power: 10
+    _advanceDistance: 2
+    _advanceDuration: 0.4
+    _fadeTime: 0.2
+    _inputBuffer: 0.2
+    _useLegRun: 1
+    _alwaysLegRun: 0
+    _canDashCancel: 1
+    _isInvincibleOnSwing: 0
+  - _energyGain: 1.25
+    _ultimateGaugeGain: 50
+    _power: 10
+    _advanceDistance: 4.5
+    _advanceDuration: 0.85
+    _fadeTime: 0.2
+    _inputBuffer: 0.2
+    _useLegRun: 0
+    _alwaysLegRun: 0
+    _canDashCancel: 0
+    _isInvincibleOnSwing: 1
+  - _energyGain: 1.25
+    _ultimateGaugeGain: 50
+    _power: 10
+    _advanceDistance: 3
+    _advanceDuration: 0.5
+    _fadeTime: 0.2
+    _inputBuffer: 0.2
     _useLegRun: 0
     _alwaysLegRun: 0
     _canDashCancel: 1
+    _isInvincibleOnSwing: 0
   _heavyAttack:
     _energyGain: 5
+    _ultimateGaugeGain: 50
     _power: 10
     _advanceDistance: 3.5
     _advanceDuration: 1
@@ -31966,12 +31976,14 @@ MonoBehaviour:
     _useLegRun: 0
     _alwaysLegRun: 0
     _canDashCancel: 0
+    _isInvincibleOnSwing: 0
   _chargeTime: 0.6
   _hitBoxCenter: {x: 0, y: 1, z: 0.5}
   _hitBoxSize: {x: 1.5, y: 1.5, z: 1}
   _attackStopDistance: 1.2
   _dashAttack:
     _energyGain: 1.25
+    _ultimateGaugeGain: 50
     _power: 10
     _advanceDistance: 1.5
     _advanceDuration: 0.25
@@ -31980,8 +31992,10 @@ MonoBehaviour:
     _useLegRun: 1
     _alwaysLegRun: 1
     _canDashCancel: 1
+    _isInvincibleOnSwing: 0
   _dodgeCounter:
     _energyGain: 5
+    _ultimateGaugeGain: 50
     _power: 10
     _advanceDistance: 1.5
     _advanceDuration: 0.15
@@ -31990,8 +32004,10 @@ MonoBehaviour:
     _useLegRun: 0
     _alwaysLegRun: 0
     _canDashCancel: 0
+    _isInvincibleOnSwing: 0
   _skill:
     _energyGain: 5
+    _ultimateGaugeGain: 50
     _power: 10
     _advanceDistance: 7.5
     _advanceDuration: 0.6
@@ -32000,8 +32016,10 @@ MonoBehaviour:
     _useLegRun: 0
     _alwaysLegRun: 0
     _canDashCancel: 1
+    _isInvincibleOnSwing: 0
   _specialSkill:
     _energyGain: 5
+    _ultimateGaugeGain: 50
     _power: 10
     _advanceDistance: 7.5
     _advanceDuration: 1.25
@@ -32010,8 +32028,8 @@ MonoBehaviour:
     _useLegRun: 0
     _alwaysLegRun: 0
     _canDashCancel: 1
+    _isInvincibleOnSwing: 0
   _specialSkillEnergyCost: 60
-  _testAlwaysPerfectDodge: 0
 --- !u!114 &6322618722868687519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32038,7 +32056,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d16b8cc6c2cb09b4990c4e01cbb45567, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTargeting
-  _lockOnAction: {fileID: 694580335105051867, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _lockOnAction: {fileID: 694580335105051867, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _cameraTransform: {fileID: 0}
   _lockOnMarker: {fileID: 0}
   _attackRange: 15
@@ -32047,20 +32065,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   _sightHeight: 1.2
-  _markerHeight: 1.5
---- !u!114 &5377382666987954038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7306029376340620380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d69a858eb9fcf4044843a95c3c5dc49a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
-  _maxHealth: 100
+  _markerHeight: 2.5
 --- !u!114 &7823694639924144761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32089,6 +32094,54 @@ MonoBehaviour:
   _duration: 1
   _enemyTimeScale: 0.5
   _markerPrefab: {fileID: 0}
+--- !u!114 &8916903027818413115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7306029376340620380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c5c3423283ad6d4d8217bddd6748ef8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerParry
+  _parryPreviousAction: {fileID: -3882990654037931100, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _parryNextAction: {fileID: 3151153704128378850, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _readyTime: 1
+  _teleportDistance: 1.5
+  _teleportBlockLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  _reactDistance: 7.5
+  _reactTime: 1
+  _parryChase:
+    _energyGain: 5
+    _ultimateGaugeGain: 50
+    _power: 10
+    _advanceDistance: 0.5
+    _advanceDuration: 0.15
+    _fadeTime: 0.1
+    _inputBuffer: 0.4
+    _useLegRun: 1
+    _alwaysLegRun: 0
+    _canDashCancel: 0
+    _isInvincibleOnSwing: 1
+--- !u!114 &8149544136973105350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7306029376340620380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be4363cba63a79148ae22a88d3645ada, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerUltimate
+  _maxGauge: 3000
+  _parryGaugeGain: 300
+  _perfectDodgeGaugeGain: 300
 --- !u!1 &7306636993918616150
 GameObject:
   m_ObjectHideFlags: 0

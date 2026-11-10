@@ -41,19 +41,24 @@ public class DummyEnemyAttacker : MonoBehaviour
     private bool _isParryWindowOpen;
 
     private EnemyAttackSetting CurrentAttack => _attacks[_attackIndex];
+    // 예고를 시작해 판정이 나기 전까지가 공격 중이다. 판정 순간 패링당해도 판정 대기 단계에서 경직이 들어온다.
+    private bool IsAttacking => _phase == Phase.Telegraph || _phase == Phase.HitDelay;
 
     private void Start() => Init();
     private void Update() => UpdateAttack();
     private void OnDisable() => CloseParryWindow();
     private void OnDrawGizmosSelected() => DrawHitRanges();
 
-    // 진행 중이던 공격을 끊고 경직한다. 패링당한 공격은 소모된 것으로 보고 경직이 끝나면 다음 공격으로 넘어간다.
+    // 경직한다. 공격 중(예고 · 판정 대기)이었으면 그 공격을 끊고, 끊긴 공격은 소모된 것으로 보고 경직이 끝나면 다음 공격으로 넘어간다.
+    // 공격 전 대기 중이거나 이미 경직 중이면 끊을 공격이 없으므로 공격 순서는 그대로 두고, 경직이 끝나면 원래 하려던 공격을 한다.
     public void Stagger(float duration)
     {
         CloseParryWindow();
         _renderer.transform.localScale = _originalScale;
         _renderer.material.color = _staggerColor;
-        _attackIndex = (_attackIndex + 1) % _attacks.Length;
+
+        if(IsAttacking) _attackIndex = (_attackIndex + 1) % _attacks.Length;
+
         _timer = duration;
         _phase = Phase.Stagger;
 
