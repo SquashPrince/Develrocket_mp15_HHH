@@ -11,6 +11,7 @@ public class PlayerAnimationEventRelay : MonoBehaviour
     // 어느 Animator 상태에서 온 이벤트인지 함께 넘겨 현재 상태의 이벤트만 처리하게 한다.
     private void ComboInputOpen(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.ComboInputOpen, animationEvent);
     private void Hit(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.Hit, animationEvent);
+    private void Impact(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.Impact, animationEvent);
     private void AttackMotionEnd(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.AttackMotionEnd, animationEvent);
     private void RecoveryEnd(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.RecoveryEnd, animationEvent);
 

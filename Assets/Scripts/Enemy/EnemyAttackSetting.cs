@@ -7,9 +7,12 @@ using UnityEngine;
 public class EnemyAttackSetting
 {
     // 플레이어가 맞았을 때의 반응. 피격은 제자리 경직, 넉백은 밀려난 뒤 일어난다.
+    // 큰 피격은 피격과 같이 경직 · 밀림 값을 쓰고 모션만 큰 피격 모션으로 나온다. (강공격)
+    // Inspector 에 저장된 값은 순서 번호이므로, 새 반응은 항상 맨 뒤에 추가한다.
     public enum HitReaction
     {
         Hit,
+        HeavyHit,
         Knockback
     }
 
@@ -42,11 +45,11 @@ public class EnemyAttackSetting
 
     [Header("플레이어 반응")]
     [SerializeField] private HitReaction _reaction = HitReaction.Hit;
-    [Tooltip("[피격] 멈춰 있는 시간(초). 강공격처럼 큰 경직은 길게 준다")]
+    [Tooltip("[피격 · 큰 피격] 멈춰 있는 시간(초). 강공격처럼 큰 경직은 길게 준다")]
     [SerializeField, Min(0f)] private float _hitStunTime = 0.4f;
-    [Tooltip("[피격] 경직이 시작될 때 공격 반대 방향으로 밀려나는 거리. 0이면 제자리에서 경직")]
+    [Tooltip("[피격 · 큰 피격] 경직이 시작될 때 공격 반대 방향으로 밀려나는 거리. 0이면 제자리에서 경직")]
     [SerializeField, Min(0f)] private float _hitPushDistance;
-    [Tooltip("[피격] 밀려나는 데 걸리는 시간(초). 경직 시간보다 길면 경직이 끝날 때 함께 멈춘다")]
+    [Tooltip("[피격 · 큰 피격] 밀려나는 데 걸리는 시간(초). 경직 시간보다 길면 경직이 끝날 때 함께 멈춘다")]
     [SerializeField, Min(0.01f)] private float _hitPushDuration = 0.2f;
     [Tooltip("[넉백] 공격 반대 방향으로 밀려나는 거리")]
     [SerializeField, Min(0f)] private float _knockbackDistance = 3f;

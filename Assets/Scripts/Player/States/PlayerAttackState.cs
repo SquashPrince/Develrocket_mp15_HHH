@@ -26,8 +26,9 @@ public class PlayerAttackState : PlayerState
         DashAttack,
         DodgeCounter,
         ParryChase,
-        // 필살기는 공격 상태가 아닌 필살기 상태가 처리한다. 적중 로그에서 공격 종류를 구분하는 데만 쓴다.
-        Ultimate
+        // 필살기 · 콤보 스킬은 공격 상태가 아닌 각자의 상태가 처리한다. 적중 로그에서 공격 종류를 구분하는 데만 쓴다.
+        Ultimate,
+        ComboSkill
     }
 
     private enum Phase
@@ -142,7 +143,8 @@ public class PlayerAttackState : PlayerState
                 _isComboInputOpen = true;
                 break;
             case PlayerAnimationEventType.Hit:
-                Controller.PerformHit(_type, _setting);
+            case PlayerAnimationEventType.Impact:
+                Controller.PerformHit(_type, _setting, isImpact: type == PlayerAnimationEventType.Impact);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 OnAttackMotionEnd();

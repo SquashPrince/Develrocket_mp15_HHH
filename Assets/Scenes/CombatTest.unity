@@ -119,6 +119,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &62100410 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7306029376340620380, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+  m_PrefabInstance: {fileID: 1784046741436834221}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &253891554
 GameObject:
   m_ObjectHideFlags: 0
@@ -492,7 +497,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60.000004
+  field of view: 64.49285
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1006,6 +1011,10 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[0]._reaction
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._hitStunTime
       value: 0.8
       objectReference: {fileID: 0}
@@ -1355,11 +1364,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._name
-      value: Parry
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[1]._name
@@ -1367,11 +1376,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._power
-      value: 15
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._reaction
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[1]._reaction
@@ -1379,19 +1388,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._getUpTime
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[0]._hitRadius
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[1]._getUpTime
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[0]._hitCenter.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[0]._hitCenter.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._hitStunTime
-      value: 0.4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._isParryable
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[1]._hitStunTime
@@ -1407,7 +1428,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._telegraphTime
-      value: 0.8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[1]._telegraphTime
@@ -1415,11 +1436,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._telegraphScale
-      value: 1.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[1]._telegraphScale
       value: 1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[0]._canPerfectDodge
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._hitPushDistance
@@ -1427,23 +1452,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._hitPushDuration
-      value: 0.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[1]._hitPushDistance
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[0]._parryStaggerTime
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[0]._telegraphColor.a
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._telegraphColor.b
-      value: 0.015686275
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._telegraphColor.g
-      value: 0.92156863
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._telegraphColor.r
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[1]._telegraphColor.b
@@ -1459,11 +1492,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._knockbackDistance
-      value: 7.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._knockbackDuration
-      value: 0.725
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[0]._useTelegraphColor
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[1]._knockbackDistance
@@ -1752,12 +1789,25 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7492969571146502241, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
   m_PrefabInstance: {fileID: 1784046741436834221}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 62100410}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d16b8cc6c2cb09b4990c4e01cbb45567, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTargeting
+--- !u!114 &1675973298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62100410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63cc0c6ea269c174eb9a990b910fd11e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerGroggyDebug
+  _groggyAction: {fileID: 4882079035516688179, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
 --- !u!1 &1942779148
 GameObject:
   m_ObjectHideFlags: 0
@@ -2033,7 +2083,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._reaction
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[1]._reaction
@@ -2248,58 +2298,6 @@ PrefabInstance:
       propertyPath: _cameraTransform
       value: 
       objectReference: {fileID: 330585546}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _heavyAttack._fadeTime
-      value: 0.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _dashAttack._advanceDistance
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _dashAttack._advanceDuration
-      value: 0.275
-      objectReference: {fileID: 0}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _heavyAttack._advanceDistance
-      value: 4.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _heavyAttack._advanceDuration
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _dodgeCounter._advanceDuration
-      value: 0.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _specialSkill._advanceDuration
-      value: 1.65
-      objectReference: {fileID: 0}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _dodgeCounter._isInvincibleOnSwing
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _specialSkill._isInvincibleOnSwing
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _comboSteps.Array.data[0]._advanceDuration
-      value: 0.265
-      objectReference: {fileID: 0}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _comboSteps.Array.data[1]._advanceDuration
-      value: 0.315
-      objectReference: {fileID: 0}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _comboSteps.Array.data[2]._advanceDuration
-      value: 0.775
-      objectReference: {fileID: 0}
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _comboSteps.Array.data[3]._advanceDuration
-      value: 0.45
-      objectReference: {fileID: 0}
     - target: {fileID: 3907669777063714774, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2340,6 +2338,82 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[0]._useLegRun
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[1]._useLegRun
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[2]._useLegRun
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[0]._canDashCancel
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[1]._canDashCancel
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[2]._canDashCancel
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[0]._advanceDistance
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[0]._advanceDuration
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[1]._advanceDistance
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[1]._advanceDuration
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[2]._advanceDistance
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[2]._advanceDuration
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[0]._canUltimateCancel
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[1]._canUltimateCancel
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[2]._canUltimateCancel
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[0]._isInvincibleOnSwing
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[1]._isInvincibleOnSwing
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      propertyPath: _chainSteps.Array.data[2]._isInvincibleOnSwing
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7306029376340620380, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
       propertyPath: m_Name
       value: Player
@@ -2352,98 +2426,13 @@ PrefabInstance:
       propertyPath: _cameraTransform
       value: 
       objectReference: {fileID: 330585546}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _maxGauge
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _ultimateAction
-      value: 
-      objectReference: {fileID: 6644543871057390047, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[1]._power
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[1]._fadeTime
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[0]._useLegRun
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[1]._useLegRun
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[1]._energyGain
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[1]._inputBuffer
-      value: 0.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[0]._canDashCancel
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[1]._canDashCancel
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[0]._advanceDistance
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[0]._advanceDuration
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[1]._advanceDistance
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[1]._advanceDuration
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[0]._canUltimateCancel
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[1]._canUltimateCancel
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[1]._ultimateGaugeGain
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[0]._isInvincibleOnSwing
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8149544136973105350, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _attackSteps.Array.data[1]._isInvincibleOnSwing
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8916903027818413115, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _parryChase._canUltimateCancel
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8916903027818413115, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _parryChase._isInvincibleOnSwing
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7306029376340620380, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1675973298}
   m_SourcePrefab: {fileID: 100100000, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
 --- !u!1001 &2466157165362577959
 PrefabInstance:
@@ -2463,6 +2452,14 @@ PrefabInstance:
       objectReference: {fileID: 1675973285}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attackInterval
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[1]._reaction
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[2]._reaction
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8041674962229910187, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}

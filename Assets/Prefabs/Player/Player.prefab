@@ -31842,6 +31842,7 @@ GameObject:
   - component: {fileID: 3260304514223116691}
   - component: {fileID: 8916903027818413115}
   - component: {fileID: 8149544136973105350}
+  - component: {fileID: 3235283595720457195}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -31925,57 +31926,62 @@ MonoBehaviour:
     _ultimateGaugeGain: 50
     _power: 10
     _advanceDistance: 1.5
-    _advanceDuration: 0.35
+    _advanceDuration: 0.265
     _fadeTime: 0.2
     _inputBuffer: 0.2
     _useLegRun: 1
     _alwaysLegRun: 0
     _canDashCancel: 1
+    _canUltimateCancel: 1
     _isInvincibleOnSwing: 0
   - _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
     _advanceDistance: 2
-    _advanceDuration: 0.4
+    _advanceDuration: 0.315
     _fadeTime: 0.2
     _inputBuffer: 0.2
     _useLegRun: 1
     _alwaysLegRun: 0
     _canDashCancel: 1
+    _canUltimateCancel: 1
     _isInvincibleOnSwing: 0
   - _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
     _advanceDistance: 4.5
-    _advanceDuration: 0.85
+    _advanceDuration: 0.775
     _fadeTime: 0.2
     _inputBuffer: 0.2
     _useLegRun: 0
     _alwaysLegRun: 0
     _canDashCancel: 0
+    _canUltimateCancel: 1
     _isInvincibleOnSwing: 1
   - _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
     _advanceDistance: 3
-    _advanceDuration: 0.5
+    _advanceDuration: 0.45
     _fadeTime: 0.2
     _inputBuffer: 0.2
     _useLegRun: 0
     _alwaysLegRun: 0
     _canDashCancel: 1
+    _canUltimateCancel: 1
     _isInvincibleOnSwing: 0
   _heavyAttack:
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
-    _advanceDistance: 3.5
-    _advanceDuration: 1
-    _fadeTime: 0.1
+    _advanceDistance: 4.5
+    _advanceDuration: 0.5
+    _fadeTime: 0.25
     _inputBuffer: 0
     _useLegRun: 0
     _alwaysLegRun: 0
     _canDashCancel: 0
+    _canUltimateCancel: 1
     _isInvincibleOnSwing: 0
   _chargeTime: 0.6
   _hitBoxCenter: {x: 0, y: 1, z: 0.5}
@@ -31985,26 +31991,28 @@ MonoBehaviour:
     _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
-    _advanceDistance: 1.5
-    _advanceDuration: 0.25
+    _advanceDistance: 5
+    _advanceDuration: 0.275
     _fadeTime: 0.2
     _inputBuffer: 0.1
     _useLegRun: 1
     _alwaysLegRun: 1
     _canDashCancel: 1
+    _canUltimateCancel: 1
     _isInvincibleOnSwing: 0
   _dodgeCounter:
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
     _advanceDistance: 1.5
-    _advanceDuration: 0.15
+    _advanceDuration: 0.4
     _fadeTime: 0.1
     _inputBuffer: 0.4
     _useLegRun: 0
     _alwaysLegRun: 0
     _canDashCancel: 0
-    _isInvincibleOnSwing: 0
+    _canUltimateCancel: 1
+    _isInvincibleOnSwing: 1
   _skill:
     _energyGain: 5
     _ultimateGaugeGain: 50
@@ -32016,19 +32024,21 @@ MonoBehaviour:
     _useLegRun: 0
     _alwaysLegRun: 0
     _canDashCancel: 1
+    _canUltimateCancel: 1
     _isInvincibleOnSwing: 0
   _specialSkill:
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
     _advanceDistance: 7.5
-    _advanceDuration: 1.25
+    _advanceDuration: 1.65
     _fadeTime: 0.1
     _inputBuffer: 0.4
     _useLegRun: 0
     _alwaysLegRun: 0
     _canDashCancel: 1
-    _isInvincibleOnSwing: 0
+    _canUltimateCancel: 1
+    _isInvincibleOnSwing: 1
   _specialSkillEnergyCost: 60
 --- !u!114 &6322618722868687519
 MonoBehaviour:
@@ -32110,9 +32120,6 @@ MonoBehaviour:
   _parryNextAction: {fileID: 3151153704128378850, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _readyTime: 1
   _teleportDistance: 1.5
-  _teleportBlockLayers:
-    serializedVersion: 2
-    m_Bits: 1
   _reactDistance: 7.5
   _reactTime: 1
   _parryChase:
@@ -32126,6 +32133,7 @@ MonoBehaviour:
     _useLegRun: 1
     _alwaysLegRun: 0
     _canDashCancel: 0
+    _canUltimateCancel: 0
     _isInvincibleOnSwing: 1
 --- !u!114 &8149544136973105350
 MonoBehaviour:
@@ -32139,9 +32147,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be4363cba63a79148ae22a88d3645ada, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerUltimate
-  _maxGauge: 3000
+  _ultimateAction: {fileID: 6644543871057390047, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _maxGauge: 1
   _parryGaugeGain: 300
   _perfectDodgeGaugeGain: 300
+  _attackSteps:
+  - _energyGain: 5
+    _ultimateGaugeGain: 50
+    _power: 10
+    _advanceDistance: 6
+    _advanceDuration: 4
+    _fadeTime: 0.1
+    _inputBuffer: 0.4
+    _useLegRun: 0
+    _alwaysLegRun: 0
+    _canDashCancel: 0
+    _canUltimateCancel: 0
+    _isInvincibleOnSwing: 1
+  - _energyGain: 5
+    _ultimateGaugeGain: 50
+    _power: 10
+    _advanceDistance: 4
+    _advanceDuration: 2
+    _fadeTime: 0.1
+    _inputBuffer: 0.4
+    _useLegRun: 0
+    _alwaysLegRun: 0
+    _canDashCancel: 0
+    _canUltimateCancel: 0
+    _isInvincibleOnSwing: 1
+  _hitStaggerTime: 2
+  _targetSearchRange: 10
+  _teleportDistance: 1.5
+--- !u!114 &3235283595720457195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7306029376340620380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfb3bd9d0ab25fe4798d06e9599195fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerTeleport
+  _blockLayers:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!1 &7306636993918616150
 GameObject:
   m_ObjectHideFlags: 0
