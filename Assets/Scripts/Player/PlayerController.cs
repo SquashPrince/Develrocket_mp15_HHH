@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController), typeof(PlayerEnergy), typeof(PlayerTargeting))]
 [RequireComponent(typeof(PlayerHealth), typeof(PlayerSlowMotion), typeof(PlayerParry))]
+[RequireComponent(typeof(PlayerUltimate))]
 public class PlayerController : MonoBehaviour
 {
     private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
@@ -88,6 +89,7 @@ public class PlayerController : MonoBehaviour
     private PlayerEnergy _energy;
     private PlayerTargeting _targeting;
     private PlayerSlowMotion _slowMotion;
+    private PlayerUltimate _ultimate;
     private PlayerStateMachine _stateMachine;
     private PlayerLocomotionState _locomotionState;
     private PlayerDashState _dashState;
@@ -286,7 +288,7 @@ public class PlayerController : MonoBehaviour
         return true;
     }
 
-    // 캐릭터 앞의 판정 상자 안에 있는 적에게 한 번씩 적중시키고, 적중한 적마다 공격 설정의 에너지를 얻는다.
+    // 캐릭터 앞의 판정 상자 안에 있는 적에게 한 번씩 적중시키고, 적중한 적마다 공격 설정의 에너지와 필살기 게이지를 얻는다.
     public void PerformHit(PlayerAttackState.AttackType type, PlayerAttackSetting setting)
     {
         Vector3 center = transform.TransformPoint(_hitBoxCenter);
@@ -307,6 +309,8 @@ public class PlayerController : MonoBehaviour
 #if UNITY_EDITOR
             Debug.Log($"[적중] {type} 위력 {setting.Power} / 에너지 +{setting.EnergyGain} → {_energy.CurrentEnergy:F1}");
 #endif
+
+            _ultimate.AddGauge(setting.UltimateGaugeGain);
         }
     }
 
@@ -401,6 +405,7 @@ public class PlayerController : MonoBehaviour
         _energy = GetComponent<PlayerEnergy>();
         _targeting = GetComponent<PlayerTargeting>();
         _slowMotion = GetComponent<PlayerSlowMotion>();
+        _ultimate = GetComponent<PlayerUltimate>();
         Health = GetComponent<PlayerHealth>();
     }
 

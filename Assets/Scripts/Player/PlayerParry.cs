@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 // 패링을 시작하면 패링 공격을 하는 적 앞으로 순간 이동한다. 실제로 이동하면 벽 등에 걸리기 때문이다. 도착 지점이 막혀 있으면 제자리에서 패링한다.
 // 패링 공격을 하는 적이 여럿이면 공격 대상 기준(록온 대상 → 자동 조준 대상)을 따르고, 둘 다 아니면 가장 최근에 예고를 시작한 적을 고른다.
 [RequireComponent(typeof(PlayerController), typeof(CharacterController), typeof(PlayerTargeting))]
+[RequireComponent(typeof(PlayerUltimate))]
 public class PlayerParry : MonoBehaviour
 {
     [Header("입력")]
@@ -33,6 +34,7 @@ public class PlayerParry : MonoBehaviour
     private PlayerController _controller;
     private CharacterController _characterController;
     private PlayerTargeting _targeting;
+    private PlayerUltimate _ultimate;
     private PlayerParryState _parryState;
 
     public float ReadyTime => _readyTime;
@@ -56,6 +58,7 @@ public class PlayerParry : MonoBehaviour
 #endif
 
         attacker.Stagger(attack.ParryStaggerTime);
+        _ultimate.AddParryGauge();
         _parryState.OnParrySuccess(attacker.transform.position);
         return true;
     }
@@ -135,6 +138,7 @@ public class PlayerParry : MonoBehaviour
         _controller = GetComponent<PlayerController>();
         _characterController = GetComponent<CharacterController>();
         _targeting = GetComponent<PlayerTargeting>();
+        _ultimate = GetComponent<PlayerUltimate>();
     }
 
     private void Init()

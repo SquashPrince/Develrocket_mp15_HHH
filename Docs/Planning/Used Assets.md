@@ -18,6 +18,14 @@
     - 사용처 : 플레이어 캐릭터
     - 관련 Prefab : 추후 기록
 
+### 2. 애니메이션
+
+- Paladin Anim Set
+    - 사용처 : 검방 캐릭터
+
+- Powerful Sword PackGreat Sword Katana
+    - 사용처 : 검방 캐릭터
+
 ---
 
 ## 미사용 

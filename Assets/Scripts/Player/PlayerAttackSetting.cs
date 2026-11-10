@@ -8,6 +8,8 @@ public class PlayerAttackSetting
 {
     [Tooltip("적중한 적 하나마다 얻는 에너지")]
     [SerializeField, Min(0f)] private float _energyGain = 5f;
+    [Tooltip("적중한 적 하나마다 얻는 필살기 게이지")]
+    [SerializeField, Min(0f)] private float _ultimateGaugeGain = 50f;
     [Tooltip("적중 시 위력. 적 체력이 생기기 전까지는 로그로만 확인한다")]
     [SerializeField, Min(0f)] private float _power = 10f;
     [Tooltip("휘두르기 시작부터 앞으로 나아가는 거리")]
@@ -28,6 +30,7 @@ public class PlayerAttackSetting
     [SerializeField] private bool _isInvincibleOnSwing;
 
     public float EnergyGain => _energyGain;
+    public float UltimateGaugeGain => _ultimateGaugeGain;
     public float Power => _power;
     public float AdvanceDistance => _advanceDistance;
     public float AdvanceDuration => _advanceDuration;
