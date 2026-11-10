@@ -2,17 +2,28 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // 지금 패링 가능 시간을 열어 둔 적 목록. 적은 패링 공격의 예고를 시작할 때 열고, 판정 · 경직 때 닫는다.
-// 플레이어는 패링 키를 누를 때 하나라도 열려 있으면 패링을 시작하고, 가장 최근에 연 적 앞으로 순간 이동한다.
+// 플레이어는 패링 키를 누를 때 록온 사거리 안에 연 적이 있으면 패링을 시작하고, 그중 한 적 앞으로 순간 이동한다.
 public static class ParryWindow
 {
     private static readonly List<DummyEnemyAttacker> _openAttackers = new List<DummyEnemyAttacker>();
 
-    public static bool IsOpen => _openAttackers.Count > 0;
-
-    // 가장 최근에 패링 가능 시간을 연 적. 열린 적이 없으면 null 이다.
-    public static DummyEnemyAttacker LatestAttacker => IsOpen ? _openAttackers[_openAttackers.Count - 1] : null;
-
     public static bool IsOpenBy(DummyEnemyAttacker attacker) => _openAttackers.Contains(attacker);
+
+    // position 에서 range 안에 있는 적 중 가장 최근에 패링 가능 시간을 연 적. 없으면 null 이다.
+    // 나중에 연 적이 목록 뒤에 있으므로 뒤에서부터 찾는다.
+    public static DummyEnemyAttacker FindLatestWithin(Vector3 position, float range)
+    {
+        float sqrRange = range * range;
+
+        for(int i = _openAttackers.Count - 1; i >= 0; i--)
+        {
+            DummyEnemyAttacker attacker = _openAttackers[i];
+
+            if((attacker.transform.position - position).sqrMagnitude <= sqrRange) return attacker;
+        }
+
+        return null;
+    }
 
     public static void Open(DummyEnemyAttacker attacker)
     {

@@ -1,12 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// 패링 입력과 수치. 적의 패링 가능 시간이 열려 있을 때 패링 키를 누르면 어느 상태에서든 패링 상태로 넘긴다.
+// 패링 입력과 수치. 록온 사거리 안의 적이 패링 가능 시간을 열었을 때 패링 키를 누르면 어느 상태에서든 패링 상태로 넘긴다.
 // 코어 전투에서는 이전 · 다음 캐릭터 키 모두 현재 캐릭터가 직접 패링한다. 교체 방향 구분은 파티 전투 단계에서 한다.
-// 이미 패링 중이거나, 시전 중 무적인 공격(패링 추격 포함)을 휘두르는 중이면 입력을 무시한다.
-// 패링 가능 시간 밖의 입력도 무시한다. 파티 전투에서는 이 입력이 그냥 교체가 된다.
+// 이미 패링 중이거나, 시전 중 무적인 공격(패링 추격 · 필살기 포함) 중이면 입력을 무시한다.
+// 패링 가능 시간 밖이거나 록온 사거리 밖의 적만 연 경우의 입력도 무시한다. 파티 전투에서는 이 입력이 그냥 교체가 된다.
 // 패링을 시작하면 패링 공격을 하는 적 앞으로 순간 이동한다. 실제로 이동하면 벽 등에 걸리기 때문이다. 도착 지점이 막혀 있으면 제자리에서 패링한다.
-// 패링 공격을 하는 적이 여럿이면 공격 대상 기준(록온 대상 → 자동 조준 대상)을 따르고, 둘 다 아니면 가장 최근에 예고를 시작한 적을 고른다.
+// 패링 공격을 하는 적이 여럿이면 공격 대상 기준(록온 대상 → 자동 조준 대상)을 따르고, 둘 다 아니면 록온 사거리 안에서 가장 최근에 예고를 시작한 적을 고른다.
 [RequireComponent(typeof(PlayerController), typeof(PlayerTeleport), typeof(PlayerTargeting))]
 [RequireComponent(typeof(PlayerUltimate))]
 public class PlayerParry : MonoBehaviour
@@ -34,6 +34,8 @@ public class PlayerParry : MonoBehaviour
     private PlayerTargeting _targeting;
     private PlayerUltimate _ultimate;
     private PlayerParryState _parryState;
+    // 패링 키를 누른 순간 고른 패링 대상. 패링 상태에 들어가며 이 적 앞으로 순간 이동한다.
+    private DummyEnemyAttacker _selectedAttacker;
 
     public float ReadyTime => _readyTime;
     public float ReactDistance => _reactDistance;
@@ -61,19 +63,16 @@ public class PlayerParry : MonoBehaviour
         return true;
     }
 
-    // 패링 공격을 하는 적의 정면, 정해진 거리만큼 떨어진 곳으로 순간 이동하고 적 쪽을 본다.
+    // 패링 키를 누른 순간 고른 적의 정면, 정해진 거리만큼 떨어진 곳으로 순간 이동하고 적 쪽을 본다.
     // 적은 예고를 시작할 때 플레이어 쪽으로 돌기 때문에, 적의 정면은 플레이어가 있던 쪽이다.
     // 도착 지점이 막혀 있으면 이동하지 않고 제자리에서 패링한다.
     public void TeleportToAttacker()
     {
-        DummyEnemyAttacker attacker = SelectAttacker();
-
-        if(attacker == null) return;
-
-        _teleport.TryTeleport(attacker.transform.position, attacker.transform.forward, _teleportDistance);
+        _teleport.TryTeleport(_selectedAttacker.transform.position, _selectedAttacker.transform.forward, _teleportDistance);
     }
 
-    // 패링 가능 시간을 연 적 중에서 공격 대상 기준으로 고른다. 록온 대상 → 자동 조준 대상 → 가장 최근에 예고를 시작한 적 순서다.
+    // 록온 사거리 안에서 패링 가능 시간을 연 적 중 공격 대상 기준으로 고른다. 록온 대상 → 자동 조준 대상 → 가장 최근에 예고를 시작한 적 순서다.
+    // 록온 사거리는 록온이 풀리는 거리와 같아, 록온할 수 있는 거리의 적만 패링할 수 있다. 없으면 null 이다.
     private DummyEnemyAttacker SelectAttacker()
     {
         DummyEnemyAttacker lockAttacker = GetOpenAttacker(_targeting.LockTarget);
@@ -82,24 +81,31 @@ public class PlayerParry : MonoBehaviour
 
         DummyEnemyAttacker aimAttacker = GetOpenAttacker(_targeting.FindTarget(_targeting.AttackRange));
 
-        return aimAttacker != null ? aimAttacker : ParryWindow.LatestAttacker;
+        return aimAttacker != null ? aimAttacker : ParryWindow.FindLatestWithin(transform.position, _targeting.LockOnRange);
     }
 
-    // 대상이 패링 가능 시간을 연 적이면 그 공격 기능을, 아니면 null 을 돌려준다.
-    private static DummyEnemyAttacker GetOpenAttacker(DummyEnemy target)
+    // 대상이 록온 사거리 안에서 패링 가능 시간을 연 적이면 그 공격 기능을, 아니면 null 을 돌려준다.
+    private DummyEnemyAttacker GetOpenAttacker(DummyEnemy target)
     {
         if(target == null) return null;
 
         DummyEnemyAttacker attacker = target.GetComponent<DummyEnemyAttacker>();
 
-        return attacker != null && ParryWindow.IsOpenBy(attacker) ? attacker : null;
-    }
+        if(attacker == null || !ParryWindow.IsOpenBy(attacker)) return null;
 
+        float lockOnRange = _targeting.LockOnRange;
+
+        return (attacker.transform.position - transform.position).sqrMagnitude <= lockOnRange * lockOnRange ? attacker : null;
+    }
 
     private void TryStartParry()
     {
-        if(!WasParryPressed || !ParryWindow.IsOpen) return;
+        if(!WasParryPressed) return;
         if(_parryState.IsActive || _controller.Health.IsAttackInvincible) return;
+
+        _selectedAttacker = SelectAttacker();
+
+        if(_selectedAttacker == null) return;
 
         _controller.EnterState(_parryState);
     }
