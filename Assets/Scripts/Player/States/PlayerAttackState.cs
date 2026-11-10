@@ -25,7 +25,9 @@ public class PlayerAttackState : PlayerState
         SpecialSkill,
         DashAttack,
         DodgeCounter,
-        ParryChase
+        ParryChase,
+        // 필살기는 공격 상태가 아닌 필살기 상태가 처리한다. 적중 로그에서 공격 종류를 구분하는 데만 쓴다.
+        Ultimate
     }
 
     private enum Phase
@@ -35,6 +37,7 @@ public class PlayerAttackState : PlayerState
     }
 
     private PlayerAttackSetting _setting;
+    private DummyEnemy _priorityTarget;
     private AttackType _type;
     private Phase _phase;
     private Vector3 _advanceVelocity;
@@ -48,6 +51,9 @@ public class PlayerAttackState : PlayerState
     {
     }
 
+    // 공격마다 공격 설정에서 필살기로 끊을 수 있는지 정한다.
+    public override bool CanUseUltimate => _setting.CanUltimateCancel;
+
     private bool IsSkill => _type == AttackType.Skill || _type == AttackType.SpecialSkill;
     // 콤보의 마지막 단계는 마무리 공격이다. 끝났다는 느낌을 주기 위해 후딜이 끝날 때까지 공격 입력을 받지 않는다.
     private bool IsFinisher => _type == AttackType.Basic && _step == Controller.ComboStepCount - 1;
@@ -57,11 +63,13 @@ public class PlayerAttackState : PlayerState
     private bool CanChargeInSwing => _type != AttackType.DashAttack && _type != AttackType.DodgeCounter && _type != AttackType.ParryChase;
 
     // step : 기본 공격 단계(0부터). 기본 공격이 아니면 사용하지 않는다.
-    public void Setup(AttackType type, int step, PlayerAttackSetting setting)
+    // priorityTarget : 록온 중이 아닐 때 자동 조준보다 먼저 노릴 대상. 없으면 null
+    public void Setup(AttackType type, int step, PlayerAttackSetting setting, DummyEnemy priorityTarget = null)
     {
         _type = type;
         _step = step;
         _setting = setting;
+        _priorityTarget = priorityTarget;
         _animationHash = GetAnimationHash(type, step);
     }
 
@@ -80,7 +88,7 @@ public class PlayerAttackState : PlayerState
 
         // 콤보 2단부터는 이동 입력으로 방향을 바꾸지 않는다. 콤보 도중 방향이 휙휙 바뀌면 모션이 어색하기 때문이다.
         bool canTurnToInput = _type != AttackType.Basic || _step == 0;
-        float advanceDistance = Controller.AimAttack(_setting, canTurnToInput);
+        float advanceDistance = Controller.AimAttack(_setting, canTurnToInput, _priorityTarget);
 
         _advanceVelocity = Controller.transform.forward * (advanceDistance / _setting.AdvanceDuration);
 

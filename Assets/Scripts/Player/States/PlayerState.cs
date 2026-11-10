@@ -10,6 +10,10 @@ public abstract class PlayerState
 
     protected PlayerController Controller { get; }
 
+    // 이 상태에서 필살기를 쓸 수 있는지. 기본은 쓸 수 없고, 허용할 상태만 재정의한다.
+    // 새 상태를 추가할 때 따로 적지 않아도 필살기가 막히도록 기본값을 불가로 둔다.
+    public virtual bool CanUseUltimate => false;
+
     public virtual void Enter()
     {
     }

@@ -4,6 +4,7 @@ using UnityEngine;
 // 준비 : 패링 공격을 하는 적 앞으로 순간 이동한 뒤 자세를 유지한다. 적 공격이 끊겨도 정해진 시간까지 유지하고, 그동안 노란 공격이 오지 않으면 이동으로 돌아간다.
 // 반응 : 공격한 적 반대 방향으로 점점 느려지며 밀려난다. 반응 동안 노란 공격이 다시 닿으면(연속 패링) 반응을 처음부터 다시 시작한다.
 // 추격 : 반응 동안 공격 키를 눌렀으면 반응이 끝난 뒤 추격 공격이 나간다. 연속 패링이 일어나면 이전 입력은 지우고 마지막 반응의 입력만 본다.
+//        추격 대상은 록온 중이면 록온 대상, 아니면 마지막으로 패링한 적이다.
 // 노란색이 아닌 공격은 패링되지 않고 기존처럼 맞는다.
 public class PlayerParryState : PlayerState
 {
@@ -18,6 +19,7 @@ public class PlayerParryState : PlayerState
     }
 
     private readonly PlayerParry _parry;
+    private DummyEnemy _parriedTarget;
     private Vector3 _awayDirection;
     private Phase _phase;
     private float _timer;
@@ -45,9 +47,11 @@ public class PlayerParryState : PlayerState
     public override void Exit() => IsActive = false;
 
     // 공격한 적 쪽을 보고, 그 반대 방향으로 밀려나기 시작한다. 연속 패링이면 반응과 추격 입력을 처음부터 다시 시작한다.
-    public void OnParrySuccess(Vector3 attackerPosition)
+    // 마지막으로 패링한 적을 기억해, 록온 중이 아니면 추격 공격이 그 적에게 나가게 한다.
+    public void OnParrySuccess(DummyEnemy parriedTarget)
     {
-        _awayDirection = Controller.transform.position - attackerPosition;
+        _parriedTarget = parriedTarget;
+        _awayDirection = Controller.transform.position - parriedTarget.transform.position;
         _awayDirection.y = 0f;
 
         // 적과 위치가 겹치면 방향을 알 수 없으므로 뒤로 밀려난다.
@@ -89,7 +93,7 @@ public class PlayerParryState : PlayerState
 
         Controller.HorizontalVelocity = Vector3.zero;
 
-        if(_hasChaseInput) Controller.StartAttack(PlayerAttackState.AttackType.ParryChase, _parry.ParryChase);
+        if(_hasChaseInput) Controller.StartAttack(PlayerAttackState.AttackType.ParryChase, _parry.ParryChase, _parriedTarget);
         else Controller.EnterLocomotion(false);
     }
 

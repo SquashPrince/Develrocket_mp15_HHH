@@ -26,6 +26,8 @@ public class PlayerAttackSetting
     [SerializeField] private bool _alwaysLegRun;
     [Tooltip("휘두르는 중 대시 · 회피로 끊을 수 있는지. 끄면 휘두르기가 끝날 때까지 대시 입력을 무시한다. 후딜은 항상 끊을 수 있다")]
     [SerializeField] private bool _canDashCancel = true;
+    [Tooltip("이 공격 중(휘두르기 · 후딜) 필살기 게이지가 가득 차 있으면 필살기로 끊을 수 있는지")]
+    [SerializeField] private bool _canUltimateCancel = true;
     [Tooltip("휘두르는 동안 적 공격에 맞지 않는지 여부. 회피하지 않아도 무적이며, 후딜에 들어가면 풀린다. 무적 중 들어온 노란 공격은 패링되지 않는다")]
     [SerializeField] private bool _isInvincibleOnSwing;
 
@@ -39,5 +41,6 @@ public class PlayerAttackSetting
     public bool UseLegRun => _useLegRun;
     public bool AlwaysLegRun => _alwaysLegRun;
     public bool CanDashCancel => _canDashCancel;
+    public bool CanUltimateCancel => _canUltimateCancel;
     public bool IsInvincibleOnSwing => _isInvincibleOnSwing;
 }

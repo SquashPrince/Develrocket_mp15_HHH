@@ -120,6 +120,8 @@ public class PlayerController : MonoBehaviour
     public float DashInvincibleTime => _dashInvincibleTime;
     // 완벽 회피 후 슬로모션 중인지. 이 동안의 공격 입력은 대시 공격보다 회피 반격이 우선한다.
     public bool IsPerfectDodge => _slowMotion.IsActive;
+    // 현재 상태에서 필살기를 쓸 수 있는지. 상태마다 스스로 정한다.
+    public bool CanUseUltimate => _stateMachine.CurrentState.CanUseUltimate;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -186,11 +188,12 @@ public class PlayerController : MonoBehaviour
 
     // 기본 공격 외의 공격(강공격 · 스킬 · 특수스킬 · 대시 공격 · 회피 반격 · 패링 추격)을 시작한다.
     // 진행 중이던 차지는 끊고, 이 공격들 뒤의 콤보는 1단부터 다시 시작한다.
-    public void StartAttack(PlayerAttackState.AttackType type, PlayerAttackSetting setting)
+    // priorityTarget : 록온 중이 아닐 때 자동 조준보다 먼저 노릴 대상. 패링 추격은 패링한 적을 넘긴다.
+    public void StartAttack(PlayerAttackState.AttackType type, PlayerAttackSetting setting, DummyEnemy priorityTarget = null)
     {
         _isCharging = false;
         _comboExpireTime = 0f;
-        _attackState.Setup(type, 0, setting);
+        _attackState.Setup(type, 0, setting, priorityTarget);
         _stateMachine.ChangeState(_attackState);
     }
 
@@ -238,13 +241,16 @@ public class PlayerController : MonoBehaviour
     }
 
     // 공격을 시작할 때 몸을 돌릴 방향과 전진 거리를 정하고, 전진 거리를 돌려준다.
-    // 대상은 록온 대상을 우선하고, 록온 중이 아니면 공격 사거리 안의 자동 조준 대상을 쓴다.
+    // 대상은 록온 대상 → 우선 대상 → 공격 사거리 안의 자동 조준 대상 순서로 고른다.
     // 대상이 있으면 대상 쪽으로 즉시 돌고, 대상 앞 정지 거리까지 다가간다. 다가가는 거리는 공격 사거리를 넘지 않는다.
     // 그래서 록온 대상이 공격 사거리 밖에 있으면 공격 사거리만큼만 다가가고, 공격이 닿지 않을 수 있다.
     // 대상이 없으면 canTurnToInput 일 때만 이동 입력 방향으로 돌고(입력이 없으면 그대로), 공격 설정의 전진 거리를 쓴다.
-    public float AimAttack(PlayerAttackSetting setting, bool canTurnToInput)
+    // priorityTarget : 록온 중이 아닐 때 자동 조준보다 먼저 쓸 대상. 필살기는 순간 이동한 대상을 넘긴다.
+    public float AimAttack(PlayerAttackSetting setting, bool canTurnToInput, DummyEnemy priorityTarget = null)
     {
-        DummyEnemy target = _targeting.LockTarget != null ? _targeting.LockTarget : _targeting.FindTarget(_targeting.AttackRange);
+        DummyEnemy target = _targeting.LockTarget != null ? _targeting.LockTarget : priorityTarget;
+
+        if(target == null) target = _targeting.FindTarget(_targeting.AttackRange);
 
         if(target == null)
         {
@@ -289,7 +295,8 @@ public class PlayerController : MonoBehaviour
     }
 
     // 캐릭터 앞의 판정 상자 안에 있는 적에게 한 번씩 적중시키고, 적중한 적마다 공격 설정의 에너지와 필살기 게이지를 얻는다.
-    public void PerformHit(PlayerAttackState.AttackType type, PlayerAttackSetting setting)
+    // staggerTime : 0보다 크면 맞은 적 중 공격하는 적을 이 시간 동안 경직시킨다. 경직은 적이 진행 중이던 공격을 끊는다. (필살기)
+    public void PerformHit(PlayerAttackState.AttackType type, PlayerAttackSetting setting, float staggerTime = 0f)
     {
         Vector3 center = transform.TransformPoint(_hitBoxCenter);
         int count = Physics.OverlapBoxNonAlloc(center, _hitBoxSize * 0.5f, _hitColliders, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
@@ -311,6 +318,9 @@ public class PlayerController : MonoBehaviour
 #endif
 
             _ultimate.AddGauge(setting.UltimateGaugeGain);
+
+            // 공격하지 않는 더미 적에는 공격 기능이 없으므로 경직시킬 것이 없다.
+            if(staggerTime > 0f && enemy.TryGetComponent(out DummyEnemyAttacker attacker)) attacker.Stagger(staggerTime);
         }
     }
 
