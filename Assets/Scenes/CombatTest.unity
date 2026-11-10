@@ -119,11 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &62100410 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7306029376340620380, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-  m_PrefabInstance: {fileID: 1784046741436834221}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &253891554
 GameObject:
   m_ObjectHideFlags: 0
@@ -1789,25 +1784,12 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7492969571146502241, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
   m_PrefabInstance: {fileID: 1784046741436834221}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 62100410}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d16b8cc6c2cb09b4990c4e01cbb45567, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTargeting
---- !u!114 &1675973298
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 62100410}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63cc0c6ea269c174eb9a990b910fd11e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerGroggyDebug
-  _groggyAction: {fileID: 4882079035516688179, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
 --- !u!1 &1942779148
 GameObject:
   m_ObjectHideFlags: 0
@@ -2338,82 +2320,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[0]._useLegRun
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[1]._useLegRun
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[2]._useLegRun
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[0]._canDashCancel
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[1]._canDashCancel
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[2]._canDashCancel
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[0]._advanceDistance
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[0]._advanceDuration
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[1]._advanceDistance
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[1]._advanceDuration
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[2]._advanceDistance
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[2]._advanceDuration
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[0]._canUltimateCancel
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[1]._canUltimateCancel
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[2]._canUltimateCancel
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[0]._isInvincibleOnSwing
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[1]._isInvincibleOnSwing
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4745494404723644207, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _chainSteps.Array.data[2]._isInvincibleOnSwing
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7306029376340620380, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
       propertyPath: m_Name
       value: Player
@@ -2429,10 +2335,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7306029376340620380, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1675973298}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
 --- !u!1001 &2466157165362577959
 PrefabInstance:

@@ -31843,6 +31843,8 @@ GameObject:
   - component: {fileID: 8916903027818413115}
   - component: {fileID: 8149544136973105350}
   - component: {fileID: 3235283595720457195}
+  - component: {fileID: 4745494404723644207}
+  - component: {fileID: 1745635829274798527}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -32194,6 +32196,69 @@ MonoBehaviour:
   _blockLayers:
     serializedVersion: 2
     m_Bits: 1
+--- !u!114 &4745494404723644207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7306029376340620380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a837fb2d9436fd345aac46764af39021, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerComboSkill
+  _chainSteps:
+  - _energyGain: 5
+    _ultimateGaugeGain: 50
+    _power: 10
+    _advanceDistance: 6
+    _advanceDuration: 4
+    _fadeTime: 0.1
+    _inputBuffer: 0.4
+    _useLegRun: 0
+    _alwaysLegRun: 0
+    _canDashCancel: 0
+    _canUltimateCancel: 0
+    _isInvincibleOnSwing: 1
+  - _energyGain: 5
+    _ultimateGaugeGain: 50
+    _power: 10
+    _advanceDistance: 6
+    _advanceDuration: 4
+    _fadeTime: 0.1
+    _inputBuffer: 0.4
+    _useLegRun: 0
+    _alwaysLegRun: 0
+    _canDashCancel: 0
+    _canUltimateCancel: 0
+    _isInvincibleOnSwing: 1
+  - _energyGain: 5
+    _ultimateGaugeGain: 50
+    _power: 10
+    _advanceDistance: 6
+    _advanceDuration: 4
+    _fadeTime: 0.1
+    _inputBuffer: 0.4
+    _useLegRun: 0
+    _alwaysLegRun: 0
+    _canDashCancel: 0
+    _canUltimateCancel: 0
+    _isInvincibleOnSwing: 1
+  _teleportDistance: 1.5
+--- !u!114 &1745635829274798527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7306029376340620380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63cc0c6ea269c174eb9a990b910fd11e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerGroggyDebug
+  _groggyAction: {fileID: 4882079035516688179, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
 --- !u!1 &7306636993918616150
 GameObject:
   m_ObjectHideFlags: 0
