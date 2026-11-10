@@ -62,8 +62,22 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.5668478
+      - time: 0.583797
         functionName: Hit
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.6475208
+        functionName: Impact
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.71707314
+        functionName: AttackMotionEnd
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -76,8 +90,8 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.71707314
-        functionName: AttackMotionEnd
+      - time: 0.60970587
+        functionName: Hit
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

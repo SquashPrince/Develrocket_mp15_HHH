@@ -2,7 +2,8 @@ using UnityEngine;
 
 // 피격 · 넉백 상태. 어떤 상태에서든 적 공격에 맞으면 이 상태로 넘어온다.
 // 피격 : 공격한 적 쪽을 보고 경직 시간 동안 멈춘 뒤 이동 상태로 돌아간다. 경직 중 다시 맞으면 새 피격으로 바뀐다.
-//        공격 설정에 밀림 거리가 있으면 경직이 시작될 때 공격 반대 방향으로 밀려난다. (강공격의 큰 경직)
+//        공격 설정에 밀림 거리가 있으면 경직이 시작될 때 공격 반대 방향으로 밀려난다.
+// 큰 피격 : 피격과 같은 경직 · 밀림 흐름이고, 모션만 큰 피격(HeavyHit)으로 나온다. (강공격)
 // 넉백 : 공격한 적 반대 방향으로 밀려난 뒤 일어나고, 일어나기가 끝나면 이동 상태로 돌아간다.
 //        넉백 · 일어나기 동안은 무적이다. 연속으로 맞으며 계속 띄워지는 것을 막기 위해서다.
 // 공격 설정에서 대시 캔슬을 허용한 공격이면 피격 · 넉백 중 대시 · 회피로 끊을 수 있다.
@@ -10,6 +11,7 @@ public class PlayerHitState : PlayerState
 {
     // Animator Controller 의 상태 이름과 같아야 한다.
     private static readonly int HIT_ANIMATION = Animator.StringToHash("Hit");
+    private static readonly int HEAVY_HIT_ANIMATION = Animator.StringToHash("HeavyHit");
     private static readonly int KNOCKBACK_ANIMATION = Animator.StringToHash("Knockback");
     private static readonly int GET_UP_ANIMATION = Animator.StringToHash("GetUp");
 
@@ -48,10 +50,11 @@ public class PlayerHitState : PlayerState
         Controller.FaceImmediately(-_awayDirection);
         Controller.HorizontalVelocity = Vector3.zero;
 
-        if(_attack.Reaction == EnemyAttackSetting.HitReaction.Hit)
+        // 피격과 큰 피격은 같은 경직 흐름을 쓰고 모션만 다르다.
+        if(_attack.Reaction != EnemyAttackSetting.HitReaction.Knockback)
         {
             _phase = Phase.Stun;
-            Controller.PlayAnimation(HIT_ANIMATION);
+            Controller.PlayAnimation(_attack.Reaction == EnemyAttackSetting.HitReaction.HeavyHit ? HEAVY_HIT_ANIMATION : HIT_ANIMATION);
             return;
         }
 

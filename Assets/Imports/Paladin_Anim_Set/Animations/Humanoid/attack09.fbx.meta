@@ -70,7 +70,7 @@ ModelImporter:
         intParameter: 0
         messageOptions: 0
       - time: 0.43256578
-        functionName: Hit
+        functionName: Impact
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

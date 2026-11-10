@@ -69,7 +69,8 @@ public class PlayerUltimateState : PlayerState
         switch(type)
         {
             case PlayerAnimationEventType.Hit:
-                if(_step != CUTSCENE_STEP) Controller.PerformHit(PlayerAttackState.AttackType.Ultimate, _ultimate.GetAttackStep(_step), _ultimate.HitStaggerTime);
+            case PlayerAnimationEventType.Impact:
+                if(_step != CUTSCENE_STEP) Controller.PerformHit(PlayerAttackState.AttackType.Ultimate, _ultimate.GetAttackStep(_step), _ultimate.HitStaggerTime, type == PlayerAnimationEventType.Impact);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();
@@ -92,8 +93,8 @@ public class PlayerUltimateState : PlayerState
 
         PlayerAttackSetting setting = _ultimate.GetAttackStep(_step);
 
-        // 일반 공격처럼 대상 쪽으로 돌아 대상 앞 정지 거리까지, 단계의 전진 시간 동안 다가간다.
-        float advanceDistance = Controller.AimAttack(setting, false, _target);
+        // 발동 때 정한 대상 쪽으로 돌아 대상 앞 정지 거리까지, 단계의 전진 시간 동안 다가간다. 도중에 록온이 바뀌어도 대상은 그대로다.
+        float advanceDistance = Controller.AimFixedTarget(setting, _target);
 
         _advanceDuration = setting.AdvanceDuration;
         _advanceTimer = 0f;

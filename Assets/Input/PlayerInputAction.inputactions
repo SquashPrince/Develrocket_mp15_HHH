@@ -110,7 +110,7 @@
                     "name": "DebugGroggy",
                     "type": "Button",
                     "id": "8749c8be-4f5a-49ca-aac1-76aceef66431",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false,
@@ -550,7 +550,7 @@
                 {
                     "name": "",
                     "id": "5b2e8f43-7c1a-4d96-b0e7-3f9a6c4d2e81",
-                    "path": "<Keyboard>/0",
+                    "path": "<Keyboard>/numpad0",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",

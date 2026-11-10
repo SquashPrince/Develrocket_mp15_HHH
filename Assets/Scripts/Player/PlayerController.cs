@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController), typeof(PlayerEnergy), typeof(PlayerTargeting))]
 [RequireComponent(typeof(PlayerHealth), typeof(PlayerSlowMotion), typeof(PlayerParry))]
-[RequireComponent(typeof(PlayerUltimate))]
+[RequireComponent(typeof(PlayerUltimate), typeof(PlayerComboSkill))]
 public class PlayerController : MonoBehaviour
 {
     private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
@@ -90,6 +90,7 @@ public class PlayerController : MonoBehaviour
     private PlayerTargeting _targeting;
     private PlayerSlowMotion _slowMotion;
     private PlayerUltimate _ultimate;
+    private PlayerComboSkill _comboSkill;
     private PlayerStateMachine _stateMachine;
     private PlayerLocomotionState _locomotionState;
     private PlayerDashState _dashState;
@@ -245,7 +246,7 @@ public class PlayerController : MonoBehaviour
     // 대상이 있으면 대상 쪽으로 즉시 돌고, 대상 앞 정지 거리까지 다가간다. 다가가는 거리는 공격 사거리를 넘지 않는다.
     // 그래서 록온 대상이 공격 사거리 밖에 있으면 공격 사거리만큼만 다가가고, 공격이 닿지 않을 수 있다.
     // 대상이 없으면 canTurnToInput 일 때만 이동 입력 방향으로 돌고(입력이 없으면 그대로), 공격 설정의 전진 거리를 쓴다.
-    // priorityTarget : 록온 중이 아닐 때 자동 조준보다 먼저 쓸 대상. 필살기는 순간 이동한 대상을 넘긴다.
+    // priorityTarget : 록온 중이 아닐 때 자동 조준보다 먼저 쓸 대상. 패링 추격은 패링한 적을 넘긴다.
     public float AimAttack(PlayerAttackSetting setting, bool canTurnToInput, DummyEnemy priorityTarget = null)
     {
         DummyEnemy target = _targeting.LockTarget != null ? _targeting.LockTarget : priorityTarget;
@@ -258,11 +259,17 @@ public class PlayerController : MonoBehaviour
             return setting.AdvanceDistance;
         }
 
-        Vector3 toTarget = target.transform.position - transform.position;
-        toTarget.y = 0f;
-        FaceImmediately(toTarget);
+        return FaceAndGetApproachDistance(target);
+    }
 
-        return Mathf.Clamp(toTarget.magnitude - _attackStopDistance, 0f, _targeting.AttackRange);
+    // 발동 때 정한 대상을 끝까지 노리는 공격(필살기 · 콤보 스킬)의 방향과 전진 거리를 정한다.
+    // 도중에 록온을 바꾸거나 풀어도 이 대상 쪽으로 돌아 다가간다. 카메라는 바뀐 록온 대상을 따라간다.
+    // 발동 때 대상이 없었으면(null) 도중에 생긴 대상도 노리지 않고, 바라보는 방향 그대로 공격 설정의 전진 거리를 쓴다.
+    public float AimFixedTarget(PlayerAttackSetting setting, DummyEnemy fixedTarget)
+    {
+        if(fixedTarget == null) return setting.AdvanceDistance;
+
+        return FaceAndGetApproachDistance(fixedTarget);
     }
 
     // 완벽 회피 슬로모션이 남아 있으면 끝낸다. 어떤 공격이든 시작하면 슬로모션은 끝난다.
@@ -296,10 +303,12 @@ public class PlayerController : MonoBehaviour
 
     // 캐릭터 앞의 판정 상자 안에 있는 적에게 한 번씩 적중시키고, 적중한 적마다 공격 설정의 에너지와 필살기 게이지를 얻는다.
     // staggerTime : 0보다 크면 맞은 적 중 공격하는 적을 이 시간 동안 경직시킨다. 경직은 적이 진행 중이던 공격을 끊는다. (필살기)
-    public void PerformHit(PlayerAttackState.AttackType type, PlayerAttackSetting setting, float staggerTime = 0f)
+    // isImpact : 강타 신호로 판정했는지. 판정은 일반 타격과 같고, 그로기 적에게 맞으면 판정이 끝난 뒤 콤보 스킬을 발동한다.
+    public void PerformHit(PlayerAttackState.AttackType type, PlayerAttackSetting setting, float staggerTime = 0f, bool isImpact = false)
     {
         Vector3 center = transform.TransformPoint(_hitBoxCenter);
         int count = Physics.OverlapBoxNonAlloc(center, _hitBoxSize * 0.5f, _hitColliders, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+        DummyEnemy comboSkillTarget = null;
 
         // 콜라이더가 여러 개인 적도 한 번만 맞도록 이번 판정에서 맞은 적을 기억한다.
         _hitTargets.Clear();
@@ -314,14 +323,22 @@ public class PlayerController : MonoBehaviour
             _energy.Add(setting.EnergyGain);
 
 #if UNITY_EDITOR
-            Debug.Log($"[적중] {type} 위력 {setting.Power} / 에너지 +{setting.EnergyGain} → {_energy.CurrentEnergy:F1}");
+            Debug.Log($"[{(isImpact ? "강타" : "적중")}] {type} 위력 {setting.Power} / 에너지 +{setting.EnergyGain} → {_energy.CurrentEnergy:F1}");
 #endif
 
             _ultimate.AddGauge(setting.UltimateGaugeGain);
 
-            // 공격하지 않는 더미 적에는 공격 기능이 없으므로 경직시킬 것이 없다.
-            if(staggerTime > 0f && enemy.TryGetComponent(out DummyEnemyAttacker attacker)) attacker.Stagger(staggerTime);
+            // 공격하지 않는 더미 적에는 공격 기능이 없으므로 경직 · 그로기가 없다.
+            if(!enemy.TryGetComponent(out DummyEnemyAttacker attacker)) continue;
+
+            if(staggerTime > 0f) attacker.Stagger(staggerTime);
+
+            // 한 번의 판정에서 콤보 스킬은 하나의 그로기 적에게만 발동한다. 발동 기회는 실제로 발동할 적에게서만 소모한다.
+            if(isImpact && comboSkillTarget == null && _comboSkill.CanStart && attacker.TryConsumeComboSkillChance()) comboSkillTarget = enemy;
         }
+
+        // 판정을 모두 마친 뒤 상태를 바꿔, 같은 판정의 다른 적도 에너지 · 게이지 · 경직을 받게 한다.
+        if(comboSkillTarget != null) _comboSkill.Begin(comboSkillTarget);
     }
 
     public void HandleAnimationEvent(PlayerAnimationEventType type, int stateHash)
@@ -358,6 +375,16 @@ public class PlayerController : MonoBehaviour
         _isCharging = false;
         _locomotionState.SetStartRunning(startRunning);
         _stateMachine.ChangeState(_locomotionState);
+    }
+
+    // 대상 쪽으로 즉시 돌고, 대상 앞 정지 거리까지의 전진 거리를 돌려준다. 다가가는 거리는 공격 사거리를 넘지 않는다.
+    private float FaceAndGetApproachDistance(DummyEnemy target)
+    {
+        Vector3 toTarget = target.transform.position - transform.position;
+        toTarget.y = 0f;
+        FaceImmediately(toTarget);
+
+        return Mathf.Clamp(toTarget.magnitude - _attackStopDistance, 0f, _targeting.AttackRange);
     }
 
     // 강공격 뒤에는 콤보가 1단부터 다시 시작한다.
@@ -416,6 +443,7 @@ public class PlayerController : MonoBehaviour
         _targeting = GetComponent<PlayerTargeting>();
         _slowMotion = GetComponent<PlayerSlowMotion>();
         _ultimate = GetComponent<PlayerUltimate>();
+        _comboSkill = GetComponent<PlayerComboSkill>();
         Health = GetComponent<PlayerHealth>();
     }
 
