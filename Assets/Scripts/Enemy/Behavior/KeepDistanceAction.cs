@@ -26,7 +26,7 @@ public partial class KeepDistanceAction : Action
     // 목적지를 지금 위치보다 도는 방향으로 이 각도만큼 앞선 지점으로 잡는다.
     private const float STRAFE_LEAD_ANGLE = 30f;
     // 백스텝 목적지를 지금 위치에서 이 거리만큼 뒤로 잡는다. 실제로 물러나는 거리는 속도 × 모션 길이가 정한다.
-    private const float BACK_STEP_LOOK_AHEAD = 2f;
+    private const float BACK_STEP_LOOK_AHEAD = 6f;
 
     [SerializeReference] public BlackboardVariable<Transform> Target;
 

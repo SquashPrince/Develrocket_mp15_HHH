@@ -232,6 +232,8 @@ MonoBehaviour:
   _strafeSpeed: 1.25
   _keepDistanceTimeMin: 1.5
   _keepDistanceTimeMax: 3
+  _backStepChance: 0.3
+  _backStepSpeedRate: 0.75
   _attackRange: 2
   _attackInterval: 2
 --- !u!114 &8805603893295329841
@@ -267,6 +269,8 @@ MonoBehaviour:
     _isParryable: 0
     _parryStaggerTime: 1.5
     _staggerResistLevel: 1
+    _resistUntilEvent: 0
+    _isContinuousHit: 0
     _canPerfectDodge: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
     _hitRadius: 1.5
@@ -293,6 +297,8 @@ MonoBehaviour:
     _isParryable: 0
     _parryStaggerTime: 1.5
     _staggerResistLevel: 1
+    _resistUntilEvent: 0
+    _isContinuousHit: 0
     _canPerfectDodge: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
     _hitRadius: 1.5
@@ -319,6 +325,8 @@ MonoBehaviour:
     _isParryable: 0
     _parryStaggerTime: 1.5
     _staggerResistLevel: 1
+    _resistUntilEvent: 0
+    _isContinuousHit: 0
     _canPerfectDodge: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
     _hitRadius: 1.5
@@ -351,6 +359,8 @@ MonoBehaviour:
     _isParryable: 1
     _parryStaggerTime: 2
     _staggerResistLevel: 2
+    _resistUntilEvent: 1
+    _isContinuousHit: 1
     _canPerfectDodge: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
     _hitRadius: 1.5

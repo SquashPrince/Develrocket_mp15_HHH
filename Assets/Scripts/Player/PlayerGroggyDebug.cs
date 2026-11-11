@@ -13,7 +13,7 @@ public class PlayerGroggyDebug : MonoBehaviour
     private void Awake() => CacheComponent();
     private void Update() => TryEnterGroggy();
 
-    // 그로기 기능이 없는 적(공격하지 않는 더미 적)은 그로기가 될 수 없으므로 무시한다.
+    // 그로기 기능(EnemyReaction)이 없는 적은 그로기가 될 수 없으므로 무시한다.
     private void TryEnterGroggy()
     {
         if(!_groggyAction.action.WasPressedThisFrame()) return;

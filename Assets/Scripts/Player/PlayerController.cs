@@ -305,11 +305,13 @@ public class PlayerController : MonoBehaviour
     // 맞은 적의 체력은 공격 설정의 위력만큼 줄어든다.
     // 공격 설정의 경직 시간이 0보다 크면, 맞은 적 중 경직 저항 레벨이 공격의 경직 레벨 이하인 적을 경직시킨다.
     // isImpact : 강타 신호로 판정했는지. 판정은 일반 타격과 같고, 그로기 적에게 맞으면 판정이 끝난 뒤 콤보 스킬을 발동한다.
+    //            콤보 스킬 중이면 새로 발동하지 않고, 콤보 스킬 대상에게 맞았을 때 다음 연계를 잇게 한다.
     public void PerformHit(PlayerAttackState.AttackType type, PlayerAttackSetting setting, bool isImpact = false)
     {
         Vector3 center = transform.TransformPoint(_hitBoxCenter);
         int count = Physics.OverlapBoxNonAlloc(center, _hitBoxSize * 0.5f, _hitColliders, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
         IEnemyTargetable comboSkillTarget = null;
+        int comboSkillMaxChain = 0;
 
         // 콜라이더가 여러 개인 적도 한 번만 맞도록 이번 판정에서 맞은 적을 기억한다.
         _hitTargets.Clear();
@@ -332,19 +334,30 @@ public class PlayerController : MonoBehaviour
             // 이 타격으로 처치된 적은 경직 · 콤보 스킬 대상이 아니다. 그로기 적이 강타로 처치되면 콤보 스킬보다 처치가 먼저다.
             if(!enemy.IsAlive) continue;
 
-            // 경직 · 그로기 기능이 없는 적(공격하지 않는 더미 적)은 경직 · 그로기 · 콤보 스킬 대상이 아니다.
+            // 경직 · 그로기 기능(EnemyReaction)이 없는 적은 경직 · 그로기 · 콤보 스킬 대상이 아니다.
             if(setting.StaggerTime > 0f && enemy.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(setting.StaggerTime, setting.StaggerLevel);
 
+            if(!isImpact) continue;
+
+            // 콤보 스킬 중의 강타는 새로 발동하지 않고, 콤보 스킬 대상에게 맞았으면 다음 연계를 잇게 한다.
+            if(!_comboSkill.CanStart)
+            {
+                _comboSkill.OnImpactHit(enemy);
+                continue;
+            }
+
             // 한 번의 판정에서 콤보 스킬은 하나의 그로기 적에게만 발동한다. 발동 기회는 실제로 발동할 적에게서만 소모한다.
-            if(!isImpact || comboSkillTarget != null || !_comboSkill.CanStart) continue;
+            // 그로기 기능이 없는 적은 콤보 스킬을 받을 수 없다.
+            if(comboSkillTarget != null) continue;
 
             if(!enemy.transform.TryGetComponent(out IEnemyGroggyable groggyable) || !groggyable.TryConsumeComboSkillChance()) continue;
 
             enemy.transform.TryGetComponent(out comboSkillTarget);
+            comboSkillMaxChain = groggyable.MaxComboChain;
         }
 
         // 판정을 모두 마친 뒤 상태를 바꿔, 같은 판정의 다른 적도 에너지 · 게이지 · 경직을 받게 한다.
-        if(comboSkillTarget != null) _comboSkill.Begin(comboSkillTarget);
+        if(comboSkillTarget != null) _comboSkill.Begin(comboSkillTarget, comboSkillMaxChain);
     }
 
     public void HandleAnimationEvent(PlayerAnimationEventType type, int stateHash)

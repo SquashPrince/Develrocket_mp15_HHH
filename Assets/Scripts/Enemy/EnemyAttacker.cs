@@ -5,7 +5,7 @@ using UnityEngine;
 // 각 단계는 그 상태의 재생이 끝나면 다음 단계로 넘어가고, 마지막 단계가 끝나면 공격이 끝난다.
 // 판정은 지금 단계 클립의 Hit 이벤트에서 한다. 첫 Hit 이벤트 전까지는 대상 쪽으로 돌고, 그 뒤에는 방향을 고정한다.
 // 판정 지속 공격은 Hit 이벤트부터 그 단계가 끝날 때까지 매 프레임 판정한다. 어느 쪽이든 플레이어는 공격 한 번에 한 번만 맞는다.
-// 패링 공격은 공격 시작부터 첫 Hit 이벤트까지 패링 가능 시간을 열고 예고 표시를 켠다.
+// 패링 공격은 Telegraph 이벤트부터 첫 Hit 이벤트까지 패링 가능 시간을 열고 예고 표시를 켠다. 예고 시점은 이벤트 프레임으로 조정한다.
 // 공격 시작부터 그 공격의 경직 저항 레벨을 적용하고, 첫 Hit 이벤트(또는 설정에 따라 ResistEnd 이벤트)에서 푼다.
 // 경직 · 그로기 · 처치되면 진행 중인 공격을 끊는다. 끊긴 공격도 쓴 것으로 보고 쿨타임을 시작한다.
 // 공격 선택 : 쿨타임 중인 공격은 빼고, 가중치(기본 가중치 + 증가량 × 마지막으로 쓴 뒤 다른 공격이 선택된 횟수)에 비례해 무작위로 고른다.
@@ -96,8 +96,6 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
         _reaction.SetAttackStaggerResistLevel(CurrentAttack.StaggerResistLevel);
 
-        if(CurrentAttack.IsParryable) OpenParryWindow();
-
 #if UNITY_EDITOR
         Debug.Log($"[적 공격] {name} {CurrentAttack.Name}");
 #endif
@@ -113,6 +111,9 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
         switch(type)
         {
+            case EnemyAnimationEventType.Telegraph:
+                if(CurrentAttack.IsParryable && !_isHitStarted) OpenParryWindow();
+                break;
             case EnemyAnimationEventType.Hit:
                 PerformHit();
                 break;
@@ -166,6 +167,10 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
         if(isFirstHit)
         {
+#if UNITY_EDITOR
+            if(CurrentAttack.IsParryable && !_isParryWindowOpen) Debug.LogWarning($"[적 공격] {name} {CurrentAttack.Name} : 패링 공격인데 Hit 전에 Telegraph 이벤트가 없어 패링할 수 없다. 준비 단계 클립에 Telegraph 이벤트를 넣는다");
+#endif
+
             _isHitStarted = true;
             CloseParryWindow();
 

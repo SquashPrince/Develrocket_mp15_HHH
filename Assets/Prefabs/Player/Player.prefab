@@ -31922,7 +31922,7 @@ MonoBehaviour:
   _dodgeDuration: 0.25
   _dashCooldown: 1
   _dashChainInterval: 0.25
-  _dashInvincibleTime: 0.15
+  _dashInvincibleTime: 0.25
   _comboSteps:
   - _energyGain: 1.25
     _ultimateGaugeGain: 50
