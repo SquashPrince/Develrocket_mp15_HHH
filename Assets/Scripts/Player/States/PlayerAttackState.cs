@@ -38,7 +38,7 @@ public class PlayerAttackState : PlayerState
     }
 
     private PlayerAttackSetting _setting;
-    private DummyEnemy _priorityTarget;
+    private IEnemyTargetable _priorityTarget;
     private AttackType _type;
     private Phase _phase;
     private Vector3 _advanceVelocity;
@@ -65,7 +65,7 @@ public class PlayerAttackState : PlayerState
 
     // step : 기본 공격 단계(0부터). 기본 공격이 아니면 사용하지 않는다.
     // priorityTarget : 록온 중이 아닐 때 자동 조준보다 먼저 노릴 대상. 없으면 null
-    public void Setup(AttackType type, int step, PlayerAttackSetting setting, DummyEnemy priorityTarget = null)
+    public void Setup(AttackType type, int step, PlayerAttackSetting setting, IEnemyTargetable priorityTarget = null)
     {
         _type = type;
         _step = step;

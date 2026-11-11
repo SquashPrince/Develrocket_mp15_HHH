@@ -13,16 +13,16 @@ public class PlayerGroggyDebug : MonoBehaviour
     private void Awake() => CacheComponent();
     private void Update() => TryEnterGroggy();
 
-    // 공격하지 않는 더미 적은 공격 기능이 없어 그로기가 될 수 없으므로 무시한다.
+    // 그로기 기능이 없는 적(공격하지 않는 더미 적)은 그로기가 될 수 없으므로 무시한다.
     private void TryEnterGroggy()
     {
         if(!_groggyAction.action.WasPressedThisFrame()) return;
 
-        DummyEnemy target = _targeting.LockTarget != null ? _targeting.LockTarget : _targeting.FindTarget(_targeting.AttackRange);
+        IEnemyTargetable target = _targeting.LockTarget != null ? _targeting.LockTarget : _targeting.FindTarget(_targeting.AttackRange);
 
-        if(target == null || !target.TryGetComponent(out DummyEnemyAttacker attacker)) return;
+        if(target == null || !target.transform.TryGetComponent(out IEnemyGroggyable groggyable)) return;
 
-        attacker.EnterGroggy();
+        groggyable.EnterGroggy();
     }
 
     private void CacheComponent()

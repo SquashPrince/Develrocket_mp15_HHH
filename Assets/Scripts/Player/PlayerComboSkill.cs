@@ -25,10 +25,10 @@ public class PlayerComboSkill : MonoBehaviour
     public PlayerAttackSetting GetChainStep(int step) => _chainSteps[step];
 
     // 그로기 적을 대상으로 콤보 스킬 상태로 넘긴다. 진행 중이던 공격 · 필살기는 끊긴다.
-    public void Begin(DummyEnemy target)
+    public void Begin(IEnemyTargetable target)
     {
 #if UNITY_EDITOR
-        Debug.Log($"[콤보 스킬] {target.name}");
+        Debug.Log($"[콤보 스킬] {target.transform.name}");
 #endif
 
         _comboSkillState.Setup(target);
@@ -36,7 +36,7 @@ public class PlayerComboSkill : MonoBehaviour
     }
 
     // 대상에서 플레이어 쪽으로 정해진 거리 앞에 순간 이동한다. 막혀 있으면 제자리에 있는다.
-    public void TeleportToTarget(DummyEnemy target)
+    public void TeleportToTarget(IEnemyTargetable target)
     {
         Vector3 targetPosition = target.transform.position;
 

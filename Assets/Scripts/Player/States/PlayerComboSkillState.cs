@@ -11,7 +11,7 @@ public class PlayerComboSkillState : PlayerState
     private const string ANIMATION_PREFIX = "ComboSkill ";
 
     private readonly PlayerComboSkill _comboSkill;
-    private DummyEnemy _target;
+    private IEnemyTargetable _target;
     private Vector3 _advanceVelocity;
     private float _advanceTimer;
     private float _advanceDuration;
@@ -26,7 +26,7 @@ public class PlayerComboSkillState : PlayerState
     public bool IsActive { get; private set; }
 
     // target : 콤보 스킬을 발동시킨 그로기 적. 순간 이동과 단계별 접근의 대상이 된다.
-    public void Setup(DummyEnemy target) => _target = target;
+    public void Setup(IEnemyTargetable target) => _target = target;
 
     public override void Enter()
     {

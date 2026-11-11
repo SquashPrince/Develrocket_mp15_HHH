@@ -17,7 +17,7 @@ public class PlayerUltimateState : PlayerState
     private static readonly int CUTSCENE_ANIMATION = Animator.StringToHash("UltimateCutscene");
 
     private readonly PlayerUltimate _ultimate;
-    private DummyEnemy _target;
+    private IEnemyTargetable _target;
     private Vector3 _advanceVelocity;
     private float _advanceTimer;
     private float _advanceDuration;

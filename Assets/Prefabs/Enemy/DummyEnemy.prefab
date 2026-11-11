@@ -102,6 +102,8 @@ GameObject:
   - component: {fileID: 5305893028653298869}
   - component: {fileID: 1896030893427091369}
   - component: {fileID: 2078393640954614018}
+  - component: {fileID: 8687263713236910750}
+  - component: {fileID: 4711690554576644121}
   m_Layer: 8
   m_Name: DummyEnemy
   m_TagString: Untagged
@@ -178,8 +180,9 @@ MonoBehaviour:
   _targetLayers:
     serializedVersion: 2
     m_Bits: 128
-  _attackInterval: 3
+  _attackInterval: 2
   _staggerColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  _groggyColor: {r: 0.6, g: 0.2, b: 0.9, a: 1}
   _attacks:
   - _name: Weak
     _telegraphTime: 0.5
@@ -213,7 +216,7 @@ MonoBehaviour:
     _hitCenter: {x: 0, y: 1, z: 1.2}
     _hitRadius: 1.5
     _power: 15
-    _reaction: 0
+    _reaction: 1
     _hitStunTime: 0.8
     _hitPushDistance: 2
     _hitPushDuration: 0.2
@@ -233,7 +236,7 @@ MonoBehaviour:
     _hitCenter: {x: 0, y: 1, z: 1.2}
     _hitRadius: 1.5
     _power: 15
-    _reaction: 1
+    _reaction: 2
     _hitStunTime: 0.4
     _hitPushDistance: 0
     _hitPushDuration: 0.2
@@ -241,3 +244,31 @@ MonoBehaviour:
     _knockbackDuration: 0.725
     _getUpTime: 1
     _canDashCancel: 0
+--- !u!114 &8687263713236910750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206866603110110876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8874a05a45ac422439cd66d987f5a3eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  _maxHealth: 100
+  _canDie: 1
+--- !u!114 &4711690554576644121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206866603110110876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ab53961717a74c448ba062b47188698, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyReaction
+  _groggyTime: 12
+  _maxComboChain: 1

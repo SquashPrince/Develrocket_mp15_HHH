@@ -70,9 +70,9 @@ public class PlayerUltimate : MonoBehaviour
     // 록온 대상 → 찾는 거리 안의 자동 조준 대상 순서로 대상을 고르고, 대상에서 플레이어 쪽으로 정해진 거리 앞에 순간 이동한다.
     // 공격하지 않는 적은 플레이어를 보고 있지 않을 수 있어, 적의 정면이 아니라 플레이어가 있던 쪽에 선다.
     // 대상을 돌려준다. 대상이 없으면 null, 도착 지점이 막혀 있으면 이동하지 않고 대상만 돌려준다.
-    public DummyEnemy TeleportToTarget()
+    public IEnemyTargetable TeleportToTarget()
     {
-        DummyEnemy target = _targeting.LockTarget != null ? _targeting.LockTarget : _targeting.FindTarget(_targetSearchRange);
+        IEnemyTargetable target = _targeting.LockTarget != null ? _targeting.LockTarget : _targeting.FindTarget(_targetSearchRange);
 
         if(target == null) return null;
 
