@@ -7,6 +7,9 @@ public interface IEnemyDamageable
     // 맞은 적의 경직 · 그로기 기능을 같은 오브젝트에서 찾을 때 쓴다.
     Transform transform { get; }
 
+    // 이 타격으로 처치된 적은 경직 · 콤보 스킬 대상에서 빠진다.
+    bool IsAlive { get; }
+
     // power : 공격 위력. 체력에서 뺀다.
     // isImpact : 강타인지. 체력이 0 인 적은 강타에 맞아야만 처치된다.
     void TakeDamage(float power, bool isImpact);

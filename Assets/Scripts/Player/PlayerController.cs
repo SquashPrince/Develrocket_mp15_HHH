@@ -329,6 +329,9 @@ public class PlayerController : MonoBehaviour
 
             _ultimate.AddGauge(setting.UltimateGaugeGain);
 
+            // 이 타격으로 처치된 적은 경직 · 콤보 스킬 대상이 아니다. 그로기 적이 강타로 처치되면 콤보 스킬보다 처치가 먼저다.
+            if(!enemy.IsAlive) continue;
+
             // 경직 · 그로기 기능이 없는 적(공격하지 않는 더미 적)은 경직 · 그로기 · 콤보 스킬 대상이 아니다.
             if(setting.StaggerTime > 0f && enemy.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(setting.StaggerTime, setting.StaggerLevel);
 
