@@ -58,7 +58,8 @@ public class PlayerParry : MonoBehaviour
         Debug.Log($"[패링 성공] {attack.Name}");
 #endif
 
-        if(attacker.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(attack.ParryStaggerTime);
+        // 패링 성공 경직은 패링당한 공격의 저항 레벨을 경직 레벨로 쓴다. 레벨이 같으면 경직되므로 패링 성공은 항상 경직을 건다.
+        if(attacker.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(attack.ParryStaggerTime, attack.StaggerResistLevel);
 
         _ultimate.AddParryGauge();
         attacker.transform.TryGetComponent(out IEnemyTargetable parriedTarget);

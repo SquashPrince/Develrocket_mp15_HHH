@@ -31927,6 +31927,8 @@ MonoBehaviour:
   - _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 1
+    _staggerTime: 0.15
     _advanceDistance: 1.5
     _advanceDuration: 0.265
     _fadeTime: 0.2
@@ -31939,6 +31941,8 @@ MonoBehaviour:
   - _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 1
+    _staggerTime: 0.15
     _advanceDistance: 2
     _advanceDuration: 0.315
     _fadeTime: 0.2
@@ -31951,6 +31955,8 @@ MonoBehaviour:
   - _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 1
+    _staggerTime: 0.15
     _advanceDistance: 4.5
     _advanceDuration: 0.775
     _fadeTime: 0.2
@@ -31963,6 +31969,8 @@ MonoBehaviour:
   - _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 1
+    _staggerTime: 0.25
     _advanceDistance: 3
     _advanceDuration: 0.45
     _fadeTime: 0.2
@@ -31976,6 +31984,8 @@ MonoBehaviour:
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 1
+    _staggerTime: 0.25
     _advanceDistance: 4.5
     _advanceDuration: 0.5
     _fadeTime: 0.25
@@ -31993,6 +32003,8 @@ MonoBehaviour:
     _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 1
+    _staggerTime: 0.25
     _advanceDistance: 5
     _advanceDuration: 0.275
     _fadeTime: 0.2
@@ -32006,6 +32018,8 @@ MonoBehaviour:
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 1
+    _staggerTime: 0.25
     _advanceDistance: 1.5
     _advanceDuration: 0.4
     _fadeTime: 0.1
@@ -32019,6 +32033,8 @@ MonoBehaviour:
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 1
+    _staggerTime: 0.25
     _advanceDistance: 7.5
     _advanceDuration: 0.6
     _fadeTime: 0.1
@@ -32032,6 +32048,8 @@ MonoBehaviour:
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 1
+    _staggerTime: 0.5
     _advanceDistance: 7.5
     _advanceDuration: 1.65
     _fadeTime: 0.1
@@ -32128,6 +32146,8 @@ MonoBehaviour:
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 2
+    _staggerTime: 2
     _advanceDistance: 0.5
     _advanceDuration: 0.15
     _fadeTime: 0.1
@@ -32157,6 +32177,8 @@ MonoBehaviour:
   - _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 3
+    _staggerTime: 1.5
     _advanceDistance: 6
     _advanceDuration: 4
     _fadeTime: 0.1
@@ -32169,6 +32191,8 @@ MonoBehaviour:
   - _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 3
+    _staggerTime: 1.5
     _advanceDistance: 4
     _advanceDuration: 2
     _fadeTime: 0.1
@@ -32178,7 +32202,6 @@ MonoBehaviour:
     _canDashCancel: 0
     _canUltimateCancel: 0
     _isInvincibleOnSwing: 1
-  _hitStaggerTime: 2
   _targetSearchRange: 10
   _teleportDistance: 1.5
 --- !u!114 &3235283595720457195
@@ -32212,6 +32235,8 @@ MonoBehaviour:
   - _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 3
+    _staggerTime: 1
     _advanceDistance: 6
     _advanceDuration: 4
     _fadeTime: 0.1
@@ -32224,6 +32249,8 @@ MonoBehaviour:
   - _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 3
+    _staggerTime: 1
     _advanceDistance: 6
     _advanceDuration: 4
     _fadeTime: 0.1
@@ -32236,6 +32263,8 @@ MonoBehaviour:
   - _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
+    _staggerLevel: 3
+    _staggerTime: 1
     _advanceDistance: 6
     _advanceDuration: 4
     _fadeTime: 0.1

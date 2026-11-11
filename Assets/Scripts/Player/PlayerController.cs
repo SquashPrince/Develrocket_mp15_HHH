@@ -303,9 +303,9 @@ public class PlayerController : MonoBehaviour
 
     // 캐릭터 앞의 판정 상자 안에 있는 적에게 한 번씩 적중시키고, 적중한 적마다 공격 설정의 에너지와 필살기 게이지를 얻는다.
     // 맞은 적의 체력은 공격 설정의 위력만큼 줄어든다.
-    // staggerTime : 0보다 크면 맞은 적 중 경직되는 적을 이 시간 동안 경직시킨다. 경직은 적이 진행 중이던 공격을 끊는다. (필살기)
+    // 공격 설정의 경직 시간이 0보다 크면, 맞은 적 중 경직 저항 레벨이 공격의 경직 레벨 이하인 적을 경직시킨다.
     // isImpact : 강타 신호로 판정했는지. 판정은 일반 타격과 같고, 그로기 적에게 맞으면 판정이 끝난 뒤 콤보 스킬을 발동한다.
-    public void PerformHit(PlayerAttackState.AttackType type, PlayerAttackSetting setting, float staggerTime = 0f, bool isImpact = false)
+    public void PerformHit(PlayerAttackState.AttackType type, PlayerAttackSetting setting, bool isImpact = false)
     {
         Vector3 center = transform.TransformPoint(_hitBoxCenter);
         int count = Physics.OverlapBoxNonAlloc(center, _hitBoxSize * 0.5f, _hitColliders, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
@@ -330,7 +330,7 @@ public class PlayerController : MonoBehaviour
             _ultimate.AddGauge(setting.UltimateGaugeGain);
 
             // 경직 · 그로기 기능이 없는 적(공격하지 않는 더미 적)은 경직 · 그로기 · 콤보 스킬 대상이 아니다.
-            if(staggerTime > 0f && enemy.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(staggerTime);
+            if(setting.StaggerTime > 0f && enemy.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(setting.StaggerTime, setting.StaggerLevel);
 
             // 한 번의 판정에서 콤보 스킬은 하나의 그로기 적에게만 발동한다. 발동 기회는 실제로 발동할 적에게서만 소모한다.
             if(!isImpact || comboSkillTarget != null || !_comboSkill.CanStart) continue;

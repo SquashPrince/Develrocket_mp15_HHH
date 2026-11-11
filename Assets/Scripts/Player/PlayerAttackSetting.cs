@@ -10,8 +10,12 @@ public class PlayerAttackSetting
     [SerializeField, Min(0f)] private float _energyGain = 5f;
     [Tooltip("적중한 적 하나마다 얻는 필살기 게이지")]
     [SerializeField, Min(0f)] private float _ultimateGaugeGain = 50f;
-    [Tooltip("적중 시 위력. 적 체력이 생기기 전까지는 로그로만 확인한다")]
+    [Tooltip("적중 시 위력. 맞은 적의 체력을 이만큼 깎는다")]
     [SerializeField, Min(0f)] private float _power = 10f;
+    [Tooltip("경직 레벨. 맞은 적의 경직 저항 레벨 이상이면 경직시킨다")]
+    [SerializeField, Min(0)] private int _staggerLevel = 1;
+    [Tooltip("맞은 적을 경직시키는 시간(초, 적 전용 시간). 0이면 경직시키지 않는다. 경직하면 적이 진행 중이던 공격이 끊긴다")]
+    [SerializeField, Min(0f)] private float _staggerTime;
     [Tooltip("휘두르기 시작부터 앞으로 나아가는 거리")]
     [SerializeField, Min(0f)] private float _advanceDistance = 0.5f;
     [Tooltip("앞으로 나아가는 데 걸리는 시간(초)")]
@@ -34,6 +38,8 @@ public class PlayerAttackSetting
     public float EnergyGain => _energyGain;
     public float UltimateGaugeGain => _ultimateGaugeGain;
     public float Power => _power;
+    public int StaggerLevel => _staggerLevel;
+    public float StaggerTime => _staggerTime;
     public float AdvanceDistance => _advanceDistance;
     public float AdvanceDuration => _advanceDuration;
     public float FadeTime => _fadeTime;

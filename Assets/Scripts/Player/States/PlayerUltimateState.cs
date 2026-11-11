@@ -70,7 +70,7 @@ public class PlayerUltimateState : PlayerState
         {
             case PlayerAnimationEventType.Hit:
             case PlayerAnimationEventType.Impact:
-                if(_step != CUTSCENE_STEP) Controller.PerformHit(PlayerAttackState.AttackType.Ultimate, _ultimate.GetAttackStep(_step), _ultimate.HitStaggerTime, type == PlayerAnimationEventType.Impact);
+                if(_step != CUTSCENE_STEP) Controller.PerformHit(PlayerAttackState.AttackType.Ultimate, _ultimate.GetAttackStep(_step), type == PlayerAnimationEventType.Impact);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();

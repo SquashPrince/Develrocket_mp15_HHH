@@ -35,6 +35,8 @@ public class EnemyAttackSetting
     [SerializeField] private bool _isParryable;
     [Tooltip("[패링 공격] 패링당했을 때 적이 경직하는 시간(초)")]
     [SerializeField, Min(0f)] private float _parryStaggerTime = 1.5f;
+    [Tooltip("이 공격 중(예고 ~ 판정)의 경직 저항 레벨. 플레이어 공격의 경직 레벨이 이 값 이상이어야 경직된다. 적의 평소 저항 레벨이 더 높으면 그 값을 쓴다. 패링 성공 경직은 이 값을 경직 레벨로 쓴다")]
+    [SerializeField, Min(0)] private int _staggerResistLevel;
     [Tooltip("대시 · 회피 무적 시간 안에 닿으면 완벽 회피(슬로모션)가 되는 공격인지 여부. 끄면 무적으로 무시만 된다")]
     [SerializeField] private bool _canPerfectDodge = true;
     [Tooltip("판정 구의 중심 (적 기준 위치)")]
@@ -64,6 +66,7 @@ public class EnemyAttackSetting
     public float TelegraphTime => _telegraphTime;
     public float HitDelay => _hitDelay;
     public float ParryStaggerTime => _parryStaggerTime;
+    public int StaggerResistLevel => _staggerResistLevel;
     public bool UseTelegraphColor => _useTelegraphColor;
     public Color TelegraphColor => _telegraphColor;
     public float TelegraphScale => _telegraphScale;

@@ -2578,6 +2578,14 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[0]._ignoreHitStagger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[0]._parryStaggerTime
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[0]._telegraphColor.b
       value: 0.015686275
       objectReference: {fileID: 0}
@@ -2616,6 +2624,14 @@ PrefabInstance:
     - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: _attacks.Array.data[1]._knockbackDuration
       value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 2078393640954614018, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _attacks.Array.data[0]._staggerResistLevel
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4711690554576644121, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
+      propertyPath: _baseStaggerResistLevel
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8041674962229910187, guid: 5d0a0f61a451d6243b1d65164be46714, type: 3}
       propertyPath: m_LocalPosition.x

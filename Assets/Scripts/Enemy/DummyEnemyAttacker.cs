@@ -113,6 +113,7 @@ public class DummyEnemyAttacker : MonoBehaviour, IEnemyParryable
     private void InterruptAttack()
     {
         CloseParryWindow();
+        _reaction.SetAttackStaggerResistLevel(0);
         _renderer.transform.localScale = _originalScale;
 
         if(IsAttacking) _attackIndex = (_attackIndex + 1) % _attacks.Length;
@@ -125,6 +126,8 @@ public class DummyEnemyAttacker : MonoBehaviour, IEnemyParryable
         if(CurrentAttack.UseTelegraphColor) _enemy.SetBaseColor(CurrentAttack.TelegraphColor);
         if(CurrentAttack.IsParryable) OpenParryWindow();
 
+        // 예고부터 판정까지는 이 공격의 경직 저항 레벨을 적용한다.
+        _reaction.SetAttackStaggerResistLevel(CurrentAttack.StaggerResistLevel);
         _renderer.transform.localScale = _originalScale * CurrentAttack.TelegraphScale;
         _timer = CurrentAttack.TelegraphTime;
         _phase = Phase.Telegraph;
@@ -142,6 +145,7 @@ public class DummyEnemyAttacker : MonoBehaviour, IEnemyParryable
     private void PerformAttack()
     {
         CloseParryWindow();
+        _reaction.SetAttackStaggerResistLevel(0);
         HitTarget(CurrentAttack);
 
         // 판정 중 패링당해 경직했으면 경직 알림에서 다음 공격을 정했으므로 그대로 둔다.
@@ -208,7 +212,7 @@ public class DummyEnemyAttacker : MonoBehaviour, IEnemyParryable
 #if UNITY_EDITOR
     // [테스트] 플레이 중 컴포넌트 우클릭 메뉴에서 지금 공격의 패링 경직을 바로 건다.
     [ContextMenu("Test Stagger")]
-    private void TestStagger() => _reaction.Stagger(CurrentAttack.ParryStaggerTime);
+    private void TestStagger() => _reaction.Stagger(CurrentAttack.ParryStaggerTime, CurrentAttack.StaggerResistLevel);
 #endif
 
     private void CacheComponent()

@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 
 // 적의 경직 · 그로기. 경직 · 그로기 시간은 적 전용 시간으로 흘러 슬로모션 · 필살기 연출 동안 느려지거나 멈춘다.
+// 경직은 경직을 거는 쪽의 경직 레벨이 지금의 경직 저항 레벨 이상일 때만 걸린다.
+// 지금의 경직 저항 레벨은 평소 저항 레벨과, 공격 중이면 그 공격의 저항 레벨 중 큰 값이다.
 // 그로기 중에는 경직이 걸려도 그로기를 유지한다. 그로기가 될 때마다 콤보 스킬 기회가 한 번 생긴다.
 // 적의 공격 기능은 알림을 받아 진행 중인 공격을 끊고, 경직 · 그로기 동안에는 공격하지 않는다.
 // 적 체력과 같은 오브젝트(루트)에 붙인다.
@@ -14,6 +16,8 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
         Groggy
     }
 
+    [Tooltip("평소 경직 저항 레벨. 경직을 거는 쪽의 경직 레벨이 이 값 이상이어야 경직된다")]
+    [SerializeField, Min(0)] private int _baseStaggerResistLevel;
     [Tooltip("그로기가 유지되는 시간(초, 적 전용 시간)")]
     [SerializeField, Min(0f)] private float _groggyTime = 12f;
     [Tooltip("이 적에게 콤보 스킬이 이어지는 최대 연계 수. 일반 1, 엘리트 2")]
@@ -21,6 +25,8 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
 
     private State _state;
     private float _timer;
+    // 진행 중인 공격의 경직 저항 레벨. 공격 기능이 공격을 시작할 때 정하고, 공격이 끝나거나 끊기면 0 으로 돌린다.
+    private int _attackStaggerResistLevel;
     // 이번 그로기에서 콤보 스킬을 아직 발동하지 않았는지. 그로기가 될 때마다 한 번 생긴다.
     private bool _hasComboSkillChance;
 
@@ -37,20 +43,24 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
     private void Update() => UpdateTimer();
 
     // 경직한다. 경직 중 다시 걸면 경직 시간을 처음부터 센다.
+    // 경직 레벨이 지금의 경직 저항 레벨보다 낮으면 경직하지 않는다.
     // 그로기 중에는 이미 공격을 멈춘 상태이므로 경직하지 않고 그로기를 유지한다.
-    public void Stagger(float duration)
+    public void Stagger(float duration, int staggerLevel)
     {
-        if(IsGroggy) return;
+        if(IsGroggy || staggerLevel < Mathf.Max(_baseStaggerResistLevel, _attackStaggerResistLevel)) return;
 
         _timer = duration;
         _state = State.Stagger;
 
 #if UNITY_EDITOR
-        Debug.Log($"[적 경직] {name} {duration}초");
+        Debug.Log($"[적 경직] {name} {duration}초 (경직 레벨 {staggerLevel})");
 #endif
 
         Staggered?.Invoke();
     }
+
+    // 공격 기능이 공격을 시작할 때 그 공격의 경직 저항 레벨로, 공격이 끝나거나 끊기면 0 으로 정한다.
+    public void SetAttackStaggerResistLevel(int level) => _attackStaggerResistLevel = level;
 
     // 그로기가 된다. 그로기 중 다시 걸면 그로기 시간을 처음부터 세고 콤보 스킬 기회도 다시 생긴다.
     public void EnterGroggy()
