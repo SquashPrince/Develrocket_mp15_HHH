@@ -169,7 +169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8874a05a45ac422439cd66d987f5a3eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  _maxHealth: 100
+  _maxHealth: 150
   _canDie: 1
   _corpseDuration: 2
 --- !u!114 &2428002810246828485
@@ -259,13 +259,8 @@ MonoBehaviour:
     _animationStates:
     - Attack 1
     _cooldown: 3.5
-    _baseWeight: 50
+    _baseWeight: 25
     _weightGrowth: 10
-    _telegraphTime: 0.6
-    _hitDelay: 0
-    _useTelegraphColor: 0
-    _telegraphColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-    _telegraphScale: 1.1
     _isParryable: 0
     _parryStaggerTime: 1.5
     _staggerResistLevel: 1
@@ -287,13 +282,8 @@ MonoBehaviour:
     _animationStates:
     - Attack 2
     _cooldown: 2
-    _baseWeight: 50
+    _baseWeight: 25
     _weightGrowth: 10
-    _telegraphTime: 0.6
-    _hitDelay: 0
-    _useTelegraphColor: 0
-    _telegraphColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-    _telegraphScale: 1.1
     _isParryable: 0
     _parryStaggerTime: 1.5
     _staggerResistLevel: 1
@@ -317,11 +307,6 @@ MonoBehaviour:
     _cooldown: 5
     _baseWeight: 30
     _weightGrowth: 10
-    _telegraphTime: 0.6
-    _hitDelay: 0
-    _useTelegraphColor: 0
-    _telegraphColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-    _telegraphScale: 1.1
     _isParryable: 0
     _parryStaggerTime: 1.5
     _staggerResistLevel: 1
@@ -351,11 +336,6 @@ MonoBehaviour:
     _cooldown: 10
     _baseWeight: 20
     _weightGrowth: 5
-    _telegraphTime: 0.5
-    _hitDelay: 0.5
-    _useTelegraphColor: 0
-    _telegraphColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-    _telegraphScale: 1.1
     _isParryable: 1
     _parryStaggerTime: 2
     _staggerResistLevel: 2

@@ -32246,34 +32246,6 @@ MonoBehaviour:
     _canDashCancel: 0
     _canUltimateCancel: 0
     _isInvincibleOnSwing: 1
-  - _energyGain: 5
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 3
-    _staggerTime: 1
-    _advanceDistance: 6
-    _advanceDuration: 4
-    _fadeTime: 0.1
-    _inputBuffer: 0.4
-    _useLegRun: 0
-    _alwaysLegRun: 0
-    _canDashCancel: 0
-    _canUltimateCancel: 0
-    _isInvincibleOnSwing: 1
-  - _energyGain: 5
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 3
-    _staggerTime: 1
-    _advanceDistance: 6
-    _advanceDuration: 4
-    _fadeTime: 0.1
-    _inputBuffer: 0.4
-    _useLegRun: 0
-    _alwaysLegRun: 0
-    _canDashCancel: 0
-    _canUltimateCancel: 0
-    _isInvincibleOnSwing: 1
   _teleportDistance: 1.5
 --- !u!114 &1745635829274798527
 MonoBehaviour:
