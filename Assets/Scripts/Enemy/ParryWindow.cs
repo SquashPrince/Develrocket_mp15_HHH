@@ -5,19 +5,17 @@ using UnityEngine;
 // 플레이어는 패링 키를 누를 때 록온 사거리 안에 연 적이 있으면 패링을 시작하고, 그중 한 적 앞으로 순간 이동한다.
 public static class ParryWindow
 {
-    private static readonly List<DummyEnemyAttacker> _openAttackers = new List<DummyEnemyAttacker>();
-
-    public static bool IsOpenBy(DummyEnemyAttacker attacker) => _openAttackers.Contains(attacker);
+    private static readonly List<IEnemyParryable> _openAttackers = new List<IEnemyParryable>();
 
     // position 에서 range 안에 있는 적 중 가장 최근에 패링 가능 시간을 연 적. 없으면 null 이다.
     // 나중에 연 적이 목록 뒤에 있으므로 뒤에서부터 찾는다.
-    public static DummyEnemyAttacker FindLatestWithin(Vector3 position, float range)
+    public static IEnemyParryable FindLatestWithin(Vector3 position, float range)
     {
         float sqrRange = range * range;
 
         for(int i = _openAttackers.Count - 1; i >= 0; i--)
         {
-            DummyEnemyAttacker attacker = _openAttackers[i];
+            IEnemyParryable attacker = _openAttackers[i];
 
             if((attacker.transform.position - position).sqrMagnitude <= sqrRange) return attacker;
         }
@@ -25,12 +23,12 @@ public static class ParryWindow
         return null;
     }
 
-    public static void Open(DummyEnemyAttacker attacker)
+    public static void Open(IEnemyParryable attacker)
     {
         if(!_openAttackers.Contains(attacker)) _openAttackers.Add(attacker);
     }
 
-    public static void Close(DummyEnemyAttacker attacker) => _openAttackers.Remove(attacker);
+    public static void Close(IEnemyParryable attacker) => _openAttackers.Remove(attacker);
 
     // 도메인 리로드를 끈 채 플레이를 다시 시작해도 이전 플레이의 목록이 남지 않게 한다.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

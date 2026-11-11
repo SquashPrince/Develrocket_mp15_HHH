@@ -52,8 +52,7 @@ public class PlayerHealth : MonoBehaviour
     // 맞았으면 true 를 돌려준다. 완벽 회피 · 패링했거나 무적이면 무시하고 false 를 돌려준다.
     // 판정 순서 : 완벽 회피 → 패링 → 무적 → 피격
     // attacker : 패링 성공을 알리고, 넉백 방향을 정할 때 위치를 쓰는 공격한 적
-    //            일반 적을 만드는 단계에서 적 공통 계약이 필요한지 다시 검토한다.
-    public bool TakeHit(EnemyAttackSetting attack, DummyEnemyAttacker attacker)
+    public bool TakeHit(EnemyAttackSetting attack, IEnemyParryable attacker)
     {
         if(TryPerfectDodge(attack)) return false;
         if(_parry.TryParry(attack, attacker)) return false;

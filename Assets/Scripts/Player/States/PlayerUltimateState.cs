@@ -17,7 +17,7 @@ public class PlayerUltimateState : PlayerState
     private static readonly int CUTSCENE_ANIMATION = Animator.StringToHash("UltimateCutscene");
 
     private readonly PlayerUltimate _ultimate;
-    private DummyEnemy _target;
+    private IEnemyTargetable _target;
     private Vector3 _advanceVelocity;
     private float _advanceTimer;
     private float _advanceDuration;
@@ -70,7 +70,7 @@ public class PlayerUltimateState : PlayerState
         {
             case PlayerAnimationEventType.Hit:
             case PlayerAnimationEventType.Impact:
-                if(_step != CUTSCENE_STEP) Controller.PerformHit(PlayerAttackState.AttackType.Ultimate, _ultimate.GetAttackStep(_step), _ultimate.HitStaggerTime, type == PlayerAnimationEventType.Impact);
+                if(_step != CUTSCENE_STEP) Controller.PerformHit(PlayerAttackState.AttackType.Ultimate, _ultimate.GetAttackStep(_step), type == PlayerAnimationEventType.Impact);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();

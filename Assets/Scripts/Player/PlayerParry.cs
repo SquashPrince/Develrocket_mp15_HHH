@@ -35,7 +35,7 @@ public class PlayerParry : MonoBehaviour
     private PlayerUltimate _ultimate;
     private PlayerParryState _parryState;
     // 패링 키를 누른 순간 고른 패링 대상. 패링 상태에 들어가며 이 적 앞으로 순간 이동한다.
-    private DummyEnemyAttacker _selectedAttacker;
+    private IEnemyParryable _selectedAttacker;
 
     public float ReadyTime => _readyTime;
     public float ReactDistance => _reactDistance;
@@ -49,7 +49,8 @@ public class PlayerParry : MonoBehaviour
     private void Update() => TryStartParry();
 
     // 패링 준비 · 반응 중 노란 공격이 닿으면 패링 성공으로 처리하고 true 를 돌려준다. 체력 기능이 맞았을 때 부른다.
-    public bool TryParry(EnemyAttackSetting attack, DummyEnemyAttacker attacker)
+    // 패링한 적은 경직되고, 패링 추격은 이 적을 노린다.
+    public bool TryParry(EnemyAttackSetting attack, IEnemyParryable attacker)
     {
         if(!_parryState.IsActive || !attack.IsParryable) return false;
 
@@ -57,9 +58,12 @@ public class PlayerParry : MonoBehaviour
         Debug.Log($"[패링 성공] {attack.Name}");
 #endif
 
-        attacker.Stagger(attack.ParryStaggerTime);
+        // 패링 성공 경직은 패링당한 공격의 저항 레벨을 경직 레벨로 쓴다. 레벨이 같으면 경직되므로 패링 성공은 항상 경직을 건다.
+        if(attacker.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(attack.ParryStaggerTime, attack.StaggerResistLevel);
+
         _ultimate.AddParryGauge();
-        _parryState.OnParrySuccess(attacker.GetComponent<DummyEnemy>());
+        attacker.transform.TryGetComponent(out IEnemyTargetable parriedTarget);
+        _parryState.OnParrySuccess(parriedTarget);
         return true;
     }
 
@@ -73,25 +77,23 @@ public class PlayerParry : MonoBehaviour
 
     // 록온 사거리 안에서 패링 가능 시간을 연 적 중 공격 대상 기준으로 고른다. 록온 대상 → 자동 조준 대상 → 가장 최근에 예고를 시작한 적 순서다.
     // 록온 사거리는 록온이 풀리는 거리와 같아, 록온할 수 있는 거리의 적만 패링할 수 있다. 없으면 null 이다.
-    private DummyEnemyAttacker SelectAttacker()
+    private IEnemyParryable SelectAttacker()
     {
-        DummyEnemyAttacker lockAttacker = GetOpenAttacker(_targeting.LockTarget);
+        IEnemyParryable lockAttacker = GetOpenAttacker(_targeting.LockTarget);
 
         if(lockAttacker != null) return lockAttacker;
 
-        DummyEnemyAttacker aimAttacker = GetOpenAttacker(_targeting.FindTarget(_targeting.AttackRange));
+        IEnemyParryable aimAttacker = GetOpenAttacker(_targeting.FindTarget(_targeting.AttackRange));
 
         return aimAttacker != null ? aimAttacker : ParryWindow.FindLatestWithin(transform.position, _targeting.LockOnRange);
     }
 
-    // 대상이 록온 사거리 안에서 패링 가능 시간을 연 적이면 그 공격 기능을, 아니면 null 을 돌려준다.
-    private DummyEnemyAttacker GetOpenAttacker(DummyEnemy target)
+    // 대상이 록온 사거리 안에서 패링 가능 시간을 연 적이면 그 적을, 아니면 null 을 돌려준다.
+    private IEnemyParryable GetOpenAttacker(IEnemyTargetable target)
     {
         if(target == null) return null;
 
-        DummyEnemyAttacker attacker = target.GetComponent<DummyEnemyAttacker>();
-
-        if(attacker == null || !ParryWindow.IsOpenBy(attacker)) return null;
+        if(!target.transform.TryGetComponent(out IEnemyParryable attacker) || !attacker.IsParryWindowOpen) return null;
 
         float lockOnRange = _targeting.LockOnRange;
 

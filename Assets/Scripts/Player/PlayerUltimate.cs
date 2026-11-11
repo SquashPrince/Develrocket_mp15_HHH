@@ -21,8 +21,6 @@ public class PlayerUltimate : MonoBehaviour
     [Header("필살기")]
     [Tooltip("연출 뒤 이어지는 공격 단계별 설정. 배열 크기가 단계 수이며, Animator 에 \"Ultimate 1\" 부터 단계 수만큼 상태가 있어야 한다. 하체 달리기 · 대시 캔슬 · 입력 버퍼 값은 쓰지 않는다")]
     [SerializeField] private PlayerAttackSetting[] _attackSteps = { new PlayerAttackSetting() };
-    [Tooltip("필살기에 맞은 적이 경직하는 시간(초). 경직하면 적이 진행 중이던 공격이 끊긴다")]
-    [SerializeField, Min(0f)] private float _hitStaggerTime = 2f;
     [Tooltip("발동할 때 이 거리 안의 대상(록온 대상 우선, 없으면 자동 조준 대상)을 찾아 순간 이동한다")]
     [SerializeField, Min(0f)] private float _targetSearchRange = 10f;
     [Tooltip("순간 이동할 때 대상에서 플레이어 쪽으로 이 거리만큼 떨어진 곳에 선다")]
@@ -43,7 +41,6 @@ public class PlayerUltimate : MonoBehaviour
 
     public bool IsGaugeFull => _currentGauge >= _maxGauge;
     public int AttackStepCount => _attackSteps.Length;
-    public float HitStaggerTime => _hitStaggerTime;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -70,9 +67,9 @@ public class PlayerUltimate : MonoBehaviour
     // 록온 대상 → 찾는 거리 안의 자동 조준 대상 순서로 대상을 고르고, 대상에서 플레이어 쪽으로 정해진 거리 앞에 순간 이동한다.
     // 공격하지 않는 적은 플레이어를 보고 있지 않을 수 있어, 적의 정면이 아니라 플레이어가 있던 쪽에 선다.
     // 대상을 돌려준다. 대상이 없으면 null, 도착 지점이 막혀 있으면 이동하지 않고 대상만 돌려준다.
-    public DummyEnemy TeleportToTarget()
+    public IEnemyTargetable TeleportToTarget()
     {
-        DummyEnemy target = _targeting.LockTarget != null ? _targeting.LockTarget : _targeting.FindTarget(_targetSearchRange);
+        IEnemyTargetable target = _targeting.LockTarget != null ? _targeting.LockTarget : _targeting.FindTarget(_targetSearchRange);
 
         if(target == null) return null;
 

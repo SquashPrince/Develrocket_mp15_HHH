@@ -28,7 +28,7 @@ public class LockOnCamera : MonoBehaviour
 
     private void FollowLockTarget()
     {
-        DummyEnemy lockTarget = _targeting.LockTarget;
+        IEnemyTargetable lockTarget = _targeting.LockTarget;
         Transform target = lockTarget != null ? lockTarget.transform : null;
 
         if(target != _groupedTarget) ChangeLockTarget(target);

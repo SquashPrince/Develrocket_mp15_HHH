@@ -19,7 +19,7 @@ public class PlayerParryState : PlayerState
     }
 
     private readonly PlayerParry _parry;
-    private DummyEnemy _parriedTarget;
+    private IEnemyTargetable _parriedTarget;
     private Vector3 _awayDirection;
     private Phase _phase;
     private float _timer;
@@ -48,7 +48,7 @@ public class PlayerParryState : PlayerState
 
     // 공격한 적 쪽을 보고, 그 반대 방향으로 밀려나기 시작한다. 연속 패링이면 반응과 추격 입력을 처음부터 다시 시작한다.
     // 마지막으로 패링한 적을 기억해, 록온 중이 아니면 추격 공격이 그 적에게 나가게 한다.
-    public void OnParrySuccess(DummyEnemy parriedTarget)
+    public void OnParrySuccess(IEnemyTargetable parriedTarget)
     {
         _parriedTarget = parriedTarget;
         _awayDirection = Controller.transform.position - parriedTarget.transform.position;

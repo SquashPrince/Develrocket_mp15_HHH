@@ -38,10 +38,10 @@ public class PlayerTargeting : MonoBehaviour
     private readonly Collider[] _candidateColliders = new Collider[MAX_CANDIDATE_COLLIDERS];
     private Camera _camera;
     private Collider _lockTargetCollider;
-    private DummyEnemy _lockTarget;
+    private IEnemyTargetable _lockTarget;
     private bool _isLockTargetBlocked;
 
-    public DummyEnemy LockTarget => _lockTarget;
+    public IEnemyTargetable LockTarget => _lockTarget;
     // 록온 대상이 벽에 가려져 있는지. 가려져도 록온은 유지하며, 록온 카메라가 구도를 바꾸는 데 쓴다.
     public bool IsLockTargetBlocked => _isLockTargetBlocked;
     public float AttackRange => _attackRange;
@@ -58,21 +58,21 @@ public class PlayerTargeting : MonoBehaviour
     // 등 뒤의 적은 카메라와 플레이어 사이에 있어 레이와의 거리가 거의 0 이 되므로, 같은 기준으로 비교하면 앞의 적보다 먼저 뽑히기 때문이다.
     // 플레이어와 적 사이가 벽으로 막힌 적은 고르지 않는다. 막힌 적에게 다가가면 벽에 박히기 때문이다.
     // onlyOnScreen : true 면 중심이 화면 안에 보이는 적만 고른다. 록온에 쓴다.
-    public DummyEnemy FindTarget(float range, bool onlyOnScreen = false)
+    public IEnemyTargetable FindTarget(float range, bool onlyOnScreen = false)
     {
         int count = Physics.OverlapSphereNonAlloc(transform.position, range, _candidateColliders, Physics.AllLayers, QueryTriggerInteraction.Ignore);
         Vector3 rayOrigin = _cameraTransform.position;
         Vector3 rayDirection = _cameraTransform.forward;
-        DummyEnemy frontEnemy = null;
-        DummyEnemy backEnemy = null;
+        IEnemyTargetable frontEnemy = null;
+        IEnemyTargetable backEnemy = null;
         float frontSqrDistance = float.MaxValue;
         float backSqrDistance = float.MaxValue;
 
         for(int i = 0; i < count; i++)
         {
-            DummyEnemy enemy = _candidateColliders[i].GetComponentInParent<DummyEnemy>();
+            IEnemyTargetable enemy = _candidateColliders[i].GetComponentInParent<IEnemyTargetable>();
 
-            if(enemy == null) continue;
+            if(enemy == null || !enemy.IsAlive) continue;
 
             Vector3 enemyCenter = _candidateColliders[i].bounds.center;
 
@@ -116,7 +116,8 @@ public class PlayerTargeting : MonoBehaviour
 
         if(_lockTarget == null) return;
 
-        if((_lockTarget.transform.position - transform.position).sqrMagnitude > _lockOnRange * _lockOnRange)
+        // 록온 대상이 처치되었거나 록온 사거리 밖으로 나가면 록온을 푼다.
+        if(!_lockTarget.IsAlive || (_lockTarget.transform.position - transform.position).sqrMagnitude > _lockOnRange * _lockOnRange)
         {
             SetLockTarget(null);
             return;
@@ -144,10 +145,10 @@ public class PlayerTargeting : MonoBehaviour
         return Physics.Linecast(sightOrigin, position, _obstacleLayers, QueryTriggerInteraction.Ignore);
     }
 
-    private void SetLockTarget(DummyEnemy target)
+    private void SetLockTarget(IEnemyTargetable target)
     {
         _lockTarget = target;
-        _lockTargetCollider = target != null ? target.GetComponentInChildren<Collider>() : null;
+        _lockTargetCollider = target != null ? target.transform.GetComponentInChildren<Collider>() : null;
         _isLockTargetBlocked = false;
         _lockOnMarker.gameObject.SetActive(target != null);
     }
@@ -163,7 +164,7 @@ public class PlayerTargeting : MonoBehaviour
 
         if(!Application.isPlaying) return;
 
-        DummyEnemy target = FindTarget(_attackRange);
+        IEnemyTargetable target = FindTarget(_attackRange);
 
         if(target == null) return;
 
