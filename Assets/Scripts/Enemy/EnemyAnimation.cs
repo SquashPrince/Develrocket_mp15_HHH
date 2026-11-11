@@ -10,6 +10,7 @@ using UnityEngine;
 public class EnemyAnimation : MonoBehaviour
 {
     private static readonly int IDLE_ANIMATION = Animator.StringToHash("Idle");
+    private static readonly int MOVE_ANIMATION = Animator.StringToHash("Move");
     private static readonly int HIT_ANIMATION = Animator.StringToHash("Hit");
     private static readonly int GROGGY_ANIMATION = Animator.StringToHash("Groggy");
     private static readonly int DIE_ANIMATION = Animator.StringToHash("Die");
@@ -27,6 +28,15 @@ public class EnemyAnimation : MonoBehaviour
     private void OnEnable() => BindReactionEvent();
     private void OnDisable() => UnbindReactionEvent();
     private void Update() => _animator.speed = EnemyTime.Scale;
+
+    // 이동 기능이 이동을 시작하면 Move, 멈추면 Idle 을 재생한다.
+    // 경직 · 그로기 · 처치 중에는 반응 모션을 덮지 않는다. 회복하면 Idle 로 돌아가고, 다시 이동하면 Move 를 재생한다.
+    public void SetMoving(bool isMoving)
+    {
+        if(_reaction.IsRestricted) return;
+
+        Play(isMoving ? MOVE_ANIMATION : IDLE_ANIMATION);
+    }
 
     // 그로기 중 맞으면 그로기를 유지한 채 Hit 만 재생한다. 그로기가 아닐 때의 Hit 은 경직 알림에서 재생한다.
     private void OnDamaged(bool isImpact)
