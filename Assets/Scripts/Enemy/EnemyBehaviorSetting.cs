@@ -16,14 +16,23 @@ public class EnemyBehaviorSetting : MonoBehaviour
     [SerializeField, Min(0f)] private float _keepDistanceTimeMin = 2f;
     [Tooltip("거리 유지를 하는 최대 시간(초, 적 전용 시간). 최소 ~ 최대 사이에서 매번 무작위로 정한다")]
     [SerializeField, Min(0f)] private float _keepDistanceTimeMax = 4f;
+    [Tooltip("거리 유지를 시작할 때 좌 · 우로 도는 대신 백스텝할 확률")]
+    [SerializeField, Range(0f, 1f)] private float _backStepChance = 0.3f;
+    [Tooltip("백스텝 중 뒤로 가는 속도. 추적 이동 속도에 곱하는 배율이다 (1 = 같은 속도). 물러나는 거리 = 속도 × 백스텝 모션 길이")]
+    [SerializeField, Min(0f)] private float _backStepSpeedRate = 1f;
 
     [Header("공격")]
+    [Tooltip("이 거리 안에 들어오면 공격을 시작한다. 밖이면 이 거리까지 다가간다")]
+    [SerializeField, Min(0f)] private float _attackRange = 2f;
     [Tooltip("공격을 마친 뒤 다음 행동까지 기다리는 시간(초, 적 전용 시간)")]
     [SerializeField, Min(0f)] private float _attackInterval = 2f;
 
     public float KeepDistance => _keepDistance;
     public float KeepDistanceTolerance => _keepDistanceTolerance;
     public float StrafeSpeed => _strafeSpeed;
+    public float BackStepChance => _backStepChance;
+    public float BackStepSpeedRate => _backStepSpeedRate;
+    public float AttackRange => _attackRange;
     public float AttackInterval => _attackInterval;
 
     // 이번 거리 유지 시간을 최소 ~ 최대 사이에서 무작위로 정한다. 최대가 최소보다 작으면 최소를 쓴다.

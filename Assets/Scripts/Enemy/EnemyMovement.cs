@@ -35,7 +35,8 @@ public class EnemyMovement : MonoBehaviour
 
     // destination 쪽으로 speed 로 이동한다. 매 프레임 불러도 목적지가 조금 바뀐 정도면 경로를 다시 계산하지 않는다.
     // lookTarget : 이동하는 동안 바라볼 대상. 대상 둘레를 돌 때처럼 옆으로 움직이며 대상을 봐야 할 때 넘긴다.
-    public void MoveTo(Vector3 destination, float speed, Transform lookTarget = null)
+    // playsMoveAnimation : false 면 Move 모션을 재생하지 않고 이동만 한다. 백스텝처럼 다른 기능이 모션을 정할 때 쓴다.
+    public void MoveTo(Vector3 destination, float speed, Transform lookTarget = null, bool playsMoveAnimation = true)
     {
         _speed = speed;
         _lookTarget = lookTarget;
@@ -49,7 +50,8 @@ public class EnemyMovement : MonoBehaviour
         if(_isMoving) return;
 
         _isMoving = true;
-        _animation.SetMoving(true);
+
+        if(playsMoveAnimation) _animation.SetMoving(true);
     }
 
     public void Stop()

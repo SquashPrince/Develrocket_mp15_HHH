@@ -1,6 +1,7 @@
 using UnityEngine;
 
 // 콤보 스킬 상태. 그로기 적 앞으로 순간 이동한 뒤 연계 단계(ComboSkill 1, ComboSkill 2 ...)를 이어 쓰고 이동으로 돌아간다.
+// 연계 수는 콤보 스킬을 받는 적의 최대 연계 수를 따른다. 연계 수가 단계 설정 수보다 많으면 단계를 처음부터 다시 돌려 쓴다.
 // 각 단계는 모션 끝 이벤트(AttackMotionEnd)를 받으면 다음 단계로 넘어가고, 마지막 단계가 끝나면 이전 상태가 아닌 이동 상태로 돌아간다.
 // 같은 상태를 연속으로 다시 재생하면 처음부터 재생되지 않거나 이전 회차의 이벤트와 구분할 수 없어, 같은 클립이라도 단계마다 상태를 나눈다.
 // 단계마다 일반 공격처럼 대상 앞 정지 거리까지 다가간다.
@@ -15,6 +16,8 @@ public class PlayerComboSkillState : PlayerState
     private Vector3 _advanceVelocity;
     private float _advanceTimer;
     private float _advanceDuration;
+    // 이번 콤보 스킬의 연계 수와, 지금 몇 번째 연계인지(0부터)
+    private int _chainCount;
     private int _step;
     private int _animationHash;
 
@@ -25,8 +28,16 @@ public class PlayerComboSkillState : PlayerState
 
     public bool IsActive { get; private set; }
 
+    // 지금 연계가 쓸 단계 설정 · 모션 번호(0부터). 연계 수가 단계 설정 수보다 많으면 처음부터 다시 돌려 쓴다.
+    private int StepSettingIndex => _step % _comboSkill.ChainStepCount;
+
     // target : 콤보 스킬을 발동시킨 그로기 적. 순간 이동과 단계별 접근의 대상이 된다.
-    public void Setup(IEnemyTargetable target) => _target = target;
+    // 연계 수는 그 적의 최대 연계 수다. 그로기 기능이 없는 적이면 단계 설정 수만큼 연계한다.
+    public void Setup(IEnemyTargetable target)
+    {
+        _target = target;
+        _chainCount = target.transform.TryGetComponent(out IEnemyGroggyable groggyable) ? groggyable.MaxComboChain : _comboSkill.ChainStepCount;
+    }
 
     public override void Enter()
     {
@@ -59,7 +70,7 @@ public class PlayerComboSkillState : PlayerState
         {
             case PlayerAnimationEventType.Hit:
             case PlayerAnimationEventType.Impact:
-                Controller.PerformHit(PlayerAttackState.AttackType.ComboSkill, _comboSkill.GetChainStep(_step), isImpact: type == PlayerAnimationEventType.Impact);
+                Controller.PerformHit(PlayerAttackState.AttackType.ComboSkill, _comboSkill.GetChainStep(StepSettingIndex), isImpact: type == PlayerAnimationEventType.Impact);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();
@@ -71,13 +82,13 @@ public class PlayerComboSkillState : PlayerState
     {
         _step++;
 
-        if(_step >= _comboSkill.ChainStepCount)
+        if(_step >= _chainCount)
         {
             Controller.EnterLocomotion(false);
             return;
         }
 
-        PlayerAttackSetting setting = _comboSkill.GetChainStep(_step);
+        PlayerAttackSetting setting = _comboSkill.GetChainStep(StepSettingIndex);
 
         // 발동시킨 그로기 적 쪽으로 돌아 대상 앞 정지 거리까지, 단계의 전진 시간 동안 다가간다. 도중에 록온이 바뀌어도 대상은 그대로다.
         float advanceDistance = Controller.AimFixedTarget(setting, _target);
@@ -86,7 +97,7 @@ public class PlayerComboSkillState : PlayerState
         _advanceTimer = 0f;
         _advanceVelocity = Controller.transform.forward * (advanceDistance / _advanceDuration);
 
-        _animationHash = Animator.StringToHash(ANIMATION_PREFIX + (_step + 1));
+        _animationHash = Animator.StringToHash(ANIMATION_PREFIX + (StepSettingIndex + 1));
         Controller.PlayAnimation(_animationHash, setting.FadeTime);
     }
 

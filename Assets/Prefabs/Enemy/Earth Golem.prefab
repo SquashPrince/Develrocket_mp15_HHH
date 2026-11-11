@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3589048173589978110
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 655911707645081348}
+  m_Layer: 8
+  m_Name: TelegraphPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &655911707645081348
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3589048173589978110}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8764900569801773859}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4073899793546742747
 GameObject:
   m_ObjectHideFlags: 0
@@ -11,12 +42,13 @@ GameObject:
   - component: {fileID: 8764900569801773859}
   - component: {fileID: 3702331971191441573}
   - component: {fileID: 5327671974324453723}
+  - component: {fileID: 3122901376520537506}
   - component: {fileID: 1540001760320510130}
   - component: {fileID: 2428002810246828485}
   - component: {fileID: 8548132667061330928}
   - component: {fileID: 4460300276457232103}
   - component: {fileID: 8650727389424751678}
-  - component: {fileID: 3122901376520537506}
+  - component: {fileID: 8805603893295329841}
   m_Layer: 8
   m_Name: Earth Golem
   m_TagString: Untagged
@@ -38,6 +70,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8006515032032751856}
+  - {fileID: 655911707645081348}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &3702331971191441573
@@ -85,6 +118,45 @@ CapsuleCollider:
   m_Height: 2.25
   m_Direction: 1
   m_Center: {x: 0, y: 1.125, z: 0}
+--- !u!114 &3122901376520537506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4073899793546742747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraphAgent
+  m_Graph: {fileID: -7177865755538880784, guid: 4af8beaa14dba764cb5667fb648ee40d, type: 2}
+  m_BlackboardVariableOverridesList:
+  - rid: 3269081415467925582
+  - rid: 3269081415467925798
+  m_OriginalGraph: {fileID: 0}
+  m_IsInitialised: 0
+  m_IsStarted: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 3269081415467925582
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1
+          m_Value1: 0
+        Name: Self
+        m_Value: {fileID: 4073899793546742747}
+    - rid: 3269081415467925798
+      type: {class: 'SharedBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 4669506101125595082
+          m_Value1: 4632716313943138127
+        Name: Target
+        m_Value: {fileID: 0}
+        m_SharedVariablesRuntimeAsset: {fileID: -6863159812667662349, guid: 4af8beaa14dba764cb5667fb648ee40d, type: 2}
 --- !u!114 &1540001760320510130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -160,8 +232,9 @@ MonoBehaviour:
   _strafeSpeed: 1.25
   _keepDistanceTimeMin: 1.5
   _keepDistanceTimeMax: 3
+  _attackRange: 2
   _attackInterval: 2
---- !u!114 &3122901376520537506
+--- !u!114 &8805603893295329841
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -170,36 +243,126 @@ MonoBehaviour:
   m_GameObject: {fileID: 4073899793546742747}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
+  m_Script: {fileID: 11500000, guid: 4342dbdbef2beb84697b11527d013837, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraphAgent
-  m_Graph: {fileID: -7177865755538880784, guid: 4af8beaa14dba764cb5667fb648ee40d, type: 2}
-  m_BlackboardVariableOverridesList:
-  - rid: 3269081415467925582
-  - rid: 3269081415467925798
-  m_OriginalGraph: {fileID: 0}
-  m_IsInitialised: 0
-  m_IsStarted: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 3269081415467925582
-      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 1
-          m_Value1: 0
-        Name: Self
-        m_Value: {fileID: 4073899793546742747}
-    - rid: 3269081415467925798
-      type: {class: 'SharedBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 4669506101125595082
-          m_Value1: 4632716313943138127
-        Name: Target
-        m_Value: {fileID: 0}
-        m_SharedVariablesRuntimeAsset: {fileID: -6863159812667662349, guid: 4af8beaa14dba764cb5667fb648ee40d, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAttacker
+  _targetLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  _turnSpeed: 360
+  _parryTelegraphPrefab: {fileID: 0}
+  _telegraphPoint: {fileID: 655911707645081348}
+  _attacks:
+  - _name: Left Punch
+    _animationStates:
+    - Attack 1
+    _cooldown: 3.5
+    _baseWeight: 50
+    _weightGrowth: 10
+    _telegraphTime: 0.6
+    _hitDelay: 0
+    _useTelegraphColor: 0
+    _telegraphColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    _telegraphScale: 1.1
+    _isParryable: 0
+    _parryStaggerTime: 1.5
+    _staggerResistLevel: 1
+    _canPerfectDodge: 1
+    _hitCenter: {x: 0, y: 1, z: 1.2}
+    _hitRadius: 1.5
+    _power: 10
+    _reaction: 0
+    _hitStunTime: 0.4
+    _hitPushDistance: 0
+    _hitPushDuration: 0.1
+    _knockbackDistance: 3
+    _knockbackDuration: 0.5
+    _getUpTime: 1
+    _canDashCancel: 1
+  - _name: Right Punch
+    _animationStates:
+    - Attack 2
+    _cooldown: 2
+    _baseWeight: 50
+    _weightGrowth: 10
+    _telegraphTime: 0.6
+    _hitDelay: 0
+    _useTelegraphColor: 0
+    _telegraphColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    _telegraphScale: 1.1
+    _isParryable: 0
+    _parryStaggerTime: 1.5
+    _staggerResistLevel: 1
+    _canPerfectDodge: 1
+    _hitCenter: {x: 0, y: 1, z: 1.2}
+    _hitRadius: 1.5
+    _power: 10
+    _reaction: 0
+    _hitStunTime: 0.4
+    _hitPushDistance: 0
+    _hitPushDuration: 0.1
+    _knockbackDistance: 3
+    _knockbackDuration: 0.5
+    _getUpTime: 1
+    _canDashCancel: 1
+  - _name: Smash Attack
+    _animationStates:
+    - HeavyAttack
+    _cooldown: 5
+    _baseWeight: 30
+    _weightGrowth: 10
+    _telegraphTime: 0.6
+    _hitDelay: 0
+    _useTelegraphColor: 0
+    _telegraphColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    _telegraphScale: 1.1
+    _isParryable: 0
+    _parryStaggerTime: 1.5
+    _staggerResistLevel: 1
+    _canPerfectDodge: 1
+    _hitCenter: {x: 0, y: 1, z: 1.2}
+    _hitRadius: 1.5
+    _power: 10
+    _reaction: 1
+    _hitStunTime: 0.8
+    _hitPushDistance: 2
+    _hitPushDuration: 0.2
+    _knockbackDistance: 3
+    _knockbackDuration: 0.5
+    _getUpTime: 1
+    _canDashCancel: 0
+  - _name: Spin Attack
+    _animationStates:
+    - ParryAttackReady
+    - ParryAttackAction
+    - ParryAttackAction
+    - ParryAttackAction
+    - ParryAttackAction
+    - ParryAttackAction
+    - ParryAttackEnd
+    _cooldown: 10
+    _baseWeight: 20
+    _weightGrowth: 5
+    _telegraphTime: 0.5
+    _hitDelay: 0.5
+    _useTelegraphColor: 0
+    _telegraphColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    _telegraphScale: 1.1
+    _isParryable: 1
+    _parryStaggerTime: 2
+    _staggerResistLevel: 2
+    _canPerfectDodge: 1
+    _hitCenter: {x: 0, y: 1, z: 1.2}
+    _hitRadius: 1.5
+    _power: 10
+    _reaction: 2
+    _hitStunTime: 0.4
+    _hitPushDistance: 0
+    _hitPushDuration: 0.2
+    _knockbackDistance: 7.5
+    _knockbackDuration: 0.725
+    _getUpTime: 1
+    _canDashCancel: 0
 --- !u!1 &5149942132840661894
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,13 +454,34 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1691303173787263157, guid: 812ddbf09810e754bbf24d7bbd9f760b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3066945951043805065}
   m_SourcePrefab: {fileID: 100100000, guid: 812ddbf09810e754bbf24d7bbd9f760b, type: 3}
 --- !u!95 &593709537021241404 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5391735910949265525, guid: 812ddbf09810e754bbf24d7bbd9f760b, type: 3}
   m_PrefabInstance: {fileID: 4822806077184706633}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6167323266355833084 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1691303173787263157, guid: 812ddbf09810e754bbf24d7bbd9f760b, type: 3}
+  m_PrefabInstance: {fileID: 4822806077184706633}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3066945951043805065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6167323266355833084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24fff3ae3ba9b3246ab4011e6927e81f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimationEventRelay
+  _attacker: {fileID: 8805603893295329841}
 --- !u!4 &6835737977400095302 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2032082111789595151, guid: 812ddbf09810e754bbf24d7bbd9f760b, type: 3}

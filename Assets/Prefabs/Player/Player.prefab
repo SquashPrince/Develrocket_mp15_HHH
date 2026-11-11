@@ -31918,7 +31918,7 @@ MonoBehaviour:
   _gravity: -20
   _dashDistance: 5
   _dashDuration: 0.25
-  _dodgeDistance: 5
+  _dodgeDistance: 3
   _dodgeDuration: 0.25
   _dashCooldown: 1
   _dashChainInterval: 0.25
