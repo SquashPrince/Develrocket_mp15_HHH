@@ -41,7 +41,7 @@ public class PlayerParryState : PlayerState
 
         _parry.TeleportToAttacker();
         Controller.HorizontalVelocity = Vector3.zero;
-        Controller.PlayAnimation(READY_ANIMATION);
+        Controller.Animation.Play(READY_ANIMATION);
     }
 
     public override void Exit() => IsActive = false;
@@ -63,7 +63,7 @@ public class PlayerParryState : PlayerState
         _phase = Phase.React;
         _timer = 0f;
         _hasChaseInput = false;
-        Controller.PlayAnimation(REACT_ANIMATION);
+        Controller.Animation.Play(REACT_ANIMATION);
     }
 
     public override void Tick()

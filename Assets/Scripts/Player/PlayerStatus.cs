@@ -4,10 +4,9 @@ using UnityEngine;
 // 대시 · 회피 무적 동안은 완벽 회피 판정도 함께 열려, 완벽 회피할 수 있는 공격이 닿으면 슬로모션을 시작한다.
 // 체력이 0이 되었을 때의 쓰러짐 · 실패는 게임 흐름 단계에서 만든다. 지금은 0에서 멈추고 로그만 남긴다.
 // 현재 체력은 Inspector 를 Debug 모드로 바꾸면 실시간으로 볼 수 있다.
-public class PlayerHealth : MonoBehaviour
+// 최대 체력은 캐릭터 데이터에서 읽는다.
+public class PlayerStatus : MonoBehaviour
 {
-    [SerializeField, Min(1f)] private float _maxHealth = 100f;
-
     private PlayerController _controller;
     private PlayerSlowMotion _slowMotion;
     private PlayerParry _parry;
@@ -17,7 +16,7 @@ public class PlayerHealth : MonoBehaviour
     private float _perfectDodgeTimer;
     private bool _isAttackInvincible;
 
-    public float MaxHealth => _maxHealth;
+    public float MaxHealth => _controller.Character.MaxHealth;
     public float CurrentHealth => _currentHealth;
     // 시간으로 거는 무적(대시 · 넉백)이나 시전 중 무적 공격의 무적 중인지
     public bool IsInvincible => _invincibleTimer > 0f || _isAttackInvincible;
@@ -68,7 +67,7 @@ public class PlayerHealth : MonoBehaviour
         _currentHealth = Mathf.Max(0f, _currentHealth - attack.Power);
 
 #if UNITY_EDITOR
-        Debug.Log($"[피격] {attack.Name} ({attack.Reaction}) 위력 {attack.Power} → 체력 {_currentHealth:F0} / {_maxHealth:F0}");
+        Debug.Log($"[피격] {attack.Name} ({attack.Reaction}) 위력 {attack.Power} → 체력 {_currentHealth:F0} / {MaxHealth:F0}");
 #endif
 
         _controller.StartHit(attack, attacker.transform.position);
@@ -108,6 +107,6 @@ public class PlayerHealth : MonoBehaviour
 
     private void Init()
     {
-        _currentHealth = _maxHealth;
+        _currentHealth = MaxHealth;
     }
 }

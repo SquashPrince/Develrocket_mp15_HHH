@@ -35,7 +35,7 @@ public class PlayerLocomotionState : PlayerState
         _moveHoldTime = 0f;
         _startRunning = false;
 
-        Controller.PlayAnimation(_gait == Gait.Idle ? IDLE_ANIMATION : MOVE_ANIMATION);
+        Controller.Animation.Play(_gait == Gait.Idle ? IDLE_ANIMATION : MOVE_ANIMATION);
     }
 
     public override void Tick()
@@ -66,7 +66,7 @@ public class PlayerLocomotionState : PlayerState
         }
 
         Controller.HorizontalVelocity = UpdateGait(moveDirection);
-        Controller.SetMoveSpeedParameter(Controller.HorizontalVelocity.magnitude);
+        Controller.Animation.SetMoveSpeed(Controller.HorizontalVelocity.magnitude);
     }
 
     private Vector3 UpdateGait(Vector3 moveDirection)
@@ -74,7 +74,7 @@ public class PlayerLocomotionState : PlayerState
         if(moveDirection == Vector3.zero)
         {
             // 움직이다 멈추는 순간 대기 모션을 처음부터 재생한다.
-            if(_gait != Gait.Idle) Controller.PlayAnimation(IDLE_ANIMATION);
+            if(_gait != Gait.Idle) Controller.Animation.Play(IDLE_ANIMATION);
 
             _gait = Gait.Idle;
             _moveHoldTime = 0f;
@@ -84,7 +84,7 @@ public class PlayerLocomotionState : PlayerState
         if(_gait == Gait.Idle)
         {
             _gait = Gait.Walk;
-            Controller.PlayAnimation(MOVE_ANIMATION);
+            Controller.Animation.Play(MOVE_ANIMATION);
         }
 
         _moveHoldTime += Time.deltaTime;

@@ -1,11 +1,34 @@
-using System;
 using UnityEngine;
 
-// 공격 하나의 설정 묶음. 콤보 단계 · 강공격 · 스킬 · 특수스킬이 같은 형태로 Inspector 에서 값을 정한다.
-// MonoBehaviour 가 아닌 일반 클래스이므로 [Serializable] 을 붙여야 Inspector 에 펼쳐서 보인다.
-[Serializable]
-public class PlayerAttackSetting
+// 액션 하나(콤보 단계 · 강공격 · 스킬 · 특수스킬 · 대시 공격 · 회피 반격 · 패링 추격 · 필살기 · 콤보 스킬)의 값.
+// 액션마다 에셋 하나를 만들고, 캐릭터는 자기 액션 에셋을 참조한다. 같은 값을 여러 캐릭터 · 여러 자리에서 다시 쓸 수 있다.
+// 액션은 동작 목록을 가진다. 1개면 한 동작만, 여러 개면 순서대로 이어 재생한다. (예: 필살기 난무 2동작)
+// 동작마다 재생할 상태 · 판정 범위 · 전진이 다르고, 위력 · 경직 · 게이지 · 캔슬 · 무적 같은 타격 값은 액션 공통이다.
+// 카메라 워크 · Timeline 같은 연출 참조와 시네마틱 이동(경로 이동)은 연출 작업 때 이 에셋에 추가한다.
+[CreateAssetMenu(fileName = "NewActionData", menuName = "HHH/Action Data")]
+public class ActionData : ScriptableObject
 {
+    // 액션 종류. Inspector 에 저장된 값은 순서 번호이므로, 새 종류는 항상 맨 뒤에 추가한다.
+    public enum ActionType
+    {
+        Basic,
+        Heavy,
+        DashAttack,
+        DodgeCounter,
+        ParryChase,
+        Skill,
+        SpecialSkill,
+        Ultimate,
+        ComboSkill
+    }
+
+    [Tooltip("[예정] 액션 종류. 공격 종류에 따라 대미지를 다르게 계산할 때 쓴다. 지금은 동작에 쓰지 않는다")]
+    [SerializeField] private ActionType _actionType = ActionType.Basic;
+
+    [Tooltip("이 액션을 이루는 동작 목록. 1개면 한 동작, 여러 개면 순서대로 이어 재생한다")]
+    [SerializeField] private ActionStep[] _steps = { new ActionStep() };
+
+    [Header("타격 값")]
     [Tooltip("적중한 적 하나마다 얻는 에너지")]
     [SerializeField, Min(0f)] private float _energyGain = 5f;
     [Tooltip("적중한 적 하나마다 얻는 필살기 게이지")]
@@ -16,13 +39,9 @@ public class PlayerAttackSetting
     [SerializeField, Min(0)] private int _staggerLevel = 1;
     [Tooltip("맞은 적을 경직시키는 시간(초, 적 전용 시간). 0이면 경직시키지 않는다. 경직하면 적이 진행 중이던 공격이 끊긴다")]
     [SerializeField, Min(0f)] private float _staggerTime;
-    [Tooltip("휘두르기 시작부터 앞으로 나아가는 거리")]
-    [SerializeField, Min(0f)] private float _advanceDistance = 0.5f;
-    [Tooltip("앞으로 나아가는 데 걸리는 시간(초)")]
-    [SerializeField, Min(0.01f)] private float _advanceDuration = 0.15f;
-    [Tooltip("이전 모션에서 이 모션으로 섞으며 넘어가는 시간(초)")]
-    [SerializeField, Min(0f)] private float _fadeTime = 0.1f;
-    [Tooltip("[콤보 단계만 사용] 공격 동작이 끝난 뒤 이 시간 안에 공격하면 다음 단계로 이어진다")]
+
+    [Header("입력 · 캔슬")]
+    [Tooltip("[콤보 단계만 사용] 마지막 동작이 끝난 뒤 이 시간 안에 공격하면 다음 콤보 단계로 이어진다")]
     [SerializeField, Min(0f)] private float _inputBuffer = 0.4f;
     [Tooltip("대상에게 전진 거리보다 멀리 다가갈 때 하체에 달리기 모션을 덮을지 여부. 하체 동작이 중요한 모션이면 끈다")]
     [SerializeField] private bool _useLegRun = true;
@@ -35,18 +54,20 @@ public class PlayerAttackSetting
     [Tooltip("휘두르는 동안 적 공격에 맞지 않는지 여부. 회피하지 않아도 무적이며, 후딜에 들어가면 풀린다. 무적 중 들어온 노란 공격은 패링되지 않는다")]
     [SerializeField] private bool _isInvincibleOnSwing;
 
+    public ActionType Type => _actionType;
+    public int StepCount => _steps.Length;
     public float EnergyGain => _energyGain;
     public float UltimateGaugeGain => _ultimateGaugeGain;
     public float Power => _power;
     public int StaggerLevel => _staggerLevel;
     public float StaggerTime => _staggerTime;
-    public float AdvanceDistance => _advanceDistance;
-    public float AdvanceDuration => _advanceDuration;
-    public float FadeTime => _fadeTime;
     public float InputBuffer => _inputBuffer;
     public bool UseLegRun => _useLegRun;
     public bool AlwaysLegRun => _alwaysLegRun;
     public bool CanDashCancel => _canDashCancel;
     public bool CanUltimateCancel => _canUltimateCancel;
     public bool IsInvincibleOnSwing => _isInvincibleOnSwing;
+
+    // index : 동작 번호(0부터)
+    public ActionStep GetStep(int index) => _steps[index];
 }

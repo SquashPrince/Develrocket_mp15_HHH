@@ -54,19 +54,19 @@ public class PlayerHitState : PlayerState
         if(_attack.Reaction != EnemyAttackSetting.HitReaction.Knockback)
         {
             _phase = Phase.Stun;
-            Controller.PlayAnimation(_attack.Reaction == EnemyAttackSetting.HitReaction.HeavyHit ? HEAVY_HIT_ANIMATION : HIT_ANIMATION);
+            Controller.Animation.Play(_attack.Reaction == EnemyAttackSetting.HitReaction.HeavyHit ? HEAVY_HIT_ANIMATION : HIT_ANIMATION);
             return;
         }
 
         _phase = Phase.Knockback;
-        Controller.Health.BeginInvincible(_attack.KnockbackDuration + _attack.GetUpTime);
-        Controller.PlayAnimation(KNOCKBACK_ANIMATION);
+        Controller.Status.BeginInvincible(_attack.KnockbackDuration + _attack.GetUpTime);
+        Controller.Animation.Play(KNOCKBACK_ANIMATION);
     }
 
     // 넉백 중 대시로 끊으면 남은 넉백 무적을 지운다. 대시 무적은 대시 상태가 들어오면서 다시 건다.
     public override void Exit()
     {
-        if(_phase != Phase.Stun) Controller.Health.EndInvincible();
+        if(_phase != Phase.Stun) Controller.Status.EndInvincible();
     }
 
     public override void Tick()
@@ -115,6 +115,6 @@ public class PlayerHitState : PlayerState
         Controller.HorizontalVelocity = Vector3.zero;
         _phase = Phase.GetUp;
         _timer = 0f;
-        Controller.PlayAnimation(GET_UP_ANIMATION);
+        Controller.Animation.Play(GET_UP_ANIMATION);
     }
 }
