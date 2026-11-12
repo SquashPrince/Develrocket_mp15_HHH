@@ -217,7 +217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ab53961717a74c448ba062b47188698, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyReaction
-  _baseStaggerResistLevel: 0
+  _baseStaggerResistLevel: 2
   _groggyTime: 12
   _maxComboChain: 3
 --- !u!114 &127120365638968199
@@ -418,6 +418,33 @@ MonoBehaviour:
     _canPerfectDodge: 1
     _hitCenter: {x: 0, y: 0, z: 0}
     _hitRadius: 10
+    _power: 10
+    _reaction: 2
+    _hitStunTime: 0.4
+    _hitPushDistance: 0
+    _hitPushDuration: 0.2
+    _knockbackDistance: 7.5
+    _knockbackDuration: 0.725
+    _getUpTime: 1
+    _canDashCancel: 0
+  - _name: Assult
+    _animationStates:
+    - AssultAttack
+    _cooldown: 10
+    _baseWeight: 20
+    _weightGrowth: 5
+    _minUseDistance: 7.5
+    _canUseOutOfRange: 1
+    _leapHeight: 0
+    _overshootDistance: 2.5
+    _isParryable: 0
+    _parryStaggerTime: 2
+    _staggerResistLevel: 2
+    _resistUntilEvent: 1
+    _isContinuousHit: 1
+    _canPerfectDodge: 1
+    _hitCenter: {x: 0, y: 1.5, z: 2}
+    _hitRadius: 5
     _power: 10
     _reaction: 2
     _hitStunTime: 0.4
