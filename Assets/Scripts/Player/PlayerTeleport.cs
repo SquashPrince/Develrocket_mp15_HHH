@@ -6,7 +6,7 @@ using UnityEngine;
 // 어느 쪽에 설지는 부르는 쪽이 고른다.
 //   대상 정면 : 공격하는 적을 마주 보도록 적의 정면에 선다. (패링)
 //   플레이어 쪽 : 공격하지 않는 적은 플레이어를 보고 있지 않을 수 있어, 적에서 플레이어가 있던 쪽에 선다. (필살기 · 콤보 스킬)
-// 도착 높이는 대상의 기준점 높이를 쓰므로, 대상의 기준점은 플레이어처럼 발바닥에 있어야 한다.
+// 도착 높이는 도착 지점에서 찾은 바닥 높이를 쓴다. 바닥은 대상 높이를 기준으로 위 · 아래 정한 범위 안에서 찾는다.
 [RequireComponent(typeof(PlayerController), typeof(CharacterController))]
 public class PlayerTeleport : MonoBehaviour
 {
@@ -16,10 +16,16 @@ public class PlayerTeleport : MonoBehaviour
         PlayerSide
     }
 
-    [Tooltip("순간 이동할 때 대상에서 이 거리만큼 떨어진 곳에 선다")]
+    [Tooltip("순간 이동할 때 대상 몸 표면과 플레이어 몸 표면 사이를 이 간격만큼 띄운다")]
     [SerializeField, Min(0f)] private float _distance = 1.5f;
     [Tooltip("순간 이동할 자리가 막혀 있는지 검사할 Layer. Player · Enemy 는 빼고 벽 · 지형만 넣는다")]
     [SerializeField] private LayerMask _blockLayers = 1;
+    [Tooltip("도착 지점의 바닥을 찾을 Layer. 바닥 · 지형 Layer 를 넣는다")]
+    [SerializeField] private LayerMask _groundLayers = 1;
+    [Tooltip("대상 높이에서 이 높이만큼 위에서부터 바닥을 찾기 시작한다. 너무 크면 위층 바닥이나 지붕을 바닥으로 찾을 수 있다")]
+    [SerializeField, Min(0f)] private float _groundSearchHeight = 2f;
+    [Tooltip("대상 높이에서 이 깊이만큼 아래까지 바닥을 찾는다. 이 안에 바닥이 없으면 순간 이동하지 않는다")]
+    [SerializeField, Min(0f)] private float _groundSearchDepth = 2f;
 
     private PlayerController _controller;
     private CharacterController _characterController;
@@ -30,16 +36,19 @@ public class PlayerTeleport : MonoBehaviour
     // 도착 지점이 벽 · 지형에 겹치거나, 대상과 도착 지점 사이가 막혀 있으면 이동하지 않고 false 를 돌려준다.
     public bool TryTeleportTo(Transform target, Side side) => TryTeleportTo(target, side, _distance);
 
-    // 공통 거리 대신 따로 정한 거리로 순간 이동한다. 계산과 막힘 검사는 같다. (콤보 스킬)
-    public bool TryTeleportTo(Transform target, Side side, float distance)
+    // 공통 간격 대신 따로 정한 간격으로 순간 이동한다. 계산과 막힘 검사는 같다. (콤보 스킬)
+    // gap : 대상 몸 표면과 플레이어 몸 표면 사이 간격. 중심 사이 거리는 대상 반지름 + 플레이어 반지름 + 간격이다.
+    //   중심에서 정한 거리만 띄우면 큰 적(보스)의 몸 안에 서게 되어, 겹침을 풀며 바닥 아래로 밀려나기 때문이다.
+    public bool TryTeleportTo(Transform target, Side side, float gap)
     {
         Vector3 targetPosition = target.position;
         Vector3 direction = side == Side.TargetFront ? target.forward : transform.position - targetPosition;
         direction.y = 0f;
 
+        float distance = GetHorizontalRadius(target) + _characterController.radius + gap;
         Vector3 destination = targetPosition + direction.normalized * distance;
 
-        if(IsBlocked(targetPosition, destination)) return false;
+        if(!TrySnapToGround(ref destination) || IsBlocked(targetPosition, destination)) return false;
 
         // CharacterController 가 켜져 있으면 위치를 직접 바꿔도 덮어쓰므로 잠깐 끄고 옮긴다.
         _characterController.enabled = false;
@@ -50,6 +59,30 @@ public class PlayerTeleport : MonoBehaviour
         toTarget.y = 0f;
         _controller.FaceImmediately(toTarget);
 
+        return true;
+    }
+
+    // 대상 콜라이더의 수평 반지름. 콜라이더 모양(캡슐 · 박스 등)과 상관없이 월드 기준 경계 상자(bounds)의 가로 · 세로 중 큰 쪽 절반을 쓴다.
+    // 콜라이더가 없거나 꺼져 있으면(도약 중인 보스 등) bounds 크기가 0 이라 0 이 된다.
+    private static float GetHorizontalRadius(Transform target)
+    {
+        if(!target.TryGetComponent(out Collider targetCollider)) return 0f;
+
+        Vector3 extents = targetCollider.bounds.extents;
+
+        return Mathf.Max(extents.x, extents.z);
+    }
+
+    // 도착 지점 위에서 아래로 바닥을 찾아, 찾으면 도착 높이를 바닥 높이로 맞추고 true 를 돌려준다.
+    // 대상 높이를 그대로 쓰면 도착 지점 바닥이 더 높을 때(경사 · 높낮이) 발이 땅 속에 들어가 바닥을 뚫고 떨어지기 때문이다.
+    // 찾는 범위는 대상 높이 기준 위 · 아래로 정한 만큼이다. 범위 안에 바닥이 없으면 순간 이동하지 않는다.
+    private bool TrySnapToGround(ref Vector3 destination)
+    {
+        Vector3 origin = destination + Vector3.up * _groundSearchHeight;
+
+        if(!Physics.Raycast(origin, Vector3.down, out RaycastHit hit, _groundSearchHeight + _groundSearchDepth, _groundLayers, QueryTriggerInteraction.Ignore)) return false;
+
+        destination.y = hit.point.y;
         return true;
     }
 

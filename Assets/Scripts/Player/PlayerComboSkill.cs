@@ -9,7 +9,7 @@ public class PlayerComboSkill : MonoBehaviour
 {
     [Tooltip("한 번의 콤보 스킬을 이루는 단계(동작)별 설정. 배열 크기가 단계 수이며, Animator 에 \"ComboSkill 1\" 부터 단계 수만큼 상태가 있어야 한다. 연계 수와는 관계없다. 하체 달리기 · 대시 캔슬 · 입력 버퍼 · 필살기로 끊기 값은 쓰지 않는다")]
     [SerializeField] private PlayerAttackSetting[] _chainSteps = { new PlayerAttackSetting(), new PlayerAttackSetting(), new PlayerAttackSetting() };
-    [Tooltip("발동할 때 그로기 적에서 플레이어 쪽으로 이 거리만큼 떨어진 곳에 순간 이동한다. 순간 이동 공통 거리와 따로 둔다. 파티 전투에서 남아 있는 캐릭터와 교체된 캐릭터가 같은 위치에서 콤보 스킬을 쓰지 않게 위치를 다르게 정하기 위해서다")]
+    [Tooltip("발동할 때 그로기 적에서 플레이어 쪽으로, 적 몸 표면과 플레이어 몸 표면 사이를 이 간격만큼 띄워 순간 이동한다. 순간 이동 공통 간격과 따로 둔다. 파티 전투에서 남아 있는 캐릭터와 교체된 캐릭터가 같은 위치에서 콤보 스킬을 쓰지 않게 위치를 다르게 정하기 위해서다")]
     [SerializeField, Min(0f)] private float _teleportDistance = 1.5f;
 
     private PlayerController _controller;
@@ -41,7 +41,7 @@ public class PlayerComboSkill : MonoBehaviour
     // 콤보 스킬 중 강타가 맞은 적을 알린다. 콤보 스킬 대상이면 다음 연계를 잇는다.
     public void OnImpactHit(IEnemyDamageable enemy) => _comboSkillState.QueueChain(enemy.transform);
 
-    // 대상에서 플레이어 쪽으로 콤보 스킬 전용 거리만큼 떨어진 곳에 순간 이동한다. 막혀 있으면 제자리에 있는다.
+    // 대상에서 플레이어 쪽으로 콤보 스킬 전용 간격만큼 떨어진 곳에 순간 이동한다. 막혀 있으면 제자리에 있는다.
     public void TeleportToTarget(IEnemyTargetable target) => _teleport.TryTeleportTo(target.transform, PlayerTeleport.Side.PlayerSide, _teleportDistance);
 
     private void CacheComponent()
