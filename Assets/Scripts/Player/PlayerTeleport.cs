@@ -1,11 +1,23 @@
 using UnityEngine;
 
-// 대상 앞으로 순간 이동한다. 패링 · 필살기가 함께 쓴다.
+// 대상 앞으로 순간 이동한다. 패링 · 필살기 · 콤보 스킬이 같은 계산을 함께 쓰고, 패링 · 필살기는 같은 거리를 쓴다.
+// 콤보 스킬은 거리를 따로 정한다. 파티 전투에서 남아 있는 캐릭터와 교체된 캐릭터가 같은 위치에서 콤보 스킬을 쓰지 않게 하기 위해서다.
 // 실제로 다가가면 벽 등에 걸리기 때문에 위치를 바로 옮긴다. 도착 지점이 막혀 있으면 이동하지 않는다.
+// 어느 쪽에 설지는 부르는 쪽이 고른다.
+//   대상 정면 : 공격하는 적을 마주 보도록 적의 정면에 선다. (패링)
+//   플레이어 쪽 : 공격하지 않는 적은 플레이어를 보고 있지 않을 수 있어, 적에서 플레이어가 있던 쪽에 선다. (필살기 · 콤보 스킬)
 // 도착 높이는 대상의 기준점 높이를 쓰므로, 대상의 기준점은 플레이어처럼 발바닥에 있어야 한다.
 [RequireComponent(typeof(PlayerController), typeof(CharacterController))]
 public class PlayerTeleport : MonoBehaviour
 {
+    public enum Side
+    {
+        TargetFront,
+        PlayerSide
+    }
+
+    [Tooltip("순간 이동할 때 대상에서 이 거리만큼 떨어진 곳에 선다")]
+    [SerializeField, Min(0f)] private float _distance = 1.5f;
     [Tooltip("순간 이동할 자리가 막혀 있는지 검사할 Layer. Player · Enemy 는 빼고 벽 · 지형만 넣는다")]
     [SerializeField] private LayerMask _blockLayers = 1;
 
@@ -14,10 +26,15 @@ public class PlayerTeleport : MonoBehaviour
 
     private void Awake() => CacheComponent();
 
-    // 대상 위치에서 direction 쪽으로 distance 만큼 떨어진 곳으로 순간 이동하고 대상 쪽을 본다.
+    // 대상에서 side 쪽으로 정해진 거리만큼 떨어진 곳으로 순간 이동하고 대상 쪽을 본다.
     // 도착 지점이 벽 · 지형에 겹치거나, 대상과 도착 지점 사이가 막혀 있으면 이동하지 않고 false 를 돌려준다.
-    public bool TryTeleport(Vector3 targetPosition, Vector3 direction, float distance)
+    public bool TryTeleportTo(Transform target, Side side) => TryTeleportTo(target, side, _distance);
+
+    // 공통 거리 대신 따로 정한 거리로 순간 이동한다. 계산과 막힘 검사는 같다. (콤보 스킬)
+    public bool TryTeleportTo(Transform target, Side side, float distance)
     {
+        Vector3 targetPosition = target.position;
+        Vector3 direction = side == Side.TargetFront ? target.forward : transform.position - targetPosition;
         direction.y = 0f;
 
         Vector3 destination = targetPosition + direction.normalized * distance;

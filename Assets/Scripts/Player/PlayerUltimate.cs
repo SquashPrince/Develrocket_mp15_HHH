@@ -23,8 +23,6 @@ public class PlayerUltimate : MonoBehaviour
     [SerializeField] private PlayerAttackSetting[] _attackSteps = { new PlayerAttackSetting() };
     [Tooltip("발동할 때 이 거리 안의 대상(록온 대상 우선, 없으면 자동 조준 대상)을 찾아 순간 이동한다")]
     [SerializeField, Min(0f)] private float _targetSearchRange = 10f;
-    [Tooltip("순간 이동할 때 대상에서 플레이어 쪽으로 이 거리만큼 떨어진 곳에 선다")]
-    [SerializeField, Min(0f)] private float _teleportDistance = 1.5f;
 
     private PlayerController _controller;
     private PlayerTeleport _teleport;
@@ -64,18 +62,15 @@ public class PlayerUltimate : MonoBehaviour
     // step : 공격 단계(0부터)
     public PlayerAttackSetting GetAttackStep(int step) => _attackSteps[step];
 
-    // 록온 대상 → 찾는 거리 안의 자동 조준 대상 순서로 대상을 고르고, 대상에서 플레이어 쪽으로 정해진 거리 앞에 순간 이동한다.
-    // 공격하지 않는 적은 플레이어를 보고 있지 않을 수 있어, 적의 정면이 아니라 플레이어가 있던 쪽에 선다.
+    // 공격 대상 기준(록온 대상 → 찾는 거리 안의 자동 조준 대상)으로 대상을 고르고, 대상에서 플레이어 쪽에 순간 이동한다.
     // 대상을 돌려준다. 대상이 없으면 null, 도착 지점이 막혀 있으면 이동하지 않고 대상만 돌려준다.
     public IEnemyTargetable TeleportToTarget()
     {
-        IEnemyTargetable target = _targeting.LockTarget != null ? _targeting.LockTarget : _targeting.FindTarget(_targetSearchRange);
+        IEnemyTargetable target = _targeting.FindAttackTarget(_targetSearchRange);
 
         if(target == null) return null;
 
-        Vector3 targetPosition = target.transform.position;
-
-        _teleport.TryTeleport(targetPosition, transform.position - targetPosition, _teleportDistance);
+        _teleport.TryTeleportTo(target.transform, PlayerTeleport.Side.PlayerSide);
         return target;
     }
 

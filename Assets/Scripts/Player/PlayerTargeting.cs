@@ -52,6 +52,17 @@ public class PlayerTargeting : MonoBehaviour
     private void Update() => UpdateLockOn();
     private void OnDrawGizmosSelected() => DrawRange();
 
+    // 공격 대상을 고른다. 록온 대상 → 우선 대상 → range 안의 자동 조준 대상 순서다. 없으면 null 이다.
+    // 공격 · 필살기 · 그로기 테스트처럼 "누구를 노릴지"는 모두 이 순서를 따른다.
+    // priorityTarget : 록온 중이 아닐 때 자동 조준보다 먼저 노릴 대상. 패링 추격은 패링한 적을 넘긴다.
+    public IEnemyTargetable FindAttackTarget(float range, IEnemyTargetable priorityTarget = null)
+    {
+        if(_lockTarget != null) return _lockTarget;
+        if(priorityTarget != null) return priorityTarget;
+
+        return FindTarget(range);
+    }
+
     // 플레이어 기준 range 안의 적을 찾아 돌려준다. 없으면 null 이다.
     // 플레이어 앞쪽(카메라가 보는 방향 기준)의 적 중 카메라 중앙 레이와 가장 가까운 적을 우선한다.
     // 앞쪽에 적이 없을 때만 등 뒤의 적 중 플레이어와 가장 가까운 적을 고른다.

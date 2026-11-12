@@ -18,7 +18,7 @@ public class PlayerGroggyDebug : MonoBehaviour
     {
         if(!_groggyAction.action.WasPressedThisFrame()) return;
 
-        IEnemyTargetable target = _targeting.LockTarget != null ? _targeting.LockTarget : _targeting.FindTarget(_targeting.AttackRange);
+        IEnemyTargetable target = _targeting.FindAttackTarget(_targeting.AttackRange);
 
         if(target == null || !target.transform.TryGetComponent(out IEnemyGroggyable groggyable)) return;
 

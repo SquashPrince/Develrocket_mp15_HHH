@@ -249,9 +249,7 @@ public class PlayerController : MonoBehaviour
     // priorityTarget : 록온 중이 아닐 때 자동 조준보다 먼저 쓸 대상. 패링 추격은 패링한 적을 넘긴다.
     public float AimAttack(PlayerAttackSetting setting, bool canTurnToInput, IEnemyTargetable priorityTarget = null)
     {
-        IEnemyTargetable target = _targeting.LockTarget != null ? _targeting.LockTarget : priorityTarget;
-
-        if(target == null) target = _targeting.FindTarget(_targeting.AttackRange);
+        IEnemyTargetable target = _targeting.FindAttackTarget(_targeting.AttackRange, priorityTarget);
 
         if(target == null)
         {
