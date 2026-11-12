@@ -5,7 +5,7 @@ ModelImporter:
   internalIDToNameTable:
   - first:
       74: 1827226128182048838
-    second: Left Punch Attack
+    second: Attack 1
   externalObjects: {}
   materials:
     materialImportMode: 1
@@ -34,7 +34,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Left Punch Attack
+      name: Attack 1
       takeName: Take 001
       internalID: 1827226128182048838
       firstFrame: 0

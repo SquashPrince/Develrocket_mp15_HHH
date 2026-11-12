@@ -37,7 +37,7 @@ public partial class ChaseTargetAction : Action
 
         if(toTarget.sqrMagnitude <= _setting.KeepDistance * _setting.KeepDistance) return Status.Success;
 
-        _movement.MoveTo(Target.Value.position, _movement.MoveSpeed);
+        _movement.MoveTo(Target.Value.position, _movement.MoveSpeed * _setting.RunSpeedRate);
         return Status.Running;
     }
 

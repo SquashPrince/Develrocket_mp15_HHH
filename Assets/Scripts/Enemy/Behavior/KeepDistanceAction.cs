@@ -5,9 +5,11 @@ using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Random = UnityEngine.Random;
 
-// [행동 그래프 행동] 대상과 거리를 유지한다. 시작할 때 백스텝 확률을 한 번 뽑아 백스텝 또는 좌 · 우 돌기 중 하나를 한다.
+// [행동 그래프 행동] 대상과 거리를 유지한다. 시작할 때 확률을 한 번 뽑아 백스텝 · 제자리 대기 · 좌 · 우 돌기 중 하나를 한다.
+//   뽑은 값이 백스텝 확률 안이면 백스텝, 그다음 대기 확률 구간이면 제자리 대기, 나머지는 좌 · 우 돌기다.
 // 백스텝 : 대상을 바라본 채 BackStep 모션을 재생하며 대상 반대쪽으로 물러난다. 모션이 끝나면 멈추고 성공한다.
 //          Animator 에 BackStep 상태가 없으면 좌 · 우 돌기로 대신한다.
+// 제자리 대기 : 거리 유지 시간 동안 움직이지 않고 대상 쪽으로 몸만 돌린다. 그동안 대상이 다가오거나 멀어져도 거리를 맞추지 않는다.
 // 좌 · 우 돌기 : 정해진 시간 동안 대상을 바라보며 대상 둘레의 유지 거리 위를 돈다. 시간이 지나면 멈추고 성공한다.
 //   목적지는 대상을 중심으로 유지 거리만큼 떨어진 원 위에서, 지금 위치보다 도는 방향으로 조금 앞선 지점이다.
 //   그래서 거리가 맞으면 옆으로 돌고, 멀어지거나 가까워지면 원 쪽으로 다가가거나 물러나며 거리를 맞춘다.
@@ -17,12 +19,19 @@ using Random = UnityEngine.Random;
 [Serializable, GeneratePropertyBag]
 [NodeDescription(
     name: "Keep Distance",
-    description: "대상과 거리를 유지한다. 확률에 따라 백스텝하거나, 정해진 시간 동안 둘레를 돈다.",
+    description: "대상과 거리를 유지한다. 확률에 따라 백스텝하거나, 정해진 시간 동안 제자리에서 기다리거나 둘레를 돈다.",
     story: "Keep distance from [Target]",
     category: "Enemy",
     id: "3ca178fc3d414765856c9e041f198c94")]
 public partial class KeepDistanceAction : Action
 {
+    private enum Mode
+    {
+        Strafe,
+        BackStep,
+        Idle
+    }
+
     // 목적지를 지금 위치보다 도는 방향으로 이 각도만큼 앞선 지점으로 잡는다.
     private const float STRAFE_LEAD_ANGLE = 30f;
     // 백스텝 목적지를 지금 위치에서 이 거리만큼 뒤로 잡는다. 실제로 물러나는 거리는 속도 × 모션 길이가 정한다.
@@ -36,7 +45,7 @@ public partial class KeepDistanceAction : Action
     private float _timer;
     // 1 이면 위에서 볼 때 시계 방향, -1 이면 반시계 방향으로 돈다.
     private float _strafeSign;
-    private bool _isBackStepping;
+    private Mode _mode;
 
     protected override Status OnStart()
     {
@@ -47,17 +56,48 @@ public partial class KeepDistanceAction : Action
         _setting = GameObject.GetComponent<EnemyBehaviorSetting>();
         _timer = _setting.PickKeepDistanceTime();
         _strafeSign = Random.value < 0.5f ? 1f : -1f;
-        _isBackStepping = Random.value < _setting.BackStepChance && _animation.TryPlayBackStep();
+        _mode = PickMode();
 
         return OnUpdate();
     }
 
-    protected override Status OnUpdate() => _isBackStepping ? UpdateBackStep() : UpdateStrafe();
+    protected override Status OnUpdate()
+    {
+        switch(_mode)
+        {
+            case Mode.BackStep: return UpdateBackStep();
+            case Mode.Idle: return UpdateIdle();
+            default: return UpdateStrafe();
+        }
+    }
 
     // 성공 · 실패 · 중단 어느 경우든 이동을 멈춘다.
     protected override void OnEnd()
     {
         if(_movement != null) _movement.Stop();
+    }
+
+    // 확률을 한 번 뽑아 [0, 백스텝 확률) 은 백스텝, [백스텝 확률, 백스텝 + 대기 확률) 은 제자리 대기, 나머지는 좌 · 우 돌기로 정한다.
+    // 백스텝 구간이 뽑혔지만 백스텝 모션을 재생할 수 없으면 좌 · 우 돌기로 대신한다.
+    private Mode PickMode()
+    {
+        float roll = Random.value;
+
+        if(roll < _setting.BackStepChance) return _animation.TryPlayBackStep() ? Mode.BackStep : Mode.Strafe;
+        if(roll < _setting.BackStepChance + _setting.IdleChance) return Mode.Idle;
+
+        return Mode.Strafe;
+    }
+
+    // 속도 0 으로 지금 위치를 목적지로 넘겨, 움직이지 않고 대상 쪽으로 몸만 돌린다. 방향 모션은 (0, 0) 이라 제자리 모션이 나온다.
+    private Status UpdateIdle()
+    {
+        _timer -= EnemyTime.DeltaTime;
+
+        if(_timer <= 0f) return Status.Success;
+
+        _movement.MoveTo(GameObject.transform.position, 0f, Target.Value);
+        return Status.Running;
     }
 
     private Status UpdateBackStep()

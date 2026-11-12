@@ -5,7 +5,7 @@ ModelImporter:
   internalIDToNameTable:
   - first:
       74: 1827226128182048838
-    second: Spin Attack To Idle
+    second: Parry Attack End
   externalObjects: {}
   materials:
     materialImportMode: 1
@@ -34,7 +34,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Spin Attack To Idle
+      name: Parry Attack End
       takeName: Take 001
       internalID: 1827226128182048838
       firstFrame: 0
