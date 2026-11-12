@@ -249,12 +249,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94a61a1603cae1c4fac25f20c26f17f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBehaviorSetting
+  _runSpeedRate: 1.5
   _keepDistance: 5
   _keepDistanceTolerance: 1
   _strafeSpeed: 1
   _keepDistanceTimeMin: 2
   _keepDistanceTimeMax: 3
   _backStepChance: 0.3
+  _idleChance: 0.25
   _backStepSpeedRate: 0.35
   _attackRange: 5
   _attackInterval: 2.5
@@ -277,7 +279,7 @@ MonoBehaviour:
   _parryTelegraphPrefab: {fileID: 0}
   _telegraphPoint: {fileID: 6288933616598289340}
   _attacks:
-  - _name: Left Punch
+  - _name: Swing Axe
     _animationStates:
     - Attack 1
     _cooldown: 3.5
@@ -289,18 +291,18 @@ MonoBehaviour:
     _resistUntilEvent: 0
     _isContinuousHit: 0
     _canPerfectDodge: 1
-    _hitCenter: {x: 0, y: 1, z: 1.2}
-    _hitRadius: 1.5
+    _hitCenter: {x: 0, y: 2, z: 3}
+    _hitRadius: 3
     _power: 10
-    _reaction: 0
-    _hitStunTime: 0.4
-    _hitPushDistance: 0
-    _hitPushDuration: 0.1
+    _reaction: 1
+    _hitStunTime: 0.5
+    _hitPushDistance: 1
+    _hitPushDuration: 0.2
     _knockbackDistance: 3
     _knockbackDuration: 0.5
     _getUpTime: 1
     _canDashCancel: 1
-  - _name: Right Punch
+  - _name: Pound Axe
     _animationStates:
     - Attack 2
     _cooldown: 2
@@ -312,18 +314,18 @@ MonoBehaviour:
     _resistUntilEvent: 0
     _isContinuousHit: 0
     _canPerfectDodge: 1
-    _hitCenter: {x: 0, y: 1, z: 1.2}
-    _hitRadius: 1.5
+    _hitCenter: {x: 0, y: 2, z: 3}
+    _hitRadius: 3
     _power: 10
-    _reaction: 0
-    _hitStunTime: 0.4
-    _hitPushDistance: 0
-    _hitPushDuration: 0.1
+    _reaction: 1
+    _hitStunTime: 0.75
+    _hitPushDistance: 1.25
+    _hitPushDuration: 0.3
     _knockbackDistance: 3
     _knockbackDuration: 0.5
     _getUpTime: 1
     _canDashCancel: 1
-  - _name: Smash Attack
+  - _name: Roar
     _animationStates:
     - HeavyAttack
     _cooldown: 5
@@ -335,24 +337,20 @@ MonoBehaviour:
     _resistUntilEvent: 0
     _isContinuousHit: 0
     _canPerfectDodge: 1
-    _hitCenter: {x: 0, y: 1, z: 1.2}
-    _hitRadius: 1.5
+    _hitCenter: {x: 0, y: 3.5, z: 1.65}
+    _hitRadius: 5
     _power: 10
-    _reaction: 1
+    _reaction: 2
     _hitStunTime: 0.8
     _hitPushDistance: 2
     _hitPushDuration: 0.2
-    _knockbackDistance: 3
+    _knockbackDistance: 5
     _knockbackDuration: 0.5
     _getUpTime: 1
     _canDashCancel: 0
-  - _name: Spin Attack
+  - _name: Pierce
     _animationStates:
     - ParryAttackReady
-    - ParryAttackAction
-    - ParryAttackAction
-    - ParryAttackAction
-    - ParryAttackAction
     - ParryAttackAction
     - ParryAttackEnd
     _cooldown: 10
@@ -364,8 +362,8 @@ MonoBehaviour:
     _resistUntilEvent: 1
     _isContinuousHit: 1
     _canPerfectDodge: 1
-    _hitCenter: {x: 0, y: 1, z: 1.2}
-    _hitRadius: 1.5
+    _hitCenter: {x: 0, y: 2, z: 5}
+    _hitRadius: 5
     _power: 10
     _reaction: 2
     _hitStunTime: 0.4
@@ -389,15 +387,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 6a83db130c2a41eab61ba170c28926b0, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 6a83db130c2a41eab61ba170c28926b0, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 6a83db130c2a41eab61ba170c28926b0, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 6a83db130c2a41eab61ba170c28926b0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -489,7 +487,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24fff3ae3ba9b3246ab4011e6927e81f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimationEventRelay
-  _attacker: {fileID: 0}
+  _attacker: {fileID: 2163215138331037598}
 --- !u!4 &2241258730357759620 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: 6a83db130c2a41eab61ba170c28926b0, type: 3}
