@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Boss Black Knight
+  m_Controller: {fileID: 9100000, guid: 853ea220206e9e54fae302f0621351f5, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 1827226128182048838, guid: a9e58997c00633746a03b02ea670dd24, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 4dd1de71be8d405ab2bc3af03168a484, type: 3}
+  - m_OriginalClip: {fileID: 1827226128182048838, guid: ae1e2af0639b5d0439e7c9003d484ff2, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: ff4bd1ab401d4276ad3fbb99b0b89517, type: 3}
+  - m_OriginalClip: {fileID: 1827226128182048838, guid: 4384038dd418a23489e02a1639bb18a5, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 048dd7d1c8d842199f5cc2058e8a7ee0, type: 3}
+  - m_OriginalClip: {fileID: 1827226128182048838, guid: 13e168513b763b44d9342acd1ac6c322, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: c1b925b109c0445f9d822b5301581ef8, type: 3}
+  - m_OriginalClip: {fileID: -2421509865280539368, guid: 13e168513b763b44d9342acd1ac6c322, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: e7abc4396336410eaad5acbc157ae18f, type: 3}
+  - m_OriginalClip: {fileID: 1827226128182048838, guid: 19f01b78eabe1db4ea83a19fb6f3d6bb, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 645aedcb8eca4052843108aa83475beb, type: 3}
+  - m_OriginalClip: {fileID: 1827226128182048838, guid: 369ecdc60ac3e9c47ab90600d7381b59, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 5a572291884844608c62ea09bd28b785, type: 3}
+  - m_OriginalClip: {fileID: 1827226128182048838, guid: 1bebb191716eea34a945a0ed797c9db6, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 17555262663542aa948e7a1bf8aea4b7, type: 3}
+  - m_OriginalClip: {fileID: 1827226128182048838, guid: e56d8b4b05484a74fbdc7af2f08e1443, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 667536e252524f6b904b74ddf30b1a34, type: 3}
