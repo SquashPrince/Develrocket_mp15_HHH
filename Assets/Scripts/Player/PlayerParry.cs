@@ -18,10 +18,6 @@ public class PlayerParry : MonoBehaviour
     [Tooltip("패링 성공 후 반응 시간(초). 이 시간에 걸쳐 점점 느려지며 밀려나고, 이 동안 닿은 노란 공격은 자동으로 패링된다. 이 동안 공격 키를 누르면 끝난 뒤 추격 공격이 나간다")]
     [SerializeField, Min(0.01f)] private float _reactTime = 1f;
 
-    [Header("패링 추격")]
-    [Tooltip("반응 중 공격 입력으로 나가는 추격 공격. 시전 중 무적을 켜 두어야 기획대로 추격 중 무적이 된다")]
-    [SerializeField] private ActionData _parryChase;
-
     private PlayerController _controller;
     private PlayerTeleport _teleport;
     private PlayerTargeting _targeting;
@@ -34,8 +30,7 @@ public class PlayerParry : MonoBehaviour
     public float ReadyTime => _readyTime;
     public float ReactDistance => _reactDistance;
     public float ReactTime => _reactTime;
-    public ActionData ParryChase => _parryChase;
-
+    public ActionData ParryChase => _controller.Character.ParryChase;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -98,7 +93,7 @@ public class PlayerParry : MonoBehaviour
     private void TryStartParry()
     {
         if(!_input.WasParryPressed) return;
-        if(_parryState.IsActive || _controller.Health.IsAttackInvincible) return;
+        if(_parryState.IsActive || _controller.Status.IsAttackInvincible) return;
 
         _selectedAttacker = SelectAttacker();
 

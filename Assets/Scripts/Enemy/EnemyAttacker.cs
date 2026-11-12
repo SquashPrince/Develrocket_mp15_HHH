@@ -266,11 +266,11 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
         for(int i = 0; i < count; i++)
         {
-            PlayerHealth health = _hitColliders[i].GetComponentInParent<PlayerHealth>();
+            PlayerStatus status = _hitColliders[i].GetComponentInParent<PlayerStatus>();
 
-            if(health == null) continue;
+            if(status == null) continue;
 
-            health.TakeHit(attack, this);
+            status.TakeHit(attack, this);
             return true;
         }
 

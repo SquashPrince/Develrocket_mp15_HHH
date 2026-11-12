@@ -59,14 +59,14 @@ public class PlayerHitState : PlayerState
         }
 
         _phase = Phase.Knockback;
-        Controller.Health.BeginInvincible(_attack.KnockbackDuration + _attack.GetUpTime);
+        Controller.Status.BeginInvincible(_attack.KnockbackDuration + _attack.GetUpTime);
         Controller.Animation.Play(KNOCKBACK_ANIMATION);
     }
 
     // 넉백 중 대시로 끊으면 남은 넉백 무적을 지운다. 대시 무적은 대시 상태가 들어오면서 다시 건다.
     public override void Exit()
     {
-        if(_phase != Phase.Stun) Controller.Health.EndInvincible();
+        if(_phase != Phase.Stun) Controller.Status.EndInvincible();
     }
 
     public override void Tick()

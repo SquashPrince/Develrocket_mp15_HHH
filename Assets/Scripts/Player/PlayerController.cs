@@ -1,11 +1,11 @@
 using UnityEngine;
 
-// 플레이어의 공용 데이터(수치 · 대시 스택 · 콤보 · 차지 · 스킬 · 중력)와 상태 전환을 맡는다.
+// 플레이어의 상태 전환과 이동 · 대시 스택 · 콤보 · 차지 · 스킬 분기 · 중력을 맡는다. 캐릭터별 수치 · 액션은 캐릭터 데이터(CharacterData)에서 읽고, 다른 기능도 이 클래스를 통해 같은 캐릭터 데이터를 꺼내 쓴다.
 // 입력은 입력 기능, 타격 판정은 판정 기능, Animator 제어는 애니메이션 기능이 맡고, 상태 클래스는 이 클래스를 통해 그 기능들을 꺼내 쓴다.
 // 실제 동작은 상태 클래스(이동 · 대시 · 공격 · 피격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController), typeof(PlayerEnergy), typeof(PlayerTargeting))]
-[RequireComponent(typeof(PlayerHealth), typeof(PlayerSlowMotion), typeof(PlayerParry))]
+[RequireComponent(typeof(PlayerStatus), typeof(PlayerSlowMotion), typeof(PlayerParry))]
 [RequireComponent(typeof(PlayerUltimate), typeof(PlayerComboSkill), typeof(PlayerInputReader))]
 [RequireComponent(typeof(PlayerAttackJudge), typeof(PlayerAnimation))]
 public class PlayerController : MonoBehaviour
@@ -18,47 +18,12 @@ public class PlayerController : MonoBehaviour
     [Tooltip("이동 방향의 기준이 되는 카메라 (Main Camera)")]
     [SerializeField] private Transform _cameraTransform;
 
-    [Header("이동")]
-    [SerializeField, Min(0f)] private float _walkSpeed = 4f;
-    [SerializeField, Min(0f)] private float _runSpeed = 7f;
-    [Tooltip("목표 방향으로 몸을 돌리는 데 걸리는 시간(초). 이동은 캐릭터가 보는 방향으로 하므로 곡선을 그리며 꺾는다")]
-    [SerializeField, Min(0f)] private float _turnTime = 0.3f;
-    [Tooltip("이동 입력을 이 시간 이상 유지하면 달리기로 전환")]
-    [SerializeField, Min(0f)] private float _autoRunDelay = 1.5f;
+    [Header("캐릭터")]
+    [Tooltip("이 캐릭터의 능력치 · 이동 · 대시 수치와 액션. 파티 전투에서는 캐릭터마다 다른 에셋을 넣는다")]
+    [SerializeField] private CharacterData _character;
+
+    [Header("공통")]
     [SerializeField] private float _gravity = -20f;
-
-    [Header("대시 · 회피")]
-    [SerializeField, Min(0f)] private float _dashDistance = 4f;
-    [SerializeField, Min(0.01f)] private float _dashDuration = 0.2f;
-    [SerializeField, Min(0f)] private float _dodgeDistance = 3f;
-    [SerializeField, Min(0.01f)] private float _dodgeDuration = 0.2f;
-    [Tooltip("대시 스택 1개가 차는 시간")]
-    [SerializeField, Min(0f)] private float _dashCooldown = 1f;
-    [Tooltip("대시 · 회피 시작 후 다음 대시를 쓸 수 있기까지의 시간. 지속시간보다 길게 설정하면 지속시간을 기준으로 한다")]
-    [SerializeField, Min(0f)] private float _dashChainInterval = 0.2f;
-    [Tooltip("대시 · 회피 시작부터 적 공격에 맞지 않는 시간(초). 이 시간 안에 닿은 공격은 완벽 회피가 된다. 대시와 회피가 같은 값을 쓴다")]
-    [SerializeField, Min(0f)] private float _dashInvincibleTime = 0.15f;
-
-    [Header("공격")]
-    [Tooltip("콤보 단계별 설정. 배열 크기가 콤보 단수이며, Animator 에 \"BasicAttack 1\" 부터 단수만큼 상태가 있어야 한다. 마지막 단계는 마무리 공격으로, 후딜이 끝날 때까지 공격 입력을 받지 않는다")]
-    [SerializeField] private ActionData[] _comboSteps;
-    [SerializeField] private ActionData _heavyAttack;
-    [Tooltip("공격 키를 누르고 있으면 이 시간 뒤 강공격이 나간다")]
-    [SerializeField, Min(0.01f)] private float _chargeTime = 0.6f;
-    [Tooltip("공격 대상에게 다가갈 때 대상 중심에서 이 거리만큼 앞에서 멈춘다")]
-    [SerializeField, Min(0f)] private float _attackStopDistance = 1.2f;
-
-    [Header("대시 공격 · 회피 반격")]
-    [Tooltip("대시 · 회피 도중 공격 입력으로 나가는 공격")]
-    [SerializeField] private ActionData _dashAttack;
-    [Tooltip("완벽 회피 슬로모션 중 공격 입력으로 나가는 반격")]
-    [SerializeField] private ActionData _dodgeCounter;
-
-    [Header("스킬")]
-    [SerializeField] private ActionData _skill;
-    [SerializeField] private ActionData _specialSkill;
-    [Tooltip("특수스킬에 필요한 에너지. 스킬 입력 시 에너지가 이보다 적으면 일반 스킬이 나간다")]
-    [SerializeField, Min(0f)] private float _specialSkillEnergyCost = 60f;
 
     private CharacterController _characterController;
     private PlayerInputReader _input;
@@ -81,18 +46,19 @@ public class PlayerController : MonoBehaviour
 
     // 상태가 이번 프레임에 정한 수평 속도. 매 프레임 상태 실행 뒤 중력과 함께 반영한다.
     public Vector3 HorizontalVelocity { get; set; }
-    public PlayerHealth Health { get; private set; }
+    public PlayerStatus Status { get; private set; }
     public PlayerAttackJudge AttackJudge { get; private set; }
     public PlayerAnimation Animation { get; private set; }
     public bool WasDashPressed => _input.WasDashPressed;
     public bool WasAttackPressed => _input.WasAttackPressed;
     public bool WasSkillPressed => _input.WasSkillPressed;
-    public int ComboStepCount => _comboSteps.Length;
-    public float WalkSpeed => _walkSpeed;
-    public float RunSpeed => _runSpeed;
-    public float AutoRunDelay => _autoRunDelay;
-    public float DashChainInterval => _dashChainInterval;
-    public float DashInvincibleTime => _dashInvincibleTime;
+    public CharacterData Character => _character;
+    public int ComboStepCount => _character.ComboStepCount;
+    public float WalkSpeed => _character.WalkSpeed;
+    public float RunSpeed => _character.RunSpeed;
+    public float AutoRunDelay => _character.AutoRunDelay;
+    public float DashChainInterval => _character.DashChainInterval;
+    public float DashInvincibleTime => _character.DashInvincibleTime;
     // 완벽 회피 후 슬로모션 중인지. 이 동안의 공격 입력은 대시 공격보다 회피 반격이 우선한다.
     public bool IsPerfectDodge => _slowMotion.IsActive;
     // 현재 상태에서 필살기를 쓸 수 있는지. 상태마다 스스로 정한다.
@@ -120,7 +86,7 @@ public class PlayerController : MonoBehaviour
     public void TurnTowards(Vector3 direction)
     {
         float targetYaw = Quaternion.LookRotation(direction).eulerAngles.y;
-        float yaw = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetYaw, ref _turnVelocity, _turnTime);
+        float yaw = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetYaw, ref _turnVelocity, _character.TurnTime);
 
         transform.rotation = Quaternion.Euler(0f, yaw, 0f);
     }
@@ -134,12 +100,12 @@ public class PlayerController : MonoBehaviour
         {
             // 방향 입력이 있으면 그 방향으로 즉시 돌아서 대시
             FaceImmediately(moveDirection);
-            _dashState.Setup(transform.forward, _dashDistance, _dashDuration, false);
+            _dashState.Setup(transform.forward, _character.DashDistance, _character.DashDuration, false);
         }
         else
         {
             // 방향 입력이 없으면 바라보는 방향을 유지한 채 뒤로 회피
-            _dashState.Setup(-transform.forward, _dodgeDistance, _dodgeDuration, true);
+            _dashState.Setup(-transform.forward, _character.DodgeDistance, _character.DodgeDuration, true);
         }
 
         _dashStack--;
@@ -155,7 +121,7 @@ public class PlayerController : MonoBehaviour
         int step = Time.time <= _comboExpireTime ? _nextComboStep : 0;
 
         _comboExpireTime = 0f;
-        _attackState.Setup(PlayerAttackState.AttackType.Basic, step, _comboSteps[step]);
+        _attackState.Setup(PlayerAttackState.AttackType.Basic, step, _character.GetComboStep(step));
         _stateMachine.ChangeState(_attackState);
     }
 
@@ -179,10 +145,10 @@ public class PlayerController : MonoBehaviour
     }
 
     // 대시 · 회피 도중 공격 입력으로 시작한다.
-    public void StartDashAttack() => StartAttack(PlayerAttackState.AttackType.DashAttack, _dashAttack);
+    public void StartDashAttack() => StartAttack(PlayerAttackState.AttackType.DashAttack, _character.DashAttack);
 
     // 완벽 회피 슬로모션 중 공격 입력으로 회피 반격을 시작한다. 슬로모션은 공격 상태에 들어가면서 끝난다.
-    public void StartDodgeCounter() => StartAttack(PlayerAttackState.AttackType.DodgeCounter, _dodgeCounter);
+    public void StartDodgeCounter() => StartAttack(PlayerAttackState.AttackType.DodgeCounter, _character.DodgeCounter);
 
     // 적 공격에 맞으면 어떤 상태에서든 피격 상태로 넘어간다. 진행 중이던 공격 · 차지는 끊고, 이후 콤보는 1단부터 시작한다.
     public void StartHit(EnemyAttackSetting attack, Vector3 attackerPosition)
@@ -196,21 +162,21 @@ public class PlayerController : MonoBehaviour
     // 공격 동작이 끝난 시점에 다음 단계와, 다음 단계로 이어갈 수 있는 마감 시각을 정한다. 마지막 단계 다음은 1단이다.
     public void FinishComboStep(int step)
     {
-        _nextComboStep = (step + 1) % _comboSteps.Length;
-        _comboExpireTime = Time.time + _comboSteps[step].InputBuffer;
+        _nextComboStep = (step + 1) % _character.ComboStepCount;
+        _comboExpireTime = Time.time + _character.GetComboStep(step).InputBuffer;
     }
 
     // 에너지가 특수스킬 요구량 이상이면 소모하고 특수스킬, 모자라면 일반 스킬을 시작한다.
     public void StartSkill()
     {
-        bool isSpecial = _energy.TryConsume(_specialSkillEnergyCost);
+        bool isSpecial = _energy.TryConsume(_character.SpecialSkillEnergyCost);
 
 #if UNITY_EDITOR
-        if(isSpecial) Debug.Log($"[특수스킬] 에너지 -{_specialSkillEnergyCost} → {_energy.CurrentEnergy:F1}");
+        if(isSpecial) Debug.Log($"[특수스킬] 에너지 -{_character.SpecialSkillEnergyCost} → {_energy.CurrentEnergy:F1}");
 #endif
 
-        if(isSpecial) StartAttack(PlayerAttackState.AttackType.SpecialSkill, _specialSkill);
-        else StartAttack(PlayerAttackState.AttackType.Skill, _skill);
+        if(isSpecial) StartAttack(PlayerAttackState.AttackType.SpecialSkill, _character.SpecialSkill);
+        else StartAttack(PlayerAttackState.AttackType.Skill, _character.Skill);
     }
 
     // 공격을 시작할 때 몸을 돌릴 방향과 전진 거리를 정하고, 전진 거리를 돌려준다.
@@ -265,7 +231,7 @@ public class PlayerController : MonoBehaviour
 
         _chargeTimer += Time.deltaTime;
 
-        if(_chargeTimer < _chargeTime) return false;
+        if(_chargeTimer < _character.ChargeTime) return false;
 
         StartHeavyAttack();
         return true;
@@ -291,11 +257,11 @@ public class PlayerController : MonoBehaviour
         toTarget.y = 0f;
         FaceImmediately(toTarget);
 
-        return Mathf.Clamp(toTarget.magnitude - _attackStopDistance, 0f, _targeting.AttackRange);
+        return Mathf.Clamp(toTarget.magnitude - _character.AttackStopDistance, 0f, _targeting.AttackRange);
     }
 
     // 강공격 뒤에는 콤보가 1단부터 다시 시작한다.
-    private void StartHeavyAttack() => StartAttack(PlayerAttackState.AttackType.Heavy, _heavyAttack);
+    private void StartHeavyAttack() => StartAttack(PlayerAttackState.AttackType.Heavy, _character.HeavyAttack);
 
     public void FaceImmediately(Vector3 direction)
     {
@@ -312,9 +278,9 @@ public class PlayerController : MonoBehaviour
 
         _dashCooldownTimer += Time.deltaTime;
 
-        if(_dashCooldownTimer < _dashCooldown) return;
+        if(_dashCooldownTimer < _character.DashCooldown) return;
 
-        _dashCooldownTimer -= _dashCooldown;
+        _dashCooldownTimer -= _character.DashCooldown;
         _dashStack++;
 
         if(_dashStack >= MAX_DASH_STACK) _dashCooldownTimer = 0f;
@@ -337,7 +303,7 @@ public class PlayerController : MonoBehaviour
         _slowMotion = GetComponent<PlayerSlowMotion>();
         AttackJudge = GetComponent<PlayerAttackJudge>();
         Animation = GetComponent<PlayerAnimation>();
-        Health = GetComponent<PlayerHealth>();
+        Status = GetComponent<PlayerStatus>();
     }
 
     private void Init()

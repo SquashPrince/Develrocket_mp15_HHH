@@ -40,8 +40,8 @@ public class PlayerUltimateState : PlayerState
 
         // 대시 공격 직후 발동하면 대시 무적 · 완벽 회피 판정이 남아 있을 수 있어 지운 뒤, 필살기가 끝날 때까지 무적으로 둔다.
         // 공격 무적 중에는 패링 입력도 무시되므로 패링 · 교체 키로도 끊기지 않는다.
-        Controller.Health.EndInvincible();
-        Controller.Health.SetAttackInvincible(true);
+        Controller.Status.EndInvincible();
+        Controller.Status.SetAttackInvincible(true);
 
         // 공격 단계마다 다가갈 대상을 발동 때 정해 두어, 단계 사이에 자동 조준 대상이 바뀌지 않게 한다.
         _target = _ultimate.TeleportToTarget();
@@ -54,7 +54,7 @@ public class PlayerUltimateState : PlayerState
     public override void Exit()
     {
         EnemyTime.Scale = 1f;
-        Controller.Health.SetAttackInvincible(false);
+        Controller.Status.SetAttackInvincible(false);
     }
 
     public override void Tick() => Controller.HorizontalVelocity = UpdateAdvance();

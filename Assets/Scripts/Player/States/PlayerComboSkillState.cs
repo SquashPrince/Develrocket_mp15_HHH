@@ -54,8 +54,8 @@ public class PlayerComboSkillState : PlayerState
 
         // 남아 있을 수 있는 대시 무적 · 완벽 회피 판정을 지운 뒤, 콤보 스킬이 끝날 때까지 무적으로 둔다.
         // 공격 무적 중에는 패링 입력도 무시되므로 패링 · 교체 키로도 끊기지 않는다.
-        Controller.Health.EndInvincible();
-        Controller.Health.SetAttackInvincible(true);
+        Controller.Status.EndInvincible();
+        Controller.Status.SetAttackInvincible(true);
 
         _comboSkill.TeleportToTarget(_target);
         StartChain();
@@ -64,7 +64,7 @@ public class PlayerComboSkillState : PlayerState
     public override void Exit()
     {
         IsActive = false;
-        Controller.Health.SetAttackInvincible(false);
+        Controller.Status.SetAttackInvincible(false);
     }
 
     public override void Tick() => Controller.HorizontalVelocity = UpdateAdvance();

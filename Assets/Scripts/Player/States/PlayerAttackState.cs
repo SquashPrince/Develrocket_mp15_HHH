@@ -78,7 +78,7 @@ public class PlayerAttackState : PlayerState
         Controller.EndSlowMotion();
 
         // 시전 중 무적인 공격은 휘두르는 동안만 무적이고, 후딜에 들어가거나 상태를 나가면 풀린다.
-        Controller.Health.SetAttackInvincible(_action.IsInvincibleOnSwing);
+        Controller.Status.SetAttackInvincible(_action.IsInvincibleOnSwing);
 
         StartMotion(0);
     }
@@ -86,7 +86,7 @@ public class PlayerAttackState : PlayerState
     public override void Exit()
     {
         Controller.Animation.SetLegRun(false);
-        Controller.Health.SetAttackInvincible(false);
+        Controller.Status.SetAttackInvincible(false);
     }
 
     public override void Tick()
@@ -205,6 +205,6 @@ public class PlayerAttackState : PlayerState
     private void EnterRecovery()
     {
         _phase = Phase.Recovery;
-        Controller.Health.SetAttackInvincible(false);
+        Controller.Status.SetAttackInvincible(false);
     }
 }

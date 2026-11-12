@@ -31909,31 +31909,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   _cameraTransform: {fileID: 0}
-  _walkSpeed: 5
-  _runSpeed: 15
-  _turnTime: 0.1
-  _autoRunDelay: 1
+  _character: {fileID: 11400000, guid: b26c4d85624b42cd8b510949bee0b4a0, type: 2}
   _gravity: -20
-  _dashDistance: 5
-  _dashDuration: 0.25
-  _dodgeDistance: 3
-  _dodgeDuration: 0.25
-  _dashCooldown: 1
-  _dashChainInterval: 0.25
-  _dashInvincibleTime: 0.25
-  _comboSteps:
-  - {fileID: 11400000, guid: 93303de25de2b8f4ea5136a350a910dc, type: 2}
-  - {fileID: 11400000, guid: 2970188ec2b589d4f8f5433152c43089, type: 2}
-  - {fileID: 11400000, guid: b28c38c94effc7a49854434aa1ab9471, type: 2}
-  - {fileID: 11400000, guid: 85a73f62beb99754e82d9053e2b8629d, type: 2}
-  _heavyAttack: {fileID: 11400000, guid: f773703db46f5554d8d9360dea30b06c, type: 2}
-  _chargeTime: 0.6
-  _attackStopDistance: 1.2
-  _dashAttack: {fileID: 11400000, guid: ccce58ff6566432448c61b02f814b8aa, type: 2}
-  _dodgeCounter: {fileID: 11400000, guid: 7c9f1b42c8f76454b9b7ef18fa66dade, type: 2}
-  _skill: {fileID: 11400000, guid: 62b06afbcec4f8e479af815fa5626ccd, type: 2}
-  _specialSkill: {fileID: 11400000, guid: f05ac55301ad78f48b7a19d2246d98b3, type: 2}
-  _specialSkillEnergyCost: 60
 --- !u!114 &6322618722868687519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31946,8 +31923,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edceb998fa8d7c745aafd6751879ca64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEnergy
-  _maxEnergy: 120
-  _regenPerSecond: 1
 --- !u!114 &7492969571146502241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31981,7 +31956,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d69a858eb9fcf4044843a95c3c5dc49a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
-  _maxHealth: 100
 --- !u!114 &3260304514223116691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32012,7 +31986,6 @@ MonoBehaviour:
   _readyTime: 1
   _reactDistance: 7.5
   _reactTime: 1
-  _parryChase: {fileID: 11400000, guid: b5a05a13b34420d419af1baa5ae70419, type: 2}
 --- !u!114 &8149544136973105350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32025,10 +31998,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be4363cba63a79148ae22a88d3645ada, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerUltimate
-  _maxGauge: 1
-  _parryGaugeGain: 300
-  _perfectDodgeGaugeGain: 300
-  _action: {fileID: 11400000, guid: 3f3e055a9bc21424da70ffce463356c1, type: 2}
   _targetSearchRange: 10
 --- !u!114 &3235283595720457195
 MonoBehaviour:
@@ -32063,7 +32032,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a837fb2d9436fd345aac46764af39021, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerComboSkill
-  _action: {fileID: 11400000, guid: bb322d00682be914abca4dcf7c37583f, type: 2}
   _sideAngleMin: 35
   _sideAngleMax: 90
 --- !u!114 &1745635829274798527
