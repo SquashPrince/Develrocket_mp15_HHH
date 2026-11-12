@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 // 패링 입력과 수치. 록온 사거리 안의 적이 패링 가능 시간을 열었을 때 패링 키를 누르면 어느 상태에서든 패링 상태로 넘긴다.
 // 코어 전투에서는 이전 · 다음 캐릭터 키 모두 현재 캐릭터가 직접 패링한다. 교체 방향 구분은 파티 전투 단계에서 한다.
@@ -8,13 +7,9 @@ using UnityEngine.InputSystem;
 // 패링을 시작하면 패링 공격을 하는 적 앞으로 순간 이동한다. 실제로 이동하면 벽 등에 걸리기 때문이다. 도착 지점이 막혀 있으면 제자리에서 패링한다.
 // 패링 공격을 하는 적이 여럿이면 공격 대상 기준(록온 대상 → 자동 조준 대상)을 따르고, 둘 다 아니면 록온 사거리 안에서 가장 최근에 예고를 시작한 적을 고른다.
 [RequireComponent(typeof(PlayerController), typeof(PlayerTeleport), typeof(PlayerTargeting))]
-[RequireComponent(typeof(PlayerUltimate))]
+[RequireComponent(typeof(PlayerUltimate), typeof(PlayerInputReader))]
 public class PlayerParry : MonoBehaviour
 {
-    [Header("입력")]
-    [SerializeField] private InputActionReference _parryPreviousAction;
-    [SerializeField] private InputActionReference _parryNextAction;
-
     [Header("패링")]
     [Tooltip("패링 준비 자세를 유지하는 시간(초). 적 공격이 끊겨도 끝까지 유지한다")]
     [SerializeField, Min(0.01f)] private float _readyTime = 1f;
@@ -31,6 +26,7 @@ public class PlayerParry : MonoBehaviour
     private PlayerTeleport _teleport;
     private PlayerTargeting _targeting;
     private PlayerUltimate _ultimate;
+    private PlayerInputReader _input;
     private PlayerParryState _parryState;
     // 패링 키를 누른 순간 고른 패링 대상. 패링 상태에 들어가며 이 적 앞으로 순간 이동한다.
     private IEnemyParryable _selectedAttacker;
@@ -40,7 +36,6 @@ public class PlayerParry : MonoBehaviour
     public float ReactTime => _reactTime;
     public PlayerAttackSetting ParryChase => _parryChase;
 
-    private bool WasParryPressed => _parryPreviousAction.action.WasPressedThisFrame() || _parryNextAction.action.WasPressedThisFrame();
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -102,7 +97,7 @@ public class PlayerParry : MonoBehaviour
 
     private void TryStartParry()
     {
-        if(!WasParryPressed) return;
+        if(!_input.WasParryPressed) return;
         if(_parryState.IsActive || _controller.Health.IsAttackInvincible) return;
 
         _selectedAttacker = SelectAttacker();
@@ -118,6 +113,7 @@ public class PlayerParry : MonoBehaviour
         _teleport = GetComponent<PlayerTeleport>();
         _targeting = GetComponent<PlayerTargeting>();
         _ultimate = GetComponent<PlayerUltimate>();
+        _input = GetComponent<PlayerInputReader>();
     }
 
     private void Init()

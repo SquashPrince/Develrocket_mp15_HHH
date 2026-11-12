@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-// 플레이어의 공용 데이터(입력 · 수치 · 대시 스택 · 콤보 · 차지 · 스킬 · 중력)와 상태 전환을 맡는다.
+// 플레이어의 공용 데이터(수치 · 대시 스택 · 콤보 · 차지 · 스킬 · 중력)와 상태 전환을 맡는다. 입력은 입력 기능(PlayerInputReader)에서 읽는다.
 // 실제 동작은 상태 클래스(이동 · 대시 · 공격 · 피격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController), typeof(PlayerEnergy), typeof(PlayerTargeting))]
 [RequireComponent(typeof(PlayerHealth), typeof(PlayerSlowMotion), typeof(PlayerParry))]
-[RequireComponent(typeof(PlayerUltimate), typeof(PlayerComboSkill))]
+[RequireComponent(typeof(PlayerUltimate), typeof(PlayerComboSkill), typeof(PlayerInputReader))]
 public class PlayerController : MonoBehaviour
 {
     private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
@@ -25,12 +24,6 @@ public class PlayerController : MonoBehaviour
     private const float SPEED_DAMP_TIME = 0.1f;
     // 땅에 붙어 있도록 누르는 작은 아래 방향 속도 (0 이면 경사에서 isGrounded 가 흔들린다)
     private const float GROUNDED_VERTICAL_SPEED = -2f;
-
-    [Header("입력")]
-    [SerializeField] private InputActionReference _moveAction;
-    [SerializeField] private InputActionReference _dashAction;
-    [SerializeField] private InputActionReference _attackAction;
-    [SerializeField] private InputActionReference _skillAction;
 
     [Header("참조")]
     [Tooltip("이동 방향의 기준이 되는 카메라 (Main Camera)")]
@@ -86,6 +79,7 @@ public class PlayerController : MonoBehaviour
     private readonly HashSet<IEnemyDamageable> _hitTargets = new HashSet<IEnemyDamageable>();
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
     private CharacterController _characterController;
+    private PlayerInputReader _input;
     private PlayerEnergy _energy;
     private PlayerTargeting _targeting;
     private PlayerSlowMotion _slowMotion;
@@ -110,9 +104,9 @@ public class PlayerController : MonoBehaviour
     // 상태가 이번 프레임에 정한 수평 속도. 매 프레임 상태 실행 뒤 중력과 함께 반영한다.
     public Vector3 HorizontalVelocity { get; set; }
     public PlayerHealth Health { get; private set; }
-    public bool WasDashPressed => _dashAction.action.WasPressedThisFrame();
-    public bool WasAttackPressed => _attackAction.action.WasPressedThisFrame();
-    public bool WasSkillPressed => _skillAction.action.WasPressedThisFrame();
+    public bool WasDashPressed => _input.WasDashPressed;
+    public bool WasAttackPressed => _input.WasAttackPressed;
+    public bool WasSkillPressed => _input.WasSkillPressed;
     public int ComboStepCount => _comboSteps.Length;
     public float WalkSpeed => _walkSpeed;
     public float RunSpeed => _runSpeed;
@@ -139,7 +133,7 @@ public class PlayerController : MonoBehaviour
     // 이동 중 카메라가 캐릭터 뒤로 자동 복귀하면 기준이 바뀌어 원을 그리므로, 이동 중 복귀는 CameraRecenterBlocker 가 막는다.
     public Vector3 ReadMoveDirection()
     {
-        Vector2 input = _moveAction.action.ReadValue<Vector2>();
+        Vector2 input = _input.MoveInput;
         Vector3 localDirection = Vector3.ClampMagnitude(new Vector3(input.x, 0f, input.y), 1f);
 
         return Quaternion.Euler(0f, _cameraTransform.eulerAngles.y, 0f) * localDirection;
@@ -285,7 +279,7 @@ public class PlayerController : MonoBehaviour
     {
         if(!_isCharging) return false;
 
-        if(!_attackAction.action.IsPressed())
+        if(!_input.IsAttackHeld)
         {
             _isCharging = false;
             return false;
@@ -456,6 +450,7 @@ public class PlayerController : MonoBehaviour
     private void CacheComponent()
     {
         _characterController = GetComponent<CharacterController>();
+        _input = GetComponent<PlayerInputReader>();
         _energy = GetComponent<PlayerEnergy>();
         _targeting = GetComponent<PlayerTargeting>();
         _slowMotion = GetComponent<PlayerSlowMotion>();

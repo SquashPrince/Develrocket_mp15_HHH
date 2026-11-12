@@ -1,17 +1,14 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 // 공격 · 록온 대상을 찾고 록온 상태를 관리한다.
 // 록온 입력으로 록온 사거리 안의 대상을 고정하거나 해제하고, 대상이 록온 사거리 밖으로 나가면 자동으로 해제한다.
 // 범위 안의 플레이어 앞쪽 적 중 카메라 중앙 레이와의 수직 거리가 가장 짧은 적을 대상으로 고른다.
 // 같은 화면 위치라면 가까운 적일수록 레이와의 거리가 짧아 근접 공격 대상으로 우선된다.
+[RequireComponent(typeof(PlayerInputReader))]
 public class PlayerTargeting : MonoBehaviour
 {
     // 한 번의 대상 찾기에서 검사할 수 있는 최대 콜라이더 수
     private const int MAX_CANDIDATE_COLLIDERS = 32;
-
-    [Header("입력")]
-    [SerializeField] private InputActionReference _lockOnAction;
 
     [Header("참조")]
     [Tooltip("화면 중앙 레이의 기준이 되는 카메라 (Main Camera)")]
@@ -36,6 +33,7 @@ public class PlayerTargeting : MonoBehaviour
     [SerializeField] private float _markerHeight = 2.5f;
 
     private readonly Collider[] _candidateColliders = new Collider[MAX_CANDIDATE_COLLIDERS];
+    private PlayerInputReader _input;
     private Camera _camera;
     private Collider _lockTargetCollider;
     private IEnemyTargetable _lockTarget;
@@ -119,7 +117,7 @@ public class PlayerTargeting : MonoBehaviour
     // 록온 사거리 안에 적이 없으면 록온 입력은 아무 일도 하지 않는다.
     private void UpdateLockOn()
     {
-        if(_lockOnAction.action.WasPressedThisFrame())
+        if(_input.WasLockOnPressed)
         {
             if(_lockTarget != null) SetLockTarget(null);
             else SetLockTarget(FindTarget(_lockOnRange, true));
@@ -186,6 +184,7 @@ public class PlayerTargeting : MonoBehaviour
     private void CacheComponent()
     {
         _camera = _cameraTransform.GetComponent<Camera>();
+        _input = GetComponent<PlayerInputReader>();
     }
 
     private void Init()

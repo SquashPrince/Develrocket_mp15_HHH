@@ -1,16 +1,13 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 // 필살기 입력 · 게이지 · 수치. 게이지는 에너지와 별개로 쌓이며, 공격 적중 · 패링 성공 · 완벽 회피로 쌓이고 줄어들지 않는다.
 // 공격 적중 획득량은 공격마다 공격 설정에서 정하고, 패링 성공 · 완벽 회피 획득량은 여기서 정한다.
 // 게이지가 가득 차 있고 현재 상태가 필살기를 허용할 때 필살기 키를 누르면 게이지를 전부 소모하고 필살기 상태로 넘긴다.
 // 현재 게이지는 Inspector 를 Debug 모드로 바꾸면 실시간으로 볼 수 있다.
 [RequireComponent(typeof(PlayerController), typeof(PlayerTeleport), typeof(PlayerTargeting))]
+[RequireComponent(typeof(PlayerInputReader))]
 public class PlayerUltimate : MonoBehaviour
 {
-    [Header("입력")]
-    [SerializeField] private InputActionReference _ultimateAction;
-
     [Header("게이지")]
     [SerializeField, Min(1f)] private float _maxGauge = 3000f;
     [Tooltip("패링 성공 한 번에 얻는 게이지")]
@@ -27,6 +24,7 @@ public class PlayerUltimate : MonoBehaviour
     private PlayerController _controller;
     private PlayerTeleport _teleport;
     private PlayerTargeting _targeting;
+    private PlayerInputReader _input;
     private PlayerUltimateState _ultimateState;
     private float _currentGauge;
 
@@ -77,7 +75,7 @@ public class PlayerUltimate : MonoBehaviour
     // 진행 중이던 강공격 차지는 상태를 넘길 때 끊긴다.
     private void TryStartUltimate()
     {
-        if(!_ultimateAction.action.WasPressedThisFrame()) return;
+        if(!_input.WasUltimatePressed) return;
         if(!IsGaugeFull || !_controller.CanUseUltimate) return;
 
         CurrentGauge = 0f;
@@ -94,6 +92,7 @@ public class PlayerUltimate : MonoBehaviour
         _controller = GetComponent<PlayerController>();
         _teleport = GetComponent<PlayerTeleport>();
         _targeting = GetComponent<PlayerTargeting>();
+        _input = GetComponent<PlayerInputReader>();
     }
 
     private void Init()

@@ -2011,7 +2011,7 @@ RotationConstraint:
   serializedVersion: 2
   m_Weight: 0.5
   m_RotationAtRest: {x: -90, y: 0, z: 0}
-  m_RotationOffset: {x: 90, y: 0, z: -0.000116544805}
+  m_RotationOffset: {x: 90, y: 0, z: -0.00011793468}
   m_AffectRotationX: 1
   m_AffectRotationY: 1
   m_AffectRotationZ: 1
@@ -3857,7 +3857,7 @@ RotationConstraint:
   serializedVersion: 2
   m_Weight: 0.5
   m_RotationAtRest: {x: 36.638622, y: -175.17076, z: -140.65733}
-  m_RotationOffset: {x: -36.63829, y: -4.8293223, z: 39.34273}
+  m_RotationOffset: {x: -36.63829, y: -4.8293247, z: 39.34274}
   m_AffectRotationX: 1
   m_AffectRotationY: 1
   m_AffectRotationZ: 1
@@ -14866,7 +14866,7 @@ RotationConstraint:
   serializedVersion: 2
   m_Weight: 0.5
   m_RotationAtRest: {x: 0.16972092, y: 179.8665, z: -128.21599}
-  m_RotationOffset: {x: -0.16939728, y: 0.13346452, z: 51.784096}
+  m_RotationOffset: {x: -0.16939728, y: 0.13346452, z: 51.7841}
   m_AffectRotationX: 1
   m_AffectRotationY: 1
   m_AffectRotationZ: 1
@@ -31845,6 +31845,7 @@ GameObject:
   - component: {fileID: 3235283595720457195}
   - component: {fileID: 4745494404723644207}
   - component: {fileID: 1745635829274798527}
+  - component: {fileID: 8756939034753121556}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -31905,10 +31906,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9203f4226a7a84e47b14121d6a8d407a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _dashAction: {fileID: 504704208043311331, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _attackAction: {fileID: -2737370060291335809, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _skillAction: {fileID: -3361557722714098977, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _cameraTransform: {fileID: 0}
   _animator: {fileID: 3735240450347513969}
   _walkSpeed: 5
@@ -32086,7 +32083,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d16b8cc6c2cb09b4990c4e01cbb45567, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTargeting
-  _lockOnAction: {fileID: 694580335105051867, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _cameraTransform: {fileID: 0}
   _lockOnMarker: {fileID: 0}
   _attackRange: 15
@@ -32136,10 +32132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c5c3423283ad6d4d8217bddd6748ef8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerParry
-  _parryPreviousAction: {fileID: -3882990654037931100, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _parryNextAction: {fileID: 3151153704128378850, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _readyTime: 1
-  _teleportDistance: 1.5
   _reactDistance: 7.5
   _reactTime: 1
   _parryChase:
@@ -32169,7 +32162,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be4363cba63a79148ae22a88d3645ada, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerUltimate
-  _ultimateAction: {fileID: 6644543871057390047, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _maxGauge: 1
   _parryGaugeGain: 300
   _perfectDodgeGaugeGain: 300
@@ -32203,7 +32195,6 @@ MonoBehaviour:
     _canUltimateCancel: 0
     _isInvincibleOnSwing: 1
   _targetSearchRange: 10
-  _teleportDistance: 1.5
 --- !u!114 &3235283595720457195
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32216,6 +32207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfb3bd9d0ab25fe4798d06e9599195fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTeleport
+  _distance: 1.5
   _blockLayers:
     serializedVersion: 2
     m_Bits: 1
@@ -32259,7 +32251,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63cc0c6ea269c174eb9a990b910fd11e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerGroggyDebug
-  _groggyAction: {fileID: 4882079035516688179, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+--- !u!114 &8756939034753121556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7306029376340620380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de5b05c6812b88d41b77232ef7bcaec0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInputReader
+  _isControlled: 1
+  _moveAction: {fileID: 0}
+  _dashAction: {fileID: 0}
+  _attackAction: {fileID: 0}
+  _skillAction: {fileID: 0}
+  _ultimateAction: {fileID: 0}
+  _parryPreviousAction: {fileID: 0}
+  _parryNextAction: {fileID: 3151153704128378850, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _lockOnAction: {fileID: 694580335105051867, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _groggyDebugAction: {fileID: 4882079035516688179, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
 --- !u!1 &7306636993918616150
 GameObject:
   m_ObjectHideFlags: 0
@@ -35166,7 +35179,7 @@ RotationConstraint:
   serializedVersion: 2
   m_Weight: 0.5
   m_RotationAtRest: {x: 0.16972649, y: -179.8665, z: 128.21599}
-  m_RotationOffset: {x: -0.16940285, y: -0.13346887, z: -51.78411}
+  m_RotationOffset: {x: -0.16940285, y: -0.13346887, z: -51.78412}
   m_AffectRotationX: 1
   m_AffectRotationY: 1
   m_AffectRotationZ: 1
@@ -35745,7 +35758,7 @@ RotationConstraint:
   serializedVersion: 2
   m_Weight: 0.5
   m_RotationAtRest: {x: 36.638603, y: 175.17076, z: 140.65733}
-  m_RotationOffset: {x: -36.63827, y: 4.829314, z: -39.34273}
+  m_RotationOffset: {x: -36.63827, y: 4.8293166, z: -39.34273}
   m_AffectRotationX: 1
   m_AffectRotationY: 1
   m_AffectRotationZ: 1
@@ -36252,7 +36265,7 @@ RotationConstraint:
   serializedVersion: 2
   m_Weight: 0.5
   m_RotationAtRest: {x: -90, y: 0, z: 0}
-  m_RotationOffset: {x: 90, y: 0, z: 0.00011654482}
+  m_RotationOffset: {x: 90, y: 0, z: 0.00011793469}
   m_AffectRotationX: 1
   m_AffectRotationY: 1
   m_AffectRotationZ: 1
