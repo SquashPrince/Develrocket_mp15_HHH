@@ -31922,184 +31922,17 @@ MonoBehaviour:
   _dashChainInterval: 0.25
   _dashInvincibleTime: 0.25
   _comboSteps:
-  - _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
-    _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 1.25
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 1
-    _staggerTime: 0.15
-    _advanceDistance: 1.5
-    _advanceDuration: 0.265
-    _fadeTime: 0.2
-    _inputBuffer: 0.2
-    _useLegRun: 1
-    _alwaysLegRun: 0
-    _canDashCancel: 1
-    _canUltimateCancel: 1
-    _isInvincibleOnSwing: 0
-  - _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
-    _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 1.25
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 1
-    _staggerTime: 0.15
-    _advanceDistance: 2
-    _advanceDuration: 0.315
-    _fadeTime: 0.2
-    _inputBuffer: 0.2
-    _useLegRun: 1
-    _alwaysLegRun: 0
-    _canDashCancel: 1
-    _canUltimateCancel: 1
-    _isInvincibleOnSwing: 0
-  - _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
-    _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 1.25
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 1
-    _staggerTime: 0.15
-    _advanceDistance: 4.5
-    _advanceDuration: 0.775
-    _fadeTime: 0.2
-    _inputBuffer: 0.2
-    _useLegRun: 0
-    _alwaysLegRun: 0
-    _canDashCancel: 0
-    _canUltimateCancel: 1
-    _isInvincibleOnSwing: 1
-  - _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
-    _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 1.25
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 1
-    _staggerTime: 0.25
-    _advanceDistance: 3
-    _advanceDuration: 0.45
-    _fadeTime: 0.2
-    _inputBuffer: 0.2
-    _useLegRun: 0
-    _alwaysLegRun: 0
-    _canDashCancel: 1
-    _canUltimateCancel: 1
-    _isInvincibleOnSwing: 0
-  _heavyAttack:
-    _hitShape: 2
-    _hitCenter: {x: 0, y: 0, z: 0}
-    _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 5
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 1
-    _staggerTime: 0.25
-    _advanceDistance: 4.5
-    _advanceDuration: 0.5
-    _fadeTime: 0.25
-    _inputBuffer: 0
-    _useLegRun: 0
-    _alwaysLegRun: 0
-    _canDashCancel: 0
-    _canUltimateCancel: 1
-    _isInvincibleOnSwing: 0
+  - {fileID: 11400000, guid: 93303de25de2b8f4ea5136a350a910dc, type: 2}
+  - {fileID: 11400000, guid: 2970188ec2b589d4f8f5433152c43089, type: 2}
+  - {fileID: 11400000, guid: b28c38c94effc7a49854434aa1ab9471, type: 2}
+  - {fileID: 11400000, guid: 85a73f62beb99754e82d9053e2b8629d, type: 2}
+  _heavyAttack: {fileID: 11400000, guid: f773703db46f5554d8d9360dea30b06c, type: 2}
   _chargeTime: 0.6
   _attackStopDistance: 1.2
-  _dashAttack:
-    _hitShape: 1
-    _hitCenter: {x: 0, y: 1.5, z: 1}
-    _hitSize: {x: 0.5, y: 2, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 1.25
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 1
-    _staggerTime: 0.25
-    _advanceDistance: 5
-    _advanceDuration: 0.275
-    _fadeTime: 0.2
-    _inputBuffer: 0.1
-    _useLegRun: 1
-    _alwaysLegRun: 1
-    _canDashCancel: 1
-    _canUltimateCancel: 1
-    _isInvincibleOnSwing: 0
-  _dodgeCounter:
-    _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
-    _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 5
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 1
-    _staggerTime: 0.25
-    _advanceDistance: 1.5
-    _advanceDuration: 0.4
-    _fadeTime: 0.1
-    _inputBuffer: 0.4
-    _useLegRun: 0
-    _alwaysLegRun: 0
-    _canDashCancel: 0
-    _canUltimateCancel: 1
-    _isInvincibleOnSwing: 1
-  _skill:
-    _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
-    _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 5
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 1
-    _staggerTime: 0.25
-    _advanceDistance: 7.5
-    _advanceDuration: 0.6
-    _fadeTime: 0.1
-    _inputBuffer: 0.4
-    _useLegRun: 0
-    _alwaysLegRun: 0
-    _canDashCancel: 1
-    _canUltimateCancel: 1
-    _isInvincibleOnSwing: 0
-  _specialSkill:
-    _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
-    _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 5
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 1
-    _staggerTime: 0.5
-    _advanceDistance: 7.5
-    _advanceDuration: 1.65
-    _fadeTime: 0.1
-    _inputBuffer: 0.4
-    _useLegRun: 0
-    _alwaysLegRun: 0
-    _canDashCancel: 1
-    _canUltimateCancel: 1
-    _isInvincibleOnSwing: 1
+  _dashAttack: {fileID: 11400000, guid: ccce58ff6566432448c61b02f814b8aa, type: 2}
+  _dodgeCounter: {fileID: 11400000, guid: 7c9f1b42c8f76454b9b7ef18fa66dade, type: 2}
+  _skill: {fileID: 11400000, guid: 62b06afbcec4f8e479af815fa5626ccd, type: 2}
+  _specialSkill: {fileID: 11400000, guid: f05ac55301ad78f48b7a19d2246d98b3, type: 2}
   _specialSkillEnergyCost: 60
 --- !u!114 &6322618722868687519
 MonoBehaviour:
@@ -32133,7 +31966,7 @@ MonoBehaviour:
   _lockOnRange: 20
   _obstacleLayers:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 3072
   _sightHeight: 1.2
   _markerHeight: 2.5
 --- !u!114 &7823694639924144761
@@ -32179,26 +32012,7 @@ MonoBehaviour:
   _readyTime: 1
   _reactDistance: 7.5
   _reactTime: 1
-  _parryChase:
-    _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
-    _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 5
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 2
-    _staggerTime: 2
-    _advanceDistance: 0.5
-    _advanceDuration: 0.15
-    _fadeTime: 0.1
-    _inputBuffer: 0.4
-    _useLegRun: 1
-    _alwaysLegRun: 0
-    _canDashCancel: 0
-    _canUltimateCancel: 0
-    _isInvincibleOnSwing: 1
+  _parryChase: {fileID: 11400000, guid: b5a05a13b34420d419af1baa5ae70419, type: 2}
 --- !u!114 &8149544136973105350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32214,45 +32028,7 @@ MonoBehaviour:
   _maxGauge: 1
   _parryGaugeGain: 300
   _perfectDodgeGaugeGain: 300
-  _attackSteps:
-  - _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
-    _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 5
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 3
-    _staggerTime: 1.5
-    _advanceDistance: 6
-    _advanceDuration: 4
-    _fadeTime: 0.1
-    _inputBuffer: 0.4
-    _useLegRun: 0
-    _alwaysLegRun: 0
-    _canDashCancel: 0
-    _canUltimateCancel: 0
-    _isInvincibleOnSwing: 1
-  - _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
-    _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 5
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 3
-    _staggerTime: 1.5
-    _advanceDistance: 4
-    _advanceDuration: 2
-    _fadeTime: 0.1
-    _inputBuffer: 0.4
-    _useLegRun: 0
-    _alwaysLegRun: 0
-    _canDashCancel: 0
-    _canUltimateCancel: 0
-    _isInvincibleOnSwing: 1
+  _action: {fileID: 11400000, guid: 3f3e055a9bc21424da70ffce463356c1, type: 2}
   _targetSearchRange: 10
 --- !u!114 &3235283595720457195
 MonoBehaviour:
@@ -32287,26 +32063,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a837fb2d9436fd345aac46764af39021, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerComboSkill
-  _chainSteps:
-  - _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
-    _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
-    _energyGain: 5
-    _ultimateGaugeGain: 50
-    _power: 10
-    _staggerLevel: 3
-    _staggerTime: 1
-    _advanceDistance: 6
-    _advanceDuration: 4
-    _fadeTime: 0.1
-    _inputBuffer: 0.4
-    _useLegRun: 0
-    _alwaysLegRun: 0
-    _canDashCancel: 0
-    _canUltimateCancel: 0
-    _isInvincibleOnSwing: 1
+  _action: {fileID: 11400000, guid: bb322d00682be914abca4dcf7c37583f, type: 2}
   _sideAngleMin: 35
   _sideAngleMax: 90
 --- !u!114 &1745635829274798527

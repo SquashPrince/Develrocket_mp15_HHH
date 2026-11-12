@@ -7,8 +7,8 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerController), typeof(PlayerTeleport))]
 public class PlayerComboSkill : MonoBehaviour
 {
-    [Tooltip("한 번의 콤보 스킬을 이루는 단계(동작)별 설정. 배열 크기가 단계 수이며, Animator 에 \"ComboSkill 1\" 부터 단계 수만큼 상태가 있어야 한다. 연계 수와는 관계없다. 하체 달리기 · 대시 캔슬 · 입력 버퍼 · 필살기로 끊기 값은 쓰지 않는다")]
-    [SerializeField] private PlayerAttackSetting[] _chainSteps = { new PlayerAttackSetting(), new PlayerAttackSetting(), new PlayerAttackSetting() };
+    [Tooltip("한 번의 콤보 스킬 액션. 동작 목록 순서대로 이어 재생한다. 동작 수와 연계 수는 관계없다. 하체 달리기 · 대시 캔슬 · 입력 버퍼 · 필살기로 끊기 값은 쓰지 않는다")]
+    [SerializeField] private ActionData _action;
     [Header("순간 이동 옆 각도")]
     [Tooltip("발동할 때 적 둘레로 비켜 서는 최소 각도(도). 최소 ~ 최대 사이에서 무작위로 정하고 왼쪽 · 오른쪽도 무작위다. 적과의 거리는 순간 이동 공통 간격을 그대로 쓴다. 파티 전투에서 남아 있는 캐릭터와 교체된 캐릭터가 같은 위치에서 콤보 스킬을 쓰지 않게 하기 위해서다")]
     [SerializeField, Range(0f, 180f)] private float _sideAngleMin;
@@ -19,15 +19,13 @@ public class PlayerComboSkill : MonoBehaviour
     private PlayerTeleport _teleport;
     private PlayerComboSkillState _comboSkillState;
 
-    public int ChainStepCount => _chainSteps.Length;
+    public ActionData Action => _action;
     // 콤보 스킬 중에는 다른 그로기 적에게 강타가 맞아도 다시 발동하지 않는다.
     public bool CanStart => !_comboSkillState.IsActive;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
 
-    // step : 연계 단계(0부터)
-    public PlayerAttackSetting GetChainStep(int step) => _chainSteps[step];
 
     // 그로기 적을 대상으로 콤보 스킬 상태로 넘긴다. 진행 중이던 공격 · 필살기는 끊긴다.
     // maxChain : 대상 적의 최대 연계 수

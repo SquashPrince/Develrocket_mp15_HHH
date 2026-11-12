@@ -16,8 +16,8 @@ public class PlayerUltimate : MonoBehaviour
     [SerializeField, Min(0f)] private float _perfectDodgeGaugeGain = 300f;
 
     [Header("필살기")]
-    [Tooltip("연출 뒤 이어지는 공격 단계별 설정. 배열 크기가 단계 수이며, Animator 에 \"Ultimate 1\" 부터 단계 수만큼 상태가 있어야 한다. 하체 달리기 · 대시 캔슬 · 입력 버퍼 값은 쓰지 않는다")]
-    [SerializeField] private PlayerAttackSetting[] _attackSteps = { new PlayerAttackSetting() };
+    [Tooltip("연출 뒤 이어지는 필살기 액션. 동작 목록 순서대로 이어 재생한다. 하체 달리기 · 대시 캔슬 · 입력 버퍼 값은 쓰지 않는다")]
+    [SerializeField] private ActionData _action;
     [Tooltip("발동할 때 이 거리 안의 대상(록온 대상 우선, 없으면 자동 조준 대상)을 찾아 순간 이동한다")]
     [SerializeField, Min(0f)] private float _targetSearchRange = 10f;
 
@@ -36,7 +36,7 @@ public class PlayerUltimate : MonoBehaviour
     }
 
     public bool IsGaugeFull => _currentGauge >= _maxGauge;
-    public int AttackStepCount => _attackSteps.Length;
+    public ActionData Action => _action;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -57,8 +57,6 @@ public class PlayerUltimate : MonoBehaviour
 
     public void AddPerfectDodgeGauge() => AddGauge(_perfectDodgeGaugeGain);
 
-    // step : 공격 단계(0부터)
-    public PlayerAttackSetting GetAttackStep(int step) => _attackSteps[step];
 
     // 공격 대상 기준(록온 대상 → 찾는 거리 안의 자동 조준 대상)으로 대상을 고르고, 대상에서 플레이어 쪽에 순간 이동한다.
     // 대상을 돌려준다. 대상이 없으면 null, 도착 지점이 막혀 있으면 이동하지 않고 대상만 돌려준다.

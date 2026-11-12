@@ -1,16 +1,14 @@
 using UnityEngine;
 
-// 필살기 상태. 연출(UltimateCutscene) → 공격 단계(Ultimate 1, Ultimate 2 ...) → 이동으로 돌아간다.
+// 필살기 상태. 연출(UltimateCutscene) → 필살기 액션의 동작 목록 순서대로 → 이동으로 돌아간다.
 // 발동하면 대상 앞으로 순간 이동한다. 대상이 없거나 막혀 있으면 제자리에서 쓴다.
 // 각 구간은 모션 끝 이벤트(AttackMotionEnd)를 받으면 다음 구간으로 넘어가고, 마지막 공격 단계가 끝나면 이전 상태가 아닌 이동 상태로 돌아간다.
-// 단계 사이는 Animator 전이선 대신 코드가 다음 상태를 재생하며, 섞는 시간은 단계별 공격 설정의 값을 쓴다.
+// 단계 사이는 Animator 전이선 대신 코드가 동작에 적힌 상태를 재생하며, 섞는 시간은 동작의 값을 쓴다.
 // 연출 중에는 움직이지 않고, 공격 단계마다 일반 공격처럼 대상 앞 정지 거리까지 다가간다.
 // 필살기 중에는 어떤 입력으로도 끊기지 않도록 입력을 읽지 않고, 발동부터 끝까지 무적이다. 적은 연출 구간 동안만 멈춘다.
 // 필살기에 맞은 적은 경직하며, 경직은 적이 진행 중이던 공격을 끊는다.
 public class PlayerUltimateState : PlayerState
 {
-    // Animator Controller 의 상태 이름과 같아야 한다. 공격 단계는 "Ultimate 1", "Ultimate 2" ... 순서다.
-    private const string ATTACK_ANIMATION_PREFIX = "Ultimate ";
     // 연출 구간을 뜻하는 단계 번호
     private const int CUTSCENE_STEP = -1;
 
@@ -70,7 +68,7 @@ public class PlayerUltimateState : PlayerState
         {
             case PlayerAnimationEventType.Hit:
             case PlayerAnimationEventType.Impact:
-                if(_step != CUTSCENE_STEP) Controller.AttackJudge.PerformHit(PlayerAttackState.AttackType.Ultimate, _ultimate.GetAttackStep(_step), type == PlayerAnimationEventType.Impact);
+                if(_step != CUTSCENE_STEP) Controller.AttackJudge.PerformHit(PlayerAttackState.AttackType.Ultimate, _ultimate.Action, _ultimate.Action.GetStep(_step), type == PlayerAnimationEventType.Impact);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();
@@ -85,23 +83,23 @@ public class PlayerUltimateState : PlayerState
 
         _step++;
 
-        if(_step >= _ultimate.AttackStepCount)
+        if(_step >= _ultimate.Action.StepCount)
         {
             Controller.EnterLocomotion(false);
             return;
         }
 
-        PlayerAttackSetting setting = _ultimate.GetAttackStep(_step);
+        ActionStep step = _ultimate.Action.GetStep(_step);
 
         // 발동 때 정한 대상 쪽으로 돌아 대상 앞 정지 거리까지, 단계의 전진 시간 동안 다가간다. 도중에 록온이 바뀌어도 대상은 그대로다.
-        float advanceDistance = Controller.AimFixedTarget(setting, _target);
+        float advanceDistance = Controller.AimFixedTarget(step, _target);
 
-        _advanceDuration = setting.AdvanceDuration;
+        _advanceDuration = step.AdvanceDuration;
         _advanceTimer = 0f;
         _advanceVelocity = Controller.transform.forward * (advanceDistance / _advanceDuration);
 
-        _animationHash = Animator.StringToHash(ATTACK_ANIMATION_PREFIX + (_step + 1));
-        Controller.Animation.Play(_animationHash, setting.FadeTime);
+        _animationHash = step.AnimationHash;
+        Controller.Animation.Play(_animationHash, step.FadeTime);
     }
 
     // 전진 시간 동안만 앞으로 나아가고, 그 뒤와 연출 중에는 제자리에 멈춘다.

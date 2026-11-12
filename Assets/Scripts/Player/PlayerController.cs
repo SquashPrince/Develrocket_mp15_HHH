@@ -41,8 +41,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("공격")]
     [Tooltip("콤보 단계별 설정. 배열 크기가 콤보 단수이며, Animator 에 \"BasicAttack 1\" 부터 단수만큼 상태가 있어야 한다. 마지막 단계는 마무리 공격으로, 후딜이 끝날 때까지 공격 입력을 받지 않는다")]
-    [SerializeField] private PlayerAttackSetting[] _comboSteps = { new PlayerAttackSetting(), new PlayerAttackSetting(), new PlayerAttackSetting(), new PlayerAttackSetting() };
-    [SerializeField] private PlayerAttackSetting _heavyAttack = new PlayerAttackSetting();
+    [SerializeField] private ActionData[] _comboSteps;
+    [SerializeField] private ActionData _heavyAttack;
     [Tooltip("공격 키를 누르고 있으면 이 시간 뒤 강공격이 나간다")]
     [SerializeField, Min(0.01f)] private float _chargeTime = 0.6f;
     [Tooltip("공격 대상에게 다가갈 때 대상 중심에서 이 거리만큼 앞에서 멈춘다")]
@@ -50,13 +50,13 @@ public class PlayerController : MonoBehaviour
 
     [Header("대시 공격 · 회피 반격")]
     [Tooltip("대시 · 회피 도중 공격 입력으로 나가는 공격")]
-    [SerializeField] private PlayerAttackSetting _dashAttack = new PlayerAttackSetting();
+    [SerializeField] private ActionData _dashAttack;
     [Tooltip("완벽 회피 슬로모션 중 공격 입력으로 나가는 반격")]
-    [SerializeField] private PlayerAttackSetting _dodgeCounter = new PlayerAttackSetting();
+    [SerializeField] private ActionData _dodgeCounter;
 
     [Header("스킬")]
-    [SerializeField] private PlayerAttackSetting _skill = new PlayerAttackSetting();
-    [SerializeField] private PlayerAttackSetting _specialSkill = new PlayerAttackSetting();
+    [SerializeField] private ActionData _skill;
+    [SerializeField] private ActionData _specialSkill;
     [Tooltip("특수스킬에 필요한 에너지. 스킬 입력 시 에너지가 이보다 적으면 일반 스킬이 나간다")]
     [SerializeField, Min(0f)] private float _specialSkillEnergyCost = 60f;
 
@@ -162,7 +162,7 @@ public class PlayerController : MonoBehaviour
     // 기본 공격 외의 공격(강공격 · 스킬 · 특수스킬 · 대시 공격 · 회피 반격 · 패링 추격)을 시작한다.
     // 진행 중이던 차지는 끊고, 이 공격들 뒤의 콤보는 1단부터 다시 시작한다.
     // priorityTarget : 록온 중이 아닐 때 자동 조준보다 먼저 노릴 대상. 패링 추격은 패링한 적을 넘긴다.
-    public void StartAttack(PlayerAttackState.AttackType type, PlayerAttackSetting setting, IEnemyTargetable priorityTarget = null)
+    public void StartAttack(PlayerAttackState.AttackType type, ActionData setting, IEnemyTargetable priorityTarget = null)
     {
         _isCharging = false;
         _comboExpireTime = 0f;
@@ -217,16 +217,16 @@ public class PlayerController : MonoBehaviour
     // 대상은 록온 대상 → 우선 대상 → 공격 사거리 안의 자동 조준 대상 순서로 고른다.
     // 대상이 있으면 대상 쪽으로 즉시 돌고, 대상 앞 정지 거리까지 다가간다. 다가가는 거리는 공격 사거리를 넘지 않는다.
     // 그래서 록온 대상이 공격 사거리 밖에 있으면 공격 사거리만큼만 다가가고, 공격이 닿지 않을 수 있다.
-    // 대상이 없으면 canTurnToInput 일 때만 이동 입력 방향으로 돌고(입력이 없으면 그대로), 공격 설정의 전진 거리를 쓴다.
+    // 대상이 없으면 canTurnToInput 일 때만 이동 입력 방향으로 돌고(입력이 없으면 그대로), 동작의 전진 거리를 쓴다.
     // priorityTarget : 록온 중이 아닐 때 자동 조준보다 먼저 쓸 대상. 패링 추격은 패링한 적을 넘긴다.
-    public float AimAttack(PlayerAttackSetting setting, bool canTurnToInput, IEnemyTargetable priorityTarget = null)
+    public float AimAttack(ActionStep step, bool canTurnToInput, IEnemyTargetable priorityTarget = null)
     {
         IEnemyTargetable target = _targeting.FindAttackTarget(_targeting.AttackRange, priorityTarget);
 
         if(target == null)
         {
             if(canTurnToInput) FaceImmediately(ReadMoveDirection());
-            return setting.AdvanceDistance;
+            return step.AdvanceDistance;
         }
 
         return FaceAndGetApproachDistance(target);
@@ -234,10 +234,10 @@ public class PlayerController : MonoBehaviour
 
     // 발동 때 정한 대상을 끝까지 노리는 공격(필살기 · 콤보 스킬)의 방향과 전진 거리를 정한다.
     // 도중에 록온을 바꾸거나 풀어도 이 대상 쪽으로 돌아 다가간다. 카메라는 바뀐 록온 대상을 따라간다.
-    // 발동 때 대상이 없었으면(null) 도중에 생긴 대상도 노리지 않고, 바라보는 방향 그대로 공격 설정의 전진 거리를 쓴다.
-    public float AimFixedTarget(PlayerAttackSetting setting, IEnemyTargetable fixedTarget)
+    // 발동 때 대상이 없었으면(null) 도중에 생긴 대상도 노리지 않고, 바라보는 방향 그대로 동작의 전진 거리를 쓴다.
+    public float AimFixedTarget(ActionStep step, IEnemyTargetable fixedTarget)
     {
-        if(fixedTarget == null) return setting.AdvanceDistance;
+        if(fixedTarget == null) return step.AdvanceDistance;
 
         return FaceAndGetApproachDistance(fixedTarget);
     }

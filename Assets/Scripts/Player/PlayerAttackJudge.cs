@@ -26,28 +26,28 @@ public class PlayerAttackJudge : MonoBehaviour
     private void Awake() => CacheComponent();
     private void OnDrawGizmosSelected() => DrawDefaultHitBox();
 
-    // 공격 설정의 판정 범위 안에 있는 적에게 한 번씩 적중시킨다.
+    // 지금 동작의 판정 범위 안에 있는 적에게 한 번씩 적중시킨다. 판정 범위는 동작(step), 위력 · 게이지 같은 타격 값은 액션(action)에서 읽는다.
     // isImpact : 강타 신호로 판정했는지. 판정은 일반 타격과 같고, 그로기 적에게 맞으면 판정이 끝난 뒤 콤보 스킬을 발동한다.
     //            콤보 스킬 중이면 새로 발동하지 않고, 콤보 스킬 대상에게 맞았을 때 다음 연계를 잇게 한다.
-    public void PerformHit(PlayerAttackState.AttackType type, PlayerAttackSetting setting, bool isImpact = false)
+    public void PerformHit(PlayerAttackState.AttackType type, ActionData action, ActionStep step, bool isImpact = false)
     {
-        int count = FindHitColliders(setting);
+        int count = FindHitColliders(step);
 
-        ApplyHits(count, type, setting, isImpact);
+        ApplyHits(count, type, action, isImpact);
     }
 
-    // 공격 설정의 모양대로 판정 범위 안의 콜라이더를 찾아 버퍼에 담고, 찾은 수를 돌려준다.
-    private int FindHitColliders(PlayerAttackSetting setting)
+    // 동작의 판정 모양대로 판정 범위 안의 콜라이더를 찾아 버퍼에 담고, 찾은 수를 돌려준다.
+    private int FindHitColliders(ActionStep step)
     {
-        switch(setting.Shape)
+        switch(step.Shape)
         {
-            case PlayerAttackSetting.HitShape.Box:
-                return Physics.OverlapBoxNonAlloc(transform.TransformPoint(setting.HitCenter), setting.HitSize * 0.5f, _hitColliders, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-            case PlayerAttackSetting.HitShape.Sphere:
-                return Physics.OverlapSphereNonAlloc(transform.TransformPoint(setting.HitCenter), setting.HitRadius, _hitColliders, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-            case PlayerAttackSetting.HitShape.Capsule:
-                GetCapsulePoints(setting, out Vector3 start, out Vector3 end);
-                return Physics.OverlapCapsuleNonAlloc(start, end, setting.HitRadius, _hitColliders, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            case ActionStep.HitShape.Box:
+                return Physics.OverlapBoxNonAlloc(transform.TransformPoint(step.HitCenter), step.HitSize * 0.5f, _hitColliders, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            case ActionStep.HitShape.Sphere:
+                return Physics.OverlapSphereNonAlloc(transform.TransformPoint(step.HitCenter), step.HitRadius, _hitColliders, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            case ActionStep.HitShape.Capsule:
+                GetCapsulePoints(step, out Vector3 start, out Vector3 end);
+                return Physics.OverlapCapsuleNonAlloc(start, end, step.HitRadius, _hitColliders, Physics.AllLayers, QueryTriggerInteraction.Ignore);
             default:
                 return Physics.OverlapBoxNonAlloc(transform.TransformPoint(_defaultHitCenter), _defaultHitSize * 0.5f, _hitColliders, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
         }
@@ -55,7 +55,7 @@ public class PlayerAttackJudge : MonoBehaviour
 
     // 버퍼에 담긴 콜라이더 중 적에게 결과를 적용한다. 맞은 적의 체력은 공격 설정의 위력만큼 줄고, 적중한 적마다 에너지와 필살기 게이지를 얻는다.
     // 공격 설정의 경직 시간이 0보다 크면, 맞은 적 중 경직 저항 레벨이 공격의 경직 레벨 이하인 적을 경직시킨다.
-    private void ApplyHits(int count, PlayerAttackState.AttackType type, PlayerAttackSetting setting, bool isImpact)
+    private void ApplyHits(int count, PlayerAttackState.AttackType type, ActionData setting, bool isImpact)
     {
         IEnemyTargetable comboSkillTarget = null;
         int comboSkillMaxChain = 0;
@@ -108,10 +108,10 @@ public class PlayerAttackJudge : MonoBehaviour
     }
 
     // 캡슐의 양 끝 구 중심. 캐릭터 앞쪽 방향으로 전체 길이만큼 뻗고, 길이가 반지름의 두 배보다 짧으면 두 점이 겹쳐 구가 된다.
-    private void GetCapsulePoints(PlayerAttackSetting setting, out Vector3 start, out Vector3 end)
+    private void GetCapsulePoints(ActionStep step, out Vector3 start, out Vector3 end)
     {
-        Vector3 center = transform.TransformPoint(setting.HitCenter);
-        float halfSegment = Mathf.Max(0f, setting.HitLength * 0.5f - setting.HitRadius);
+        Vector3 center = transform.TransformPoint(step.HitCenter);
+        float halfSegment = Mathf.Max(0f, step.HitLength * 0.5f - step.HitRadius);
 
         start = center - transform.forward * halfSegment;
         end = center + transform.forward * halfSegment;

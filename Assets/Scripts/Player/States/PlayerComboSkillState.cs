@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// 콤보 스킬 상태. 그로기 적 앞으로 순간 이동한 뒤 단계(ComboSkill 1, ComboSkill 2 ...)를 순서대로 이어 쓰고 이동으로 돌아간다.
+// 콤보 스킬 상태. 그로기 적 앞으로 순간 이동한 뒤 콤보 스킬 액션의 동작 목록을 순서대로 이어 쓰고 이동으로 돌아간다.
 // 한 번의 콤보 스킬은 필살기처럼 단계 설정 수만큼의 동작으로 이루어진다. 단계 수와 연계 수는 관계없다.
 // 콤보 스킬 중 대상에게 강타(Impact)가 맞으면 다음 연계를 예약하고, 마지막 단계가 끝나면 콤보 스킬을 처음 단계부터 다시 쓴다.
 // 연계는 대상 적의 최대 연계 수까지만 이어진다. 강타가 맞지 않았거나 최대 연계 수에 닿으면 이동 상태로 돌아간다.
@@ -10,9 +10,6 @@ using UnityEngine;
 // 발동부터 끝까지 무적이고, 어떤 입력으로도 끊기지 않도록 입력을 읽지 않는다. 적 시간은 멈추지 않는다.
 public class PlayerComboSkillState : PlayerState
 {
-    // Animator Controller 의 상태 이름과 같아야 한다. "ComboSkill 1", "ComboSkill 2" ... 순서다.
-    private const string ANIMATION_PREFIX = "ComboSkill ";
-
     private readonly PlayerComboSkill _comboSkill;
     private IEnemyTargetable _target;
     private Vector3 _advanceVelocity;
@@ -81,7 +78,7 @@ public class PlayerComboSkillState : PlayerState
         {
             case PlayerAnimationEventType.Hit:
             case PlayerAnimationEventType.Impact:
-                Controller.AttackJudge.PerformHit(PlayerAttackState.AttackType.ComboSkill, _comboSkill.GetChainStep(_step), isImpact: type == PlayerAnimationEventType.Impact);
+                Controller.AttackJudge.PerformHit(PlayerAttackState.AttackType.ComboSkill, _comboSkill.Action, _comboSkill.Action.GetStep(_step), isImpact: type == PlayerAnimationEventType.Impact);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();
@@ -106,7 +103,7 @@ public class PlayerComboSkillState : PlayerState
     {
         _step++;
 
-        if(_step >= _comboSkill.ChainStepCount)
+        if(_step >= _comboSkill.Action.StepCount)
         {
             if(!_isNextChainQueued)
             {
@@ -119,17 +116,17 @@ public class PlayerComboSkillState : PlayerState
             return;
         }
 
-        PlayerAttackSetting setting = _comboSkill.GetChainStep(_step);
+        ActionStep step = _comboSkill.Action.GetStep(_step);
 
         // 발동시킨 그로기 적 쪽으로 돌아 대상 앞 정지 거리까지, 단계의 전진 시간 동안 다가간다. 도중에 록온이 바뀌어도 대상은 그대로다.
-        float advanceDistance = Controller.AimFixedTarget(setting, _target);
+        float advanceDistance = Controller.AimFixedTarget(step, _target);
 
-        _advanceDuration = setting.AdvanceDuration;
+        _advanceDuration = step.AdvanceDuration;
         _advanceTimer = 0f;
         _advanceVelocity = Controller.transform.forward * (advanceDistance / _advanceDuration);
 
-        _animationHash = Animator.StringToHash(ANIMATION_PREFIX + (_step + 1));
-        Controller.Animation.Play(_animationHash, setting.FadeTime);
+        _animationHash = step.AnimationHash;
+        Controller.Animation.Play(_animationHash, step.FadeTime);
     }
 
     // 전진 시간 동안만 앞으로 나아가고, 그 뒤에는 제자리에 멈춘다.

@@ -20,7 +20,7 @@ public class PlayerParry : MonoBehaviour
 
     [Header("패링 추격")]
     [Tooltip("반응 중 공격 입력으로 나가는 추격 공격. 시전 중 무적을 켜 두어야 기획대로 추격 중 무적이 된다")]
-    [SerializeField] private PlayerAttackSetting _parryChase = new PlayerAttackSetting();
+    [SerializeField] private ActionData _parryChase;
 
     private PlayerController _controller;
     private PlayerTeleport _teleport;
@@ -34,7 +34,7 @@ public class PlayerParry : MonoBehaviour
     public float ReadyTime => _readyTime;
     public float ReactDistance => _reactDistance;
     public float ReactTime => _reactTime;
-    public PlayerAttackSetting ParryChase => _parryChase;
+    public ActionData ParryChase => _parryChase;
 
 
     private void Awake() => CacheComponent();
