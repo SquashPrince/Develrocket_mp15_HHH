@@ -1,7 +1,8 @@
 using UnityEngine;
 
-// 대상 앞으로 순간 이동한다. 패링 · 필살기 · 콤보 스킬이 같은 계산을 함께 쓰고, 패링 · 필살기는 같은 거리를 쓴다.
-// 콤보 스킬은 거리를 따로 정한다. 파티 전투에서 남아 있는 캐릭터와 교체된 캐릭터가 같은 위치에서 콤보 스킬을 쓰지 않게 하기 위해서다.
+// 대상 앞으로 순간 이동한다. 패링 · 필살기 · 콤보 스킬이 같은 계산과 같은 간격을 함께 쓴다.
+// 콤보 스킬은 기준 방향에서 옆으로 비켜 선다(옆 각도). 파티 전투에서 남아 있는 캐릭터와 교체된 캐릭터가 같은 위치에서 콤보 스킬을 쓰지 않게 하되,
+// 적과의 거리는 같게 두어 모든 캐릭터의 사정거리를 하나로 맞추기 위해서다.
 // 실제로 다가가면 벽 등에 걸리기 때문에 위치를 바로 옮긴다. 도착 지점이 막혀 있으면 이동하지 않는다.
 // 어느 쪽에 설지는 부르는 쪽이 고른다.
 //   대상 정면 : 공격하는 적을 마주 보도록 적의 정면에 선다. (패링)
@@ -32,20 +33,19 @@ public class PlayerTeleport : MonoBehaviour
 
     private void Awake() => CacheComponent();
 
-    // 대상에서 side 쪽으로 정해진 거리만큼 떨어진 곳으로 순간 이동하고 대상 쪽을 본다.
-    // 도착 지점이 벽 · 지형에 겹치거나, 대상과 도착 지점 사이가 막혀 있으면 이동하지 않고 false 를 돌려준다.
-    public bool TryTeleportTo(Transform target, Side side) => TryTeleportTo(target, side, _distance);
-
-    // 공통 간격 대신 따로 정한 간격으로 순간 이동한다. 계산과 막힘 검사는 같다. (콤보 스킬)
-    // gap : 대상 몸 표면과 플레이어 몸 표면 사이 간격. 중심 사이 거리는 대상 반지름 + 플레이어 반지름 + 간격이다.
+    // 대상에서 side 쪽으로 정해진 간격만큼 떨어진 곳으로 순간 이동하고 대상 쪽을 본다.
+    // 간격은 대상 몸 표면과 플레이어 몸 표면 사이다. 중심 사이 거리는 대상 반지름 + 플레이어 반지름 + 간격이다.
     //   중심에서 정한 거리만 띄우면 큰 적(보스)의 몸 안에 서게 되어, 겹침을 풀며 바닥 아래로 밀려나기 때문이다.
-    public bool TryTeleportTo(Transform target, Side side, float gap)
+    // sideAngle : side 방향에서 대상 둘레로 비켜 설 각도(도, 위에서 볼 때 시계 방향이 +). 0 이면 side 방향 그대로다.
+    // 도착 지점이 벽 · 지형에 겹치거나, 대상과 도착 지점 사이가 막혀 있으면 이동하지 않고 false 를 돌려준다.
+    public bool TryTeleportTo(Transform target, Side side, float sideAngle = 0f)
     {
         Vector3 targetPosition = target.position;
         Vector3 direction = side == Side.TargetFront ? target.forward : transform.position - targetPosition;
         direction.y = 0f;
+        direction = Quaternion.Euler(0f, sideAngle, 0f) * direction;
 
-        float distance = GetHorizontalRadius(target) + _characterController.radius + gap;
+        float distance = GetHorizontalRadius(target) + _characterController.radius + _distance;
         Vector3 destination = targetPosition + direction.normalized * distance;
 
         if(!TrySnapToGround(ref destination) || IsBlocked(targetPosition, destination)) return false;
