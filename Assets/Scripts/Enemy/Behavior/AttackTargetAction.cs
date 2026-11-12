@@ -51,7 +51,7 @@ public partial class AttackTargetAction : Action
 
         if(toTarget.sqrMagnitude > _setting.AttackRange * _setting.AttackRange)
         {
-            _movement.MoveTo(Target.Value.position, _movement.MoveSpeed);
+            _movement.MoveTo(Target.Value.position, _movement.MoveSpeed * _setting.RunSpeedRate);
             return Status.Running;
         }
 

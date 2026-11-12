@@ -35,7 +35,9 @@ public class EnemyMovement : MonoBehaviour
 
     // destination 쪽으로 speed 로 이동한다. 매 프레임 불러도 목적지가 조금 바뀐 정도면 경로를 다시 계산하지 않는다.
     // lookTarget : 이동하는 동안 바라볼 대상. 대상 둘레를 돌 때처럼 옆으로 움직이며 대상을 봐야 할 때 넘긴다.
-    // playsMoveAnimation : false 면 Move 모션을 재생하지 않고 이동만 한다. 백스텝처럼 다른 기능이 모션을 정할 때 쓴다.
+    //   대상을 넘기면 바라보는 방향과 이동 방향이 달라지므로 방향 모션(Move), 없으면 달리기 모션(Run)을 재생한다.
+    //   speed 를 0 으로 넘기면 제자리에서 대상 쪽으로 몸만 돌린다.
+    // playsMoveAnimation : false 면 이동 모션을 재생하지 않고 이동만 한다. 백스텝처럼 다른 기능이 모션을 정할 때 쓴다.
     public void MoveTo(Vector3 destination, float speed, Transform lookTarget = null, bool playsMoveAnimation = true)
     {
         _speed = speed;
@@ -51,7 +53,7 @@ public class EnemyMovement : MonoBehaviour
 
         _isMoving = true;
 
-        if(playsMoveAnimation) _animation.SetMoving(true);
+        if(playsMoveAnimation) _animation.SetMoving(true, lookTarget != null);
     }
 
     public void Stop()
@@ -78,6 +80,10 @@ public class EnemyMovement : MonoBehaviour
         // Agent 의 위치를 먼저 옮기면 NavMesh 위로 맞춰지므로, 맞춰진 위치를 실제 위치로 쓴다.
         _agent.nextPosition = transform.position + moveDirection * step;
         transform.position = _agent.nextPosition;
+
+        // 방향 모션용으로, 실제로 움직인 방향을 적이 바라보는 방향 기준으로 바꿔 넘긴다. 움직이지 않았으면 (0, 0) 이다.
+        Vector3 localDirection = step > 0f ? transform.InverseTransformDirection(moveDirection) : Vector3.zero;
+        _animation.SetMoveDirection(localDirection);
 
         Vector3 lookDirection = _lookTarget != null ? _lookTarget.position - transform.position : moveDirection;
         TurnTowards(lookDirection);
