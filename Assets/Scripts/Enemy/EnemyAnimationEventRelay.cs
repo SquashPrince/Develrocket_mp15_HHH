@@ -12,9 +12,13 @@ public class EnemyAnimationEventRelay : MonoBehaviour
     private void Telegraph(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.Telegraph, animationEvent);
     private void Hit(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.Hit, animationEvent);
     private void ResistEnd(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.ResistEnd, animationEvent);
+    private void LeapStart(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.LeapStart, animationEvent);
+    private void LeapLock(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.LeapLock, animationEvent);
+    private void LeapEnd(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.LeapEnd, animationEvent);
 
+    // 도약은 같은 클립의 다른 이벤트 시점을 읽어야 하므로 이벤트 정보를 그대로 넘긴다.
     private void Relay(EnemyAnimationEventType type, AnimationEvent animationEvent)
     {
-        _attacker.HandleAnimationEvent(type, animationEvent.animatorStateInfo.shortNameHash);
+        _attacker.HandleAnimationEvent(type, animationEvent);
     }
 }

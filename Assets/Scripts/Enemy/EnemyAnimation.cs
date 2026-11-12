@@ -82,6 +82,16 @@ public class EnemyAnimation : MonoBehaviour
         return stateInfo.shortNameHash == stateHash && stateInfo.normalizedTime >= 1f;
     }
 
+    // stateHash 상태의 재생 위치(0 = 처음, 1 = 끝)를 돌려준다. 그 상태로 섞여 들어가는 중이면 들어가는 쪽의 위치다.
+    // 지금 재생 중이거나 섞여 들어가는 상태가 아니면 false 다.
+    public bool TryGetStateNormalizedTime(int stateHash, out float normalizedTime)
+    {
+        AnimatorStateInfo stateInfo = _animator.IsInTransition(0) ? _animator.GetNextAnimatorStateInfo(0) : _animator.GetCurrentAnimatorStateInfo(0);
+        normalizedTime = stateInfo.normalizedTime;
+
+        return stateInfo.shortNameHash == stateHash;
+    }
+
     // 그로기 중 맞으면 그로기를 유지한 채 Hit 만 재생한다. 그로기가 아닐 때의 Hit 은 경직 알림에서 재생한다.
     private void OnDamaged(bool isImpact)
     {

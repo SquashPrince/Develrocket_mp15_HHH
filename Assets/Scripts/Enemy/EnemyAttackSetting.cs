@@ -28,6 +28,16 @@ public class EnemyAttackSetting
     [SerializeField, Min(0f)] private float _baseWeight = 1f;
     [Tooltip("다른 공격이 선택될 때마다 늘어나는 가중치. 오래 쓰지 않은 공격일수록 잘 뽑힌다. 이 공격이 선택되면 기본 가중치로 돌아간다")]
     [SerializeField, Min(0f)] private float _weightGrowth = 1f;
+    [Tooltip("대상이 이 거리 이상 떨어져 있어야 쓸 수 있다(수평 거리). 0 이면 거리 제한이 없다")]
+    [SerializeField, Min(0f)] private float _minUseDistance;
+    [Tooltip("켜면 대상이 공격 사거리 밖에 있을 때 다가가지 않고 바로 쓸 수 있다 (Ranged Attack 노드). 끄면 사거리 안에서만 쓴다. 사거리 안에서는 켜져 있어도 쓸 수 있다")]
+    [SerializeField] private bool _canUseOutOfRange;
+
+    [Header("도약 · 돌진 (LeapStart 이벤트가 있는 공격)")]
+    [Tooltip("도약 중 외형이 떠오르는 최고 높이. 0 이면 땅을 따라 직선으로 돌진한다. 0 보다 크면 공중에 있는 동안 맞지 않는다")]
+    [SerializeField, Min(0f)] private float _leapHeight;
+    [Tooltip("목표 지점을 대상 위치보다 이 거리만큼 더 지나친 곳으로 잡는다. 돌진처럼 대상을 뚫고 지나가는 공격에 쓴다")]
+    [SerializeField, Min(0f)] private float _overshootDistance;
 
 
     [Header("판정")]
@@ -71,6 +81,10 @@ public class EnemyAttackSetting
     public float Cooldown => _cooldown;
     public float BaseWeight => _baseWeight;
     public float WeightGrowth => _weightGrowth;
+    public float MinUseDistance => _minUseDistance;
+    public bool CanUseOutOfRange => _canUseOutOfRange;
+    public float LeapHeight => _leapHeight;
+    public float OvershootDistance => _overshootDistance;
     public float ParryStaggerTime => _parryStaggerTime;
     public int StaggerResistLevel => _staggerResistLevel;
     public bool ResistUntilEvent => _resistUntilEvent;

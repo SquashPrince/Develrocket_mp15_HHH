@@ -8,8 +8,9 @@ using UnityEngine;
 // 패링 공격은 Telegraph 이벤트부터 첫 Hit 이벤트까지 패링 가능 시간을 열고 예고 표시를 켠다. 예고 시점은 이벤트 프레임으로 조정한다.
 // 공격 시작부터 그 공격의 경직 저항 레벨을 적용하고, 첫 Hit 이벤트(또는 설정에 따라 ResistEnd 이벤트)에서 푼다.
 // 경직 · 그로기 · 처치되면 진행 중인 공격을 끊는다. 끊긴 공격도 쓴 것으로 보고 쿨타임을 시작한다.
-// 공격 선택 : 쿨타임 중인 공격은 빼고, 가중치(기본 가중치 + 증가량 × 마지막으로 쓴 뒤 다른 공격이 선택된 횟수)에 비례해 무작위로 고른다.
-// 모션은 루트 모션 없이 제자리에서 재생한다.
+// 공격 선택 : 쿨타임 중이거나 대상이 사용 최소 거리보다 가까운 공격은 빼고, 가중치(기본 가중치 + 증가량 × 마지막으로 쓴 뒤 다른 공격이 선택된 횟수)에 비례해 무작위로 고른다.
+//   사거리 밖 공격만 요청받으면(대상이 공격 사거리 밖) 사거리 밖에서 쓸 수 있는 공격 중에서만 고른다.
+// 모션은 루트 모션 없이 제자리에서 재생한다. 도약 · 돌진 공격은 LeapStart · LeapLock · LeapEnd 이벤트를 도약 기능(EnemyLeap)에 넘겨 목표 지점으로 옮긴다.
 [RequireComponent(typeof(EnemyHealth), typeof(EnemyReaction), typeof(EnemyAnimation))]
 public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 {
@@ -31,6 +32,8 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     private EnemyHealth _health;
     private EnemyReaction _reaction;
     private EnemyAnimation _animation;
+    // 도약 공격이 있는 적만 가진다. 없으면 null 이다.
+    private EnemyLeap _leap;
     private GameObject _parryTelegraph;
     private Transform _target;
     // 공격별 남은 쿨타임과, 마지막으로 쓴 뒤 다른 공격이 선택된 횟수
@@ -81,9 +84,13 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     }
 
     // 쓸 수 있는 공격 중 하나를 골라 시작한다. 쓸 수 있는 공격이 없으면 false 를 돌려준다.
-    public bool TryStartAttack(Transform target)
+    // rangedOnly : true 면 사거리 밖에서 쓸 수 있는 공격 중에서만 고른다. 대상이 공격 사거리 밖일 때 다가가기 전에 쓴다.
+    public bool TryStartAttack(Transform target, bool rangedOnly = false)
     {
-        int index = PickAttack();
+        Vector3 toTarget = target.position - transform.position;
+        toTarget.y = 0f;
+
+        int index = PickAttack(toTarget.magnitude, rangedOnly);
 
         if(index < 0) return false;
 
@@ -105,9 +112,9 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     }
 
     // 이전 단계 클립과 섞이는 동안 들어오는 이전 클립의 이벤트는 무시한다.
-    public void HandleAnimationEvent(EnemyAnimationEventType type, int stateHash)
+    public void HandleAnimationEvent(EnemyAnimationEventType type, AnimationEvent animationEvent)
     {
-        if(!IsAttacking || stateHash != _phaseHash) return;
+        if(!IsAttacking || animationEvent.animatorStateInfo.shortNameHash != _phaseHash) return;
 
         switch(type)
         {
@@ -119,6 +126,15 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
                 break;
             case EnemyAnimationEventType.ResistEnd:
                 if(CurrentAttack.ResistUntilEvent) _reaction.SetAttackStaggerResistLevel(0);
+                break;
+            case EnemyAnimationEventType.LeapStart:
+                StartLeap(animationEvent);
+                break;
+            case EnemyAnimationEventType.LeapLock:
+                if(_leap != null) _leap.Lock();
+                break;
+            case EnemyAnimationEventType.LeapEnd:
+                if(_leap != null) _leap.Land();
                 break;
         }
     }
@@ -189,6 +205,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         if(!IsAttacking) return;
 
         CloseParryWindow();
+        if(_leap != null) _leap.Stop();
         _reaction.SetAttackStaggerResistLevel(0);
         _cooldownTimers[_attackIndex] = CurrentAttack.Cooldown;
         _attackIndex = -1;
@@ -196,14 +213,14 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         WasLastAttackInterrupted = isInterrupted;
     }
 
-    // 쿨타임이 끝난 공격 중 가중치에 비례해 무작위로 고른다. 고른 공격은 선택 횟수를 0 으로, 나머지는 1 씩 올린다.
-    private int PickAttack()
+    // 지금 쓸 수 있는 공격 중 가중치에 비례해 무작위로 고른다. 고른 공격은 선택 횟수를 0 으로, 나머지는 1 씩 올린다.
+    private int PickAttack(float distance, bool rangedOnly)
     {
         float totalWeight = 0f;
 
         for(int i = 0; i < _attacks.Length; i++)
         {
-            if(_cooldownTimers[i] <= 0f) totalWeight += GetWeight(i);
+            if(IsUsable(i, distance, rangedOnly)) totalWeight += GetWeight(i);
         }
 
         if(totalWeight <= 0f) return -1;
@@ -213,7 +230,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
         for(int i = 0; i < _attacks.Length; i++)
         {
-            if(_cooldownTimers[i] > 0f) continue;
+            if(!IsUsable(i, distance, rangedOnly)) continue;
 
             pickedIndex = i;
             pick -= GetWeight(i);
@@ -227,6 +244,16 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         }
 
         return pickedIndex;
+    }
+
+    // 쿨타임이 끝났고, 대상이 사용 최소 거리 이상 떨어져 있으면 쓸 수 있다. 사거리 밖 공격만 고를 때는 사거리 밖에서 쓸 수 있는 공격이어야 한다.
+    private bool IsUsable(int index, float distance, bool rangedOnly)
+    {
+        EnemyAttackSetting attack = _attacks[index];
+
+        if(_cooldownTimers[index] > 0f || distance < attack.MinUseDistance) return false;
+
+        return !rangedOnly || attack.CanUseOutOfRange;
     }
 
     private float GetWeight(int index) => _attacks[index].BaseWeight + _attacks[index].WeightGrowth * _skipCounts[index];
@@ -260,6 +287,19 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         if(toTarget == Vector3.zero) return;
 
         transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(toTarget), _turnSpeed * EnemyTime.DeltaTime);
+    }
+
+    private void StartLeap(AnimationEvent animationEvent)
+    {
+        if(_leap == null)
+        {
+#if UNITY_EDITOR
+            Debug.LogWarning($"[적 공격] {name} {CurrentAttack.Name} : LeapStart 이벤트가 있지만 EnemyLeap 컴포넌트가 없어 도약하지 않는다");
+#endif
+            return;
+        }
+
+        _leap.Begin(_target, animationEvent, CurrentAttack.LeapHeight, CurrentAttack.OvershootDistance);
     }
 
     private void OpenParryWindow()
@@ -300,6 +340,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         _health = GetComponent<EnemyHealth>();
         _reaction = GetComponent<EnemyReaction>();
         _animation = GetComponent<EnemyAnimation>();
+        _leap = GetComponent<EnemyLeap>();
     }
 
     // 예고 표시는 미리 한 번 만들어 꺼 두고, 패링 가능 시간마다 켜고 끈다. 예고 표시 프리팹은 넣지 않아도 된다.

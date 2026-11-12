@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
   _maxHealth: 150
-  _canDie: 1
+  _canDie: 0
   _corpseDuration: 2
 --- !u!114 &2428002810246828485
 MonoBehaviour:
@@ -227,12 +227,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94a61a1603cae1c4fac25f20c26f17f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBehaviorSetting
+  _runSpeedRate: 1.5
   _keepDistance: 2
   _keepDistanceTolerance: 4
   _strafeSpeed: 1.25
   _keepDistanceTimeMin: 1.5
   _keepDistanceTimeMax: 3
   _backStepChance: 0.3
+  _idleChance: 0.5
   _backStepSpeedRate: 0.75
   _attackRange: 2
   _attackInterval: 2
@@ -261,6 +263,10 @@ MonoBehaviour:
     _cooldown: 3.5
     _baseWeight: 25
     _weightGrowth: 10
+    _minUseDistance: 0
+    _canUseOutOfRange: 0
+    _leapHeight: 0
+    _overshootDistance: 0
     _isParryable: 0
     _parryStaggerTime: 1.5
     _staggerResistLevel: 1
@@ -284,6 +290,10 @@ MonoBehaviour:
     _cooldown: 2
     _baseWeight: 25
     _weightGrowth: 10
+    _minUseDistance: 0
+    _canUseOutOfRange: 0
+    _leapHeight: 0
+    _overshootDistance: 0
     _isParryable: 0
     _parryStaggerTime: 1.5
     _staggerResistLevel: 1
@@ -307,6 +317,10 @@ MonoBehaviour:
     _cooldown: 5
     _baseWeight: 30
     _weightGrowth: 10
+    _minUseDistance: 0
+    _canUseOutOfRange: 0
+    _leapHeight: 0
+    _overshootDistance: 0
     _isParryable: 0
     _parryStaggerTime: 1.5
     _staggerResistLevel: 1
@@ -336,6 +350,10 @@ MonoBehaviour:
     _cooldown: 10
     _baseWeight: 20
     _weightGrowth: 5
+    _minUseDistance: 0
+    _canUseOutOfRange: 0
+    _leapHeight: 0
+    _overshootDistance: 0
     _isParryable: 1
     _parryStaggerTime: 2
     _staggerResistLevel: 2
