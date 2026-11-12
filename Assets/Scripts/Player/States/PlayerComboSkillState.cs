@@ -81,7 +81,7 @@ public class PlayerComboSkillState : PlayerState
         {
             case PlayerAnimationEventType.Hit:
             case PlayerAnimationEventType.Impact:
-                Controller.PerformHit(PlayerAttackState.AttackType.ComboSkill, _comboSkill.GetChainStep(_step), isImpact: type == PlayerAnimationEventType.Impact);
+                Controller.AttackJudge.PerformHit(PlayerAttackState.AttackType.ComboSkill, _comboSkill.GetChainStep(_step), isImpact: type == PlayerAnimationEventType.Impact);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();
@@ -129,7 +129,7 @@ public class PlayerComboSkillState : PlayerState
         _advanceVelocity = Controller.transform.forward * (advanceDistance / _advanceDuration);
 
         _animationHash = Animator.StringToHash(ANIMATION_PREFIX + (_step + 1));
-        Controller.PlayAnimation(_animationHash, setting.FadeTime);
+        Controller.Animation.Play(_animationHash, setting.FadeTime);
     }
 
     // 전진 시간 동안만 앞으로 나아가고, 그 뒤에는 제자리에 멈춘다.

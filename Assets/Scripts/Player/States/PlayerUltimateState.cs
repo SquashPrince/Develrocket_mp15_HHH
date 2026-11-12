@@ -49,7 +49,7 @@ public class PlayerUltimateState : PlayerState
         _target = _ultimate.TeleportToTarget();
 
         Controller.HorizontalVelocity = Vector3.zero;
-        Controller.PlayAnimation(CUTSCENE_ANIMATION);
+        Controller.Animation.Play(CUTSCENE_ANIMATION);
     }
 
     // 슬로모션 중 발동했더라도 적은 원래 속도로 돌아온다. 공격 단계 시작 때 이미 돌렸지만, 어떤 경우에도 멈춘 채 남지 않도록 나갈 때도 돌린다.
@@ -70,7 +70,7 @@ public class PlayerUltimateState : PlayerState
         {
             case PlayerAnimationEventType.Hit:
             case PlayerAnimationEventType.Impact:
-                if(_step != CUTSCENE_STEP) Controller.PerformHit(PlayerAttackState.AttackType.Ultimate, _ultimate.GetAttackStep(_step), type == PlayerAnimationEventType.Impact);
+                if(_step != CUTSCENE_STEP) Controller.AttackJudge.PerformHit(PlayerAttackState.AttackType.Ultimate, _ultimate.GetAttackStep(_step), type == PlayerAnimationEventType.Impact);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();
@@ -101,7 +101,7 @@ public class PlayerUltimateState : PlayerState
         _advanceVelocity = Controller.transform.forward * (advanceDistance / _advanceDuration);
 
         _animationHash = Animator.StringToHash(ATTACK_ANIMATION_PREFIX + (_step + 1));
-        Controller.PlayAnimation(_animationHash, setting.FadeTime);
+        Controller.Animation.Play(_animationHash, setting.FadeTime);
     }
 
     // 전진 시간 동안만 앞으로 나아가고, 그 뒤와 연출 중에는 제자리에 멈춘다.

@@ -1,35 +1,22 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-// 플레이어의 공용 데이터(수치 · 대시 스택 · 콤보 · 차지 · 스킬 · 중력)와 상태 전환을 맡는다. 입력은 입력 기능(PlayerInputReader)에서 읽는다.
+// 플레이어의 공용 데이터(수치 · 대시 스택 · 콤보 · 차지 · 스킬 · 중력)와 상태 전환을 맡는다.
+// 입력은 입력 기능, 타격 판정은 판정 기능, Animator 제어는 애니메이션 기능이 맡고, 상태 클래스는 이 클래스를 통해 그 기능들을 꺼내 쓴다.
 // 실제 동작은 상태 클래스(이동 · 대시 · 공격 · 피격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController), typeof(PlayerEnergy), typeof(PlayerTargeting))]
 [RequireComponent(typeof(PlayerHealth), typeof(PlayerSlowMotion), typeof(PlayerParry))]
 [RequireComponent(typeof(PlayerUltimate), typeof(PlayerComboSkill), typeof(PlayerInputReader))]
+[RequireComponent(typeof(PlayerAttackJudge), typeof(PlayerAnimation))]
 public class PlayerController : MonoBehaviour
 {
-    private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
-    private static readonly int LEG_RUN_ANIMATION = Animator.StringToHash("LegRun");
-
-    // Animator Controller 의 하체 달리기 레이어 이름과 같아야 한다. 하체만 덮는 Avatar Mask 를 씌운 레이어다.
-    private const string LEG_RUN_LAYER_NAME = "LegRun";
-
     private const int MAX_DASH_STACK = 2;
-    // 한 번의 타격 판정에서 검사할 수 있는 최대 콜라이더 수
-    private const int MAX_HIT_COLLIDERS = 16;
-    // 애니메이션을 바꿀 때 이전 모션과 섞는 시간(초)
-    private const float ANIMATION_FADE_TIME = 0.1f;
-    // 이동 속도 파라미터가 목표값까지 부드럽게 따라가는 시간(초)
-    private const float SPEED_DAMP_TIME = 0.1f;
     // 땅에 붙어 있도록 누르는 작은 아래 방향 속도 (0 이면 경사에서 isGrounded 가 흔들린다)
     private const float GROUNDED_VERTICAL_SPEED = -2f;
 
     [Header("참조")]
     [Tooltip("이동 방향의 기준이 되는 카메라 (Main Camera)")]
     [SerializeField] private Transform _cameraTransform;
-    [Tooltip("캐릭터 모델의 Animator (Visual 아래 캐릭터 모델)")]
-    [SerializeField] private Animator _animator;
 
     [Header("이동")]
     [SerializeField, Min(0f)] private float _walkSpeed = 4f;
@@ -58,9 +45,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerAttackSetting _heavyAttack = new PlayerAttackSetting();
     [Tooltip("공격 키를 누르고 있으면 이 시간 뒤 강공격이 나간다")]
     [SerializeField, Min(0.01f)] private float _chargeTime = 0.6f;
-    [Tooltip("타격 판정 상자의 중심 (캐릭터 기준 위치)")]
-    [SerializeField] private Vector3 _hitBoxCenter = new Vector3(0f, 1f, 1f);
-    [SerializeField] private Vector3 _hitBoxSize = new Vector3(1.5f, 1.5f, 2f);
     [Tooltip("공격 대상에게 다가갈 때 대상 중심에서 이 거리만큼 앞에서 멈춘다")]
     [SerializeField, Min(0f)] private float _attackStopDistance = 1.2f;
 
@@ -76,15 +60,11 @@ public class PlayerController : MonoBehaviour
     [Tooltip("특수스킬에 필요한 에너지. 스킬 입력 시 에너지가 이보다 적으면 일반 스킬이 나간다")]
     [SerializeField, Min(0f)] private float _specialSkillEnergyCost = 60f;
 
-    private readonly HashSet<IEnemyDamageable> _hitTargets = new HashSet<IEnemyDamageable>();
-    private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
     private CharacterController _characterController;
     private PlayerInputReader _input;
     private PlayerEnergy _energy;
     private PlayerTargeting _targeting;
     private PlayerSlowMotion _slowMotion;
-    private PlayerUltimate _ultimate;
-    private PlayerComboSkill _comboSkill;
     private PlayerStateMachine _stateMachine;
     private PlayerLocomotionState _locomotionState;
     private PlayerDashState _dashState;
@@ -95,8 +75,6 @@ public class PlayerController : MonoBehaviour
     private float _turnVelocity;
     private float _comboExpireTime;
     private float _chargeTimer;
-    private float _legRunTargetWeight;
-    private int _legRunLayer;
     private int _dashStack;
     private int _nextComboStep;
     private bool _isCharging;
@@ -104,6 +82,8 @@ public class PlayerController : MonoBehaviour
     // 상태가 이번 프레임에 정한 수평 속도. 매 프레임 상태 실행 뒤 중력과 함께 반영한다.
     public Vector3 HorizontalVelocity { get; set; }
     public PlayerHealth Health { get; private set; }
+    public PlayerAttackJudge AttackJudge { get; private set; }
+    public PlayerAnimation Animation { get; private set; }
     public bool WasDashPressed => _input.WasDashPressed;
     public bool WasAttackPressed => _input.WasAttackPressed;
     public bool WasSkillPressed => _input.WasSkillPressed;
@@ -125,9 +105,7 @@ public class PlayerController : MonoBehaviour
         RechargeDashStack();
         _stateMachine.Tick();
         ApplyMovement();
-        UpdateLegRunWeight();
     }
-    private void OnDrawGizmosSelected() => DrawHitBox();
 
     // 입력을 카메라 기준의 월드 수평 방향으로 바꾼다. 스틱을 살짝 기울이면 길이가 1보다 작다.
     // 이동 중 카메라가 캐릭터 뒤로 자동 복귀하면 기준이 바뀌어 원을 그리므로, 이동 중 복귀는 CameraRecenterBlocker 가 막는다.
@@ -293,91 +271,9 @@ public class PlayerController : MonoBehaviour
         return true;
     }
 
-    // 캐릭터 앞의 판정 상자 안에 있는 적에게 한 번씩 적중시키고, 적중한 적마다 공격 설정의 에너지와 필살기 게이지를 얻는다.
-    // 맞은 적의 체력은 공격 설정의 위력만큼 줄어든다.
-    // 공격 설정의 경직 시간이 0보다 크면, 맞은 적 중 경직 저항 레벨이 공격의 경직 레벨 이하인 적을 경직시킨다.
-    // isImpact : 강타 신호로 판정했는지. 판정은 일반 타격과 같고, 그로기 적에게 맞으면 판정이 끝난 뒤 콤보 스킬을 발동한다.
-    //            콤보 스킬 중이면 새로 발동하지 않고, 콤보 스킬 대상에게 맞았을 때 다음 연계를 잇게 한다.
-    public void PerformHit(PlayerAttackState.AttackType type, PlayerAttackSetting setting, bool isImpact = false)
-    {
-        Vector3 center = transform.TransformPoint(_hitBoxCenter);
-        int count = Physics.OverlapBoxNonAlloc(center, _hitBoxSize * 0.5f, _hitColliders, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-        IEnemyTargetable comboSkillTarget = null;
-        int comboSkillMaxChain = 0;
-
-        // 콜라이더가 여러 개인 적도 한 번만 맞도록 이번 판정에서 맞은 적을 기억한다.
-        _hitTargets.Clear();
-
-        for(int i = 0; i < count; i++)
-        {
-            IEnemyDamageable enemy = _hitColliders[i].GetComponentInParent<IEnemyDamageable>();
-
-            if(enemy == null || !_hitTargets.Add(enemy)) continue;
-
-            enemy.TakeDamage(setting.Power, isImpact);
-            _energy.Add(setting.EnergyGain);
-
-#if UNITY_EDITOR
-            Debug.Log($"[{(isImpact ? "강타" : "적중")}] {type} 위력 {setting.Power} / 에너지 +{setting.EnergyGain} → {_energy.CurrentEnergy:F1}");
-#endif
-
-            _ultimate.AddGauge(setting.UltimateGaugeGain);
-
-            // 이 타격으로 처치된 적은 경직 · 콤보 스킬 대상이 아니다. 그로기 적이 강타로 처치되면 콤보 스킬보다 처치가 먼저다.
-            if(!enemy.IsAlive) continue;
-
-            // 경직 · 그로기 기능(EnemyReaction)이 없는 적은 경직 · 그로기 · 콤보 스킬 대상이 아니다.
-            if(setting.StaggerTime > 0f && enemy.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(setting.StaggerTime, setting.StaggerLevel);
-
-            if(!isImpact) continue;
-
-            // 콤보 스킬 중의 강타는 새로 발동하지 않고, 콤보 스킬 대상에게 맞았으면 다음 연계를 잇게 한다.
-            if(!_comboSkill.CanStart)
-            {
-                _comboSkill.OnImpactHit(enemy);
-                continue;
-            }
-
-            // 한 번의 판정에서 콤보 스킬은 하나의 그로기 적에게만 발동한다. 발동 기회는 실제로 발동할 적에게서만 소모한다.
-            // 그로기 기능이 없는 적은 콤보 스킬을 받을 수 없다.
-            if(comboSkillTarget != null) continue;
-
-            if(!enemy.transform.TryGetComponent(out IEnemyGroggyable groggyable) || !groggyable.TryConsumeComboSkillChance()) continue;
-
-            enemy.transform.TryGetComponent(out comboSkillTarget);
-            comboSkillMaxChain = groggyable.MaxComboChain;
-        }
-
-        // 판정을 모두 마친 뒤 상태를 바꿔, 같은 판정의 다른 적도 에너지 · 게이지 · 경직을 받게 한다.
-        if(comboSkillTarget != null) _comboSkill.Begin(comboSkillTarget, comboSkillMaxChain);
-    }
-
     public void HandleAnimationEvent(PlayerAnimationEventType type, int stateHash)
     {
         _stateMachine.CurrentState.OnAnimationEvent(type, stateHash);
-    }
-
-    // Animator 의 상태를 이름(해시)으로 직접 재생한다. 전이선 대신 코드가 어떤 모션을 재생할지 정한다.
-    // fadeTime : 이전 모션과 섞는 시간(초). 공격은 공격 설정의 값을 넘기고, 그 외에는 기본값을 쓴다.
-    public void PlayAnimation(int stateHash, float fadeTime = ANIMATION_FADE_TIME)
-    {
-        _animator.CrossFadeInFixedTime(stateHash, fadeTime);
-    }
-
-    // 실제 수평 이동 속도를 넘겨 Blend Tree 가 걷기 · 달리기를 섞게 한다.
-    public void SetMoveSpeedParameter(float speed)
-    {
-        _animator.SetFloat(SPEED_PARAMETER, speed, SPEED_DAMP_TIME, Time.deltaTime);
-    }
-
-    // 공격 대상에게 멀리 다가가는 동안 하체에 달리기 모션을 덮는다. 상체는 공격 모션을 그대로 재생한다.
-    // 레이어 비중은 즉시 바꾸지 않고 UpdateLegRunWeight 가 섞는 시간에 걸쳐 따라가게 해 모션이 튀지 않게 한다.
-    public void SetLegRun(bool isRunning)
-    {
-        // 꺼져 있다가 켜질 때만 달리기를 처음부터 재생한다. 콤보가 이어지며 다시 켜질 때 발이 끊기지 않게 하기 위해서다.
-        if(isRunning && _legRunTargetWeight == 0f) _animator.Play(LEG_RUN_ANIMATION, _legRunLayer, 0f);
-
-        _legRunTargetWeight = isRunning ? 1f : 0f;
     }
 
     // 이동 상태로 돌아가면 진행 중이던 차지는 끊는다.
@@ -424,27 +320,12 @@ public class PlayerController : MonoBehaviour
         if(_dashStack >= MAX_DASH_STACK) _dashCooldownTimer = 0f;
     }
 
-    private void UpdateLegRunWeight()
-    {
-        float weight = Mathf.MoveTowards(_animator.GetLayerWeight(_legRunLayer), _legRunTargetWeight, Time.deltaTime / ANIMATION_FADE_TIME);
-
-        _animator.SetLayerWeight(_legRunLayer, weight);
-    }
-
     private void ApplyMovement()
     {
         if(_characterController.isGrounded && _verticalSpeed < 0f) _verticalSpeed = GROUNDED_VERTICAL_SPEED;
         else _verticalSpeed += _gravity * Time.deltaTime;
 
         _characterController.Move((HorizontalVelocity + Vector3.up * _verticalSpeed) * Time.deltaTime);
-    }
-
-    // Scene 창에서 플레이어를 선택하면 타격 판정 범위를 빨간 상자로 보여준다.
-    private void DrawHitBox()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.matrix = Matrix4x4.TRS(transform.TransformPoint(_hitBoxCenter), transform.rotation, Vector3.one);
-        Gizmos.DrawWireCube(Vector3.zero, _hitBoxSize);
     }
 
     private void CacheComponent()
@@ -454,8 +335,8 @@ public class PlayerController : MonoBehaviour
         _energy = GetComponent<PlayerEnergy>();
         _targeting = GetComponent<PlayerTargeting>();
         _slowMotion = GetComponent<PlayerSlowMotion>();
-        _ultimate = GetComponent<PlayerUltimate>();
-        _comboSkill = GetComponent<PlayerComboSkill>();
+        AttackJudge = GetComponent<PlayerAttackJudge>();
+        Animation = GetComponent<PlayerAnimation>();
         Health = GetComponent<PlayerHealth>();
     }
 
@@ -467,7 +348,6 @@ public class PlayerController : MonoBehaviour
         _attackState = new PlayerAttackState(this);
         _hitState = new PlayerHitState(this);
         _dashStack = MAX_DASH_STACK;
-        _legRunLayer = _animator.GetLayerIndex(LEG_RUN_LAYER_NAME);
 
         EnterLocomotion(false);
     }

@@ -96,14 +96,14 @@ public class PlayerAttackState : PlayerState
         // 공격 설정의 전진 거리보다 멀리 다가가야 하면 다가가는 동안 하체에 달리기 모션을 보여준다. 공격마다 끌 수 있다.
         // 항상 달리기를 켠 공격은 대상이 없거나 가까워도 전진하는 동안 보여준다.
         bool isFarAdvance = advanceDistance > _setting.AdvanceDistance;
-        Controller.SetLegRun(_setting.UseLegRun && (_setting.AlwaysLegRun || isFarAdvance) && advanceDistance > 0f);
+        Controller.Animation.SetLegRun(_setting.UseLegRun && (_setting.AlwaysLegRun || isFarAdvance) && advanceDistance > 0f);
         Controller.HorizontalVelocity = _advanceVelocity;
-        Controller.PlayAnimation(_animationHash, _setting.FadeTime);
+        Controller.Animation.Play(_animationHash, _setting.FadeTime);
     }
 
     public override void Exit()
     {
-        Controller.SetLegRun(false);
+        Controller.Animation.SetLegRun(false);
         Controller.Health.SetAttackInvincible(false);
     }
 
@@ -144,7 +144,7 @@ public class PlayerAttackState : PlayerState
                 break;
             case PlayerAnimationEventType.Hit:
             case PlayerAnimationEventType.Impact:
-                Controller.PerformHit(_type, _setting, isImpact: type == PlayerAnimationEventType.Impact);
+                Controller.AttackJudge.PerformHit(_type, _setting, isImpact: type == PlayerAnimationEventType.Impact);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 OnAttackMotionEnd();
@@ -183,7 +183,7 @@ public class PlayerAttackState : PlayerState
 
         if(_advanceTimer < _setting.AdvanceDuration) return _advanceVelocity;
 
-        Controller.SetLegRun(false);
+        Controller.Animation.SetLegRun(false);
         return Vector3.zero;
     }
 

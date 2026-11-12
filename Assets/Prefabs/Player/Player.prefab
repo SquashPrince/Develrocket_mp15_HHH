@@ -31846,6 +31846,8 @@ GameObject:
   - component: {fileID: 4745494404723644207}
   - component: {fileID: 1745635829274798527}
   - component: {fileID: 8756939034753121556}
+  - component: {fileID: 6695114068962537715}
+  - component: {fileID: 3495393291802485486}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -31907,7 +31909,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   _cameraTransform: {fileID: 0}
-  _animator: {fileID: 3735240450347513969}
   _walkSpeed: 5
   _runSpeed: 15
   _turnTime: 0.1
@@ -31921,7 +31922,12 @@ MonoBehaviour:
   _dashChainInterval: 0.25
   _dashInvincibleTime: 0.25
   _comboSteps:
-  - _energyGain: 1.25
+  - _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
+    _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
     _staggerLevel: 1
@@ -31935,7 +31941,12 @@ MonoBehaviour:
     _canDashCancel: 1
     _canUltimateCancel: 1
     _isInvincibleOnSwing: 0
-  - _energyGain: 1.25
+  - _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
+    _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
     _staggerLevel: 1
@@ -31949,7 +31960,12 @@ MonoBehaviour:
     _canDashCancel: 1
     _canUltimateCancel: 1
     _isInvincibleOnSwing: 0
-  - _energyGain: 1.25
+  - _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
+    _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
     _staggerLevel: 1
@@ -31963,7 +31979,12 @@ MonoBehaviour:
     _canDashCancel: 0
     _canUltimateCancel: 1
     _isInvincibleOnSwing: 1
-  - _energyGain: 1.25
+  - _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
+    _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
     _staggerLevel: 1
@@ -31978,6 +31999,11 @@ MonoBehaviour:
     _canUltimateCancel: 1
     _isInvincibleOnSwing: 0
   _heavyAttack:
+    _hitShape: 2
+    _hitCenter: {x: 0, y: 0, z: 0}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
@@ -31993,10 +32019,13 @@ MonoBehaviour:
     _canUltimateCancel: 1
     _isInvincibleOnSwing: 0
   _chargeTime: 0.6
-  _hitBoxCenter: {x: 0, y: 1, z: 0.5}
-  _hitBoxSize: {x: 1.5, y: 1.5, z: 1}
   _attackStopDistance: 1.2
   _dashAttack:
+    _hitShape: 1
+    _hitCenter: {x: 0, y: 1.5, z: 1}
+    _hitSize: {x: 0.5, y: 2, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
     _energyGain: 1.25
     _ultimateGaugeGain: 50
     _power: 10
@@ -32012,6 +32041,11 @@ MonoBehaviour:
     _canUltimateCancel: 1
     _isInvincibleOnSwing: 0
   _dodgeCounter:
+    _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
@@ -32027,6 +32061,11 @@ MonoBehaviour:
     _canUltimateCancel: 1
     _isInvincibleOnSwing: 1
   _skill:
+    _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
@@ -32042,6 +32081,11 @@ MonoBehaviour:
     _canUltimateCancel: 1
     _isInvincibleOnSwing: 0
   _specialSkill:
+    _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
@@ -32136,6 +32180,11 @@ MonoBehaviour:
   _reactDistance: 7.5
   _reactTime: 1
   _parryChase:
+    _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
     _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
@@ -32166,7 +32215,12 @@ MonoBehaviour:
   _parryGaugeGain: 300
   _perfectDodgeGaugeGain: 300
   _attackSteps:
-  - _energyGain: 5
+  - _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
+    _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
     _staggerLevel: 3
@@ -32180,7 +32234,12 @@ MonoBehaviour:
     _canDashCancel: 0
     _canUltimateCancel: 0
     _isInvincibleOnSwing: 1
-  - _energyGain: 5
+  - _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
+    _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
     _staggerLevel: 3
@@ -32207,10 +32266,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfb3bd9d0ab25fe4798d06e9599195fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTeleport
-  _distance: 1.5
+  _distance: 0
   _blockLayers:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 3072
+  _groundLayers:
+    serializedVersion: 2
+    m_Bits: 1024
+  _groundSearchHeight: 2
+  _groundSearchDepth: 2
 --- !u!114 &4745494404723644207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32224,7 +32288,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerComboSkill
   _chainSteps:
-  - _energyGain: 5
+  - _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
+    _energyGain: 5
     _ultimateGaugeGain: 50
     _power: 10
     _staggerLevel: 3
@@ -32238,7 +32307,8 @@ MonoBehaviour:
     _canDashCancel: 0
     _canUltimateCancel: 0
     _isInvincibleOnSwing: 1
-  _teleportDistance: 1.5
+  _sideAngleMin: 35
+  _sideAngleMax: 90
 --- !u!114 &1745635829274798527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32264,15 +32334,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputReader
   _isControlled: 1
-  _moveAction: {fileID: 0}
-  _dashAction: {fileID: 0}
-  _attackAction: {fileID: 0}
-  _skillAction: {fileID: 0}
-  _ultimateAction: {fileID: 0}
-  _parryPreviousAction: {fileID: 0}
+  _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _dashAction: {fileID: 504704208043311331, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _attackAction: {fileID: -2737370060291335809, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _skillAction: {fileID: -3361557722714098977, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _ultimateAction: {fileID: 6644543871057390047, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _parryPreviousAction: {fileID: -3882990654037931100, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _parryNextAction: {fileID: 3151153704128378850, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _lockOnAction: {fileID: 694580335105051867, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _groggyDebugAction: {fileID: 4882079035516688179, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+--- !u!114 &6695114068962537715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7306029376340620380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71725b71c6096174f8d05d148b2cf901, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAttackJudge
+  _defaultHitCenter: {x: 0, y: 1, z: 0.5}
+  _defaultHitSize: {x: 1.5, y: 1.5, z: 2}
+--- !u!114 &3495393291802485486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7306029376340620380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f538fe0b5a15bb4981458b950b29174, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
+  _animator: {fileID: 3735240450347513969}
 --- !u!1 &7306636993918616150
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,10 +2,34 @@ using System;
 using UnityEngine;
 
 // 공격 하나의 설정 묶음. 콤보 단계 · 강공격 · 스킬 · 특수스킬이 같은 형태로 Inspector 에서 값을 정한다.
+// 판정 범위 모양도 공격마다 정한다. (예: 내려 베기는 좌우가 좁은 상자, 회전 베기는 캐릭터 중심의 구)
 // MonoBehaviour 가 아닌 일반 클래스이므로 [Serializable] 을 붙여야 Inspector 에 펼쳐서 보인다.
 [Serializable]
 public class PlayerAttackSetting
 {
+    // 판정 범위 모양. 기본은 판정 기능에 있는 공통 상자를 쓴다.
+    // Inspector 에 저장된 값은 순서 번호이므로, 새 모양은 항상 맨 뒤에 추가한다.
+    public enum HitShape
+    {
+        Default,
+        Box,
+        Sphere,
+        Capsule
+    }
+
+    [Header("판정 범위")]
+    [Tooltip("기본 : 판정 기능의 공통 상자 / 상자 : 중심 · 크기 / 구 : 중심 · 반지름 / 캡슐 : 중심 · 반지름 · 길이 (캐릭터 앞쪽으로 긴 막대)")]
+    [SerializeField] private HitShape _hitShape = HitShape.Default;
+    [Tooltip("[상자 · 구 · 캡슐] 판정 범위의 중심 (캐릭터 기준 위치)")]
+    [SerializeField] private Vector3 _hitCenter = new Vector3(0f, 1f, 1f);
+    [Tooltip("[상자] 판정 상자의 크기 (좌우 · 위아래 · 앞뒤)")]
+    [SerializeField] private Vector3 _hitSize = new Vector3(1.5f, 1.5f, 2f);
+    [Tooltip("[구 · 캡슐] 반지름")]
+    [SerializeField, Min(0f)] private float _hitRadius = 1.5f;
+    [Tooltip("[캡슐] 캐릭터 앞쪽 방향으로의 전체 길이. 반지름의 두 배보다 짧으면 구와 같다")]
+    [SerializeField, Min(0f)] private float _hitLength = 3f;
+
+    [Header("수치 · 동작")]
     [Tooltip("적중한 적 하나마다 얻는 에너지")]
     [SerializeField, Min(0f)] private float _energyGain = 5f;
     [Tooltip("적중한 적 하나마다 얻는 필살기 게이지")]
@@ -35,6 +59,11 @@ public class PlayerAttackSetting
     [Tooltip("휘두르는 동안 적 공격에 맞지 않는지 여부. 회피하지 않아도 무적이며, 후딜에 들어가면 풀린다. 무적 중 들어온 노란 공격은 패링되지 않는다")]
     [SerializeField] private bool _isInvincibleOnSwing;
 
+    public HitShape Shape => _hitShape;
+    public Vector3 HitCenter => _hitCenter;
+    public Vector3 HitSize => _hitSize;
+    public float HitRadius => _hitRadius;
+    public float HitLength => _hitLength;
     public float EnergyGain => _energyGain;
     public float UltimateGaugeGain => _ultimateGaugeGain;
     public float Power => _power;
