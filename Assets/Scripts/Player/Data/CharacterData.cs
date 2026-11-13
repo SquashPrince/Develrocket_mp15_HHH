@@ -53,6 +53,8 @@ public class CharacterData : ScriptableObject
     [SerializeField] private ActionData _dodgeCounter;
 
     [Header("교체 · 패링")]
+    [Tooltip("패링(준비 · 반응) 액션. 지금은 순간 이동 옵션만 쓴다")]
+    [SerializeField] private ActionData _parry;
     [Tooltip("패링 반응 중 공격 입력으로 나가는 추격 공격. 시전 중 무적을 켜 두어야 기획대로 추격 중 무적이 된다")]
     [SerializeField] private ActionData _parryChase;
 
@@ -93,6 +95,7 @@ public class CharacterData : ScriptableObject
     public float AttackStopDistance => _attackStopDistance;
     public ActionData DashAttack => _dashAttack;
     public ActionData DodgeCounter => _dodgeCounter;
+    public ActionData Parry => _parry;
     public ActionData ParryChase => _parryChase;
     public ActionData Skill => _skill;
     public ActionData SpecialSkill => _specialSkill;

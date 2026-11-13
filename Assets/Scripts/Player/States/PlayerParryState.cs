@@ -39,7 +39,8 @@ public class PlayerParryState : PlayerState
         _phase = Phase.Ready;
         _timer = 0f;
 
-        _parry.TeleportToAttacker();
+        // 패링 액션의 순간 이동 옵션대로 고른 적 앞에 순간 이동한다. 도착 지점이 막혀 있으면 제자리에서 패링한다.
+        Controller.Teleport.TryTeleportTo(_parry.SelectedAttacker.transform, _parry.Action.Teleport);
         Controller.HorizontalVelocity = Vector3.zero;
         Controller.Animation.Play(READY_ANIMATION);
     }

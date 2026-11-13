@@ -1,22 +1,13 @@
 using UnityEngine;
 
-// 대상 앞으로 순간 이동한다. 패링 · 필살기 · 콤보 스킬이 같은 계산과 같은 간격을 함께 쓴다.
-// 콤보 스킬은 기준 방향에서 옆으로 비켜 선다(옆 각도). 파티 전투에서 남아 있는 캐릭터와 교체된 캐릭터가 같은 위치에서 콤보 스킬을 쓰지 않게 하되,
-// 적과의 거리는 같게 두어 모든 캐릭터의 사정거리를 하나로 맞추기 위해서다.
+// 대상 앞으로 순간 이동한다. 순간 이동 옵션이 붙은 액션(패링 · 필살기 · 콤보 스킬)이 같은 계산과 같은 간격을 함께 쓴다.
+// 어느 쪽에 설지 · 옆으로 얼마나 비켜 설지는 액션의 순간 이동 옵션(TeleportOption)이 정한다.
+// 옆으로 비켜 서도 적과의 거리는 같게 두어 모든 캐릭터의 사정거리를 하나로 맞춘다.
 // 실제로 다가가면 벽 등에 걸리기 때문에 위치를 바로 옮긴다. 도착 지점이 막혀 있으면 이동하지 않는다.
-// 어느 쪽에 설지는 부르는 쪽이 고른다.
-//   대상 정면 : 공격하는 적을 마주 보도록 적의 정면에 선다. (패링)
-//   플레이어 쪽 : 공격하지 않는 적은 플레이어를 보고 있지 않을 수 있어, 적에서 플레이어가 있던 쪽에 선다. (필살기 · 콤보 스킬)
 // 도착 높이는 도착 지점에서 찾은 바닥 높이를 쓴다. 바닥은 대상 높이를 기준으로 위 · 아래 정한 범위 안에서 찾는다.
 [RequireComponent(typeof(PlayerController), typeof(CharacterController))]
 public class PlayerTeleport : MonoBehaviour
 {
-    public enum Side
-    {
-        TargetFront,
-        PlayerSide
-    }
-
     [Tooltip("순간 이동할 때 대상 몸 표면과 플레이어 몸 표면 사이를 이 간격만큼 띄운다")]
     [SerializeField, Min(0f)] private float _distance = 1.5f;
     [Tooltip("순간 이동할 자리가 막혀 있는지 검사할 Layer. Player · Enemy 는 빼고 벽 · 지형만 넣는다")]
@@ -33,15 +24,25 @@ public class PlayerTeleport : MonoBehaviour
 
     private void Awake() => CacheComponent();
 
+    // 액션의 순간 이동 옵션대로 대상 앞에 순간 이동한다. 옵션이 비어 있으면(순간 이동하지 않는 액션) 이동하지 않고 false 를 돌려준다.
+    // 옆 각도는 부를 때마다 옵션의 범위 안에서 무작위로 정한다.
+    // 지금(1인)은 플레이어 쪽의 기준이 자기 위치다. 파티 전투에서는 기준을 남아 있는 캐릭터의 위치로 바꾼다.
+    public bool TryTeleportTo(Transform target, TeleportOption option)
+    {
+        if(option == null) return false;
+
+        return TryTeleportTo(target, option.StandSide, option.PickSideAngle());
+    }
+
     // 대상에서 side 쪽으로 정해진 간격만큼 떨어진 곳으로 순간 이동하고 대상 쪽을 본다.
     // 간격은 대상 몸 표면과 플레이어 몸 표면 사이다. 중심 사이 거리는 대상 반지름 + 플레이어 반지름 + 간격이다.
     //   중심에서 정한 거리만 띄우면 큰 적(보스)의 몸 안에 서게 되어, 겹침을 풀며 바닥 아래로 밀려나기 때문이다.
     // sideAngle : side 방향에서 대상 둘레로 비켜 설 각도(도, 위에서 볼 때 시계 방향이 +). 0 이면 side 방향 그대로다.
     // 도착 지점이 벽 · 지형에 겹치거나, 대상과 도착 지점 사이가 막혀 있으면 이동하지 않고 false 를 돌려준다.
-    public bool TryTeleportTo(Transform target, Side side, float sideAngle = 0f)
+    private bool TryTeleportTo(Transform target, TeleportOption.Side side, float sideAngle)
     {
         Vector3 targetPosition = target.position;
-        Vector3 direction = side == Side.TargetFront ? target.forward : transform.position - targetPosition;
+        Vector3 direction = side == TeleportOption.Side.TargetFront ? target.forward : transform.position - targetPosition;
         direction.y = 0f;
         direction = Quaternion.Euler(0f, sideAngle, 0f) * direction;
 

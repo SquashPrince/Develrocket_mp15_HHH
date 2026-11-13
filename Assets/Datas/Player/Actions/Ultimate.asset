@@ -43,3 +43,4 @@ MonoBehaviour:
   _canDashCancel: 0
   _canUltimateCancel: 0
   _isInvincibleOnSwing: 1
+  _teleport: {fileID: 11400000, guid: c555635f73488104bba4f75bacd32a01, type: 2}

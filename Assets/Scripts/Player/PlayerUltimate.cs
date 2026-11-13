@@ -4,15 +4,13 @@ using UnityEngine;
 // 공격 적중 획득량은 액션마다 액션 데이터에서, 최대치와 패링 성공 · 완벽 회피 획득량은 캐릭터 데이터에서 정한다.
 // 게이지가 가득 차 있고 현재 상태가 필살기를 허용할 때 필살기 키를 누르면 게이지를 전부 소모하고 필살기 상태로 넘긴다.
 // 현재 게이지는 Inspector 를 Debug 모드로 바꾸면 실시간으로 볼 수 있다.
-[RequireComponent(typeof(PlayerController), typeof(PlayerTeleport), typeof(PlayerTargeting))]
-[RequireComponent(typeof(PlayerInputReader))]
+[RequireComponent(typeof(PlayerController), typeof(PlayerTargeting), typeof(PlayerInputReader))]
 public class PlayerUltimate : MonoBehaviour
 {
-    [Tooltip("발동할 때 이 거리 안의 대상(록온 대상 우선, 없으면 자동 조준 대상)을 찾아 순간 이동한다")]
+    [Tooltip("발동할 때 이 거리 안의 대상(록온 대상 우선, 없으면 자동 조준 대상)을 찾는다. 필살기 액션에 순간 이동 옵션이 있으면 그 대상 앞으로 순간 이동한다")]
     [SerializeField, Min(0f)] private float _targetSearchRange = 10f;
 
     private PlayerController _controller;
-    private PlayerTeleport _teleport;
     private PlayerTargeting _targeting;
     private PlayerInputReader _input;
     private PlayerUltimateState _ultimateState;
@@ -47,17 +45,8 @@ public class PlayerUltimate : MonoBehaviour
 
     public void AddPerfectDodgeGauge() => AddGauge(_controller.Character.PerfectDodgeGaugeGain);
 
-    // 공격 대상 기준(록온 대상 → 찾는 거리 안의 자동 조준 대상)으로 대상을 고르고, 대상에서 플레이어 쪽에 순간 이동한다.
-    // 대상을 돌려준다. 대상이 없으면 null, 도착 지점이 막혀 있으면 이동하지 않고 대상만 돌려준다.
-    public IEnemyTargetable TeleportToTarget()
-    {
-        IEnemyTargetable target = _targeting.FindAttackTarget(_targetSearchRange);
-
-        if(target == null) return null;
-
-        _teleport.TryTeleportTo(target.transform, PlayerTeleport.Side.PlayerSide);
-        return target;
-    }
+    // 공격 대상 기준(록온 대상 → 찾는 거리 안의 자동 조준 대상)으로 필살기 대상을 고른다. 없으면 null 이다.
+    public IEnemyTargetable FindTarget() => _targeting.FindAttackTarget(_targetSearchRange);
 
     // 진행 중이던 강공격 차지는 상태를 넘길 때 끊긴다.
     private void TryStartUltimate()
@@ -77,7 +66,6 @@ public class PlayerUltimate : MonoBehaviour
     private void CacheComponent()
     {
         _controller = GetComponent<PlayerController>();
-        _teleport = GetComponent<PlayerTeleport>();
         _targeting = GetComponent<PlayerTargeting>();
         _input = GetComponent<PlayerInputReader>();
     }

@@ -44,7 +44,10 @@ public class PlayerUltimateState : PlayerState
         Controller.Status.SetAttackInvincible(true);
 
         // 공격 단계마다 다가갈 대상을 발동 때 정해 두어, 단계 사이에 자동 조준 대상이 바뀌지 않게 한다.
-        _target = _ultimate.TeleportToTarget();
+        // 필살기 액션의 순간 이동 옵션대로 대상 앞에 순간 이동한다. 대상이 없거나 막혀 있으면 제자리에서 쓴다.
+        _target = _ultimate.FindTarget();
+
+        if(_target != null) Controller.Teleport.TryTeleportTo(_target.transform, _ultimate.Action.Teleport);
 
         Controller.HorizontalVelocity = Vector3.zero;
         Controller.Animation.Play(CUTSCENE_ANIMATION);

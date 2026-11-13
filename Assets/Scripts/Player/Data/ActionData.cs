@@ -4,6 +4,7 @@ using UnityEngine;
 // 액션마다 에셋 하나를 만들고, 캐릭터는 자기 액션 에셋을 참조한다. 같은 값을 여러 캐릭터 · 여러 자리에서 다시 쓸 수 있다.
 // 액션은 동작 목록을 가진다. 1개면 한 동작만, 여러 개면 순서대로 이어 재생한다. (예: 필살기 난무 2동작)
 // 동작마다 재생할 상태 · 판정 범위 · 전진이 다르고, 위력 · 경직 · 게이지 · 캔슬 · 무적 같은 타격 값은 액션 공통이다.
+// 일부 액션에만 붙는 기능은 추가 옵션(옵션 에셋 참조)으로 붙인다. 비워 두면 그 기능을 쓰지 않는다. (예: 순간 이동)
 // 카메라 워크 · Timeline 같은 연출 참조와 시네마틱 이동(경로 이동)은 연출 작업 때 이 에셋에 추가한다.
 [CreateAssetMenu(fileName = "NewActionData", menuName = "HHH/Action Data")]
 public class ActionData : ScriptableObject
@@ -54,6 +55,10 @@ public class ActionData : ScriptableObject
     [Tooltip("휘두르는 동안 적 공격에 맞지 않는지 여부. 회피하지 않아도 무적이며, 후딜에 들어가면 풀린다. 무적 중 들어온 노란 공격은 패링되지 않는다")]
     [SerializeField] private bool _isInvincibleOnSwing;
 
+    [Header("추가 옵션")]
+    [Tooltip("액션을 시작할 때 대상 앞으로 순간 이동하는 옵션. 비워 두면 순간 이동하지 않는다")]
+    [SerializeField] private TeleportOption _teleport;
+
     public ActionType Type => _actionType;
     public int StepCount => _steps.Length;
     public float EnergyGain => _energyGain;
@@ -67,6 +72,7 @@ public class ActionData : ScriptableObject
     public bool CanDashCancel => _canDashCancel;
     public bool CanUltimateCancel => _canUltimateCancel;
     public bool IsInvincibleOnSwing => _isInvincibleOnSwing;
+    public TeleportOption Teleport => _teleport;
 
     // index : 동작 번호(0부터)
     public ActionStep GetStep(int index) => _steps[index];

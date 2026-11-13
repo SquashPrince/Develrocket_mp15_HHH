@@ -4,10 +4,10 @@ using UnityEngine;
 // 코어 전투에서는 이전 · 다음 캐릭터 키 모두 현재 캐릭터가 직접 패링한다. 교체 방향 구분은 파티 전투 단계에서 한다.
 // 이미 패링 중이거나, 시전 중 무적인 공격(패링 추격 · 필살기 포함) 중이면 입력을 무시한다.
 // 패링 가능 시간 밖이거나 록온 사거리 밖의 적만 연 경우의 입력도 무시한다. 파티 전투에서는 이 입력이 그냥 교체가 된다.
-// 패링을 시작하면 패링 공격을 하는 적 앞으로 순간 이동한다. 실제로 이동하면 벽 등에 걸리기 때문이다. 도착 지점이 막혀 있으면 제자리에서 패링한다.
+// 패링을 시작하면 패링 액션의 순간 이동 옵션대로 패링 공격을 하는 적 앞으로 순간 이동한다. 실제로 이동하면 벽 등에 걸리기 때문이다. 도착 지점이 막혀 있으면 제자리에서 패링한다.
 // 패링 공격을 하는 적이 여럿이면 공격 대상 기준(록온 대상 → 자동 조준 대상)을 따르고, 둘 다 아니면 록온 사거리 안에서 가장 최근에 예고를 시작한 적을 고른다.
-[RequireComponent(typeof(PlayerController), typeof(PlayerTeleport), typeof(PlayerTargeting))]
-[RequireComponent(typeof(PlayerUltimate), typeof(PlayerInputReader))]
+[RequireComponent(typeof(PlayerController), typeof(PlayerTargeting), typeof(PlayerUltimate))]
+[RequireComponent(typeof(PlayerInputReader))]
 public class PlayerParry : MonoBehaviour
 {
     [Header("패링")]
@@ -19,7 +19,6 @@ public class PlayerParry : MonoBehaviour
     [SerializeField, Min(0.01f)] private float _reactTime = 1f;
 
     private PlayerController _controller;
-    private PlayerTeleport _teleport;
     private PlayerTargeting _targeting;
     private PlayerUltimate _ultimate;
     private PlayerInputReader _input;
@@ -30,7 +29,10 @@ public class PlayerParry : MonoBehaviour
     public float ReadyTime => _readyTime;
     public float ReactDistance => _reactDistance;
     public float ReactTime => _reactTime;
+    public ActionData Action => _controller.Character.Parry;
     public ActionData ParryChase => _controller.Character.ParryChase;
+    // 패링 키를 누른 순간 고른 패링 대상. 적은 예고를 시작할 때 플레이어 쪽으로 돌기 때문에, 이 적의 정면은 플레이어가 있던 쪽이다.
+    public IEnemyParryable SelectedAttacker => _selectedAttacker;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -53,14 +55,6 @@ public class PlayerParry : MonoBehaviour
         attacker.transform.TryGetComponent(out IEnemyTargetable parriedTarget);
         _parryState.OnParrySuccess(parriedTarget);
         return true;
-    }
-
-    // 패링 키를 누른 순간 고른 적의 정면, 순간 이동 기능의 거리만큼 떨어진 곳으로 순간 이동하고 적 쪽을 본다.
-    // 적은 예고를 시작할 때 플레이어 쪽으로 돌기 때문에, 적의 정면은 플레이어가 있던 쪽이다.
-    // 도착 지점이 막혀 있으면 이동하지 않고 제자리에서 패링한다.
-    public void TeleportToAttacker()
-    {
-        _teleport.TryTeleportTo(_selectedAttacker.transform, PlayerTeleport.Side.TargetFront);
     }
 
     // 록온 사거리 안에서 패링 가능 시간을 연 적 중 공격 대상 기준으로 고른다. 록온 대상 → 자동 조준 대상 → 가장 최근에 예고를 시작한 적 순서다.
@@ -95,6 +89,16 @@ public class PlayerParry : MonoBehaviour
         if(!_input.WasParryPressed) return;
         if(_parryState.IsActive || _controller.Status.IsAttackInvincible) return;
 
+        // 패링 액션이 연결되지 않았으면 패링을 시작하지 않는다. 상태에 들어간 뒤 멈추면 준비 모션 없이 패링 판정만 켜져,
+        // 준비 성공 → 반응 → 추격 순서가 깨지기 때문이다. 상태가 바뀌기 전에 막아 진행 중이던 동작도 끊지 않는다.
+        if(Action == null)
+        {
+#if UNITY_EDITOR
+            Debug.LogWarning($"[패링] {_controller.Character.name} 의 패링 액션이 비어 있어 패링하지 않는다");
+#endif
+            return;
+        }
+
         _selectedAttacker = SelectAttacker();
 
         if(_selectedAttacker == null) return;
@@ -105,7 +109,6 @@ public class PlayerParry : MonoBehaviour
     private void CacheComponent()
     {
         _controller = GetComponent<PlayerController>();
-        _teleport = GetComponent<PlayerTeleport>();
         _targeting = GetComponent<PlayerTargeting>();
         _ultimate = GetComponent<PlayerUltimate>();
         _input = GetComponent<PlayerInputReader>();

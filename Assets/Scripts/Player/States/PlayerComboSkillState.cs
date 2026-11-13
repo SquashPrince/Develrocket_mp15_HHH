@@ -57,7 +57,8 @@ public class PlayerComboSkillState : PlayerState
         Controller.Status.EndInvincible();
         Controller.Status.SetAttackInvincible(true);
 
-        _comboSkill.TeleportToTarget(_target);
+        // 콤보 스킬 액션의 순간 이동 옵션대로 대상 둘레로 비켜 선 곳에 순간 이동한다. 막혀 있으면 제자리에 있는다.
+        Controller.Teleport.TryTeleportTo(_target.transform, _comboSkill.Action.Teleport);
         StartChain();
     }
 
