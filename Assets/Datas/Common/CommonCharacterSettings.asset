@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f378e03f84f1b64489b73e88c4479f2, type: 3}
+  m_Name: CommonCharacterSettings
+  m_EditorClassIdentifier: Assembly-CSharp::CommonCharacterSettings
+  _gravity: -20
+  _attackRange: 15
+  _lockOnRange: 20
+  _obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 3072
+  _sightHeight: 1.2
+  _lockOnMarkerPrefab: {fileID: 6668375599957286743, guid: 86d476e8f4ecd2443bf6651d8d833efc, type: 3}
+  _teleportDistance: 0
+  _teleportBlockLayers:
+    serializedVersion: 2
+    m_Bits: 3072
+  _teleportGroundLayers:
+    serializedVersion: 2
+    m_Bits: 1024
+  _groundSearchHeight: 2
+  _groundSearchDepth: 2
+  _slowMotionDuration: 1
+  _slowMotionEnemyTimeScale: 0.5
+  _slowMotionMarkerPrefab: {fileID: 4365308044123951882, guid: ab2927bfddf64e34c8a41ba60305abf6, type: 3}
+  _parryReadyTime: 1
+  _parryReactDistance: 7.5
+  _parryReactTime: 1
+  _ultimateTargetSearchRange: 10
+  _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _dashAction: {fileID: 504704208043311331, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _attackAction: {fileID: -2737370060291335809, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _skillAction: {fileID: -3361557722714098977, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _ultimateAction: {fileID: 6644543871057390047, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _parryPreviousAction: {fileID: -3882990654037931100, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _parryNextAction: {fileID: 3151153704128378850, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _lockOnAction: {fileID: 694580335105051867, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _groggyDebugAction: {fileID: 4882079035516688179, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}

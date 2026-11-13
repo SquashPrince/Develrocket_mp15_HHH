@@ -31909,7 +31909,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   _cameraTransform: {fileID: 0}
   _character: {fileID: 11400000, guid: b26c4d85624b42cd8b510949bee0b4a0, type: 2}
-  _gravity: -20
+  _common: {fileID: 11400000, guid: ef69c664edeb2f1449529a56f5024eba, type: 2}
 --- !u!114 &7492969571146502241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31923,13 +31923,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTargeting
   _cameraTransform: {fileID: 0}
-  _lockOnMarker: {fileID: 0}
-  _attackRange: 15
-  _lockOnRange: 20
-  _obstacleLayers:
-    serializedVersion: 2
-    m_Bits: 3072
-  _sightHeight: 1.2
   _markerHeight: 2.5
 --- !u!114 &7823694639924144761
 MonoBehaviour:
@@ -31955,9 +31948,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d53ac335d93bf30439db97d31415e33d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSlowMotion
-  _duration: 1
-  _enemyTimeScale: 0.5
-  _markerPrefab: {fileID: 0}
 --- !u!114 &8916903027818413115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31970,9 +31960,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c5c3423283ad6d4d8217bddd6748ef8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerParry
-  _readyTime: 1
-  _reactDistance: 7.5
-  _reactTime: 1
 --- !u!114 &8149544136973105350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31985,7 +31972,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be4363cba63a79148ae22a88d3645ada, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerUltimate
-  _targetSearchRange: 10
 --- !u!114 &3235283595720457195
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31998,15 +31984,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfb3bd9d0ab25fe4798d06e9599195fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTeleport
-  _distance: 0
-  _blockLayers:
-    serializedVersion: 2
-    m_Bits: 3072
-  _groundLayers:
-    serializedVersion: 2
-    m_Bits: 1024
-  _groundSearchHeight: 2
-  _groundSearchDepth: 2
 --- !u!114 &4745494404723644207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32044,15 +32021,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputReader
   _isControlled: 1
-  _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _dashAction: {fileID: 504704208043311331, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _attackAction: {fileID: -2737370060291335809, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _skillAction: {fileID: -3361557722714098977, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _ultimateAction: {fileID: 6644543871057390047, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _parryPreviousAction: {fileID: -3882990654037931100, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _parryNextAction: {fileID: 3151153704128378850, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _lockOnAction: {fileID: 694580335105051867, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _groggyDebugAction: {fileID: 4882079035516688179, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
 --- !u!114 &6695114068962537715
 MonoBehaviour:
   m_ObjectHideFlags: 0

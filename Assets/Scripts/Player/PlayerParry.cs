@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// 패링 입력과 수치. 록온 사거리 안의 적이 패링 가능 시간을 열었을 때 패링 키를 누르면 어느 상태에서든 패링 상태로 넘긴다.
+// 패링 입력과 대상 고르기 · 성공 처리. 준비 · 반응 수치는 공통 설정에서 읽는다. 록온 사거리 안의 적이 패링 가능 시간을 열었을 때 패링 키를 누르면 어느 상태에서든 패링 상태로 넘긴다.
 // 코어 전투에서는 이전 · 다음 캐릭터 키 모두 현재 캐릭터가 직접 패링한다. 교체 방향 구분은 파티 전투 단계에서 한다.
 // 이미 패링 중이거나, 시전 중 무적인 공격(패링 추격 · 필살기 포함) 중이면 입력을 무시한다.
 // 패링 가능 시간 밖이거나 록온 사거리 밖의 적만 연 경우의 입력도 무시한다. 파티 전투에서는 이 입력이 그냥 교체가 된다.
@@ -9,14 +9,6 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerController), typeof(PlayerTargeting), typeof(PlayerInputReader))]
 public class PlayerParry : MonoBehaviour
 {
-    [Header("패링")]
-    [Tooltip("패링 준비 자세를 유지하는 시간(초). 적 공격이 끊겨도 끝까지 유지한다")]
-    [SerializeField, Min(0.01f)] private float _readyTime = 1f;
-    [Tooltip("패링 성공 후 공격 반대 방향으로 밀려나는 거리")]
-    [SerializeField, Min(0f)] private float _reactDistance = 2f;
-    [Tooltip("패링 성공 후 반응 시간(초). 이 시간에 걸쳐 점점 느려지며 밀려나고, 이 동안 닿은 노란 공격은 자동으로 패링된다. 이 동안 공격 키를 누르면 끝난 뒤 추격 공격이 나간다")]
-    [SerializeField, Min(0.01f)] private float _reactTime = 1f;
-
     private PlayerController _controller;
     private PlayerTargeting _targeting;
     private PlayerInputReader _input;
@@ -24,9 +16,10 @@ public class PlayerParry : MonoBehaviour
     // 패링 키를 누른 순간 고른 패링 대상. 패링 상태에 들어가며 이 적 앞으로 순간 이동한다.
     private IEnemyParryable _selectedAttacker;
 
-    public float ReadyTime => _readyTime;
-    public float ReactDistance => _reactDistance;
-    public float ReactTime => _reactTime;
+    // 준비 · 반응 시간과 반응 거리는 모든 캐릭터가 같이 쓰는 공통 설정에서 읽는다.
+    public float ReadyTime => _controller.Common.ParryReadyTime;
+    public float ReactDistance => _controller.Common.ParryReactDistance;
+    public float ReactTime => _controller.Common.ParryReactTime;
     public ActionData Action => _controller.Character.Parry;
     public ActionData ParryChase => _controller.Character.ParryChase;
     // 패링 키를 누른 순간 고른 패링 대상. 적은 예고를 시작할 때 플레이어 쪽으로 돌기 때문에, 이 적의 정면은 플레이어가 있던 쪽이다.

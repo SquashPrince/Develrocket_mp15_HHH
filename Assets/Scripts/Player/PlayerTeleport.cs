@@ -8,19 +8,11 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerController), typeof(CharacterController))]
 public class PlayerTeleport : MonoBehaviour
 {
-    [Tooltip("순간 이동할 때 대상 몸 표면과 플레이어 몸 표면 사이를 이 간격만큼 띄운다")]
-    [SerializeField, Min(0f)] private float _distance = 1.5f;
-    [Tooltip("순간 이동할 자리가 막혀 있는지 검사할 Layer. Player · Enemy 는 빼고 벽 · 지형만 넣는다")]
-    [SerializeField] private LayerMask _blockLayers = 1;
-    [Tooltip("도착 지점의 바닥을 찾을 Layer. 바닥 · 지형 Layer 를 넣는다")]
-    [SerializeField] private LayerMask _groundLayers = 1;
-    [Tooltip("대상 높이에서 이 높이만큼 위에서부터 바닥을 찾기 시작한다. 너무 크면 위층 바닥이나 지붕을 바닥으로 찾을 수 있다")]
-    [SerializeField, Min(0f)] private float _groundSearchHeight = 2f;
-    [Tooltip("대상 높이에서 이 깊이만큼 아래까지 바닥을 찾는다. 이 안에 바닥이 없으면 순간 이동하지 않는다")]
-    [SerializeField, Min(0f)] private float _groundSearchDepth = 2f;
-
     private PlayerController _controller;
     private CharacterController _characterController;
+
+    // 간격 · Layer · 바닥 찾는 범위는 모든 캐릭터가 같이 쓰는 공통 설정에서 읽는다.
+    private CommonCharacterSettings Common => _controller.Common;
 
     private void Awake() => CacheComponent();
 
@@ -46,7 +38,7 @@ public class PlayerTeleport : MonoBehaviour
         direction.y = 0f;
         direction = Quaternion.Euler(0f, sideAngle, 0f) * direction;
 
-        float distance = GetHorizontalRadius(target) + _characterController.radius + _distance;
+        float distance = GetHorizontalRadius(target) + _characterController.radius + Common.TeleportDistance;
         Vector3 destination = targetPosition + direction.normalized * distance;
 
         if(!TrySnapToGround(ref destination) || IsBlocked(targetPosition, destination)) return false;
@@ -79,9 +71,9 @@ public class PlayerTeleport : MonoBehaviour
     // 찾는 범위는 대상 높이 기준 위 · 아래로 정한 만큼이다. 범위 안에 바닥이 없으면 순간 이동하지 않는다.
     private bool TrySnapToGround(ref Vector3 destination)
     {
-        Vector3 origin = destination + Vector3.up * _groundSearchHeight;
+        Vector3 origin = destination + Vector3.up * Common.GroundSearchHeight;
 
-        if(!Physics.Raycast(origin, Vector3.down, out RaycastHit hit, _groundSearchHeight + _groundSearchDepth, _groundLayers, QueryTriggerInteraction.Ignore)) return false;
+        if(!Physics.Raycast(origin, Vector3.down, out RaycastHit hit, Common.GroundSearchHeight + Common.GroundSearchDepth, Common.TeleportGroundLayers, QueryTriggerInteraction.Ignore)) return false;
 
         destination.y = hit.point.y;
         return true;
@@ -96,9 +88,9 @@ public class PlayerTeleport : MonoBehaviour
         Vector3 bottom = center - Vector3.up * halfHeight;
         Vector3 top = center + Vector3.up * halfHeight;
 
-        if(Physics.CheckCapsule(bottom, top, _characterController.radius, _blockLayers, QueryTriggerInteraction.Ignore)) return true;
+        if(Physics.CheckCapsule(bottom, top, _characterController.radius, Common.TeleportBlockLayers, QueryTriggerInteraction.Ignore)) return true;
 
-        return Physics.Linecast(targetPosition + _characterController.center, center, _blockLayers, QueryTriggerInteraction.Ignore);
+        return Physics.Linecast(targetPosition + _characterController.center, center, Common.TeleportBlockLayers, QueryTriggerInteraction.Ignore);
     }
 
     private void CacheComponent()

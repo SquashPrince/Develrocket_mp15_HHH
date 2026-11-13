@@ -5,9 +5,6 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerController), typeof(PlayerTargeting), typeof(PlayerInputReader))]
 public class PlayerUltimate : MonoBehaviour
 {
-    [Tooltip("발동할 때 이 거리 안의 대상(록온 대상 우선, 없으면 자동 조준 대상)을 찾는다. 필살기 액션에 순간 이동 옵션이 있으면 그 대상 앞으로 순간 이동한다")]
-    [SerializeField, Min(0f)] private float _targetSearchRange = 10f;
-
     private PlayerController _controller;
     private PlayerTargeting _targeting;
     private PlayerInputReader _input;
@@ -19,8 +16,8 @@ public class PlayerUltimate : MonoBehaviour
     private void Start() => Init();
     private void Update() => TryStartUltimate();
 
-    // 공격 대상 기준(록온 대상 → 찾는 거리 안의 자동 조준 대상)으로 필살기 대상을 고른다. 없으면 null 이다.
-    public IEnemyTargetable FindTarget() => _targeting.FindAttackTarget(_targetSearchRange);
+    // 공격 대상 기준(록온 대상 → 공통 설정의 찾는 거리 안의 자동 조준 대상)으로 필살기 대상을 고른다. 없으면 null 이다.
+    public IEnemyTargetable FindTarget() => _targeting.FindAttackTarget(_controller.Common.UltimateTargetSearchRange);
 
     // 진행 중이던 강공격 차지는 상태를 넘길 때 끊긴다.
     private void TryStartUltimate()
