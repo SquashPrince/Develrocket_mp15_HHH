@@ -18,16 +18,16 @@ public class PlayerParryState : PlayerState
         React
     }
 
-    private readonly PlayerParry _parry;
+    private readonly PlayerActionTrigger _trigger;
     private IEnemyTargetable _parriedTarget;
     private Vector3 _awayDirection;
     private Phase _phase;
     private float _timer;
     private bool _hasChaseInput;
 
-    public PlayerParryState(PlayerController controller, PlayerParry parry) : base(controller)
+    public PlayerParryState(PlayerController controller, PlayerActionTrigger trigger) : base(controller)
     {
-        _parry = parry;
+        _trigger = trigger;
     }
 
     // 패링 준비 · 반응 중인지. 이 동안 닿은 노란 공격은 패링된다.
@@ -40,7 +40,7 @@ public class PlayerParryState : PlayerState
         _timer = 0f;
 
         // 패링 액션의 순간 이동 옵션대로 고른 적 앞에 순간 이동한다. 도착 지점이 막혀 있으면 제자리에서 패링한다.
-        Controller.Teleport.TryTeleportTo(_parry.SelectedAttacker.transform, _parry.Action.Teleport);
+        TeleportManager.TryTeleportTo(Controller, _trigger.SelectedParryAttacker.transform, _trigger.ParryAction.Teleport);
         Controller.HorizontalVelocity = Vector3.zero;
         Controller.Animation.Play(READY_ANIMATION);
     }
@@ -79,14 +79,14 @@ public class PlayerParryState : PlayerState
     {
         Controller.HorizontalVelocity = Vector3.zero;
 
-        if(_timer >= _parry.ReadyTime) Controller.EnterLocomotion(false);
+        if(_timer >= _trigger.ParryReadyTime) Controller.EnterLocomotion(false);
     }
 
     private void UpdateReact()
     {
         if(Controller.WasAttackPressed) _hasChaseInput = true;
 
-        if(_timer < _parry.ReactTime)
+        if(_timer < _trigger.ParryReactTime)
         {
             Controller.HorizontalVelocity = _awayDirection * GetPushSpeed();
             return;
@@ -94,7 +94,7 @@ public class PlayerParryState : PlayerState
 
         Controller.HorizontalVelocity = Vector3.zero;
 
-        if(_hasChaseInput) Controller.StartAttack(PlayerAttackState.AttackType.ParryChase, _parry.ParryChase, _parriedTarget);
+        if(_hasChaseInput) Controller.StartAttack(PlayerAttackState.AttackType.ParryChase, _trigger.ParryChaseAction, _parriedTarget);
         else Controller.EnterLocomotion(false);
     }
 
@@ -103,8 +103,8 @@ public class PlayerParryState : PlayerState
     // Lerp 는 t 를 0 ~ 1 로 자르므로 반응 시간이 지나면 0 이 된다.
     private float GetPushSpeed()
     {
-        float startSpeed = 2f * _parry.ReactDistance / _parry.ReactTime;
-        float t = _timer / _parry.ReactTime;
+        float startSpeed = 2f * _trigger.ParryReactDistance / _trigger.ParryReactTime;
+        float t = _timer / _trigger.ParryReactTime;
 
         return Mathf.Lerp(startSpeed, 0f, t);
     }

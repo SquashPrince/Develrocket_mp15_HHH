@@ -14,7 +14,7 @@ public class PlayerUltimateState : PlayerState
 
     private static readonly int CUTSCENE_ANIMATION = Animator.StringToHash("UltimateCutscene");
 
-    private readonly PlayerUltimate _ultimate;
+    private readonly PlayerActionTrigger _trigger;
     private IEnemyTargetable _target;
     private Vector3 _advanceVelocity;
     private float _advanceTimer;
@@ -22,9 +22,9 @@ public class PlayerUltimateState : PlayerState
     private int _step;
     private int _animationHash;
 
-    public PlayerUltimateState(PlayerController controller, PlayerUltimate ultimate) : base(controller)
+    public PlayerUltimateState(PlayerController controller, PlayerActionTrigger trigger) : base(controller)
     {
-        _ultimate = ultimate;
+        _trigger = trigger;
     }
 
     public override void Enter()
@@ -45,9 +45,9 @@ public class PlayerUltimateState : PlayerState
 
         // 공격 단계마다 다가갈 대상을 발동 때 정해 두어, 단계 사이에 자동 조준 대상이 바뀌지 않게 한다.
         // 필살기 액션의 순간 이동 옵션대로 대상 앞에 순간 이동한다. 대상이 없거나 막혀 있으면 제자리에서 쓴다.
-        _target = _ultimate.FindTarget();
+        _target = _trigger.FindUltimateTarget();
 
-        if(_target != null) Controller.Teleport.TryTeleportTo(_target.transform, _ultimate.Action.Teleport);
+        if(_target != null) TeleportManager.TryTeleportTo(Controller, _target.transform, _trigger.UltimateAction.Teleport);
 
         Controller.HorizontalVelocity = Vector3.zero;
         Controller.Animation.Play(CUTSCENE_ANIMATION);
@@ -71,7 +71,7 @@ public class PlayerUltimateState : PlayerState
         {
             case PlayerAnimationEventType.Hit:
             case PlayerAnimationEventType.Impact:
-                if(_step != CUTSCENE_STEP) Controller.AttackJudge.PerformHit(PlayerAttackState.AttackType.Ultimate, _ultimate.Action, _ultimate.Action.GetStep(_step), type == PlayerAnimationEventType.Impact);
+                if(_step != CUTSCENE_STEP) Controller.AttackJudge.PerformHit(PlayerAttackState.AttackType.Ultimate, _trigger.UltimateAction, _trigger.UltimateAction.GetStep(_step), type == PlayerAnimationEventType.Impact);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();
@@ -86,13 +86,13 @@ public class PlayerUltimateState : PlayerState
 
         _step++;
 
-        if(_step >= _ultimate.Action.StepCount)
+        if(_step >= _trigger.UltimateAction.StepCount)
         {
             Controller.EnterLocomotion(false);
             return;
         }
 
-        ActionStep step = _ultimate.Action.GetStep(_step);
+        ActionStep step = _trigger.UltimateAction.GetStep(_step);
 
         // 발동 때 정한 대상 쪽으로 돌아 대상 앞 정지 거리까지, 단계의 전진 시간 동안 다가간다. 도중에 록온이 바뀌어도 대상은 그대로다.
         float advanceDistance = Controller.AimFixedTarget(step, _target);

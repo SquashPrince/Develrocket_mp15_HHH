@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // 액션 데이터에 붙이는 순간 이동 옵션. 이 옵션이 붙은 액션은 시작할 때 대상 앞으로 순간 이동한다. (패링 · 필살기 · 콤보 스킬)
-// 대상과의 간격 · 바닥 찾기 같은 계산은 순간 이동 기능(PlayerTeleport)이 맡고, 이 옵션은 어느 쪽에 설지만 정한다.
+// 대상과의 간격 · 바닥 찾기 같은 계산은 순간 이동 규칙(TeleportManager)이 맡고, 이 옵션은 어느 쪽에 설지만 정한다.
 // 같은 옵션 에셋을 여러 액션이 함께 쓸 수 있다.
 [CreateAssetMenu(fileName = "NewTeleportOption", menuName = "HHH/Teleport Option")]
 public class TeleportOption : ScriptableObject

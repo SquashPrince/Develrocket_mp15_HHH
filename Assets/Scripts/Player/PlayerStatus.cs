@@ -12,7 +12,7 @@ public class PlayerStatus : MonoBehaviour
 {
     private PlayerController _controller;
     private PlayerSlowMotion _slowMotion;
-    private PlayerParry _parry;
+    private PlayerActionTrigger _actionTrigger;
     private float _currentHealth;
     private float _currentEnergy;
     private float _currentUltimateGauge;
@@ -75,7 +75,7 @@ public class PlayerStatus : MonoBehaviour
     public bool TakeHit(EnemyAttackSetting attack, IEnemyParryable attacker)
     {
         if(TryPerfectDodge(attack)) return false;
-        if(_parry.TryParry(attack, attacker)) return false;
+        if(_actionTrigger.TryParry(attack, attacker)) return false;
 
         if(IsInvincible)
         {
@@ -158,7 +158,7 @@ public class PlayerStatus : MonoBehaviour
     {
         _controller = GetComponent<PlayerController>();
         _slowMotion = GetComponent<PlayerSlowMotion>();
-        _parry = GetComponent<PlayerParry>();
+        _actionTrigger = GetComponent<PlayerActionTrigger>();
     }
 
     private void Init()

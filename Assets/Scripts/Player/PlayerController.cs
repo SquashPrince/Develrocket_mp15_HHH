@@ -2,13 +2,12 @@ using UnityEngine;
 
 // 플레이어의 상태 전환과 이동 · 대시 스택 · 콤보 · 차지 · 스킬 분기 · 중력을 맡는다. 캐릭터별 수치 · 액션은 캐릭터 데이터(CharacterData)에서 읽고, 다른 기능도 이 클래스를 통해 같은 캐릭터 데이터를 꺼내 쓴다.
 // 모든 캐릭터가 같이 쓰는 규칙 값 · 입력은 공통 설정(CommonCharacterSettings)에 있고, 다른 기능도 이 클래스를 통해 꺼내 쓴다.
-// 입력은 입력 기능, 타격 판정은 판정 기능, Animator 제어는 애니메이션 기능, 순간 이동은 순간 이동 기능이 맡고, 상태 클래스는 이 클래스를 통해 그 기능들을 꺼내 쓴다.
+// 입력은 입력 기능, 타격 판정은 판정 기능, Animator 제어는 애니메이션 기능, 순간 이동은 순간 이동 규칙(TeleportManager)이 맡고, 상태 클래스는 이 클래스를 통해 그 기능들을 꺼내 쓴다.
 // 실제 동작은 상태 클래스(이동 · 대시 · 공격 · 피격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController), typeof(PlayerTargeting))]
-[RequireComponent(typeof(PlayerStatus), typeof(PlayerSlowMotion), typeof(PlayerParry))]
-[RequireComponent(typeof(PlayerUltimate), typeof(PlayerComboSkill), typeof(PlayerInputReader))]
-[RequireComponent(typeof(PlayerAttackJudge), typeof(PlayerAnimation), typeof(PlayerTeleport))]
+[RequireComponent(typeof(PlayerStatus), typeof(PlayerSlowMotion), typeof(PlayerActionTrigger))]
+[RequireComponent(typeof(PlayerInputReader), typeof(PlayerAttackJudge), typeof(PlayerAnimation))]
 public class PlayerController : MonoBehaviour
 {
     private const int MAX_DASH_STACK = 2;
@@ -50,7 +49,8 @@ public class PlayerController : MonoBehaviour
     public PlayerStatus Status { get; private set; }
     public PlayerAttackJudge AttackJudge { get; private set; }
     public PlayerAnimation Animation { get; private set; }
-    public PlayerTeleport Teleport { get; private set; }
+    // 캐릭터 몸(CharacterController). 순간 이동 규칙이 몸 크기를 재고 위치를 옮길 때 쓴다.
+    public CharacterController Body => _characterController;
     public bool WasDashPressed => _input.WasDashPressed;
     public bool WasAttackPressed => _input.WasAttackPressed;
     public bool WasSkillPressed => _input.WasSkillPressed;
@@ -305,7 +305,6 @@ public class PlayerController : MonoBehaviour
         _slowMotion = GetComponent<PlayerSlowMotion>();
         AttackJudge = GetComponent<PlayerAttackJudge>();
         Animation = GetComponent<PlayerAnimation>();
-        Teleport = GetComponent<PlayerTeleport>();
         Status = GetComponent<PlayerStatus>();
     }
 
