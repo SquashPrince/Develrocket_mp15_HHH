@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 704d3d9974da3fe47a72125690715b6e, type: 3}
-  m_Name: ComboSkill
+  m_Name: Ultimate
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
-  _actionType: 8
+  _actionType: 7
   _steps:
-  - _animationState: ComboSkill
+  - _animationState: Ultimate 1
     _hitShape: 0
     _hitCenter: {x: 0, y: 1, z: 1}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
@@ -23,14 +23,24 @@ MonoBehaviour:
     _advanceDistance: 6
     _advanceDuration: 4
     _fadeTime: 0.1
+  - _animationState: Ultimate 2
+    _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 1.5
+    _hitLength: 3
+    _advanceDistance: 4
+    _advanceDuration: 2
+    _fadeTime: 0.1
   _energyGain: 5
   _ultimateGaugeGain: 50
   _power: 10
   _staggerLevel: 3
-  _staggerTime: 1
+  _staggerTime: 1.5
   _inputBuffer: 0.4
   _useLegRun: 0
   _alwaysLegRun: 0
   _canDashCancel: 0
   _canUltimateCancel: 0
   _isInvincibleOnSwing: 1
+  _teleport: {fileID: 11400000, guid: c555635f73488104bba4f75bacd32a01, type: 2}

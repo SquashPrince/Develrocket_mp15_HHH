@@ -1,13 +1,13 @@
 using UnityEngine;
 
 // 플레이어의 상태 전환과 이동 · 대시 스택 · 콤보 · 차지 · 스킬 분기 · 중력을 맡는다. 캐릭터별 수치 · 액션은 캐릭터 데이터(CharacterData)에서 읽고, 다른 기능도 이 클래스를 통해 같은 캐릭터 데이터를 꺼내 쓴다.
-// 입력은 입력 기능, 타격 판정은 판정 기능, Animator 제어는 애니메이션 기능이 맡고, 상태 클래스는 이 클래스를 통해 그 기능들을 꺼내 쓴다.
+// 모든 캐릭터가 같이 쓰는 규칙 값 · 입력은 공통 설정(CommonCharacterSettings)에 있고, 다른 기능도 이 클래스를 통해 꺼내 쓴다.
+// 입력은 입력 기능, 타격 판정은 판정 기능, Animator 제어는 애니메이션 기능, 순간 이동은 순간 이동 규칙(TeleportManager)이 맡고, 상태 클래스는 이 클래스를 통해 그 기능들을 꺼내 쓴다.
 // 실제 동작은 상태 클래스(이동 · 대시 · 공격 · 피격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
-[RequireComponent(typeof(CharacterController), typeof(PlayerEnergy), typeof(PlayerTargeting))]
-[RequireComponent(typeof(PlayerStatus), typeof(PlayerSlowMotion), typeof(PlayerParry))]
-[RequireComponent(typeof(PlayerUltimate), typeof(PlayerComboSkill), typeof(PlayerInputReader))]
-[RequireComponent(typeof(PlayerAttackJudge), typeof(PlayerAnimation))]
+[RequireComponent(typeof(CharacterController), typeof(PlayerTargeting))]
+[RequireComponent(typeof(PlayerStatus), typeof(PlayerSlowMotion), typeof(PlayerActionTrigger))]
+[RequireComponent(typeof(PlayerInputReader), typeof(PlayerAttackJudge), typeof(PlayerAnimation))]
 public class PlayerController : MonoBehaviour
 {
     private const int MAX_DASH_STACK = 2;
@@ -23,11 +23,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private CharacterData _character;
 
     [Header("공통")]
-    [SerializeField] private float _gravity = -20f;
+    [Tooltip("모든 캐릭터가 함께 쓰는 규칙 값 · 입력. 파티 전투에서는 파티 기능이 넘겨준다")]
+    [SerializeField] private CommonCharacterSettings _common;
 
     private CharacterController _characterController;
     private PlayerInputReader _input;
-    private PlayerEnergy _energy;
     private PlayerTargeting _targeting;
     private PlayerSlowMotion _slowMotion;
     private PlayerStateMachine _stateMachine;
@@ -49,10 +49,13 @@ public class PlayerController : MonoBehaviour
     public PlayerStatus Status { get; private set; }
     public PlayerAttackJudge AttackJudge { get; private set; }
     public PlayerAnimation Animation { get; private set; }
+    // 캐릭터 몸(CharacterController). 순간 이동 규칙이 몸 크기를 재고 위치를 옮길 때 쓴다.
+    public CharacterController Body => _characterController;
     public bool WasDashPressed => _input.WasDashPressed;
     public bool WasAttackPressed => _input.WasAttackPressed;
     public bool WasSkillPressed => _input.WasSkillPressed;
     public CharacterData Character => _character;
+    public CommonCharacterSettings Common => _common;
     public int ComboStepCount => _character.ComboStepCount;
     public float WalkSpeed => _character.WalkSpeed;
     public float RunSpeed => _character.RunSpeed;
@@ -166,13 +169,14 @@ public class PlayerController : MonoBehaviour
         _comboExpireTime = Time.time + _character.GetComboStep(step).InputBuffer;
     }
 
-    // 에너지가 특수스킬 요구량 이상이면 소모하고 특수스킬, 모자라면 일반 스킬을 시작한다.
+    // 에너지가 특수스킬 액션의 에너지 비용 이상이면 소모하고 특수스킬, 모자라면 일반 스킬을 시작한다.
     public void StartSkill()
     {
-        bool isSpecial = _energy.TryConsume(_character.SpecialSkillEnergyCost);
+        float cost = _character.SpecialSkill.EnergyCost;
+        bool isSpecial = Status.TryConsumeEnergy(cost);
 
 #if UNITY_EDITOR
-        if(isSpecial) Debug.Log($"[특수스킬] 에너지 -{_character.SpecialSkillEnergyCost} → {_energy.CurrentEnergy:F1}");
+        if(isSpecial) Debug.Log($"[특수스킬] 에너지 -{cost} → {Status.CurrentEnergy:F1}");
 #endif
 
         if(isSpecial) StartAttack(PlayerAttackState.AttackType.SpecialSkill, _character.SpecialSkill);
@@ -231,7 +235,7 @@ public class PlayerController : MonoBehaviour
 
         _chargeTimer += Time.deltaTime;
 
-        if(_chargeTimer < _character.ChargeTime) return false;
+        if(_chargeTimer < _character.HeavyAttack.ChargeTime) return false;
 
         StartHeavyAttack();
         return true;
@@ -251,13 +255,17 @@ public class PlayerController : MonoBehaviour
     }
 
     // 대상 쪽으로 즉시 돌고, 대상 앞 정지 거리까지의 전진 거리를 돌려준다. 다가가는 거리는 공격 사거리를 넘지 않는다.
+    // 정지 거리는 순간 이동과 같은 몸 표면 기준이다. 대상 반지름 + 플레이어 반지름 + 공격 간격만큼 떨어져 멈춘다.
+    //   중심 기준으로 정하면 큰 적(보스)일수록 몸 안까지 파고들기 때문이다.
     private float FaceAndGetApproachDistance(IEnemyTargetable target)
     {
         Vector3 toTarget = target.transform.position - transform.position;
         toTarget.y = 0f;
         FaceImmediately(toTarget);
 
-        return Mathf.Clamp(toTarget.magnitude - _character.AttackStopDistance, 0f, _targeting.AttackRange);
+        float stopDistance = BodyRadius.GetHorizontal(target.transform) + _characterController.radius + _common.AttackableDistance;
+
+        return Mathf.Clamp(toTarget.magnitude - stopDistance, 0f, _targeting.AttackRange);
     }
 
     // 강공격 뒤에는 콤보가 1단부터 다시 시작한다.
@@ -289,7 +297,7 @@ public class PlayerController : MonoBehaviour
     private void ApplyMovement()
     {
         if(_characterController.isGrounded && _verticalSpeed < 0f) _verticalSpeed = GROUNDED_VERTICAL_SPEED;
-        else _verticalSpeed += _gravity * Time.deltaTime;
+        else _verticalSpeed += _common.Gravity * Time.deltaTime;
 
         _characterController.Move((HorizontalVelocity + Vector3.up * _verticalSpeed) * Time.deltaTime);
     }
@@ -298,7 +306,6 @@ public class PlayerController : MonoBehaviour
     {
         _characterController = GetComponent<CharacterController>();
         _input = GetComponent<PlayerInputReader>();
-        _energy = GetComponent<PlayerEnergy>();
         _targeting = GetComponent<PlayerTargeting>();
         _slowMotion = GetComponent<PlayerSlowMotion>();
         AttackJudge = GetComponent<PlayerAttackJudge>();

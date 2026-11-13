@@ -5,7 +5,7 @@ using UnityEngine;
 // 범위 찾기 : 공격 설정의 모양(기본 상자 · 상자 · 구 · 캡슐)대로 캐릭터 기준 범위를 확인한다.
 // 맞은 적 처리 : 체력 감소 · 에너지 · 필살기 게이지 획득 · 경직 · 콤보 스킬 발동과 연계.
 // 두 과정을 나눠 둔 이유는, 나중에 검기처럼 날아가며 판정하는 공격도 같은 맞은 적 처리를 쓰게 하기 위해서다.
-[RequireComponent(typeof(PlayerEnergy), typeof(PlayerUltimate), typeof(PlayerComboSkill))]
+[RequireComponent(typeof(PlayerStatus), typeof(PlayerActionTrigger))]
 public class PlayerAttackJudge : MonoBehaviour
 {
     // 한 번의 타격 판정에서 검사할 수 있는 최대 콜라이더 수
@@ -19,9 +19,8 @@ public class PlayerAttackJudge : MonoBehaviour
 
     private readonly HashSet<IEnemyDamageable> _hitTargets = new HashSet<IEnemyDamageable>();
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
-    private PlayerEnergy _energy;
-    private PlayerUltimate _ultimate;
-    private PlayerComboSkill _comboSkill;
+    private PlayerStatus _status;
+    private PlayerActionTrigger _actionTrigger;
 
     private void Awake() => CacheComponent();
     private void OnDrawGizmosSelected() => DrawDefaultHitBox();
@@ -70,13 +69,13 @@ public class PlayerAttackJudge : MonoBehaviour
             if(enemy == null || !_hitTargets.Add(enemy)) continue;
 
             enemy.TakeDamage(setting.Power, isImpact);
-            _energy.Add(setting.EnergyGain);
+            _status.AddEnergy(setting.EnergyGain);
 
 #if UNITY_EDITOR
-            Debug.Log($"[{(isImpact ? "강타" : "적중")}] {type} 위력 {setting.Power} / 에너지 +{setting.EnergyGain} → {_energy.CurrentEnergy:F1}");
+            Debug.Log($"[{(isImpact ? "강타" : "적중")}] {type} 위력 {setting.Power} / 에너지 +{setting.EnergyGain} → {_status.CurrentEnergy:F1}");
 #endif
 
-            _ultimate.AddGauge(setting.UltimateGaugeGain);
+            _status.AddUltimateGauge(setting.UltimateGaugeGain);
 
             // 이 타격으로 처치된 적은 경직 · 콤보 스킬 대상이 아니다. 그로기 적이 강타로 처치되면 콤보 스킬보다 처치가 먼저다.
             if(!enemy.IsAlive) continue;
@@ -87,9 +86,9 @@ public class PlayerAttackJudge : MonoBehaviour
             if(!isImpact) continue;
 
             // 콤보 스킬 중의 강타는 새로 발동하지 않고, 콤보 스킬 대상에게 맞았으면 다음 연계를 잇게 한다.
-            if(!_comboSkill.CanStart)
+            if(!_actionTrigger.CanStartComboSkill)
             {
-                _comboSkill.OnImpactHit(enemy);
+                _actionTrigger.OnComboSkillImpactHit(enemy);
                 continue;
             }
 
@@ -104,7 +103,7 @@ public class PlayerAttackJudge : MonoBehaviour
         }
 
         // 판정을 모두 마친 뒤 상태를 바꿔, 같은 판정의 다른 적도 에너지 · 게이지 · 경직을 받게 한다.
-        if(comboSkillTarget != null) _comboSkill.Begin(comboSkillTarget, comboSkillMaxChain);
+        if(comboSkillTarget != null) _actionTrigger.BeginComboSkill(comboSkillTarget, comboSkillMaxChain);
     }
 
     // 캡슐의 양 끝 구 중심. 캐릭터 앞쪽 방향으로 전체 길이만큼 뻗고, 길이가 반지름의 두 배보다 짧으면 두 점이 겹쳐 구가 된다.
@@ -127,8 +126,7 @@ public class PlayerAttackJudge : MonoBehaviour
 
     private void CacheComponent()
     {
-        _energy = GetComponent<PlayerEnergy>();
-        _ultimate = GetComponent<PlayerUltimate>();
-        _comboSkill = GetComponent<PlayerComboSkill>();
+        _status = GetComponent<PlayerStatus>();
+        _actionTrigger = GetComponent<PlayerActionTrigger>();
     }
 }

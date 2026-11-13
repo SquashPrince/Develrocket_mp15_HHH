@@ -15,7 +15,7 @@ MonoBehaviour:
   _maxHealth: 100
   _maxEnergy: 120
   _energyRegenPerSecond: 1
-  _maxUltimateGauge: 1
+  _maxUltimateGauge: 3000
   _parryGaugeGain: 300
   _perfectDodgeGaugeGain: 300
   _walkSpeed: 5
@@ -35,13 +35,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b28c38c94effc7a49854434aa1ab9471, type: 2}
   - {fileID: 11400000, guid: 85a73f62beb99754e82d9053e2b8629d, type: 2}
   _heavyAttack: {fileID: 11400000, guid: f773703db46f5554d8d9360dea30b06c, type: 2}
-  _chargeTime: 0.6
-  _attackStopDistance: 1.2
   _dashAttack: {fileID: 11400000, guid: ccce58ff6566432448c61b02f814b8aa, type: 2}
   _dodgeCounter: {fileID: 11400000, guid: 7c9f1b42c8f76454b9b7ef18fa66dade, type: 2}
+  _parry: {fileID: 11400000, guid: 245cfa88779af1142ae3127cf07cff01, type: 2}
   _parryChase: {fileID: 11400000, guid: b5a05a13b34420d419af1baa5ae70419, type: 2}
   _skill: {fileID: 11400000, guid: 62b06afbcec4f8e479af815fa5626ccd, type: 2}
   _specialSkill: {fileID: 11400000, guid: f05ac55301ad78f48b7a19d2246d98b3, type: 2}
-  _specialSkillEnergyCost: 60
   _ultimate: {fileID: 11400000, guid: 3f3e055a9bc21424da70ffce463356c1, type: 2}
   _comboSkill: {fileID: 11400000, guid: bb322d00682be914abca4dcf7c37583f, type: 2}

@@ -10,7 +10,7 @@ using UnityEngine;
 // 발동부터 끝까지 무적이고, 어떤 입력으로도 끊기지 않도록 입력을 읽지 않는다. 적 시간은 멈추지 않는다.
 public class PlayerComboSkillState : PlayerState
 {
-    private readonly PlayerComboSkill _comboSkill;
+    private readonly PlayerActionTrigger _trigger;
     private IEnemyTargetable _target;
     private Vector3 _advanceVelocity;
     private float _advanceTimer;
@@ -24,9 +24,9 @@ public class PlayerComboSkillState : PlayerState
     // 이번 연계 중 대상에게 강타가 맞아 다음 연계가 예약됐는지
     private bool _isNextChainQueued;
 
-    public PlayerComboSkillState(PlayerController controller, PlayerComboSkill comboSkill) : base(controller)
+    public PlayerComboSkillState(PlayerController controller, PlayerActionTrigger trigger) : base(controller)
     {
-        _comboSkill = comboSkill;
+        _trigger = trigger;
     }
 
     public bool IsActive { get; private set; }
@@ -57,7 +57,8 @@ public class PlayerComboSkillState : PlayerState
         Controller.Status.EndInvincible();
         Controller.Status.SetAttackInvincible(true);
 
-        _comboSkill.TeleportToTarget(_target);
+        // 콤보 스킬 액션의 순간 이동 옵션대로 대상 둘레로 비켜 선 곳에 순간 이동한다. 막혀 있으면 제자리에 있는다.
+        TeleportManager.TryTeleportTo(Controller, _target.transform, _trigger.ComboSkillAction.Teleport);
         StartChain();
     }
 
@@ -78,7 +79,7 @@ public class PlayerComboSkillState : PlayerState
         {
             case PlayerAnimationEventType.Hit:
             case PlayerAnimationEventType.Impact:
-                Controller.AttackJudge.PerformHit(PlayerAttackState.AttackType.ComboSkill, _comboSkill.Action, _comboSkill.Action.GetStep(_step), isImpact: type == PlayerAnimationEventType.Impact);
+                Controller.AttackJudge.PerformHit(PlayerAttackState.AttackType.ComboSkill, _trigger.ComboSkillAction, _trigger.ComboSkillAction.GetStep(_step), isImpact: type == PlayerAnimationEventType.Impact);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();
@@ -103,7 +104,7 @@ public class PlayerComboSkillState : PlayerState
     {
         _step++;
 
-        if(_step >= _comboSkill.Action.StepCount)
+        if(_step >= _trigger.ComboSkillAction.StepCount)
         {
             if(!_isNextChainQueued)
             {
@@ -116,7 +117,7 @@ public class PlayerComboSkillState : PlayerState
             return;
         }
 
-        ActionStep step = _comboSkill.Action.GetStep(_step);
+        ActionStep step = _trigger.ComboSkillAction.GetStep(_step);
 
         // 발동시킨 그로기 적 쪽으로 돌아 대상 앞 정지 거리까지, 단계의 전진 시간 동안 다가간다. 도중에 록온이 바뀌어도 대상은 그대로다.
         float advanceDistance = Controller.AimFixedTarget(step, _target);

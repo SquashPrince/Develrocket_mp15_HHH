@@ -4,7 +4,8 @@ using UnityEngine;
 // 록온 입력으로 록온 사거리 안의 대상을 고정하거나 해제하고, 대상이 록온 사거리 밖으로 나가면 자동으로 해제한다.
 // 범위 안의 플레이어 앞쪽 적 중 카메라 중앙 레이와의 수직 거리가 가장 짧은 적을 대상으로 고른다.
 // 같은 화면 위치라면 가까운 적일수록 레이와의 거리가 짧아 근접 공격 대상으로 우선된다.
-[RequireComponent(typeof(PlayerInputReader))]
+// 사거리 · 가림 판정 값과 록온 표시 Prefab 은 모든 캐릭터가 같이 쓰는 공통 설정에서 읽는다. 록온 표시는 시작할 때 Prefab 으로 만든다.
+[RequireComponent(typeof(PlayerController), typeof(PlayerInputReader))]
 public class PlayerTargeting : MonoBehaviour
 {
     // 한 번의 대상 찾기에서 검사할 수 있는 최대 콜라이더 수
@@ -13,28 +14,16 @@ public class PlayerTargeting : MonoBehaviour
     [Header("참조")]
     [Tooltip("화면 중앙 레이의 기준이 되는 카메라 (Main Camera)")]
     [SerializeField] private Transform _cameraTransform;
-    [Tooltip("록온 대상 위에 띄울 표시 오브젝트. 콜라이더가 없어야 한다")]
-    [SerializeField] private Transform _lockOnMarker;
-
-    [Header("사거리")]
-    [Tooltip("공격 사거리. 자동 조준 범위와 같다")]
-    [SerializeField, Min(0f)] private float _attackRange = 5f;
-    [Tooltip("록온 사거리. 이 안의 적을 록온할 수 있고, 록온 대상이 이보다 멀어지면 록온이 풀린다")]
-    [SerializeField, Min(0f)] private float _lockOnRange = 12f;
-
-    [Header("가림 판정")]
-    [Tooltip("플레이어와 적 사이를 막는 장애물 Layer. Player · Enemy Layer 는 빼야 플레이어 몸이나 다른 적을 벽으로 보지 않는다")]
-    [SerializeField] private LayerMask _obstacleLayers;
-    [Tooltip("가림 판정 선을 시작하는 높이 (플레이어 발밑 기준, 가슴 높이 정도)")]
-    [SerializeField, Min(0f)] private float _sightHeight = 1.2f;
 
     [Header("록온 표시")]
     [Tooltip("록온 표시를 대상 위치에서 이만큼 위에 띄운다")]
     [SerializeField] private float _markerHeight = 2.5f;
 
     private readonly Collider[] _candidateColliders = new Collider[MAX_CANDIDATE_COLLIDERS];
+    private PlayerController _controller;
     private PlayerInputReader _input;
     private Camera _camera;
+    private Transform _lockOnMarker;
     private Collider _lockTargetCollider;
     private IEnemyTargetable _lockTarget;
     private bool _isLockTargetBlocked;
@@ -42,8 +31,9 @@ public class PlayerTargeting : MonoBehaviour
     public IEnemyTargetable LockTarget => _lockTarget;
     // 록온 대상이 벽에 가려져 있는지. 가려져도 록온은 유지하며, 록온 카메라가 구도를 바꾸는 데 쓴다.
     public bool IsLockTargetBlocked => _isLockTargetBlocked;
-    public float AttackRange => _attackRange;
-    public float LockOnRange => _lockOnRange;
+    public float AttackRange => Common.AttackRange;
+    public float LockOnRange => Common.LockOnRange;
+    private CommonCharacterSettings Common => _controller.Common;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -120,13 +110,13 @@ public class PlayerTargeting : MonoBehaviour
         if(_input.WasLockOnPressed)
         {
             if(_lockTarget != null) SetLockTarget(null);
-            else SetLockTarget(FindTarget(_lockOnRange, true));
+            else SetLockTarget(FindTarget(LockOnRange, true));
         }
 
         if(_lockTarget == null) return;
 
         // 록온 대상이 처치되었거나 록온 사거리 밖으로 나가면 록온을 푼다.
-        if(!_lockTarget.IsAlive || (_lockTarget.transform.position - transform.position).sqrMagnitude > _lockOnRange * _lockOnRange)
+        if(!_lockTarget.IsAlive || (_lockTarget.transform.position - transform.position).sqrMagnitude > LockOnRange * LockOnRange)
         {
             SetLockTarget(null);
             return;
@@ -149,9 +139,9 @@ public class PlayerTargeting : MonoBehaviour
     // 플레이어 가슴 높이에서 적 중심까지 선을 그어 장애물 Layer 에 닿으면 막힌 것으로 본다.
     private bool IsBlocked(Vector3 position)
     {
-        Vector3 sightOrigin = transform.position + Vector3.up * _sightHeight;
+        Vector3 sightOrigin = transform.position + Vector3.up * Common.SightHeight;
 
-        return Physics.Linecast(sightOrigin, position, _obstacleLayers, QueryTriggerInteraction.Ignore);
+        return Physics.Linecast(sightOrigin, position, Common.ObstacleLayers, QueryTriggerInteraction.Ignore);
     }
 
     private void SetLockTarget(IEnemyTargetable target)
@@ -164,16 +154,21 @@ public class PlayerTargeting : MonoBehaviour
 
     // Scene 창에서 플레이어를 선택하면 공격 사거리(노랑)와 록온 사거리(하늘)를 보여준다.
     // 플레이 중에는 지금 공격하면 선택될 대상까지 선을 긋는다.
+    // 에디터에서는 Awake 가 돌지 않아 참조가 비어 있으므로 컨트롤러에서 공통 설정을 직접 찾고, 연결 전이면 그리지 않는다.
     private void DrawRange()
     {
+        CommonCharacterSettings common = GetComponent<PlayerController>().Common;
+
+        if(common == null) return;
+
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, _attackRange);
+        Gizmos.DrawWireSphere(transform.position, common.AttackRange);
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, _lockOnRange);
+        Gizmos.DrawWireSphere(transform.position, common.LockOnRange);
 
         if(!Application.isPlaying) return;
 
-        IEnemyTargetable target = FindTarget(_attackRange);
+        IEnemyTargetable target = FindTarget(common.AttackRange);
 
         if(target == null) return;
 
@@ -184,11 +179,14 @@ public class PlayerTargeting : MonoBehaviour
     private void CacheComponent()
     {
         _camera = _cameraTransform.GetComponent<Camera>();
+        _controller = GetComponent<PlayerController>();
         _input = GetComponent<PlayerInputReader>();
     }
 
+    // 록온 표시를 공통 설정의 Prefab 으로 만들고 숨겨 둔다.
     private void Init()
     {
+        _lockOnMarker = Instantiate(Common.LockOnMarkerPrefab).transform;
         SetLockTarget(null);
     }
 }
