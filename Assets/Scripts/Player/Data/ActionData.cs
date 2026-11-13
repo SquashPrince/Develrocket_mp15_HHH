@@ -61,6 +61,10 @@ public class ActionData : ScriptableObject
     [Tooltip("휘두르는 동안 적 공격에 맞지 않는지 여부. 회피하지 않아도 무적이며, 후딜에 들어가면 풀린다. 무적 중 들어온 노란 공격은 패링되지 않는다")]
     [SerializeField] private bool _isInvincibleOnSwing;
 
+    [Header("그로기")]
+    [Tooltip("[예정] 적중할 때(패링 액션은 패링 성공할 때) 적에게 쌓는 그로기 값. 적 그로기 게이지를 만들 때 쓴다. 지금은 쓰지 않는다")]
+    [SerializeField, Min(0f)] private float _groggyGain;
+
     [Header("추가 옵션")]
     [Tooltip("액션을 시작할 때 대상 앞으로 순간 이동하는 옵션. 비워 두면 순간 이동하지 않는다")]
     [SerializeField] private TeleportOption _teleport;
@@ -80,6 +84,7 @@ public class ActionData : ScriptableObject
     public bool CanDashCancel => _canDashCancel;
     public bool CanUltimateCancel => _canUltimateCancel;
     public bool IsInvincibleOnSwing => _isInvincibleOnSwing;
+    public float GroggyGain => _groggyGain;
     public TeleportOption Teleport => _teleport;
 
     // index : 동작 번호(0부터)

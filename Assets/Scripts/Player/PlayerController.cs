@@ -51,6 +51,8 @@ public class PlayerController : MonoBehaviour
     public PlayerAnimation Animation { get; private set; }
     // 캐릭터 몸(CharacterController). 순간 이동 규칙이 몸 크기를 재고 위치를 옮길 때 쓴다.
     public CharacterController Body => _characterController;
+    // 이번 프레임의 캐릭터 시간(초). 히트렉처럼 이 캐릭터만 멈추는 효과가 반영된다. 상태 · 기능의 타이머 · 이동은 이 값을 쓴다.
+    public float DeltaTime => Status.DeltaTime;
     public bool WasDashPressed => _input.WasDashPressed;
     public bool WasAttackPressed => _input.WasAttackPressed;
     public bool WasSkillPressed => _input.WasSkillPressed;
@@ -121,7 +123,7 @@ public class PlayerController : MonoBehaviour
     // 입력 버퍼 시간 안이면 다음 콤보 단계, 지났으면 1단부터 시작한다. 공격 방향은 공격 상태에 들어갈 때 AimAttack 이 정한다.
     public void StartBasicAttack()
     {
-        int step = Time.time <= _comboExpireTime ? _nextComboStep : 0;
+        int step = Status.LocalTime <= _comboExpireTime ? _nextComboStep : 0;
 
         _comboExpireTime = 0f;
         _attackState.Setup(PlayerAttackState.AttackType.Basic, step, _character.GetComboStep(step));
@@ -166,7 +168,7 @@ public class PlayerController : MonoBehaviour
     public void FinishComboStep(int step)
     {
         _nextComboStep = (step + 1) % _character.ComboStepCount;
-        _comboExpireTime = Time.time + _character.GetComboStep(step).InputBuffer;
+        _comboExpireTime = Status.LocalTime + _character.GetComboStep(step).InputBuffer;
     }
 
     // 에너지가 특수스킬 액션의 에너지 비용 이상이면 소모하고 특수스킬, 모자라면 일반 스킬을 시작한다.
@@ -233,7 +235,7 @@ public class PlayerController : MonoBehaviour
             return false;
         }
 
-        _chargeTimer += Time.deltaTime;
+        _chargeTimer += DeltaTime;
 
         if(_chargeTimer < _character.HeavyAttack.ChargeTime) return false;
 
@@ -284,7 +286,7 @@ public class PlayerController : MonoBehaviour
     {
         if(_dashStack >= MAX_DASH_STACK) return;
 
-        _dashCooldownTimer += Time.deltaTime;
+        _dashCooldownTimer += DeltaTime;
 
         if(_dashCooldownTimer < _character.DashCooldown) return;
 
@@ -297,9 +299,9 @@ public class PlayerController : MonoBehaviour
     private void ApplyMovement()
     {
         if(_characterController.isGrounded && _verticalSpeed < 0f) _verticalSpeed = GROUNDED_VERTICAL_SPEED;
-        else _verticalSpeed += _common.Gravity * Time.deltaTime;
+        else _verticalSpeed += _common.Gravity * DeltaTime;
 
-        _characterController.Move((HorizontalVelocity + Vector3.up * _verticalSpeed) * Time.deltaTime);
+        _characterController.Move((HorizontalVelocity + Vector3.up * _verticalSpeed) * DeltaTime);
     }
 
     private void CacheComponent()

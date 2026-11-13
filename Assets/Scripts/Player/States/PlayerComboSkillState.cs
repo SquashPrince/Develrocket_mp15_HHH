@@ -64,6 +64,7 @@ public class PlayerComboSkillState : PlayerState
 
     public override void Exit()
     {
+        Controller.AttackJudge.EndHit();
         IsActive = false;
         Controller.Status.SetAttackInvincible(false);
     }
@@ -77,9 +78,14 @@ public class PlayerComboSkillState : PlayerState
 
         switch(type)
         {
-            case PlayerAnimationEventType.Hit:
-            case PlayerAnimationEventType.Impact:
-                Controller.AttackJudge.PerformHit(PlayerAttackState.AttackType.ComboSkill, _trigger.ComboSkillAction, _trigger.ComboSkillAction.GetStep(_step), isImpact: type == PlayerAnimationEventType.Impact);
+            case PlayerAnimationEventType.HitStart:
+                Controller.AttackJudge.BeginHit(PlayerAttackState.AttackType.ComboSkill, _trigger.ComboSkillAction, _trigger.ComboSkillAction.GetStep(_step));
+                break;
+            case PlayerAnimationEventType.HitEnd:
+                Controller.AttackJudge.FinishHit();
+                break;
+            case PlayerAnimationEventType.ImpactEnd:
+                Controller.AttackJudge.PerformImpact(PlayerAttackState.AttackType.ComboSkill, _trigger.ComboSkillAction, _trigger.ComboSkillAction.GetStep(_step));
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();
@@ -102,6 +108,7 @@ public class PlayerComboSkillState : PlayerState
     // 다음 단계로 넘어간다. 마지막 단계가 끝났으면, 다음 연계가 예약됐을 때만 콤보 스킬을 다시 쓰고 아니면 이동 상태로 돌아간다.
     private void StartNextStep()
     {
+        Controller.AttackJudge.EndHit();
         _step++;
 
         if(_step >= _trigger.ComboSkillAction.StepCount)
@@ -133,7 +140,7 @@ public class PlayerComboSkillState : PlayerState
     // 전진 시간 동안만 앞으로 나아가고, 그 뒤에는 제자리에 멈춘다.
     private Vector3 UpdateAdvance()
     {
-        _advanceTimer += Time.deltaTime;
+        _advanceTimer += Controller.DeltaTime;
 
         return _advanceTimer < _advanceDuration ? _advanceVelocity : Vector3.zero;
     }

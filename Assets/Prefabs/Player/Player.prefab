@@ -31843,7 +31843,7 @@ GameObject:
   - component: {fileID: 6695114068962537715}
   - component: {fileID: 3495393291802485486}
   - component: {fileID: 3260304514223116691}
-  - component: {fileID: 1745635829274798527}
+  - component: {fileID: 4500917182947509189}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -31970,8 +31970,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71725b71c6096174f8d05d148b2cf901, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttackJudge
-  _defaultHitCenter: {x: 0, y: 1, z: 0.5}
-  _defaultHitSize: {x: 1.5, y: 1.5, z: 2}
 --- !u!114 &3495393291802485486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31997,7 +31995,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d53ac335d93bf30439db97d31415e33d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSlowMotion
---- !u!114 &1745635829274798527
+--- !u!114 &4500917182947509189
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -32006,9 +32004,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7306029376340620380}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63cc0c6ea269c174eb9a990b910fd11e, type: 3}
+  m_Script: {fileID: 11500000, guid: f4249c7445e224649a053d47522391c9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerGroggyDebug
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDebugger
+  _rangeDisplayTime: 0.1
 --- !u!1 &7306636993918616150
 GameObject:
   m_ObjectHideFlags: 0

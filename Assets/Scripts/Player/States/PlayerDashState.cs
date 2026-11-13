@@ -39,7 +39,7 @@ public class PlayerDashState : PlayerState
 
     public override void Tick()
     {
-        _timer += Time.deltaTime;
+        _timer += Controller.DeltaTime;
 
         Vector3 moveDirection = Controller.ReadMoveDirection();
 

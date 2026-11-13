@@ -18,11 +18,16 @@ public class PlayerAnimation : MonoBehaviour
     [Tooltip("캐릭터 모델의 Animator (Visual 아래 캐릭터 모델)")]
     [SerializeField] private Animator _animator;
 
+    private PlayerController _controller;
     private float _legRunTargetWeight;
     private int _legRunLayer;
 
     private void Awake() => CacheComponent();
-    private void Update() => UpdateLegRunWeight();
+    private void Update()
+    {
+        ApplyTimeScale();
+        UpdateLegRunWeight();
+    }
 
     // Animator 의 상태를 이름(해시)으로 직접 재생한다. 전이선 대신 코드가 어떤 모션을 재생할지 정한다.
     // fadeTime : 이전 모션과 섞는 시간(초). 공격은 공격 설정의 값을 넘기고, 그 외에는 기본값을 쓴다.
@@ -34,7 +39,7 @@ public class PlayerAnimation : MonoBehaviour
     // 실제 수평 이동 속도를 넘겨 Blend Tree 가 걷기 · 달리기를 섞게 한다.
     public void SetMoveSpeed(float speed)
     {
-        _animator.SetFloat(SPEED_PARAMETER, speed, SPEED_DAMP_TIME, Time.deltaTime);
+        _animator.SetFloat(SPEED_PARAMETER, speed, SPEED_DAMP_TIME, _controller.DeltaTime);
     }
 
     // 공격 대상에게 멀리 다가가는 동안 하체에 달리기 모션을 덮는다. 상체는 공격 모션을 그대로 재생한다.
@@ -47,9 +52,12 @@ public class PlayerAnimation : MonoBehaviour
         _legRunTargetWeight = isRunning ? 1f : 0f;
     }
 
+    // 모델의 재생 속도를 캐릭터 시간 배율에 맞춘다. 히트렉으로 배율이 0 이면 모션이 멈추고, 애니메이션 이벤트도 함께 멈춘다.
+    private void ApplyTimeScale() => _animator.speed = _controller.Status.TimeScale;
+
     private void UpdateLegRunWeight()
     {
-        float weight = Mathf.MoveTowards(_animator.GetLayerWeight(_legRunLayer), _legRunTargetWeight, Time.deltaTime / DEFAULT_FADE_TIME);
+        float weight = Mathf.MoveTowards(_animator.GetLayerWeight(_legRunLayer), _legRunTargetWeight, _controller.DeltaTime / DEFAULT_FADE_TIME);
 
         _animator.SetLayerWeight(_legRunLayer, weight);
     }
@@ -57,6 +65,7 @@ public class PlayerAnimation : MonoBehaviour
     // 하체 달리기 레이어 번호는 다른 기능이 Start 에서 모션을 재생하기 전에 필요하므로 Awake 에서 찾아 둔다.
     private void CacheComponent()
     {
+        _controller = GetComponent<PlayerController>();
         _legRunLayer = _animator.GetLayerIndex(LEG_RUN_LAYER_NAME);
     }
 }

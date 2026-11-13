@@ -87,7 +87,7 @@ public class PlayerLocomotionState : PlayerState
             Controller.Animation.Play(MOVE_ANIMATION);
         }
 
-        _moveHoldTime += Time.deltaTime;
+        _moveHoldTime += Controller.DeltaTime;
 
         if(_gait != Gait.Run && _moveHoldTime >= Controller.AutoRunDelay) _gait = Gait.Run;
 

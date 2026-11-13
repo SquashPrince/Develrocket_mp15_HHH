@@ -38,6 +38,9 @@ public class PlayerUltimateState : PlayerState
         Controller.EndSlowMotion();
         EnemyTime.Scale = 0f;
 
+        // 히트렉으로 멈춘 순간 발동해도 필살기는 원래 속도로 시작하고, 연출이 끝나면 플레이어는 원래 속도다.
+        Controller.Status.EndHitLag();
+
         // 대시 공격 직후 발동하면 대시 무적 · 완벽 회피 판정이 남아 있을 수 있어 지운 뒤, 필살기가 끝날 때까지 무적으로 둔다.
         // 공격 무적 중에는 패링 입력도 무시되므로 패링 · 교체 키로도 끊기지 않는다.
         Controller.Status.EndInvincible();
@@ -56,6 +59,7 @@ public class PlayerUltimateState : PlayerState
     // 슬로모션 중 발동했더라도 적은 원래 속도로 돌아온다. 공격 단계 시작 때 이미 돌렸지만, 어떤 경우에도 멈춘 채 남지 않도록 나갈 때도 돌린다.
     public override void Exit()
     {
+        Controller.AttackJudge.EndHit();
         EnemyTime.Scale = 1f;
         Controller.Status.SetAttackInvincible(false);
     }
@@ -69,9 +73,15 @@ public class PlayerUltimateState : PlayerState
 
         switch(type)
         {
-            case PlayerAnimationEventType.Hit:
-            case PlayerAnimationEventType.Impact:
-                if(_step != CUTSCENE_STEP) Controller.AttackJudge.PerformHit(PlayerAttackState.AttackType.Ultimate, _trigger.UltimateAction, _trigger.UltimateAction.GetStep(_step), type == PlayerAnimationEventType.Impact);
+            // 연출 구간에는 판정하지 않는다.
+            case PlayerAnimationEventType.HitStart:
+                if(_step != CUTSCENE_STEP) Controller.AttackJudge.BeginHit(PlayerAttackState.AttackType.Ultimate, _trigger.UltimateAction, _trigger.UltimateAction.GetStep(_step));
+                break;
+            case PlayerAnimationEventType.HitEnd:
+                Controller.AttackJudge.FinishHit();
+                break;
+            case PlayerAnimationEventType.ImpactEnd:
+                if(_step != CUTSCENE_STEP) Controller.AttackJudge.PerformImpact(PlayerAttackState.AttackType.Ultimate, _trigger.UltimateAction, _trigger.UltimateAction.GetStep(_step));
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();
@@ -81,6 +91,8 @@ public class PlayerUltimateState : PlayerState
 
     private void StartNextStep()
     {
+        Controller.AttackJudge.EndHit();
+
         // 연출이 끝나고 첫 공격 단계가 시작되면 적 시간이 다시 흐른다.
         if(_step == CUTSCENE_STEP) EnemyTime.Scale = 1f;
 
@@ -110,7 +122,7 @@ public class PlayerUltimateState : PlayerState
     {
         if(_step == CUTSCENE_STEP) return Vector3.zero;
 
-        _advanceTimer += Time.deltaTime;
+        _advanceTimer += Controller.DeltaTime;
 
         return _advanceTimer < _advanceDuration ? _advanceVelocity : Vector3.zero;
     }

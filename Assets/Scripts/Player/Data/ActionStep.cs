@@ -2,28 +2,60 @@ using System;
 using UnityEngine;
 
 // 액션을 이루는 동작(모션) 하나의 값. 액션은 동작 목록을 가지며, 1개면 한 동작, 여러 개면 순서대로 이어 재생한다.
-// 모션마다 달라지는 값(재생할 Animator 상태, 판정 범위, 전진, 섞는 시간)을 담는다. 위력 · 게이지 같은 타격 값은 액션 공통이다.
+// 모션마다 달라지는 값(재생할 Animator 상태, 판정 방식 · 범위, 전진, 섞는 시간)을 담는다. 위력 · 게이지 같은 타격 값은 액션 공통이다.
 // MonoBehaviour 가 아닌 일반 클래스이므로 [Serializable] 을 붙여야 Inspector 에 펼쳐서 보인다.
 [Serializable]
 public class ActionStep
 {
-    // 판정 범위 모양. 기본은 판정 기능에 있는 공통 상자를 쓴다.
-    // Inspector 에 저장된 값은 순서 번호이므로, 새 모양은 항상 맨 뒤에 추가한다.
+    // 판정 범위 모양. Inspector 에 저장된 값은 순서 번호이므로, 새 모양은 항상 맨 뒤에 추가한다.
     public enum HitShape
     {
-        Default,
         Box,
         Sphere,
         Capsule
     }
 
+    // 판정 방식. Inspector 에 저장된 값은 순서 번호이므로, 새 방식은 항상 맨 뒤에 추가한다.
+    //   구간 : 판정 시작(HitStart) ~ 판정 끝(HitEnd) · 강타 끝(ImpactEnd) 사이에 타격 시점을 두고, 시점마다 범위 안의 적을 모두 맞힌다
+    //   한 순간 : 판정 시작(HitStart) 순간에 한 번만 판정한다
+    // 어느 방식이든 강타 끝(ImpactEnd) 순간에 강타 판정을 한 번 하고 판정을 끝낸다.
+    public enum HitMode
+    {
+        Window,
+        Instant
+    }
+
+    // 구간 판정의 타격 시점 정하기. Inspector 에 저장된 값은 순서 번호이므로, 새 방식은 항상 맨 뒤에 추가한다.
+    //   간격 : 판정 시작부터 간격마다 타격한다. 구간 끝을 넘어가는 타격은 하지 않는다
+    //   횟수 : 구간을 횟수로 나눠 간격을 정한다. 시작과 끝 시점을 모두 포함한다 (예 : 3타면 시작 · 가운데 · 끝)
+    // 강타 끝으로 끝나는 구간은 끝 시점의 타격이 강타다. 횟수 방식에서는 강타가 횟수의 마지막 1타다.
+    public enum WindowTiming
+    {
+        Interval,
+        Count
+    }
+
     [Tooltip("재생할 Animator 상태 이름. Animator Controller 의 상태 이름과 같아야 한다")]
     [SerializeField] private string _animationState = "";
 
+    [Header("판정 방식")]
+    [Tooltip("구간 : 판정 시작 ~ 끝 사이의 타격 시점마다 맞힌다 / 한 순간 : 판정 시작 순간 한 번만 판정한다")]
+    [SerializeField] private HitMode _hitMode = HitMode.Window;
+    [Tooltip("[구간] 간격 : 간격마다 타격 / 횟수 : 구간을 횟수로 나눠 타격 (시작 · 끝 포함)")]
+    [SerializeField] private WindowTiming _windowTiming = WindowTiming.Interval;
+    [Tooltip("[구간 · 간격] 타격 간격(초, 캐릭터 시간). 판정 시작부터 이 간격마다 타격하고, 구간 끝을 넘어가는 타격은 하지 않는다")]
+    [SerializeField, Min(0.01f)] private float _hitInterval = 0.1f;
+    [Tooltip("[구간 · 횟수] 구간 동안의 타격 횟수. 시작과 끝을 포함해 고르게 나눈다. 강타 끝으로 끝나면 마지막 1타가 강타다")]
+    [SerializeField, Min(1)] private int _hitCount = 1;
+    [Tooltip("[구간] 켜면 경직 · 히트렉은 판정 구간(판정 시작 한 번)에서 처음 적중한 타격에만 건다. 나머지 타격은 위력 · 에너지 · 게이지만 준다. 강타는 항상 경직 · 히트렉을 건다")]
+    [SerializeField] private bool _reactOnFirstHitOnly;
+    [Tooltip("적중할 때마다 공격한 캐릭터만 멈추는 시간(초, 실제 시간). 적은 멈추지 않는다. 0 이면 멈추지 않는다")]
+    [SerializeField, Min(0f)] private float _hitLagTime;
+
     [Header("판정 범위")]
-    [Tooltip("기본 : 판정 기능의 공통 상자 / 상자 : 중심 · 크기 / 구 : 중심 · 반지름 / 캡슐 : 중심 · 반지름 · 길이 (캐릭터 앞쪽으로 긴 막대)")]
-    [SerializeField] private HitShape _hitShape = HitShape.Default;
-    [Tooltip("[상자 · 구 · 캡슐] 판정 범위의 중심 (캐릭터 기준 위치)")]
+    [Tooltip("상자 : 중심 · 크기 / 구 : 중심 · 반지름 / 캡슐 : 중심 · 반지름 · 길이 (캐릭터 앞쪽으로 긴 막대)")]
+    [SerializeField] private HitShape _hitShape = HitShape.Box;
+    [Tooltip("판정 범위의 중심 (캐릭터 기준 위치)")]
     [SerializeField] private Vector3 _hitCenter = new Vector3(0f, 1f, 1f);
     [Tooltip("[상자] 판정 상자의 크기 (좌우 · 위아래 · 앞뒤)")]
     [SerializeField] private Vector3 _hitSize = new Vector3(1.5f, 1.5f, 2f);
@@ -43,6 +75,12 @@ public class ActionStep
     public string AnimationState => _animationState;
     // 재생 · 이벤트 구분에 쓰는 상태 해시. 상태 이름으로 매번 계산한다.
     public int AnimationHash => Animator.StringToHash(_animationState);
+    public HitMode Mode => _hitMode;
+    public float HitInterval => _hitInterval;
+    public WindowTiming Timing => _windowTiming;
+    public int HitCount => _hitCount;
+    public bool ReactOnFirstHitOnly => _reactOnFirstHitOnly;
+    public float HitLagTime => _hitLagTime;
     public HitShape Shape => _hitShape;
     public Vector3 HitCenter => _hitCenter;
     public Vector3 HitSize => _hitSize;

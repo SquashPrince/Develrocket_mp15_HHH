@@ -15,6 +15,12 @@ MonoBehaviour:
   _actionType: 6
   _steps:
   - _animationState: SpecialSkill
+    _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.035
+    _hitCount: 1
+    _reactOnFirstHitOnly: 0
+    _hitLagTime: 0.035
     _hitShape: 0
     _hitCenter: {x: 0, y: 1, z: 1}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
@@ -36,4 +42,5 @@ MonoBehaviour:
   _canDashCancel: 1
   _canUltimateCancel: 1
   _isInvincibleOnSwing: 1
+  _groggyGain: 0
   _teleport: {fileID: 0}
