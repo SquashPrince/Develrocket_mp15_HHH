@@ -169,13 +169,14 @@ public class PlayerController : MonoBehaviour
         _comboExpireTime = Time.time + _character.GetComboStep(step).InputBuffer;
     }
 
-    // 에너지가 특수스킬 요구량 이상이면 소모하고 특수스킬, 모자라면 일반 스킬을 시작한다.
+    // 에너지가 특수스킬 액션의 에너지 비용 이상이면 소모하고 특수스킬, 모자라면 일반 스킬을 시작한다.
     public void StartSkill()
     {
-        bool isSpecial = Status.TryConsumeEnergy(_character.SpecialSkillEnergyCost);
+        float cost = _character.SpecialSkill.EnergyCost;
+        bool isSpecial = Status.TryConsumeEnergy(cost);
 
 #if UNITY_EDITOR
-        if(isSpecial) Debug.Log($"[특수스킬] 에너지 -{_character.SpecialSkillEnergyCost} → {Status.CurrentEnergy:F1}");
+        if(isSpecial) Debug.Log($"[특수스킬] 에너지 -{cost} → {Status.CurrentEnergy:F1}");
 #endif
 
         if(isSpecial) StartAttack(PlayerAttackState.AttackType.SpecialSkill, _character.SpecialSkill);
@@ -234,7 +235,7 @@ public class PlayerController : MonoBehaviour
 
         _chargeTimer += Time.deltaTime;
 
-        if(_chargeTimer < _character.ChargeTime) return false;
+        if(_chargeTimer < _character.HeavyAttack.ChargeTime) return false;
 
         StartHeavyAttack();
         return true;
@@ -254,13 +255,17 @@ public class PlayerController : MonoBehaviour
     }
 
     // 대상 쪽으로 즉시 돌고, 대상 앞 정지 거리까지의 전진 거리를 돌려준다. 다가가는 거리는 공격 사거리를 넘지 않는다.
+    // 정지 거리는 순간 이동과 같은 몸 표면 기준이다. 대상 반지름 + 플레이어 반지름 + 공격 간격만큼 떨어져 멈춘다.
+    //   중심 기준으로 정하면 큰 적(보스)일수록 몸 안까지 파고들기 때문이다.
     private float FaceAndGetApproachDistance(IEnemyTargetable target)
     {
         Vector3 toTarget = target.transform.position - transform.position;
         toTarget.y = 0f;
         FaceImmediately(toTarget);
 
-        return Mathf.Clamp(toTarget.magnitude - _character.AttackStopDistance, 0f, _targeting.AttackRange);
+        float stopDistance = BodyRadius.GetHorizontal(target.transform) + _characterController.radius + _common.AttackableDistance;
+
+        return Mathf.Clamp(toTarget.magnitude - stopDistance, 0f, _targeting.AttackRange);
     }
 
     // 강공격 뒤에는 콤보가 1단부터 다시 시작한다.

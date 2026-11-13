@@ -3,6 +3,7 @@ using UnityEngine;
 // 대상 앞으로 순간 이동하는 공통 규칙. 순간 이동 옵션이 붙은 액션(패링 · 필살기 · 콤보 스킬)이 같은 계산과 같은 간격을 함께 쓴다.
 // 기억하는 값이나 매 프레임 할 일이 없는 계산이라 컴포넌트가 아닌 static 클래스로 둔다. 필요한 값은 모두 부를 때 넘겨받는다.
 // 어느 쪽에 설지 · 옆으로 얼마나 비켜 설지는 액션의 순간 이동 옵션(TeleportOption)이, 간격 · Layer · 바닥 찾는 범위는 공통 설정이 정한다.
+// 간격은 공격할 때 멈추는 간격과 같은 값(공격 간격)을 쓰고, 대상의 몸 크기는 BodyRadius 로 잰다.
 // 옆으로 비켜 서도 적과의 거리는 같게 두어 모든 캐릭터의 사정거리를 하나로 맞춘다.
 // 실제로 다가가면 벽 등에 걸리기 때문에 위치를 바로 옮긴다. 도착 지점이 막혀 있으면 이동하지 않는다.
 // 도착 높이는 도착 지점에서 찾은 바닥 높이를 쓴다. 바닥은 대상 높이를 기준으로 위 · 아래 정한 범위 안에서 찾는다.
@@ -33,7 +34,7 @@ public static class TeleportManager
         direction.y = 0f;
         direction = Quaternion.Euler(0f, sideAngle, 0f) * direction;
 
-        float distance = GetHorizontalRadius(target) + body.radius + common.TeleportDistance;
+        float distance = BodyRadius.GetHorizontal(target) + body.radius + common.AttackableDistance;
         Vector3 destination = targetPosition + direction.normalized * distance;
 
         if(!TrySnapToGround(common, ref destination) || IsBlocked(common, body, targetPosition, destination)) return false;
@@ -48,17 +49,6 @@ public static class TeleportManager
         character.FaceImmediately(toTarget);
 
         return true;
-    }
-
-    // 대상 콜라이더의 수평 반지름. 콜라이더 모양(캡슐 · 박스 등)과 상관없이 월드 기준 경계 상자(bounds)의 가로 · 세로 중 큰 쪽 절반을 쓴다.
-    // 콜라이더가 없거나 꺼져 있으면(도약 중인 보스 등) bounds 크기가 0 이라 0 이 된다.
-    private static float GetHorizontalRadius(Transform target)
-    {
-        if(!target.TryGetComponent(out Collider targetCollider)) return 0f;
-
-        Vector3 extents = targetCollider.bounds.extents;
-
-        return Mathf.Max(extents.x, extents.z);
     }
 
     // 도착 지점 위에서 아래로 바닥을 찾아, 찾으면 도착 높이를 바닥 높이로 맞추고 true 를 돌려준다.

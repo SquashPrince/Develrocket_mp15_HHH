@@ -41,7 +41,13 @@ public class ActionData : ScriptableObject
     [Tooltip("맞은 적을 경직시키는 시간(초, 적 전용 시간). 0이면 경직시키지 않는다. 경직하면 적이 진행 중이던 공격이 끊긴다")]
     [SerializeField, Min(0f)] private float _staggerTime;
 
+    [Header("비용")]
+    [Tooltip("이 액션을 쓸 때 드는 에너지. 지금은 특수스킬만 쓴다. 스킬 입력 시 에너지가 이보다 적으면 일반 스킬이 나간다")]
+    [SerializeField, Min(0f)] private float _energyCost;
+
     [Header("입력 · 캔슬")]
+    [Tooltip("[강공격만 사용] 공격 키를 누르고 있으면 이 시간 뒤 강공격이 나간다")]
+    [SerializeField, Min(0.01f)] private float _chargeTime = 0.6f;
     [Tooltip("[콤보 단계만 사용] 마지막 동작이 끝난 뒤 이 시간 안에 공격하면 다음 콤보 단계로 이어진다")]
     [SerializeField, Min(0f)] private float _inputBuffer = 0.4f;
     [Tooltip("대상에게 전진 거리보다 멀리 다가갈 때 하체에 달리기 모션을 덮을지 여부. 하체 동작이 중요한 모션이면 끈다")]
@@ -66,6 +72,8 @@ public class ActionData : ScriptableObject
     public float Power => _power;
     public int StaggerLevel => _staggerLevel;
     public float StaggerTime => _staggerTime;
+    public float EnergyCost => _energyCost;
+    public float ChargeTime => _chargeTime;
     public float InputBuffer => _inputBuffer;
     public bool UseLegRun => _useLegRun;
     public bool AlwaysLegRun => _alwaysLegRun;

@@ -28,9 +28,12 @@ MonoBehaviour:
   _power: 10
   _staggerLevel: 1
   _staggerTime: 0.5
+  _energyCost: 60
+  _chargeTime: 0.01
   _inputBuffer: 0.4
   _useLegRun: 0
   _alwaysLegRun: 0
   _canDashCancel: 1
   _canUltimateCancel: 1
   _isInvincibleOnSwing: 1
+  _teleport: {fileID: 0}

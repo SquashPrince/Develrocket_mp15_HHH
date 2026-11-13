@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: CommonCharacterSettings
   m_EditorClassIdentifier: Assembly-CSharp::CommonCharacterSettings
   _gravity: -20
+  _attackableDistance: 0
   _attackRange: 15
   _lockOnRange: 20
   _obstacleLayers:
@@ -20,7 +21,6 @@ MonoBehaviour:
     m_Bits: 3072
   _sightHeight: 1.2
   _lockOnMarkerPrefab: {fileID: 6668375599957286743, guid: 86d476e8f4ecd2443bf6651d8d833efc, type: 3}
-  _teleportDistance: 0
   _teleportBlockLayers:
     serializedVersion: 2
     m_Bits: 3072

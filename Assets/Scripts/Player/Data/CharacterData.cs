@@ -2,7 +2,9 @@ using UnityEngine;
 
 // 캐릭터 하나의 값. 캐릭터마다 다른 능력치 · 이동 · 대시 수치와 캐릭터가 쓰는 액션(ActionData)을 카테고리별로 모은다.
 // 카테고리는 일반 공격 / 회피 공격 / 교체 · 패링 / 스킬 / 필살기 / 콤보 스킬 순서로, 스킬창처럼 한눈에 보이게 한다.
-// 캐릭터가 바뀌어도 같은 규칙(중력 · 입력 · 타겟팅 사거리 · 패링 타이밍 · 슬로모션 · 순간 이동 등)은 각 기능 컴포넌트에 둔다.
+// 캐릭터가 바뀌어도 같은 규칙(중력 · 입력 · 타겟팅 사거리 · 공격 간격 · 패링 타이밍 · 슬로모션 · 순간 이동 등)은 공통 설정(CommonCharacterSettings)에 둔다.
+// 액션 하나에만 쓰는 값(강공격 차지 시간 · 특수스킬 에너지 비용 등)은 그 액션 데이터에 둔다.
+// 액션 에셋은 캐릭터마다 폴더를 나눠 둔다. (예: Datas/Player/Actions/Knight/)
 [CreateAssetMenu(fileName = "NewCharacterData", menuName = "HHH/Character Data")]
 public class CharacterData : ScriptableObject
 {
@@ -40,11 +42,8 @@ public class CharacterData : ScriptableObject
     [Header("일반 공격")]
     [Tooltip("콤보 단계별 액션. 배열 크기가 콤보 단수다. 마지막 단계는 마무리 공격으로, 후딜이 끝날 때까지 공격 입력을 받지 않는다")]
     [SerializeField] private ActionData[] _comboSteps;
+    [Tooltip("공격 키를 누르고 있으면 나가는 강공격. 차지 시간은 이 액션의 값을 쓴다")]
     [SerializeField] private ActionData _heavyAttack;
-    [Tooltip("공격 키를 누르고 있으면 이 시간 뒤 강공격이 나간다")]
-    [SerializeField, Min(0.01f)] private float _chargeTime = 0.6f;
-    [Tooltip("공격 대상에게 다가갈 때 대상 중심에서 이 거리만큼 앞에서 멈춘다")]
-    [SerializeField, Min(0f)] private float _attackStopDistance = 1.2f;
 
     [Header("회피 공격")]
     [Tooltip("대시 · 회피 도중 공격 입력으로 나가는 공격")]
@@ -60,9 +59,8 @@ public class CharacterData : ScriptableObject
 
     [Header("스킬")]
     [SerializeField] private ActionData _skill;
+    [Tooltip("에너지가 이 액션의 에너지 비용 이상이면 스킬 입력 시 일반 스킬 대신 나간다")]
     [SerializeField] private ActionData _specialSkill;
-    [Tooltip("특수스킬에 필요한 에너지. 스킬 입력 시 에너지가 이보다 적으면 일반 스킬이 나간다")]
-    [SerializeField, Min(0f)] private float _specialSkillEnergyCost = 60f;
 
     [Header("필살기")]
     [Tooltip("연출 뒤 이어지는 필살기 액션. 동작 목록 순서대로 이어 재생한다. 하체 달리기 · 대시 캔슬 · 입력 버퍼 값은 쓰지 않는다")]
@@ -91,15 +89,12 @@ public class CharacterData : ScriptableObject
     public float DashInvincibleTime => _dashInvincibleTime;
     public int ComboStepCount => _comboSteps.Length;
     public ActionData HeavyAttack => _heavyAttack;
-    public float ChargeTime => _chargeTime;
-    public float AttackStopDistance => _attackStopDistance;
     public ActionData DashAttack => _dashAttack;
     public ActionData DodgeCounter => _dodgeCounter;
     public ActionData Parry => _parry;
     public ActionData ParryChase => _parryChase;
     public ActionData Skill => _skill;
     public ActionData SpecialSkill => _specialSkill;
-    public float SpecialSkillEnergyCost => _specialSkillEnergyCost;
     public ActionData Ultimate => _ultimate;
     public ActionData ComboSkill => _comboSkill;
 

@@ -12,6 +12,10 @@ public class CommonCharacterSettings : ScriptableObject
     [Header("이동")]
     [SerializeField] private float _gravity = -20f;
 
+    [Header("공격 간격")]
+    [Tooltip("공격할 때 대상 앞에서 멈추거나 순간 이동할 때, 대상 몸 표면과 플레이어 몸 표면 사이를 이 간격만큼 띄운다. 중심 사이 거리는 대상 반지름 + 플레이어 반지름 + 간격이다")]
+    [SerializeField, Min(0f)] private float _attackableDistance = 1.5f;
+
     [Header("타겟팅")]
     [Tooltip("공격 사거리. 자동 조준 범위와 같다")]
     [SerializeField, Min(0f)] private float _attackRange = 5f;
@@ -25,8 +29,6 @@ public class CommonCharacterSettings : ScriptableObject
     [SerializeField] private GameObject _lockOnMarkerPrefab;
 
     [Header("순간 이동")]
-    [Tooltip("순간 이동할 때 대상 몸 표면과 플레이어 몸 표면 사이를 이 간격만큼 띄운다")]
-    [SerializeField, Min(0f)] private float _teleportDistance = 1.5f;
     [Tooltip("순간 이동할 자리가 막혀 있는지 검사할 Layer. Player · Enemy 는 빼고 벽 · 지형만 넣는다")]
     [SerializeField] private LayerMask _teleportBlockLayers = 1;
     [Tooltip("도착 지점의 바닥을 찾을 Layer. 바닥 · 지형 Layer 를 넣는다")]
@@ -80,7 +82,7 @@ public class CommonCharacterSettings : ScriptableObject
     public LayerMask ObstacleLayers => _obstacleLayers;
     public float SightHeight => _sightHeight;
     public GameObject LockOnMarkerPrefab => _lockOnMarkerPrefab;
-    public float TeleportDistance => _teleportDistance;
+    public float AttackableDistance => _attackableDistance;
     public LayerMask TeleportBlockLayers => _teleportBlockLayers;
     public LayerMask TeleportGroundLayers => _teleportGroundLayers;
     public float GroundSearchHeight => _groundSearchHeight;
