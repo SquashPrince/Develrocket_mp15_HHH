@@ -4,7 +4,7 @@ using UnityEngine;
 // 입력은 입력 기능, 타격 판정은 판정 기능, Animator 제어는 애니메이션 기능, 순간 이동은 순간 이동 기능이 맡고, 상태 클래스는 이 클래스를 통해 그 기능들을 꺼내 쓴다.
 // 실제 동작은 상태 클래스(이동 · 대시 · 공격 · 피격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
 // 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
-[RequireComponent(typeof(CharacterController), typeof(PlayerEnergy), typeof(PlayerTargeting))]
+[RequireComponent(typeof(CharacterController), typeof(PlayerTargeting))]
 [RequireComponent(typeof(PlayerStatus), typeof(PlayerSlowMotion), typeof(PlayerParry))]
 [RequireComponent(typeof(PlayerUltimate), typeof(PlayerComboSkill), typeof(PlayerInputReader))]
 [RequireComponent(typeof(PlayerAttackJudge), typeof(PlayerAnimation), typeof(PlayerTeleport))]
@@ -27,7 +27,6 @@ public class PlayerController : MonoBehaviour
 
     private CharacterController _characterController;
     private PlayerInputReader _input;
-    private PlayerEnergy _energy;
     private PlayerTargeting _targeting;
     private PlayerSlowMotion _slowMotion;
     private PlayerStateMachine _stateMachine;
@@ -170,10 +169,10 @@ public class PlayerController : MonoBehaviour
     // 에너지가 특수스킬 요구량 이상이면 소모하고 특수스킬, 모자라면 일반 스킬을 시작한다.
     public void StartSkill()
     {
-        bool isSpecial = _energy.TryConsume(_character.SpecialSkillEnergyCost);
+        bool isSpecial = Status.TryConsumeEnergy(_character.SpecialSkillEnergyCost);
 
 #if UNITY_EDITOR
-        if(isSpecial) Debug.Log($"[특수스킬] 에너지 -{_character.SpecialSkillEnergyCost} → {_energy.CurrentEnergy:F1}");
+        if(isSpecial) Debug.Log($"[특수스킬] 에너지 -{_character.SpecialSkillEnergyCost} → {Status.CurrentEnergy:F1}");
 #endif
 
         if(isSpecial) StartAttack(PlayerAttackState.AttackType.SpecialSkill, _character.SpecialSkill);
@@ -299,7 +298,6 @@ public class PlayerController : MonoBehaviour
     {
         _characterController = GetComponent<CharacterController>();
         _input = GetComponent<PlayerInputReader>();
-        _energy = GetComponent<PlayerEnergy>();
         _targeting = GetComponent<PlayerTargeting>();
         _slowMotion = GetComponent<PlayerSlowMotion>();
         AttackJudge = GetComponent<PlayerAttackJudge>();

@@ -31836,7 +31836,6 @@ GameObject:
   - component: {fileID: 3907669777063714774}
   - component: {fileID: 2670921355424890680}
   - component: {fileID: 3848066476718012999}
-  - component: {fileID: 6322618722868687519}
   - component: {fileID: 7492969571146502241}
   - component: {fileID: 7823694639924144761}
   - component: {fileID: 3260304514223116691}
@@ -31911,18 +31910,6 @@ MonoBehaviour:
   _cameraTransform: {fileID: 0}
   _character: {fileID: 11400000, guid: b26c4d85624b42cd8b510949bee0b4a0, type: 2}
   _gravity: -20
---- !u!114 &6322618722868687519
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7306029376340620380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: edceb998fa8d7c745aafd6751879ca64, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerEnergy
 --- !u!114 &7492969571146502241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32032,8 +32019,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a837fb2d9436fd345aac46764af39021, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerComboSkill
-  _sideAngleMin: 35
-  _sideAngleMax: 90
 --- !u!114 &1745635829274798527
 MonoBehaviour:
   m_ObjectHideFlags: 0

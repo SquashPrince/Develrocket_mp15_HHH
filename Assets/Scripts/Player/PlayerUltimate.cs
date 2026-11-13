@@ -1,9 +1,7 @@
 using UnityEngine;
 
-// 필살기 입력 · 게이지 · 수치. 게이지는 에너지와 별개로 쌓이며, 공격 적중 · 패링 성공 · 완벽 회피로 쌓이고 줄어들지 않는다.
-// 공격 적중 획득량은 액션마다 액션 데이터에서, 최대치와 패링 성공 · 완벽 회피 획득량은 캐릭터 데이터에서 정한다.
+// 필살기 입력과 대상. 게이지는 상태 기능(PlayerStatus)이 가진다.
 // 게이지가 가득 차 있고 현재 상태가 필살기를 허용할 때 필살기 키를 누르면 게이지를 전부 소모하고 필살기 상태로 넘긴다.
-// 현재 게이지는 Inspector 를 Debug 모드로 바꾸면 실시간으로 볼 수 있다.
 [RequireComponent(typeof(PlayerController), typeof(PlayerTargeting), typeof(PlayerInputReader))]
 public class PlayerUltimate : MonoBehaviour
 {
@@ -14,36 +12,12 @@ public class PlayerUltimate : MonoBehaviour
     private PlayerTargeting _targeting;
     private PlayerInputReader _input;
     private PlayerUltimateState _ultimateState;
-    private float _currentGauge;
 
-    // 값을 바꿀 때 항상 0 ~ 최대치 사이로 맞춘다.
-    public float CurrentGauge
-    {
-        get => _currentGauge;
-        private set => _currentGauge = Mathf.Clamp(value, 0f, _controller.Character.MaxUltimateGauge);
-    }
-
-    public bool IsGaugeFull => _currentGauge >= _controller.Character.MaxUltimateGauge;
     public ActionData Action => _controller.Character.Ultimate;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
     private void Update() => TryStartUltimate();
-
-    public void AddGauge(float amount)
-    {
-        if(amount <= 0f) return;
-
-        CurrentGauge += amount;
-
-#if UNITY_EDITOR
-        Debug.Log($"[필살기 게이지] +{amount} → {_currentGauge:F0} / {_controller.Character.MaxUltimateGauge:F0}");
-#endif
-    }
-
-    public void AddParryGauge() => AddGauge(_controller.Character.ParryGaugeGain);
-
-    public void AddPerfectDodgeGauge() => AddGauge(_controller.Character.PerfectDodgeGaugeGain);
 
     // 공격 대상 기준(록온 대상 → 찾는 거리 안의 자동 조준 대상)으로 필살기 대상을 고른다. 없으면 null 이다.
     public IEnemyTargetable FindTarget() => _targeting.FindAttackTarget(_targetSearchRange);
@@ -52,14 +26,9 @@ public class PlayerUltimate : MonoBehaviour
     private void TryStartUltimate()
     {
         if(!_input.WasUltimatePressed) return;
-        if(!IsGaugeFull || !_controller.CanUseUltimate) return;
+        if(!_controller.Status.IsUltimateGaugeFull || !_controller.CanUseUltimate) return;
 
-        CurrentGauge = 0f;
-
-#if UNITY_EDITOR
-        Debug.Log("[필살기] 게이지 전부 소모");
-#endif
-
+        _controller.Status.ConsumeUltimateGauge();
         _controller.EnterState(_ultimateState);
     }
 

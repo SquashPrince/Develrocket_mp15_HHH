@@ -6,8 +6,7 @@ using UnityEngine;
 // 패링 가능 시간 밖이거나 록온 사거리 밖의 적만 연 경우의 입력도 무시한다. 파티 전투에서는 이 입력이 그냥 교체가 된다.
 // 패링을 시작하면 패링 액션의 순간 이동 옵션대로 패링 공격을 하는 적 앞으로 순간 이동한다. 실제로 이동하면 벽 등에 걸리기 때문이다. 도착 지점이 막혀 있으면 제자리에서 패링한다.
 // 패링 공격을 하는 적이 여럿이면 공격 대상 기준(록온 대상 → 자동 조준 대상)을 따르고, 둘 다 아니면 록온 사거리 안에서 가장 최근에 예고를 시작한 적을 고른다.
-[RequireComponent(typeof(PlayerController), typeof(PlayerTargeting), typeof(PlayerUltimate))]
-[RequireComponent(typeof(PlayerInputReader))]
+[RequireComponent(typeof(PlayerController), typeof(PlayerTargeting), typeof(PlayerInputReader))]
 public class PlayerParry : MonoBehaviour
 {
     [Header("패링")]
@@ -20,7 +19,6 @@ public class PlayerParry : MonoBehaviour
 
     private PlayerController _controller;
     private PlayerTargeting _targeting;
-    private PlayerUltimate _ultimate;
     private PlayerInputReader _input;
     private PlayerParryState _parryState;
     // 패링 키를 누른 순간 고른 패링 대상. 패링 상태에 들어가며 이 적 앞으로 순간 이동한다.
@@ -51,7 +49,7 @@ public class PlayerParry : MonoBehaviour
         // 패링 성공 경직은 패링당한 공격의 저항 레벨을 경직 레벨로 쓴다. 레벨이 같으면 경직되므로 패링 성공은 항상 경직을 건다.
         if(attacker.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(attack.ParryStaggerTime, attack.StaggerResistLevel);
 
-        _ultimate.AddParryGauge();
+        _controller.Status.AddParryGauge();
         attacker.transform.TryGetComponent(out IEnemyTargetable parriedTarget);
         _parryState.OnParrySuccess(parriedTarget);
         return true;
@@ -110,7 +108,6 @@ public class PlayerParry : MonoBehaviour
     {
         _controller = GetComponent<PlayerController>();
         _targeting = GetComponent<PlayerTargeting>();
-        _ultimate = GetComponent<PlayerUltimate>();
         _input = GetComponent<PlayerInputReader>();
     }
 

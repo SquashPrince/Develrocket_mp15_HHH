@@ -5,7 +5,7 @@ using UnityEngine;
 // 범위 찾기 : 공격 설정의 모양(기본 상자 · 상자 · 구 · 캡슐)대로 캐릭터 기준 범위를 확인한다.
 // 맞은 적 처리 : 체력 감소 · 에너지 · 필살기 게이지 획득 · 경직 · 콤보 스킬 발동과 연계.
 // 두 과정을 나눠 둔 이유는, 나중에 검기처럼 날아가며 판정하는 공격도 같은 맞은 적 처리를 쓰게 하기 위해서다.
-[RequireComponent(typeof(PlayerEnergy), typeof(PlayerUltimate), typeof(PlayerComboSkill))]
+[RequireComponent(typeof(PlayerStatus), typeof(PlayerComboSkill))]
 public class PlayerAttackJudge : MonoBehaviour
 {
     // 한 번의 타격 판정에서 검사할 수 있는 최대 콜라이더 수
@@ -19,8 +19,7 @@ public class PlayerAttackJudge : MonoBehaviour
 
     private readonly HashSet<IEnemyDamageable> _hitTargets = new HashSet<IEnemyDamageable>();
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
-    private PlayerEnergy _energy;
-    private PlayerUltimate _ultimate;
+    private PlayerStatus _status;
     private PlayerComboSkill _comboSkill;
 
     private void Awake() => CacheComponent();
@@ -70,13 +69,13 @@ public class PlayerAttackJudge : MonoBehaviour
             if(enemy == null || !_hitTargets.Add(enemy)) continue;
 
             enemy.TakeDamage(setting.Power, isImpact);
-            _energy.Add(setting.EnergyGain);
+            _status.AddEnergy(setting.EnergyGain);
 
 #if UNITY_EDITOR
-            Debug.Log($"[{(isImpact ? "강타" : "적중")}] {type} 위력 {setting.Power} / 에너지 +{setting.EnergyGain} → {_energy.CurrentEnergy:F1}");
+            Debug.Log($"[{(isImpact ? "강타" : "적중")}] {type} 위력 {setting.Power} / 에너지 +{setting.EnergyGain} → {_status.CurrentEnergy:F1}");
 #endif
 
-            _ultimate.AddGauge(setting.UltimateGaugeGain);
+            _status.AddUltimateGauge(setting.UltimateGaugeGain);
 
             // 이 타격으로 처치된 적은 경직 · 콤보 스킬 대상이 아니다. 그로기 적이 강타로 처치되면 콤보 스킬보다 처치가 먼저다.
             if(!enemy.IsAlive) continue;
@@ -127,8 +126,7 @@ public class PlayerAttackJudge : MonoBehaviour
 
     private void CacheComponent()
     {
-        _energy = GetComponent<PlayerEnergy>();
-        _ultimate = GetComponent<PlayerUltimate>();
+        _status = GetComponent<PlayerStatus>();
         _comboSkill = GetComponent<PlayerComboSkill>();
     }
 }
