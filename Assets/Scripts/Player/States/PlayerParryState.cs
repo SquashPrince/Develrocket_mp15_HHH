@@ -6,11 +6,12 @@ using UnityEngine;
 // 추격 : 반응 동안 공격 키를 눌렀으면 반응이 끝난 뒤 추격 공격이 나간다. 연속 패링이 일어나면 이전 입력은 지우고 마지막 반응의 입력만 본다.
 //        추격 대상은 록온 중이면 록온 대상, 아니면 마지막으로 패링한 적이다.
 // 노란색이 아닌 공격은 패링되지 않고 기존처럼 맞는다.
+// 준비 · 반응 모션은 패링 액션의 동작 목록에서 읽는다. 첫 동작이 준비, 두 번째 동작이 반응이다.
 public class PlayerParryState : PlayerState
 {
-    // Animator Controller 의 상태 이름과 같아야 한다.
-    private static readonly int READY_ANIMATION = Animator.StringToHash("ParryReady");
-    private static readonly int REACT_ANIMATION = Animator.StringToHash("ParryReact");
+    // 패링 액션의 동작 번호
+    public const int READY_STEP = 0;
+    public const int REACT_STEP = 1;
 
     private enum Phase
     {
@@ -42,7 +43,7 @@ public class PlayerParryState : PlayerState
         // 패링 액션의 순간 이동 옵션대로 고른 적 앞에 순간 이동한다. 도착 지점이 막혀 있으면 제자리에서 패링한다.
         TeleportManager.TryTeleportTo(Controller, _trigger.SelectedParryAttacker.transform, _trigger.ParryAction.Teleport);
         Controller.HorizontalVelocity = Vector3.zero;
-        Controller.Animation.Play(READY_ANIMATION);
+        PlayStep(READY_STEP);
     }
 
     public override void Exit() => IsActive = false;
@@ -64,12 +65,12 @@ public class PlayerParryState : PlayerState
         _phase = Phase.React;
         _timer = 0f;
         _hasChaseInput = false;
-        Controller.Animation.Play(REACT_ANIMATION);
+        PlayStep(REACT_STEP);
     }
 
     public override void Tick()
     {
-        _timer += Time.deltaTime;
+        _timer += Controller.DeltaTime;
 
         if(_phase == Phase.Ready) UpdateReady();
         else UpdateReact();
@@ -107,5 +108,13 @@ public class PlayerParryState : PlayerState
         float t = _timer / _trigger.ParryReactTime;
 
         return Mathf.Lerp(startSpeed, 0f, t);
+    }
+
+    // 패링 액션의 index 번째 동작 모션을 그 동작의 섞는 시간으로 재생한다.
+    private void PlayStep(int index)
+    {
+        ActionStep step = _trigger.ParryAction.GetStep(index);
+
+        Controller.Animation.Play(step.AnimationHash, step.FadeTime);
     }
 }

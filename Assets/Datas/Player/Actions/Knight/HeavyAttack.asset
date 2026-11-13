@@ -15,6 +15,10 @@ MonoBehaviour:
   _actionType: 1
   _steps:
   - _animationState: HeavyAttack
+    _hitMode: 0
+    _hitInterval: 0.05
+    _maxHitsPerTarget: 5
+    _hitLagTime: 0.05
     _hitShape: 2
     _hitCenter: {x: 0, y: 0, z: 0}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
@@ -28,9 +32,13 @@ MonoBehaviour:
   _power: 10
   _staggerLevel: 1
   _staggerTime: 0.25
+  _energyCost: 0
+  _chargeTime: 0.6
   _inputBuffer: 0
   _useLegRun: 0
   _alwaysLegRun: 0
   _canDashCancel: 0
   _canUltimateCancel: 1
   _isInvincibleOnSwing: 0
+  _groggyGain: 0
+  _teleport: {fileID: 0}

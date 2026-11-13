@@ -55,35 +55,21 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.40345114
-        functionName: ComboInputOpen
+      - time: 0.4944808
+        functionName: HitStart
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.5189307
-        functionName: Hit
+      - time: 0.6660386
+        functionName: ImpactEnd
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.5419608
-        functionName: Hit
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.57557404
-        functionName: Impact
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.6373983
+      - time: 0.6862981
         functionName: AttackMotionEnd
         data: 
         objectReferenceParameter: {instanceID: 0}

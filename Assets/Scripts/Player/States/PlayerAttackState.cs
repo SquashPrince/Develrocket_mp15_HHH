@@ -83,8 +83,10 @@ public class PlayerAttackState : PlayerState
         StartMotion(0);
     }
 
+    // 켜 둔 판정 구간은 공격이 끝나거나 끊기면 함께 끈다.
     public override void Exit()
     {
+        Controller.AttackJudge.EndHit();
         Controller.Animation.SetLegRun(false);
         Controller.Status.SetAttackInvincible(false);
     }
@@ -124,9 +126,14 @@ public class PlayerAttackState : PlayerState
             case PlayerAnimationEventType.ComboInputOpen:
                 _isComboInputOpen = true;
                 break;
-            case PlayerAnimationEventType.Hit:
-            case PlayerAnimationEventType.Impact:
-                Controller.AttackJudge.PerformHit(_type, _action, _motion, isImpact: type == PlayerAnimationEventType.Impact);
+            case PlayerAnimationEventType.HitStart:
+                Controller.AttackJudge.BeginHit(_type, _action, _motion);
+                break;
+            case PlayerAnimationEventType.HitEnd:
+                Controller.AttackJudge.EndHit();
+                break;
+            case PlayerAnimationEventType.ImpactEnd:
+                Controller.AttackJudge.PerformImpact(_type, _action, _motion);
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 if(_motionIndex + 1 < _action.StepCount) StartMotion(_motionIndex + 1);
@@ -141,6 +148,7 @@ public class PlayerAttackState : PlayerState
     // index 번째 동작을 시작한다. 대상 쪽으로 돌아 방향과 전진 거리를 정하고 그 동작의 모션을 재생한다.
     private void StartMotion(int index)
     {
+        Controller.AttackJudge.EndHit();
         _motionIndex = index;
         _motion = _action.GetStep(index);
         _animationHash = _motion.AnimationHash;
@@ -163,7 +171,7 @@ public class PlayerAttackState : PlayerState
     // 전진 시간 동안만 앞으로 나아가고, 그 뒤에는 제자리에 멈추며 하체 달리기도 끈다.
     private Vector3 UpdateAdvance()
     {
-        _advanceTimer += Time.deltaTime;
+        _advanceTimer += Controller.DeltaTime;
 
         if(_advanceTimer < _motion.AdvanceDuration) return _advanceVelocity;
 

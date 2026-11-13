@@ -71,7 +71,7 @@ public class PlayerHitState : PlayerState
 
     public override void Tick()
     {
-        _timer += Time.deltaTime;
+        _timer += Controller.DeltaTime;
 
         if(_attack.CanDashCancel && Controller.WasDashPressed && Controller.TryStartDash(Controller.ReadMoveDirection())) return;
 

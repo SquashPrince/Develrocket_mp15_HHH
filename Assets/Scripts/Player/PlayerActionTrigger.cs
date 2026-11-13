@@ -92,10 +92,11 @@ public class PlayerActionTrigger : MonoBehaviour
 
         // 패링 액션이 연결되지 않았으면 패링을 시작하지 않는다. 상태에 들어간 뒤 멈추면 준비 모션 없이 패링 판정만 켜져,
         // 준비 성공 → 반응 → 추격 순서가 깨지기 때문이다. 상태가 바뀌기 전에 막아 진행 중이던 동작도 끊지 않는다.
-        if(ParryAction == null)
+        // 패링 액션에 준비 · 반응 두 동작이 없을 때도 같은 이유로 막는다.
+        if(ParryAction == null || ParryAction.StepCount <= PlayerParryState.REACT_STEP)
         {
 #if UNITY_EDITOR
-            Debug.LogWarning($"[패링] {_controller.Character.name} 의 패링 액션이 비어 있어 패링하지 않는다");
+            Debug.LogWarning($"[패링] {_controller.Character.name} 의 패링 액션이 비어 있거나 준비 · 반응 동작이 없어 패링하지 않는다");
 #endif
             return;
         }

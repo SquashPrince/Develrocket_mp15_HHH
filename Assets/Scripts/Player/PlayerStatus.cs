@@ -8,6 +8,9 @@ using UnityEngine;
 // 최대 체력 · 최대 에너지 · 초당 에너지 회복량 · 최대 게이지 · 패링 성공과 완벽 회피의 게이지 획득량은 캐릭터 데이터에서, 공격 적중 획득량은 액션 데이터에서 읽는다.
 // 체력이 0이 되었을 때의 쓰러짐 · 실패는 게임 흐름 단계에서 만든다. 지금은 0에서 멈추고 로그만 남긴다.
 // 현재 체력 · 에너지 · 게이지는 Inspector 를 Debug 모드로 바꾸면 실시간으로 볼 수 있다.
+// 캐릭터 시간 : 캐릭터마다 시간 배율을 가진다. 플레이어 쪽 기능 · 상태는 Unity 시간 대신 이 캐릭터 시간으로 타이머 · 이동을 계산한다.
+//   히트렉처럼 공격한 캐릭터만 멈추게 하기 위해서다. 슬로모션처럼 적에게 거는 전투 효과는 실제 시간을 그대로 쓴다.
+// 히트렉 : 공격이 적중하면 동작마다 정한 시간 동안 배율을 0 으로 두고, 끝나면 1 로 되돌린다.
 public class PlayerStatus : MonoBehaviour
 {
     private PlayerController _controller;
@@ -18,6 +21,8 @@ public class PlayerStatus : MonoBehaviour
     private float _currentUltimateGauge;
     private float _invincibleTimer;
     private float _perfectDodgeTimer;
+    // 남은 히트렉 시간(초, 실제 시간). 캐릭터 시간으로 세면 멈춘 동안 줄지 않으므로 실제 시간으로 센다.
+    private float _hitLagTimer;
     private bool _isAttackInvincible;
 
     public float MaxHealth => _controller.Character.MaxHealth;
@@ -38,11 +43,20 @@ public class PlayerStatus : MonoBehaviour
     // 시간으로 거는 무적(대시 · 넉백)이나 시전 중 무적 공격의 무적 중인지
     public bool IsInvincible => _invincibleTimer > 0f || _isAttackInvincible;
     public bool IsAttackInvincible => _isAttackInvincible;
+    // 캐릭터 시간 배율. 1 이면 원래 속도, 0 이면 멈춤
+    public float TimeScale { get; private set; } = 1f;
+    // 이번 프레임의 캐릭터 시간(초). Unity 프레임 시간에 캐릭터 시간 배율을 곱한 값이다.
+    public float DeltaTime => Time.deltaTime * TimeScale;
+    // 캐릭터 시간으로 잰 시계(초). 콤보 입력 유지처럼 "언제까지" 를 재는 데 쓴다. 배율이 0 인 동안은 흐르지 않는다.
+    public float LocalTime { get; private set; }
+    public bool IsHitLag => _hitLagTimer > 0f;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
     private void Update()
     {
+        UpdateHitLag();
+        LocalTime += DeltaTime;
         UpdateInvincible();
         RegenerateEnergy();
     }
@@ -67,6 +81,24 @@ public class PlayerStatus : MonoBehaviour
     {
         _invincibleTimer = 0f;
         _perfectDodgeTimer = 0f;
+    }
+
+    // duration 동안 이 캐릭터만 멈춘다(캐릭터 시간 배율 0). 적은 멈추지 않는다.
+    // 다단 히트로 히트렉 중에 또 맞히면 남은 시간과 새 시간 중 긴 쪽으로 다시 건다.
+    public void BeginHitLag(float duration)
+    {
+        if(duration <= 0f) return;
+
+        _hitLagTimer = Mathf.Max(_hitLagTimer, duration);
+        TimeScale = 0f;
+    }
+
+    // 히트렉을 끝내고, 겹친 효과와 상관없이 캐릭터 시간 배율을 원래 속도(1)로 되돌린다.
+    // 시간이 다 되었을 때와, 필살기처럼 히트렉 중에 바로 원래 속도로 시작해야 하는 행동이 부른다.
+    public void EndHitLag()
+    {
+        _hitLagTimer = 0f;
+        TimeScale = 1f;
     }
 
     // 맞았으면 true 를 돌려준다. 완벽 회피 · 패링했거나 무적이면 무시하고 false 를 돌려준다.
@@ -146,13 +178,22 @@ public class PlayerStatus : MonoBehaviour
         return true;
     }
 
-    private void UpdateInvincible()
+    private void UpdateHitLag()
     {
-        if(_invincibleTimer > 0f) _invincibleTimer -= Time.deltaTime;
-        if(_perfectDodgeTimer > 0f) _perfectDodgeTimer -= Time.deltaTime;
+        if(!IsHitLag) return;
+
+        _hitLagTimer -= Time.deltaTime;
+
+        if(_hitLagTimer <= 0f) EndHitLag();
     }
 
-    private void RegenerateEnergy() => CurrentEnergy += _controller.Character.EnergyRegenPerSecond * Time.deltaTime;
+    private void UpdateInvincible()
+    {
+        if(_invincibleTimer > 0f) _invincibleTimer -= DeltaTime;
+        if(_perfectDodgeTimer > 0f) _perfectDodgeTimer -= DeltaTime;
+    }
+
+    private void RegenerateEnergy() => CurrentEnergy += _controller.Character.EnergyRegenPerSecond * DeltaTime;
 
     private void CacheComponent()
     {

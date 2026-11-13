@@ -10,8 +10,9 @@ public class PlayerAnimationEventRelay : MonoBehaviour
     // 상태가 바뀌며 이전 클립과 섞이는 동안에는 이전 클립의 이벤트도 발생하므로,
     // 어느 Animator 상태에서 온 이벤트인지 함께 넘겨 현재 상태의 이벤트만 처리하게 한다.
     private void ComboInputOpen(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.ComboInputOpen, animationEvent);
-    private void Hit(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.Hit, animationEvent);
-    private void Impact(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.Impact, animationEvent);
+    private void HitStart(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.HitStart, animationEvent);
+    private void HitEnd(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.HitEnd, animationEvent);
+    private void ImpactEnd(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.ImpactEnd, animationEvent);
     private void AttackMotionEnd(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.AttackMotionEnd, animationEvent);
     private void RecoveryEnd(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.RecoveryEnd, animationEvent);
 

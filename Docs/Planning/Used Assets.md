@@ -37,8 +37,62 @@
 - Fighter Pack Can be used with My other Packs
     - 사용처 : 
 
+### 3. 몬스터
+
+- Demon Crew - Hand Painted
+    - 사용처 : 
+
+- Low Poly Skeleton Crew
+    - 사용처 : 
+
+- Stylized Demon Boss
+    - 사용처 : 
+
+- Monsters Ultimate Pack 01 Cute Series
+    - 사용처 : 
+
+- Monsters Ultimate Pack 04 Cute Series
+    - 사용처 : 
+
+- RPGMonsterBundlePolyart
+    - 사용처 : 
+
+### 4. UI
+
+- DamageNumbersPro
+    - 사용처 : 대미지 표시 UI
+
+- Layer Lab - GUI Pro-FantasyHero
+    - 사용처 : uGUI
+
+### 5. 맵
+
+- RPG - Stylized Fantasy Environment URP
+    - 사용처 : 맵
+
+- Toon Fantasy Nature
+    - 사용처 : 
+
+### 6. 사운드
+- Fantasy Game Sound Effects
+    - 사용처 : 
+
+- Monsters and Humanoids Sound Pack
+    - 사용처 : 
+
+- Stylized Sound Effects Bundle
+    - 사용처 : 
+
+- Battle Sound Library - Magic & Melee - Human Made Audio - Fantasy RPG
+    - 사용처 : 
+
+
+### 7. VFX
+
+
 ---
 
 ## 미사용 
 
 - STYLIZED Fantasy Female Character: Hetalia - Poly 3D Art
+- Kevin Iglesias
