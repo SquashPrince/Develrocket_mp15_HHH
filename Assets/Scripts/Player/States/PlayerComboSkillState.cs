@@ -82,7 +82,7 @@ public class PlayerComboSkillState : PlayerState
                 Controller.AttackJudge.BeginHit(PlayerAttackState.AttackType.ComboSkill, _trigger.ComboSkillAction, _trigger.ComboSkillAction.GetStep(_step));
                 break;
             case PlayerAnimationEventType.HitEnd:
-                Controller.AttackJudge.EndHit();
+                Controller.AttackJudge.FinishHit();
                 break;
             case PlayerAnimationEventType.ImpactEnd:
                 Controller.AttackJudge.PerformImpact(PlayerAttackState.AttackType.ComboSkill, _trigger.ComboSkillAction, _trigger.ComboSkillAction.GetStep(_step));

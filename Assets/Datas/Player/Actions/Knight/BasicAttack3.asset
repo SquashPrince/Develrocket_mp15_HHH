@@ -16,10 +16,11 @@ MonoBehaviour:
   _steps:
   - _animationState: BasicAttack 3
     _hitMode: 0
-    _hitInterval: 0.05
-    _maxHitsPerTarget: 5
+    _windowTiming: 1
+    _hitInterval: 0.035
+    _hitCount: 5
     _reactOnFirstHitOnly: 1
-    _hitLagTime: 0.05
+    _hitLagTime: 0.035
     _hitShape: 0
     _hitCenter: {x: 0, y: 1, z: 1}
     _hitSize: {x: 1.5, y: 1.5, z: 2}

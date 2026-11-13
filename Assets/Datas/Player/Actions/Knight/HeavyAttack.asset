@@ -16,10 +16,12 @@ MonoBehaviour:
   _steps:
   - _animationState: HeavyAttack
     _hitMode: 0
+    _windowTiming: 1
     _hitInterval: 0.05
-    _maxHitsPerTarget: 5
-    _hitLagTime: 0.05
-    _hitShape: 2
+    _hitCount: 5
+    _reactOnFirstHitOnly: 0
+    _hitLagTime: 0.035
+    _hitShape: 1
     _hitCenter: {x: 0, y: 0, z: 0}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
     _hitRadius: 1.5

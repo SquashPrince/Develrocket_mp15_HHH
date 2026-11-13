@@ -16,9 +16,11 @@ MonoBehaviour:
   _steps:
   - _animationState: Ultimate 1
     _hitMode: 0
-    _hitInterval: 0.05
-    _maxHitsPerTarget: 5
-    _hitLagTime: 0.05
+    _windowTiming: 1
+    _hitInterval: 0.035
+    _hitCount: 2
+    _reactOnFirstHitOnly: 0
+    _hitLagTime: 0.035
     _hitShape: 0
     _hitCenter: {x: 0, y: 1, z: 1}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
@@ -29,9 +31,11 @@ MonoBehaviour:
     _fadeTime: 0.1
   - _animationState: Ultimate 2
     _hitMode: 0
-    _hitInterval: 0.05
-    _maxHitsPerTarget: 5
-    _hitLagTime: 0.05
+    _windowTiming: 1
+    _hitInterval: 0.035
+    _hitCount: 3
+    _reactOnFirstHitOnly: 0
+    _hitLagTime: 0.035
     _hitShape: 0
     _hitCenter: {x: 0, y: 1, z: 1}
     _hitSize: {x: 1.5, y: 1.5, z: 2}

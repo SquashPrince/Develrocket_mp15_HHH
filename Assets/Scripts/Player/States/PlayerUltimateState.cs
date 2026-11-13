@@ -78,7 +78,7 @@ public class PlayerUltimateState : PlayerState
                 if(_step != CUTSCENE_STEP) Controller.AttackJudge.BeginHit(PlayerAttackState.AttackType.Ultimate, _trigger.UltimateAction, _trigger.UltimateAction.GetStep(_step));
                 break;
             case PlayerAnimationEventType.HitEnd:
-                Controller.AttackJudge.EndHit();
+                Controller.AttackJudge.FinishHit();
                 break;
             case PlayerAnimationEventType.ImpactEnd:
                 if(_step != CUTSCENE_STEP) Controller.AttackJudge.PerformImpact(PlayerAttackState.AttackType.Ultimate, _trigger.UltimateAction, _trigger.UltimateAction.GetStep(_step));

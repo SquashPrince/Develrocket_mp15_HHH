@@ -5,11 +5,12 @@ using UnityEngine;
 // 플레이어 공격의 타격 판정. 동작의 판정 범위 안에 있는 적을 찾아(범위 찾기), 찾은 적마다 결과를 적용한다(맞은 적 처리).
 // 판정 시점은 모션의 애니메이션 이벤트가 정한다.
 //   판정 시작 : 구간 판정 동작은 판정을 켜고, 한 순간 판정 동작은 이 순간 한 번 판정한다.
-//   판정 끝 : 켜 둔 판정을 끈다.
-//   강타 끝 : 이 순간 강타 판정을 한 번 하고 판정을 끈다. 구간의 마지막 타격을 강타로 만들 때 쓴다.
-// 구간 판정이 켜져 있는 동안 매 프레임 범위를 찾고, 같은 적은 동작의 간격(캐릭터 시간)마다 최대 횟수까지 맞는다.
+//   판정 끝 : 구간 끝까지 남은 타격을 마치고 판정을 끈다.
+//   강타 끝 : 구간 끝 전의 타격을 마치고, 이 순간 강타 판정을 한 번 한 뒤 판정을 끈다. 구간의 마지막 타격을 강타로 만들 때 쓴다.
+// 구간 판정은 시작부터의 타격 시점(간격 또는 횟수로 정함)마다 범위 안의 적을 모두 맞힌다. 시점 사이에 범위로 들어온 적은 다음 시점에 맞는다.
+//   시점은 캐릭터 시간으로 재므로, 히트렉으로 멈춘 동안은 다음 시점이 오지 않는다.
 // 적중하면 동작의 히트렉 시간 동안 공격한 캐릭터만 멈추도록 상태 기능에 요청한다.
-// 동작이 "첫 타격에만 반응"을 켜면, 구간에서 각 적의 첫 타격만 경직 · 히트렉을 건다.
+// 동작이 "첫 타격에만 반응"을 켜면, 구간(판정 시작 한 번)에서 처음 적중한 타격에만 경직 · 히트렉을 건다. 강타는 항상 건다.
 // 범위 찾기 : 동작의 모양(상자 · 구 · 캡슐)대로 캐릭터 기준 범위를 확인한다.
 // 맞은 적 처리 : 체력 감소 · 에너지 · 필살기 게이지 획득 · 경직 · 콤보 스킬 발동과 연계.
 // 두 과정을 나눠 둔 이유는, 나중에 검기처럼 날아가며 판정하는 공격도 같은 맞은 적 처리를 쓰게 하기 위해서다.
@@ -19,15 +20,9 @@ public class PlayerAttackJudge : MonoBehaviour
 {
     // 한 번의 범위 찾기에서 검사할 수 있는 최대 콜라이더 수
     private const int MAX_HIT_COLLIDERS = 16;
+    // 타격 시점과 구간 끝을 비교할 때 허용하는 오차(초). 구간 끝 시점의 타격이 계산 오차로 빠지지 않게 한다.
+    private const float TIME_EPSILON = 0.0001f;
 
-    // 구간 판정 동안 적 하나가 맞은 횟수와 마지막으로 맞은 캐릭터 시계 시간
-    private struct HitRecord
-    {
-        public int Count;
-        public float LastTime;
-    }
-
-    private readonly Dictionary<IEnemyDamageable, HitRecord> _hitRecords = new Dictionary<IEnemyDamageable, HitRecord>();
     private readonly HashSet<IEnemyDamageable> _hitTargets = new HashSet<IEnemyDamageable>();
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
     private PlayerStatus _status;
@@ -35,6 +30,15 @@ public class PlayerAttackJudge : MonoBehaviour
     private PlayerAttackState.AttackType _windowType;
     private ActionData _windowAction;
     private ActionStep _windowStep;
+    // 다음 판정 시작에 쓸 구간 길이와 강타로 끝나는지. 이벤트 전달 기능이 판정 시작 직전에 알려 준다.
+    private float _preparedLength = -1f;
+    private bool _preparedEndsWithImpact;
+    // 지금 구간의 시작 시각(캐릭터 시계), 길이(모르면 -1), 강타로 끝나는지, 다음 타격 번호, 이미 경직 · 히트렉을 걸었는지
+    private float _windowStartTime;
+    private float _windowLength;
+    private bool _windowEndsWithImpact;
+    private int _nextTickIndex;
+    private bool _hasReacted;
 
     // 판정 범위를 찾을 때마다 알린다. 전달 값 : 범위를 찾은 동작
     public event Action<ActionStep> RangeChecked;
@@ -47,7 +51,14 @@ public class PlayerAttackJudge : MonoBehaviour
     private void Awake() => CacheComponent();
     private void Update() => UpdateWindow();
 
-    // 판정 시작 이벤트. 구간 판정 동작이면 판정을 켜고 바로 한 번 찾는다. 한 순간 판정 동작이면 이 순간 한 번만 판정한다.
+    // 다음 판정 시작의 구간 길이(초, 모르면 -1)와 강타로 끝나는지를 미리 받아 둔다. 이벤트 전달 기능이 판정 시작 이벤트 직전에 부른다.
+    public void PrepareWindow(float length, bool endsWithImpact)
+    {
+        _preparedLength = length;
+        _preparedEndsWithImpact = endsWithImpact;
+    }
+
+    // 판정 시작 이벤트. 구간 판정 동작이면 판정을 켜고 시작 시점의 타격을 바로 한다. 한 순간 판정 동작이면 이 순간 한 번만 판정한다.
     // 판정 범위 · 방식은 동작(step), 위력 · 게이지 같은 타격 값은 액션(action)에서 읽는다.
     public void BeginHit(PlayerAttackState.AttackType type, ActionData action, ActionStep step)
     {
@@ -55,20 +66,38 @@ public class PlayerAttackJudge : MonoBehaviour
 
         if(step.Mode == ActionStep.HitMode.Instant)
         {
-            HitInRange(type, action, step, false, false);
+            HitInRange(type, action, step, false, true);
             return;
         }
+
+#if UNITY_EDITOR
+        if(step.Timing == ActionStep.WindowTiming.Count && _preparedLength < 0f) Debug.LogWarning($"[판정] {step.AnimationState} : 횟수 방식인데 판정 시작 뒤에 판정 끝 · 강타 끝 이벤트가 없어 시작 시점에 한 번만 타격한다");
+#endif
 
         _windowType = type;
         _windowAction = action;
         _windowStep = step;
-        _hitRecords.Clear();
+        _windowStartTime = _status.LocalTime;
+        _windowLength = _preparedLength;
+        _windowEndsWithImpact = _preparedEndsWithImpact;
+        _nextTickIndex = 0;
+        _hasReacted = false;
         IsWindowOpen = true;
+        _preparedLength = -1f;
 
         UpdateWindow();
     }
 
-    // 판정 끝 이벤트. 켜 둔 구간 판정을 끈다. 상태가 바뀌거나 다음 동작으로 넘어갈 때도 부른다.
+    // 판정 끝 이벤트. 구간 끝 시점까지 아직 하지 않은 타격을 마치고 판정을 끈다.
+    // 이벤트가 프레임 사이에 와도 끝 시점의 타격이 빠지지 않게 하기 위해서다.
+    public void FinishHit()
+    {
+        if(IsWindowOpen) HitDueTicks(GetWindowEndTime());
+
+        EndHit();
+    }
+
+    // 판정을 바로 끈다. 상태가 바뀌거나 다음 동작으로 넘어갈 때 부른다. 남은 타격은 하지 않는다.
     public void EndHit()
     {
         IsWindowOpen = false;
@@ -76,13 +105,15 @@ public class PlayerAttackJudge : MonoBehaviour
         _windowAction = null;
     }
 
-    // 강타 끝 이벤트. 이 순간 범위 안의 적에게 강타 판정을 한 번 하고 판정을 끈다.
-    // 강타는 구간의 간격 · 최대 횟수와 따로, 범위 안의 적마다 한 번씩 맞고 항상 경직 · 히트렉을 건다.
+    // 강타 끝 이벤트. 구간 끝 전의 타격을 마치고, 이 순간 범위 안의 적에게 강타 판정을 한 번 한 뒤 판정을 끈다.
+    // 강타는 범위 안의 적마다 한 번씩 맞고 항상 경직 · 히트렉을 건다.
     // 그로기 적에게 맞으면 판정을 모두 마친 뒤 콤보 스킬을 발동한다. 콤보 스킬 중이면 새로 발동하지 않고, 콤보 스킬 대상에게 맞았을 때 다음 연계를 잇게 한다.
     public void PerformImpact(PlayerAttackState.AttackType type, ActionData action, ActionStep step)
     {
+        if(IsWindowOpen) HitDueTicks(GetWindowEndTime());
+
         EndHit();
-        HitInRange(type, action, step, true, false);
+        HitInRange(type, action, step, true, true);
     }
 
     // 캡슐의 양 끝 구 중심. 캐릭터 앞쪽 방향으로 전체 길이만큼 뻗고, 길이가 반지름의 두 배보다 짧으면 두 점이 겹쳐 구가 된다.
@@ -96,22 +127,71 @@ public class PlayerAttackJudge : MonoBehaviour
         end = center + transform.forward * halfSegment;
     }
 
-    // 구간 판정이 켜져 있으면 범위 안의 적 중 다시 맞을 수 있는 적만 맞힌다.
-    // 히트렉으로 캐릭터가 멈춘 동안은 찾지 않는다. 멈춘 사이 범위로 들어온 적이 맞지 않게 하기 위해서다.
+    // 구간 판정이 켜져 있으면 지금까지 지난 타격 시점의 타격을 한다.
     private void UpdateWindow()
     {
-        if(!IsWindowOpen || _status.TimeScale <= 0f) return;
+        if(!IsWindowOpen) return;
 
-        HitInRange(_windowType, _windowAction, _windowStep, false, true);
+        HitDueTicks(_status.LocalTime - _windowStartTime);
     }
 
-    // 범위 안의 적을 찾아 맞힌다. useHitLimit 이면 구간 판정의 간격 · 최대 횟수 · 첫 타격 반응 규칙을 지킨다.
-    private void HitInRange(PlayerAttackState.AttackType type, ActionData action, ActionStep step, bool isImpact, bool useHitLimit)
+    // 구간 시작부터 elapsed(초)까지 지난 타격 시점 중 아직 하지 않은 타격을 순서대로 한다.
+    private void HitDueTicks(float elapsed)
+    {
+        while(IsWindowOpen && HasTick(_nextTickIndex) && GetTickTime(_nextTickIndex) <= elapsed + TIME_EPSILON)
+        {
+            _nextTickIndex++;
+
+            // 첫 타격에만 반응하는 동작이면, 이 구간에서 이미 경직 · 히트렉을 걸었을 때 이번 타격은 반응 없이 맞힌다.
+            bool canReact = !_windowStep.ReactOnFirstHitOnly || !_hasReacted;
+
+            if(HitInRange(_windowType, _windowAction, _windowStep, false, canReact) && canReact) _hasReacted = true;
+        }
+    }
+
+    // index 번째 타격이 이 구간에 있는지.
+    //   횟수 : 강타로 끝나면 끝 시점은 강타가 맡으므로 횟수보다 하나 적게, 아니면 횟수만큼 한다. 길이를 모르면 시작 시점 한 번만 한다.
+    //   간격 : 길이를 모르면 판정이 꺼질 때까지 계속, 알면 구간 끝(강타로 끝나면 끝 직전)까지만 한다.
+    private bool HasTick(int index)
+    {
+        if(_windowStep.Timing == ActionStep.WindowTiming.Count)
+        {
+            if(_windowLength < 0f) return index == 0;
+
+            int count = _windowEndsWithImpact ? _windowStep.HitCount - 1 : _windowStep.HitCount;
+
+            return index < count;
+        }
+
+        if(_windowLength < 0f) return true;
+
+        float tickTime = GetTickTime(index);
+
+        return _windowEndsWithImpact ? tickTime < _windowLength - TIME_EPSILON : tickTime <= _windowLength + TIME_EPSILON;
+    }
+
+    // index 번째 타격 시점(구간 시작부터 초).
+    //   간격 : 간격 × 번호 / 횟수 : 시작과 끝을 포함해 구간을 (횟수 - 1) 칸으로 나눈 간격 × 번호. 1 타면 시작 시점이다
+    private float GetTickTime(int index)
+    {
+        if(_windowStep.Timing == ActionStep.WindowTiming.Interval) return _windowStep.HitInterval * index;
+
+        int gaps = _windowStep.HitCount - 1;
+
+        return gaps > 0 && _windowLength > 0f ? _windowLength / gaps * index : 0f;
+    }
+
+    // 판정 끝 · 강타 끝 이벤트가 왔을 때 남은 타격을 어디까지 할지. 구간 길이를 알면 그 길이, 모르면 지금까지 지난 시간이다.
+    private float GetWindowEndTime() => _windowLength >= 0f ? _windowLength : _status.LocalTime - _windowStartTime;
+
+    // 범위 안의 적을 찾아 맞히고, 한 명이라도 맞았으면 true 를 돌려준다.
+    // canReact 이면 맞은 적을 경직시키고, 한 번의 찾기에서 여러 적을 맞혀도 히트렉은 한 번만 건다.
+    private bool HitInRange(PlayerAttackState.AttackType type, ActionData action, ActionStep step, bool isImpact, bool canReact)
     {
         int count = FindHitColliders(step);
         IEnemyTargetable comboSkillTarget = null;
         int comboSkillMaxChain = 0;
-        bool hasReactHit = false;
+        bool hasHit = false;
 
         RangeChecked?.Invoke(step);
 
@@ -124,43 +204,17 @@ public class PlayerAttackJudge : MonoBehaviour
 
             if(enemy == null || !_hitTargets.Add(enemy)) continue;
 
-            int hitCount = 1;
-
-            if(useHitLimit && !TryRecordHit(enemy, step, out hitCount)) continue;
-
-            // 첫 타격에만 반응하는 동작이면 그 적의 두 번째 타격부터는 경직 · 히트렉을 걸지 않는다.
-            bool canReact = !step.ReactOnFirstHitOnly || hitCount == 1;
-
             ApplyHit(enemy, action, isImpact, canReact, ref comboSkillTarget, ref comboSkillMaxChain);
             EnemyHit?.Invoke(type, action, isImpact);
-            hasReactHit |= canReact;
+            hasHit = true;
         }
 
-        // 한 번의 찾기에서 여러 적을 맞혀도 히트렉은 한 번만 건다.
-        if(hasReactHit) _status.BeginHitLag(step.HitLagTime);
+        if(hasHit && canReact) _status.BeginHitLag(step.HitLagTime);
 
         // 판정을 모두 마친 뒤 상태를 바꿔, 같은 판정의 다른 적도 에너지 · 게이지 · 경직을 받게 한다.
         if(comboSkillTarget != null) _actionTrigger.BeginComboSkill(comboSkillTarget, comboSkillMaxChain);
-    }
 
-    // 구간 판정에서 이 적을 지금 맞힐 수 있으면 횟수 · 시간을 기록하고 true 를 돌려준다. hitCount 는 이번이 몇 번째 타격인지다.
-    // 최대 횟수에 닿았거나, 마지막으로 맞은 뒤 간격(캐릭터 시간)이 지나지 않았으면 false 다.
-    private bool TryRecordHit(IEnemyDamageable enemy, ActionStep step, out int hitCount)
-    {
-        float now = _status.LocalTime;
-
-        hitCount = 0;
-
-        if(_hitRecords.TryGetValue(enemy, out HitRecord record))
-        {
-            if(record.Count >= step.MaxHitsPerTarget || now - record.LastTime < step.HitInterval) return false;
-        }
-
-        record.Count++;
-        record.LastTime = now;
-        _hitRecords[enemy] = record;
-        hitCount = record.Count;
-        return true;
+        return hasHit;
     }
 
     // 동작의 판정 모양대로 판정 범위 안의 콜라이더를 찾아 버퍼에 담고, 찾은 수를 돌려준다.

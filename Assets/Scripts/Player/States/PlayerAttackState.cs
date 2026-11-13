@@ -130,7 +130,7 @@ public class PlayerAttackState : PlayerState
                 Controller.AttackJudge.BeginHit(_type, _action, _motion);
                 break;
             case PlayerAnimationEventType.HitEnd:
-                Controller.AttackJudge.EndHit();
+                Controller.AttackJudge.FinishHit();
                 break;
             case PlayerAnimationEventType.ImpactEnd:
                 Controller.AttackJudge.PerformImpact(_type, _action, _motion);

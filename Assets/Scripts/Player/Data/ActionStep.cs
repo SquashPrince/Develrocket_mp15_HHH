@@ -16,7 +16,7 @@ public class ActionStep
     }
 
     // 판정 방식. Inspector 에 저장된 값은 순서 번호이므로, 새 방식은 항상 맨 뒤에 추가한다.
-    //   구간 : 판정 시작(HitStart) ~ 판정 끝(HitEnd) 동안 판정이 켜지고, 같은 적을 간격 · 최대 횟수만큼 맞힌다
+    //   구간 : 판정 시작(HitStart) ~ 판정 끝(HitEnd) · 강타 끝(ImpactEnd) 사이에 타격 시점을 두고, 시점마다 범위 안의 적을 모두 맞힌다
     //   한 순간 : 판정 시작(HitStart) 순간에 한 번만 판정한다
     // 어느 방식이든 강타 끝(ImpactEnd) 순간에 강타 판정을 한 번 하고 판정을 끝낸다.
     public enum HitMode
@@ -25,17 +25,29 @@ public class ActionStep
         Instant
     }
 
+    // 구간 판정의 타격 시점 정하기. Inspector 에 저장된 값은 순서 번호이므로, 새 방식은 항상 맨 뒤에 추가한다.
+    //   간격 : 판정 시작부터 간격마다 타격한다. 구간 끝을 넘어가는 타격은 하지 않는다
+    //   횟수 : 구간을 횟수로 나눠 간격을 정한다. 시작과 끝 시점을 모두 포함한다 (예 : 3타면 시작 · 가운데 · 끝)
+    // 강타 끝으로 끝나는 구간은 끝 시점의 타격이 강타다. 횟수 방식에서는 강타가 횟수의 마지막 1타다.
+    public enum WindowTiming
+    {
+        Interval,
+        Count
+    }
+
     [Tooltip("재생할 Animator 상태 이름. Animator Controller 의 상태 이름과 같아야 한다")]
     [SerializeField] private string _animationState = "";
 
     [Header("판정 방식")]
-    [Tooltip("구간 : 판정 시작 ~ 끝 동안 켜져 같은 적을 여러 번 맞힌다 / 한 순간 : 판정 시작 순간 한 번만 판정한다")]
+    [Tooltip("구간 : 판정 시작 ~ 끝 사이의 타격 시점마다 맞힌다 / 한 순간 : 판정 시작 순간 한 번만 판정한다")]
     [SerializeField] private HitMode _hitMode = HitMode.Window;
-    [Tooltip("[구간] 같은 적을 다시 맞히기까지의 간격(초, 캐릭터 시간). 히트렉으로 멈춘 동안은 흐르지 않는다")]
+    [Tooltip("[구간] 간격 : 간격마다 타격 / 횟수 : 구간을 횟수로 나눠 타격 (시작 · 끝 포함)")]
+    [SerializeField] private WindowTiming _windowTiming = WindowTiming.Interval;
+    [Tooltip("[구간 · 간격] 타격 간격(초, 캐릭터 시간). 판정 시작부터 이 간격마다 타격하고, 구간 끝을 넘어가는 타격은 하지 않는다")]
     [SerializeField, Min(0.01f)] private float _hitInterval = 0.1f;
-    [Tooltip("[구간] 판정 구간 한 번에 같은 적을 맞히는 최대 횟수. 강타 끝의 강타 판정은 이 횟수와 따로 한 번 더 맞는다")]
-    [SerializeField, Min(1)] private int _maxHitsPerTarget = 1;
-    [Tooltip("[구간] 켜면 경직 · 히트렉은 판정 구간에서 각 적의 첫 타격에만 건다. 나머지 타격은 위력 · 에너지 · 게이지만 준다. 강타 끝의 강타는 항상 경직 · 히트렉을 건다")]
+    [Tooltip("[구간 · 횟수] 구간 동안의 타격 횟수. 시작과 끝을 포함해 고르게 나눈다. 강타 끝으로 끝나면 마지막 1타가 강타다")]
+    [SerializeField, Min(1)] private int _hitCount = 1;
+    [Tooltip("[구간] 켜면 경직 · 히트렉은 판정 구간(판정 시작 한 번)에서 처음 적중한 타격에만 건다. 나머지 타격은 위력 · 에너지 · 게이지만 준다. 강타는 항상 경직 · 히트렉을 건다")]
     [SerializeField] private bool _reactOnFirstHitOnly;
     [Tooltip("적중할 때마다 공격한 캐릭터만 멈추는 시간(초, 실제 시간). 적은 멈추지 않는다. 0 이면 멈추지 않는다")]
     [SerializeField, Min(0f)] private float _hitLagTime;
@@ -65,7 +77,8 @@ public class ActionStep
     public int AnimationHash => Animator.StringToHash(_animationState);
     public HitMode Mode => _hitMode;
     public float HitInterval => _hitInterval;
-    public int MaxHitsPerTarget => _maxHitsPerTarget;
+    public WindowTiming Timing => _windowTiming;
+    public int HitCount => _hitCount;
     public bool ReactOnFirstHitOnly => _reactOnFirstHitOnly;
     public float HitLagTime => _hitLagTime;
     public HitShape Shape => _hitShape;
