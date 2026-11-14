@@ -1056,9 +1056,9 @@ ModelImporter:
     - serializedVersion: 16
       name: Skill_G_ALL
       takeName: Take 001
-      internalID: 0
+      internalID: 7400000
       firstFrame: 0
-      lastFrame: 72
+      lastFrame: 64
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -1091,7 +1091,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.115
+            time: 0.129375
             value: 0.25
             inSlope: 0
             outSlope: 0
@@ -1100,7 +1100,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.15
+            time: 0.16875
             value: 1.5
             inSlope: 0
             outSlope: 0
@@ -1109,7 +1109,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.275
+            time: 0.30937502
             value: 1.5
             inSlope: 0
             outSlope: 0
@@ -1118,7 +1118,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.3
+            time: 0.3375
             value: 0.5
             inSlope: 0
             outSlope: 0
@@ -1127,7 +1127,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.35
+            time: 0.39374998
             value: 0.5
             inSlope: 0
             outSlope: 0
@@ -1136,7 +1136,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.45
+            time: 0.50624996
             value: 0.5
             inSlope: 0
             outSlope: 0
@@ -1145,7 +1145,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.475
+            time: 0.534375
             value: 0.5
             inSlope: 0
             outSlope: 0
@@ -1154,7 +1154,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.55
+            time: 0.61875004
             value: 1.5
             inSlope: 0
             outSlope: 0
@@ -1163,7 +1163,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.575
+            time: 0.64687496
             value: 0.25
             inSlope: 0
             outSlope: 0
@@ -1172,7 +1172,7 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.75
+            time: 0.84375
             value: 0.25
             inSlope: 0
             outSlope: 0
@@ -1181,8 +1181,8 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.8
-            value: 1
+            time: 0.90000004
+            value: 0.5
             inSlope: 0
             outSlope: 0
             tangentMode: 0
@@ -1191,7 +1191,7 @@ ModelImporter:
             outWeight: 0
           - serializedVersion: 3
             time: 1
-            value: 1
+            value: 0.5
             inSlope: 0
             outSlope: 0
             tangentMode: 0
@@ -1202,7 +1202,42 @@ ModelImporter:
           postInfinity: 3
           rotationOrder: 4
       events:
-      - time: 0.8771331
+      - time: 0.17307691
+        functionName: HitStart
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.3028846
+        functionName: HitEnd
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.5686813
+        functionName: HitStart
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.7170329
+        functionName: HitEnd
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.7638675
+        functionName: ImpactEnd
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.9104095
         functionName: AttackMotionEnd
         data: 
         objectReferenceParameter: {instanceID: 0}

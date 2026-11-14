@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5738e84ba5848c09dac4e7a54a12e96, type: 3}
+  m_Name: Fighter
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  _maxHealth: 100
+  _maxEnergy: 120
+  _energyRegenPerSecond: 1
+  _maxUltimateGauge: 1
+  _parryGaugeGain: 300
+  _perfectDodgeGaugeGain: 300
+  _walkSpeed: 5
+  _runSpeed: 15
+  _turnTime: 0.1
+  _autoRunDelay: 1
+  _dashDistance: 5
+  _dashDuration: 0.25
+  _dodgeDistance: 3
+  _dodgeDuration: 0.25
+  _dashCooldown: 1
+  _dashChainInterval: 0.25
+  _dashInvincibleTime: 0.25
+  _comboSteps:
+  - {fileID: 11400000, guid: 3c1139319d12f6d47bbb0e2537388928, type: 2}
+  - {fileID: 11400000, guid: 7570cba6d207d2342a198ad176df579f, type: 2}
+  - {fileID: 11400000, guid: 7ce30a272da88414192a393d07097648, type: 2}
+  - {fileID: 11400000, guid: 38c8a7fbc36329a45b4256b293aaf8b8, type: 2}
+  - {fileID: 11400000, guid: 339a01b0aeee76e4fbb54c52d6ed7128, type: 2}
+  _heavyAttack: {fileID: 11400000, guid: 59b01f568efb9c74eae5f753c71a9e3e, type: 2}
+  _dashAttack: {fileID: 11400000, guid: cea159cfc63dce04f978255105633d44, type: 2}
+  _dodgeCounter: {fileID: 11400000, guid: 6d08a7bd08383ff4cb4b975b2e77436f, type: 2}
+  _parry: {fileID: 11400000, guid: d7cdcb544ebf63740a4f9ba3985a93f2, type: 2}
+  _parryChase: {fileID: 11400000, guid: 6e14b9d0e67bfc84db2f91032304fa4d, type: 2}
+  _skill: {fileID: 11400000, guid: 295c71f9b69657c4a83192c1f5842b33, type: 2}
+  _specialSkill: {fileID: 11400000, guid: 52b0e34188c571749984e905291d63cb, type: 2}
+  _ultimate: {fileID: 11400000, guid: 7c2917ea266817c4b90385c5812ff175, type: 2}
+  _comboSkill: {fileID: 11400000, guid: fb231bd6ef54bbd4c830afe86824725d, type: 2}

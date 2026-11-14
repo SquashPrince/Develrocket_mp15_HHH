@@ -20,14 +20,14 @@ MonoBehaviour:
     _hitInterval: 0.05
     _hitCount: 5
     _reactOnFirstHitOnly: 0
-    _hitLagTime: 0.035
+    _hitLagTime: 0.1
     _hitShape: 1
     _hitCenter: {x: 0, y: 0, z: 0}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
     _hitRadius: 1.5
     _hitLength: 3
-    _advanceDistance: 4.5
-    _advanceDuration: 0.5
+    _advanceDistance: 6
+    _advanceDuration: 1.5
     _fadeTime: 0.25
   _energyGain: 5
   _ultimateGaugeGain: 50

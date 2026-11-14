@@ -16,18 +16,18 @@ MonoBehaviour:
   _steps:
   - _animationState: SpecialSkill
     _hitMode: 0
-    _windowTiming: 0
+    _windowTiming: 1
     _hitInterval: 0.035
-    _hitCount: 1
-    _reactOnFirstHitOnly: 0
-    _hitLagTime: 0.035
+    _hitCount: 10
+    _reactOnFirstHitOnly: 1
+    _hitLagTime: 0.5
     _hitShape: 0
     _hitCenter: {x: 0, y: 1, z: 1}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
     _hitRadius: 1.5
     _hitLength: 3
-    _advanceDistance: 7.5
-    _advanceDuration: 1.65
+    _advanceDistance: 10
+    _advanceDuration: 1.125
     _fadeTime: 0.1
   _energyGain: 5
   _ultimateGaugeGain: 50

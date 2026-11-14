@@ -17,17 +17,17 @@ MonoBehaviour:
   - _animationState: BasicAttack 3
     _hitMode: 0
     _windowTiming: 1
-    _hitInterval: 0.035
-    _hitCount: 5
+    _hitInterval: 0.1
+    _hitCount: 4
     _reactOnFirstHitOnly: 1
-    _hitLagTime: 0.035
+    _hitLagTime: 0.35
     _hitShape: 0
     _hitCenter: {x: 0, y: 1, z: 1}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
     _hitRadius: 1.5
     _hitLength: 3
-    _advanceDistance: 4.5
-    _advanceDuration: 0.775
+    _advanceDistance: 2.5
+    _advanceDuration: 0.55
     _fadeTime: 0.2
   _energyGain: 1.25
   _ultimateGaugeGain: 50
@@ -36,8 +36,8 @@ MonoBehaviour:
   _staggerTime: 0.15
   _energyCost: 0
   _chargeTime: 0.01
-  _inputBuffer: 0.35
-  _useLegRun: 0
+  _inputBuffer: 0.1
+  _useLegRun: 1
   _alwaysLegRun: 0
   _canDashCancel: 0
   _canUltimateCancel: 1

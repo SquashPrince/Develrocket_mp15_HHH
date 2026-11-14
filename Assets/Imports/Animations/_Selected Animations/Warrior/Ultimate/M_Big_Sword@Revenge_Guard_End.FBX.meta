@@ -1045,7 +1045,7 @@ ModelImporter:
           curve:
           - serializedVersion: 3
             time: 0
-            value: 1
+            value: 0.5
             inSlope: 0
             outSlope: 0
             tangentMode: 0
@@ -1054,7 +1054,7 @@ ModelImporter:
             outWeight: 0
           - serializedVersion: 3
             time: 0.4
-            value: 0.5
+            value: 0.35
             inSlope: 0
             outSlope: 0
             tangentMode: 0
@@ -1063,7 +1063,7 @@ ModelImporter:
             outWeight: 0
           - serializedVersion: 3
             time: 0.55
-            value: 0.5
+            value: 0.35
             inSlope: 0
             outSlope: 0
             tangentMode: 0
@@ -1072,7 +1072,7 @@ ModelImporter:
             outWeight: 0
           - serializedVersion: 3
             time: 0.8
-            value: 1
+            value: 0.5
             inSlope: 0
             outSlope: 0
             tangentMode: 0
@@ -1092,6 +1092,27 @@ ModelImporter:
           postInfinity: 3
           rotationOrder: 4
       events:
+      - time: 0
+        functionName: HitStart
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.66483516
+        functionName: HitEnd
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.97984093
+        functionName: AttackMotionEnd
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 1
         functionName: RecoveryEnd
         data: 
