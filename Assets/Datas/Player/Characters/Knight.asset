@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5738e84ba5848c09dac4e7a54a12e96, type: 3}
   m_Name: Knight
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
-  _maxHealth: 100
+  _maxHealth: 3012
   _maxEnergy: 120
-  _energyRegenPerSecond: 1
+  _energyRegenPerSecond: 0.78
   _maxUltimateGauge: 3000
-  _parryGaugeGain: 300
-  _perfectDodgeGaugeGain: 300
+  _parryGaugeGain: 250
+  _perfectDodgeGaugeGain: 20
   _walkSpeed: 5
-  _runSpeed: 15
+  _runSpeed: 10
   _turnTime: 0.1
   _autoRunDelay: 1
   _dashDistance: 5
@@ -28,7 +28,7 @@ MonoBehaviour:
   _dodgeDuration: 0.25
   _dashCooldown: 1
   _dashChainInterval: 0.25
-  _dashInvincibleTime: 0.25
+  _dashInvincibleTime: 0.35
   _comboSteps:
   - {fileID: 11400000, guid: 93303de25de2b8f4ea5136a350a910dc, type: 2}
   - {fileID: 11400000, guid: 2970188ec2b589d4f8f5433152c43089, type: 2}

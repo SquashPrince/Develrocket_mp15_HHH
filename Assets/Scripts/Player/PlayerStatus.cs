@@ -126,10 +126,6 @@ public class PlayerStatus : MonoBehaviour
 
         _currentHealth = Mathf.Max(0f, _currentHealth - attack.Power);
 
-#if UNITY_EDITOR
-        Debug.Log($"[피격] {attack.Name} ({attack.Reaction}) 위력 {attack.Power} → 체력 {_currentHealth:F0} / {MaxHealth:F0}");
-#endif
-
         _controller.StartHit(attack, attacker.transform.position);
         return true;
     }
@@ -150,10 +146,6 @@ public class PlayerStatus : MonoBehaviour
         if(amount <= 0f) return;
 
         CurrentUltimateGauge += amount;
-
-#if UNITY_EDITOR
-        Debug.Log($"[필살기 게이지] +{amount} → {_currentUltimateGauge:F0} / {_controller.Character.MaxUltimateGauge:F0}");
-#endif
     }
 
     public void AddParryGauge() => AddUltimateGauge(_controller.Character.ParryGaugeGain);
@@ -162,10 +154,6 @@ public class PlayerStatus : MonoBehaviour
     public void ConsumeUltimateGauge()
     {
         CurrentUltimateGauge = 0f;
-
-#if UNITY_EDITOR
-        Debug.Log("[필살기] 게이지 전부 소모");
-#endif
     }
 
     // 판정 시간 안에 완벽 회피할 수 있는 공격이 닿으면 완벽 회피로 처리하고 슬로모션을 시작한다.

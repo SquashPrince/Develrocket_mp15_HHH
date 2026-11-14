@@ -8,6 +8,8 @@ using UnityEngine;
 // 파괴하지 않고 비활성화하는 이유 : 플레이어 기능이 적을 인터페이스로 들고 있어, 파괴하면 Unity 의 null 판정을 받지 못해
 // 남아 있는 참조로 접근할 때 오류가 나기 때문이다. 비활성화한 적은 이후 웨이브에서 다시 쓸 수도 있다.
 // 적 오브젝트의 맨 위(루트)에 붙인다. 플레이어는 이 오브젝트를 기준으로 적의 다른 기능을 찾는다.
+// 대상 정보 : 대상으로 고를 수 있는 적의 정보(생존 여부 · 몸 반지름 · 록온 표시 위치)도 이 컴포넌트가 알려준다.
+//   몸 반지름은 시작할 때 같은 오브젝트의 콜라이더로 한 번 재 둔다. 연출 · 도약 중 콜라이더가 꺼져도 값이 유지된다.
 public class EnemyHealth : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
 {
     [SerializeField, Min(1f)] private float _maxHealth = 100f;
@@ -15,14 +17,22 @@ public class EnemyHealth : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     [SerializeField] private bool _canDie = true;
     [Tooltip("처치된 뒤 시체가 남아 있다가 사라지기까지의 시간(초, 적 전용 시간)")]
     [SerializeField, Min(0f)] private float _corpseDuration = 3f;
+    [Tooltip("록온 표시를 띄울 위치 (머리 · 가슴 등에 둔 빈 자식 오브젝트). 비워 두면 타겟팅 기능의 기본 높이에 띄운다")]
+    [SerializeField] private Transform _lockOnPoint;
 
-    private float _currentHealth;
+    [Header("[확인용] 현재 값")]
+    [Tooltip("현재 체력. 실행 중 확인용이며, 시작할 때 최대 체력으로 정한다")]
+    [SerializeField] private float _currentHealth;
+
     private float _corpseTimer;
+    private float _radius;
     private bool _isDead;
 
     public float CurrentHealth => _currentHealth;
     public float MaxHealth => _maxHealth;
     public bool IsAlive => !_isDead;
+    public float Radius => _radius;
+    public Transform LockOnPoint => _lockOnPoint;
 
     // 맞을 때마다 강타 여부와 함께 알린다. 처치되는 타격도 먼저 맞은 것으로 알린 뒤 처치를 알린다.
     public event Action<bool> Damaged;
@@ -37,10 +47,6 @@ public class EnemyHealth : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
         if(_isDead) return;
 
         _currentHealth = Mathf.Max(0f, _currentHealth - power);
-
-#if UNITY_EDITOR
-        Debug.Log($"[적 체력] {name} -{power} → {_currentHealth:F0} / {_maxHealth:F0}");
-#endif
 
         Damaged?.Invoke(isImpact);
 
@@ -73,5 +79,7 @@ public class EnemyHealth : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     private void Init()
     {
         _currentHealth = _maxHealth;
+
+        if(TryGetComponent(out Collider bodyCollider)) _radius = BodyRadius.Measure(bodyCollider);
     }
 }

@@ -119,6 +119,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!4 &120928522 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3907669777063714774, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
+  m_PrefabInstance: {fileID: 901580288}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &160307530 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 362406810184043471, guid: df2ca08c06889d340b79104967a64347, type: 3}
@@ -329,7 +334,7 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 3636316544468560451}
+    TrackingTarget: {fileID: 120928522}
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
@@ -361,7 +366,7 @@ Transform:
   m_GameObject: {fileID: 253891554}
   serializedVersion: 2
   m_LocalRotation: {x: 0.123657785, y: -0.000000027985779, z: 0.0000000034874574, w: 0.99232495}
-  m_LocalPosition: {x: 0, y: 2.105867, z: -3.3807404}
+  m_LocalPosition: {x: 0.33765, y: 2.105867, z: -1.8252404}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -523,8 +528,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.0000000055673657, y: 0.99232495, z: -0.12365774, w: 0.000000044676828}
-  m_LocalPosition: {x: -0.00000029555372, y: 2.105867, z: 3.3807406}
+  m_LocalRotation: {x: -0.0029203733, y: 0.9957541, z: -0.085488066, w: -0.034016136}
+  m_LocalPosition: {x: 0.3376497, y: 2.105867, z: 4.9362407}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1254,7 +1259,7 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 3636316544468560451}
+    TrackingTarget: {fileID: 120928522}
     LookAtTarget: {fileID: 2145229456}
     CustomLookAtTarget: 1
   Lens:
@@ -1285,8 +1290,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1942779148}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.0000000054575864, y: 0.99232495, z: -0.12365774, w: 0.00000004466315}
-  m_LocalPosition: {x: -0.00000029555372, y: 2.105867, z: 3.3807406}
+  m_LocalRotation: {x: -0.0029203736, y: 0.9957541, z: -0.085488066, w: -0.03401614}
+  m_LocalPosition: {x: 0.3376497, y: 2.105867, z: 4.9362407}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1450,6 +1455,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1540001760320510130, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
+      propertyPath: _maxHealth
+      value: 784
+      objectReference: {fileID: 0}
+    - target: {fileID: 2428002810246828485, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
+      propertyPath: _maxGroggy
+      value: 500
+      objectReference: {fileID: 0}
     - target: {fileID: 4073899793546742747, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
       propertyPath: m_Name
       value: Earth Golem (1)
@@ -1782,18 +1795,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8698875331694340960, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
---- !u!4 &3636316544468560451 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5519931953987422134, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
-  m_PrefabInstance: {fileID: 3399390385370279526}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &7183380445868500468 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7320277439426231713, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
@@ -1813,10 +1821,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3122901376520537506, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
-      propertyPath: m_Graph
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 4073899793546742747, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
       propertyPath: m_Name
       value: Earth Golem
@@ -1886,10 +1890,6 @@ PrefabInstance:
       propertyPath: _parryTelegraphPrefab
       value: 
       objectReference: {fileID: 160307530}
-    - target: {fileID: 6288933616598289340, guid: 93a8a783d0bf5514e9fb126bcde5f762, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 2.25
-      objectReference: {fileID: 0}
     - target: {fileID: 8274059916941491464, guid: 93a8a783d0bf5514e9fb126bcde5f762, type: 3}
       propertyPath: m_LocalPosition.x
       value: 15

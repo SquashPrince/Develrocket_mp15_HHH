@@ -44,8 +44,8 @@ MonoBehaviour:
     _advanceDistance: 6
     _advanceDuration: 4
     _fadeTime: 0.1
-  _energyGain: 5
-  _ultimateGaugeGain: 50
+  _energyGain: 2.25
+  _ultimateGaugeGain: 40
   _power: 10
   _staggerLevel: 3
   _staggerTime: 1

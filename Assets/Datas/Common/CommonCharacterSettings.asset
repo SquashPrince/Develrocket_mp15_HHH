@@ -30,7 +30,7 @@ MonoBehaviour:
   _groundSearchHeight: 2
   _groundSearchDepth: 2
   _slowMotionDuration: 1
-  _slowMotionEnemyTimeScale: 0.5
+  _slowMotionEnemyTimeScale: 0.35
   _slowMotionMarkerPrefab: {fileID: 4365308044123951882, guid: ab2927bfddf64e34c8a41ba60305abf6, type: 3}
   _parryReadyTime: 1
   _parryReactDistance: 7.5
@@ -44,4 +44,3 @@ MonoBehaviour:
   _parryPreviousAction: {fileID: -3882990654037931100, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _parryNextAction: {fileID: 3151153704128378850, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _lockOnAction: {fileID: 694580335105051867, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _groggyDebugAction: {fileID: 4882079035516688179, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}

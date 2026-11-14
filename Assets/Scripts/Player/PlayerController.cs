@@ -177,10 +177,6 @@ public class PlayerController : MonoBehaviour
         float cost = _character.SpecialSkill.EnergyCost;
         bool isSpecial = Status.TryConsumeEnergy(cost);
 
-#if UNITY_EDITOR
-        if(isSpecial) Debug.Log($"[특수스킬] 에너지 -{cost} → {Status.CurrentEnergy:F1}");
-#endif
-
         if(isSpecial) StartAttack(PlayerAttackState.AttackType.SpecialSkill, _character.SpecialSkill);
         else StartAttack(PlayerAttackState.AttackType.Skill, _character.Skill);
     }

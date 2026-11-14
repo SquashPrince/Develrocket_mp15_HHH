@@ -75,13 +75,13 @@ public class PlayerUltimateState : PlayerState
         {
             // 연출 구간에는 판정하지 않는다.
             case PlayerAnimationEventType.HitStart:
-                if(_step != CUTSCENE_STEP) Controller.AttackJudge.BeginHit(PlayerAttackState.AttackType.Ultimate, _trigger.UltimateAction, _trigger.UltimateAction.GetStep(_step));
+                if(_step != CUTSCENE_STEP) Controller.AttackJudge.BeginHit(_trigger.UltimateAction, _trigger.UltimateAction.GetStep(_step));
                 break;
             case PlayerAnimationEventType.HitEnd:
                 Controller.AttackJudge.FinishHit();
                 break;
             case PlayerAnimationEventType.ImpactEnd:
-                if(_step != CUTSCENE_STEP) Controller.AttackJudge.PerformImpact(PlayerAttackState.AttackType.Ultimate, _trigger.UltimateAction, _trigger.UltimateAction.GetStep(_step));
+                if(_step != CUTSCENE_STEP) Controller.AttackJudge.PerformImpact(_trigger.UltimateAction, _trigger.UltimateAction.GetStep(_step));
                 break;
             case PlayerAnimationEventType.AttackMotionEnd:
                 StartNextStep();
