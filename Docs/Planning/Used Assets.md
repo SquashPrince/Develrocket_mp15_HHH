@@ -19,7 +19,7 @@
 
 - Paladin Anim Set
     - 경로 : `Assets/Imports/Animations/Paladin_Anim_Set`
-    - 사용처 : 검방 캐릭터
+    - 사용처 : 검방 캐릭터, 전사 캐릭터 사망 모션
 
 - Brutal Double Axe Anim Set
     - 경로 : `Assets/Imports/Animations/Brutal_Double_axe_Anim_Set`
@@ -31,7 +31,7 @@
 
 - Unleashed Boxer Anim Set
     - 경로 : `Assets/Imports/Animations/Unleashed_boxer_AnimSet`
-    - 사용처 : 
+    - 사용처 : 검방 · 격투가 캐릭터 사망 모션
 
 - Human Animations (Kevin Iglesias)
     - 경로 : `Assets/Imports/Animations/Kevin Iglesias/Human Animations`
@@ -39,11 +39,11 @@
 
 - Grruzam Powerful Sword Animation (Great Sword, Katana)
     - 경로 : `Assets/Imports/Animations/Grruzam Powerful Sword Animation(Great Sword, Katana)`
-    - 사용처 : 
+    - 사용처 : 전사 캐릭터
 
 - Grruzam Fighter Animation
     - 경로 : `Assets/Imports/Animations/Grruzam_Fighter_Animation`
-    - 사용처 : 
+    - 사용처 : 격투가 캐릭터
 
 ### 3. 몬스터
 
