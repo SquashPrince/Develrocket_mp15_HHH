@@ -49,7 +49,7 @@ public class PlayerActionTrigger : MonoBehaviour
     }
 
     // 패링 준비 · 반응 중 노란 공격이 닿으면 패링 성공으로 처리하고 true 를 돌려준다. 상태 기능이 맞았을 때 부른다.
-    // 패링한 적은 경직되고, 패링 추격은 이 적을 노린다.
+    // 패링한 적은 경직되고 패링 액션의 그로기 값만큼 그로기가 쌓이며, 패링 추격은 이 적을 노린다.
     public bool TryParry(EnemyAttackSetting attack, IEnemyParryable attacker)
     {
         if(!_parryState.IsActive || !attack.IsParryable) return false;
@@ -60,6 +60,8 @@ public class PlayerActionTrigger : MonoBehaviour
 
         // 패링 성공 경직은 패링당한 공격의 저항 레벨을 경직 레벨로 쓴다. 레벨이 같으면 경직되므로 패링 성공은 항상 경직을 건다.
         if(attacker.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(attack.ParryStaggerTime, attack.StaggerResistLevel);
+
+        if(attacker.transform.TryGetComponent(out IEnemyGroggyable groggyable)) groggyable.AddGroggy(ParryAction.GroggyGain);
 
         _controller.Status.AddParryGauge();
         attacker.transform.TryGetComponent(out IEnemyTargetable parriedTarget);

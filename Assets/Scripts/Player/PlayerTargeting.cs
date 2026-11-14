@@ -16,7 +16,7 @@ public class PlayerTargeting : MonoBehaviour
     [SerializeField] private Transform _cameraTransform;
 
     [Header("록온 표시")]
-    [Tooltip("록온 표시를 대상 위치에서 이만큼 위에 띄운다")]
+    [Tooltip("대상에 록온 표시 위치가 없을 때, 대상 위치에서 이만큼 위에 띄운다")]
     [SerializeField] private float _markerHeight = 2.5f;
 
     private readonly Collider[] _candidateColliders = new Collider[MAX_CANDIDATE_COLLIDERS];
@@ -124,7 +124,9 @@ public class PlayerTargeting : MonoBehaviour
 
         // 가림 판정은 대상 찾기와 같게 콜라이더 중심을 쓴다. 대상의 위치(발밑일 수 있음)를 쓰면 바닥에 막혀 항상 가려진 것으로 판정될 수 있다.
         _isLockTargetBlocked = IsBlocked(_lockTargetCollider.bounds.center);
-        _lockOnMarker.position = _lockTarget.transform.position + Vector3.up * _markerHeight;
+        // 대상이 알려주는 록온 표시 위치(머리 · 가슴 등)가 있으면 그 위치를 따라가고, 없으면 기본 높이에 띄운다.
+        Transform lockOnPoint = _lockTarget.LockOnPoint;
+        _lockOnMarker.position = lockOnPoint != null ? lockOnPoint.position : _lockTarget.transform.position + Vector3.up * _markerHeight;
     }
 
     // 화면 좌표(Viewport)는 화면 왼쪽 아래가 (0, 0), 오른쪽 위가 (1, 1) 이고, z 는 카메라 앞쪽 거리다.

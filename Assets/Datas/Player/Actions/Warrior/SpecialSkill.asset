@@ -42,5 +42,5 @@ MonoBehaviour:
   _canDashCancel: 1
   _canUltimateCancel: 1
   _isInvincibleOnSwing: 1
-  _groggyGain: 0
+  _groggyGain: 50
   _teleport: {fileID: 0}

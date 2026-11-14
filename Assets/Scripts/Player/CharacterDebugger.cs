@@ -1,13 +1,11 @@
 using UnityEngine;
 
-// [개발용] 캐릭터 디버그 기능. 판정 범위 표시 · 적중 로그 · 그로기 테스트 입력을 한곳에 모은다.
+// [개발용] 캐릭터 디버그 기능. 판정 범위 표시 · 적중 로그를 한곳에 모은다.
 // 판정 범위 : 판정 기능이 범위를 찾을 때마다 그 동작의 범위를 기억해, 잠깐 동안 Scene 창에 빨간 선으로 그린다.
 //             구간 판정은 켜져 있는 동안 계속 보이고, 한 순간 판정 · 강타도 짧게 남아 보인다. 캐릭터를 선택하지 않아도 그린다.
 //             Game 창에서는 Gizmos 버튼을 켰을 때만 보인다.
-// 적중 로그 : 적을 맞힐 때마다 공격 종류 · 위력 · 에너지를 에디터 Console 에 남긴다.
-// 그로기 테스트 : [코어 전투 테스트] 입력을 누르면 록온 대상, 없으면 자동 조준 대상을 그로기로 만든다. 적 그로기 게이지를 만들면 지운다.
-[RequireComponent(typeof(PlayerAttackJudge), typeof(PlayerStatus), typeof(PlayerTargeting))]
-[RequireComponent(typeof(PlayerInputReader))]
+// 적중 로그 : 적을 맞힐 때마다 공격 종류 · 위력 · 에너지 · 그로기 누적량을 에디터 Console 에 남긴다.
+[RequireComponent(typeof(PlayerAttackJudge), typeof(PlayerStatus))]
 public class CharacterDebugger : MonoBehaviour
 {
     [Tooltip("범위를 찾은 뒤 판정 범위를 그려 두는 시간(초, 실제 시간). 한 순간 판정처럼 한 프레임만 찾는 범위도 보이게 하기 위해서다")]
@@ -15,15 +13,12 @@ public class CharacterDebugger : MonoBehaviour
 
     private PlayerAttackJudge _judge;
     private PlayerStatus _status;
-    private PlayerTargeting _targeting;
-    private PlayerInputReader _input;
     private ActionStep _lastRangeStep;
     private float _lastRangeTime = float.NegativeInfinity;
 
     private void Awake() => CacheComponent();
     private void OnEnable() => BindJudgeEvent();
     private void OnDisable() => UnbindJudgeEvent();
-    private void Update() => TryEnterGroggy();
     private void OnDrawGizmos() => DrawHitRange();
 
     private void OnRangeChecked(ActionStep step)
@@ -35,20 +30,8 @@ public class CharacterDebugger : MonoBehaviour
     private void OnEnemyHit(PlayerAttackState.AttackType type, ActionData action, bool isImpact)
     {
 #if UNITY_EDITOR
-        Debug.Log($"[{(isImpact ? "강타" : "적중")}] {type} 위력 {action.Power} / 에너지 +{action.EnergyGain} → {_status.CurrentEnergy:F1}");
+        Debug.Log($"[{(isImpact ? "강타" : "적중")}] {type} 위력 {action.Power} / 에너지 +{action.EnergyGain} → {_status.CurrentEnergy:F1} / 그로기 +{action.GroggyGain}");
 #endif
-    }
-
-    // 그로기 기능(EnemyReaction)이 없는 적은 그로기가 될 수 없으므로 무시한다.
-    private void TryEnterGroggy()
-    {
-        if(!_input.WasGroggyDebugPressed) return;
-
-        IEnemyTargetable target = _targeting.FindAttackTarget(_targeting.AttackRange);
-
-        if(target == null || !target.transform.TryGetComponent(out IEnemyGroggyable groggyable)) return;
-
-        groggyable.EnterGroggy();
     }
 
     // 실행 중 표시 시간 안에 찾은 범위가 있으면 그 동작의 모양대로 그린다.
@@ -91,8 +74,6 @@ public class CharacterDebugger : MonoBehaviour
     {
         _judge = GetComponent<PlayerAttackJudge>();
         _status = GetComponent<PlayerStatus>();
-        _targeting = GetComponent<PlayerTargeting>();
-        _input = GetComponent<PlayerInputReader>();
     }
 
     private void BindJudgeEvent()

@@ -12,7 +12,7 @@ using UnityEngine;
 // 적중하면 동작의 히트렉 시간 동안 공격한 캐릭터만 멈추도록 상태 기능에 요청한다.
 // 동작이 "첫 타격에만 반응"을 켜면, 구간(판정 시작 한 번)에서 처음 적중한 타격에만 경직 · 히트렉을 건다. 강타는 항상 건다.
 // 범위 찾기 : 동작의 모양(상자 · 구 · 캡슐)대로 캐릭터 기준 범위를 확인한다.
-// 맞은 적 처리 : 체력 감소 · 에너지 · 필살기 게이지 획득 · 경직 · 콤보 스킬 발동과 연계.
+// 맞은 적 처리 : 체력 감소 · 에너지 · 필살기 게이지 획득 · 경직 · 그로기 누적 · 콤보 스킬 발동과 연계.
 // 두 과정을 나눠 둔 이유는, 나중에 검기처럼 날아가며 판정하는 공격도 같은 맞은 적 처리를 쓰게 하기 위해서다.
 // 범위를 찾을 때와 적을 맞혔을 때 이벤트로 알려, 디버그 기능이 범위 표시 · 적중 로그를 남긴다.
 [RequireComponent(typeof(PlayerStatus), typeof(PlayerActionTrigger))]
@@ -234,7 +234,9 @@ public class PlayerAttackJudge : MonoBehaviour
 
     // 맞은 적 하나에 결과를 적용한다. 체력은 액션의 위력만큼 줄고, 에너지와 필살기 게이지를 얻는다.
     // canReact 이고 액션의 경직 시간이 0보다 크면, 경직 저항 레벨이 액션의 경직 레벨 이하인 적을 경직시킨다.
+    // 그로기 게이지는 반응 여부와 상관없이 모든 적중마다 액션의 그로기 값만큼 쌓는다.
     // 강타가 그로기 적에게 맞으면 콤보 스킬 대상으로 고른다. 한 번의 판정에서 콤보 스킬은 하나의 적에게만 발동한다.
+    // 그로기를 쌓은 뒤 콤보 스킬을 확인하므로, 게이지를 채운 강타가 바로 콤보 스킬을 발동한다.
     private void ApplyHit(IEnemyDamageable enemy, ActionData action, bool isImpact, bool canReact, ref IEnemyTargetable comboSkillTarget, ref int comboSkillMaxChain)
     {
         enemy.TakeDamage(action.Power, isImpact);
@@ -246,6 +248,10 @@ public class PlayerAttackJudge : MonoBehaviour
 
         // 경직 · 그로기 기능(EnemyReaction)이 없는 적은 경직 · 그로기 · 콤보 스킬 대상이 아니다.
         if(canReact && action.StaggerTime > 0f && enemy.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(action.StaggerTime, action.StaggerLevel);
+
+        bool hasGroggy = enemy.transform.TryGetComponent(out IEnemyGroggyable groggyable);
+
+        if(hasGroggy) groggyable.AddGroggy(action.GroggyGain);
 
         if(!isImpact) return;
 
@@ -259,7 +265,7 @@ public class PlayerAttackJudge : MonoBehaviour
         // 발동 기회는 실제로 발동할 적에게서만 소모한다. 그로기 기능이 없는 적은 콤보 스킬을 받을 수 없다.
         if(comboSkillTarget != null) return;
 
-        if(!enemy.transform.TryGetComponent(out IEnemyGroggyable groggyable) || !groggyable.TryConsumeComboSkillChance()) return;
+        if(!hasGroggy || !groggyable.TryConsumeComboSkillChance()) return;
 
         enemy.transform.TryGetComponent(out comboSkillTarget);
         comboSkillMaxChain = groggyable.MaxComboChain;

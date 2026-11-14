@@ -31,7 +31,6 @@ public class PlayerInputReader : MonoBehaviour
     public bool WasParryNextPressed => WasPressed(Common.ParryNextAction);
     public bool WasParryPressed => WasParryPreviousPressed || WasParryNextPressed;
     public bool WasLockOnPressed => WasPressed(Common.LockOnAction);
-    public bool WasGroggyDebugPressed => WasPressed(Common.GroggyDebugAction);
     private CommonCharacterSettings Common => _controller.Common;
 
     private void Awake() => CacheComponent();

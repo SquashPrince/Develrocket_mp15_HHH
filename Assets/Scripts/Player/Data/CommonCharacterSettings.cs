@@ -72,10 +72,6 @@ public class CommonCharacterSettings : ScriptableObject
     [Header("입력 : 타겟팅")]
     [SerializeField] private InputActionReference _lockOnAction;
 
-    [Header("입력 : 테스트")]
-    [Tooltip("[코어 전투 테스트] 그로기 테스트 입력. 그로기 게이지를 만들면 지운다")]
-    [SerializeField] private InputActionReference _groggyDebugAction;
-
     public float Gravity => _gravity;
     public float AttackRange => _attackRange;
     public float LockOnRange => _lockOnRange;
@@ -102,5 +98,4 @@ public class CommonCharacterSettings : ScriptableObject
     public InputActionReference ParryPreviousAction => _parryPreviousAction;
     public InputActionReference ParryNextAction => _parryNextAction;
     public InputActionReference LockOnAction => _lockOnAction;
-    public InputActionReference GroggyDebugAction => _groggyDebugAction;
 }
