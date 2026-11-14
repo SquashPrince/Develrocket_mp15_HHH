@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
   _actionType: 0
   _steps:
-  - _animationState: BasicAttack 4
+  - _animationState: BasicAttack 5
     _hitMode: 0
     _windowTiming: 1
     _hitInterval: 0.035
@@ -28,7 +28,7 @@ MonoBehaviour:
     _hitLength: 3
     _advanceDistance: 3
     _advanceDuration: 0.45
-    _fadeTime: 0.2
+    _fadeTime: 0.1
   _energyGain: 1.25
   _ultimateGaugeGain: 50
   _power: 10

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-// FBX 클립의 Start · End 를 바꿀 때 Event · Curve 를 원본 프레임 위치에 고정해 주는 에디터 창
+// FBX 클립의 Start · End 를 바꿀 때 Event · Curve 를 원본 프레임 위치에 고정하고, Curve 값을 한 번에 곱해 주는 에디터 창
 public class ClipRangeEditorWindow : EditorWindow
 {
     private const float RANGE_EPSILON = 0.0001f;
@@ -14,6 +14,8 @@ public class ClipRangeEditorWindow : EditorWindow
     private ModelImporterClipAnimation[] _clips;
     private float[] _newFirstFrames;
     private float[] _newLastFrames;
+    private string _curveName = "";
+    private float _valueMultiplier = 1f;
     private Vector2 _scrollPosition;
 
     [MenuItem("Tools/Clip Range Editor")]
@@ -25,6 +27,7 @@ public class ClipRangeEditorWindow : EditorWindow
 
         if(_clips == null) return;
 
+        DrawCurveMultiplier();
         DrawClipList();
         DrawButtons();
     }
@@ -41,6 +44,25 @@ public class ClipRangeEditorWindow : EditorWindow
         {
             EditorGUILayout.HelpBox("모델 에셋(FBX 등)이 아닙니다.", MessageType.Warning);
         }
+    }
+
+    private void DrawCurveMultiplier()
+    {
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Curve 값 곱하기", EditorStyles.boldLabel);
+
+        _curveName = EditorGUILayout.TextField(new GUIContent("Curve 이름", "비워 두면 모든 Curve 에 적용합니다."), _curveName);
+        _valueMultiplier = EditorGUILayout.FloatField("배수", _valueMultiplier);
+
+        if(GUILayout.Button("곱하기 적용"))
+        {
+            ApplyValueMultiplier();
+
+            // 확인 창 · 재임포트 뒤 레이아웃이 어긋나지 않도록 이번 OnGUI 를 끝낸다
+            GUIUtility.ExitGUI();
+        }
+
+        EditorGUILayout.EndVertical();
     }
 
     private void DrawClipList()
@@ -175,6 +197,58 @@ public class ClipRangeEditorWindow : EditorWindow
             if(IsRangeChanged(i)) RemapClip(i);
         }
 
+        SaveClips();
+    }
+
+    private void ApplyValueMultiplier()
+    {
+        int clipCount = 0;
+        int curveCount = 0;
+
+        foreach(ModelImporterClipAnimation clip in _clips)
+        {
+            int targetCount = 0;
+
+            foreach(ClipAnimationInfoCurve curve in clip.curves)
+            {
+                if(IsTargetCurve(curve)) targetCount++;
+            }
+
+            if(targetCount == 0) continue;
+
+            clipCount++;
+            curveCount += targetCount;
+        }
+
+        if(curveCount == 0)
+        {
+            EditorUtility.DisplayDialog("Curve 값 곱하기", "대상 Curve 가 없습니다.", "확인");
+            return;
+        }
+
+        string message = $"{clipCount}개 클립의 Curve {curveCount}개 Value 에 ×{_valueMultiplier} 를 적용합니다.";
+
+        if(HasPendingRangeChange()) message += "\n적용하지 않은 Start · End 변경은 초기화됩니다.";
+
+        if(!EditorUtility.DisplayDialog("Curve 값 곱하기", message, "적용", "취소")) return;
+
+        foreach(ModelImporterClipAnimation clip in _clips)
+        {
+            ClipAnimationInfoCurve[] curves = clip.curves;
+
+            for(int c = 0; c < curves.Length; c++)
+            {
+                if(IsTargetCurve(curves[c])) MultiplyCurveValues(curves[c].curve);
+            }
+
+            clip.curves = curves;
+        }
+
+        SaveClips();
+    }
+
+    private void SaveClips()
+    {
         _importer.clipAnimations = _clips;
         _importer.SaveAndReimport();
 
@@ -253,6 +327,21 @@ public class ClipRangeEditorWindow : EditorWindow
         return new Keyframe(time, curve.Evaluate(time), slope, slope);
     }
 
+    // 접선 기울기도 같은 배수로 곱해야 곡선 모양을 유지한 채 높이만 바뀐다
+    private void MultiplyCurveValues(AnimationCurve curve)
+    {
+        Keyframe[] keys = curve.keys;
+
+        for(int k = 0; k < keys.Length; k++)
+        {
+            keys[k].value *= _valueMultiplier;
+            keys[k].inTangent *= _valueMultiplier;
+            keys[k].outTangent *= _valueMultiplier;
+        }
+
+        curve.keys = keys;
+    }
+
     // 기존 구간의 정규화 시간을 원본 프레임으로 환산한 뒤, 새 구간의 정규화 시간으로 바꾼다
     private float RemapTime(int index, float normalizedTime)
     {
@@ -290,6 +379,18 @@ public class ClipRangeEditorWindow : EditorWindow
     }
 
     private bool IsOutOfRange(float normalizedTime) => normalizedTime < -RANGE_EPSILON || normalizedTime > 1f + RANGE_EPSILON;
+
+    private bool IsTargetCurve(ClipAnimationInfoCurve curve) => string.IsNullOrWhiteSpace(_curveName) || curve.name == _curveName.Trim();
+
+    private bool HasPendingRangeChange()
+    {
+        for(int i = 0; i < _clips.Length; i++)
+        {
+            if(IsRangeChanged(i)) return true;
+        }
+
+        return false;
+    }
 
     private bool IsValidRange(int index) => _newLastFrames[index] > _newFirstFrames[index];
 

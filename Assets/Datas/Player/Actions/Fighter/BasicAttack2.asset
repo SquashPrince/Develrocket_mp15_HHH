@@ -33,11 +33,11 @@ MonoBehaviour:
   _ultimateGaugeGain: 50
   _power: 10
   _staggerLevel: 1
-  _staggerTime: 0.15
+  _staggerTime: 0.35
   _energyCost: 0
   _chargeTime: 0.01
   _inputBuffer: 0.35
-  _useLegRun: 1
+  _useLegRun: 0
   _alwaysLegRun: 0
   _canDashCancel: 1
   _canUltimateCancel: 1

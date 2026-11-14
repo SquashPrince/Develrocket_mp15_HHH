@@ -60,33 +60,6 @@ ModelImporter:
           curve:
           - serializedVersion: 3
             time: 0
-            value: 1
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          - serializedVersion: 3
-            time: 0.15
-            value: 1
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          - serializedVersion: 3
-            time: 0.25
-            value: 2
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          - serializedVersion: 3
-            time: 0.4
             value: 1.5
             inSlope: 0
             outSlope: 0
@@ -95,8 +68,35 @@ ModelImporter:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
+            time: 0.15
+            value: 1.5
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.25
+            value: 3
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.4
+            value: 2.25
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
             time: 0.64102316
-            value: 1
+            value: 1.5
             inSlope: 0
             outSlope: 0
             tangentMode: 0
@@ -105,7 +105,7 @@ ModelImporter:
             outWeight: 0
           - serializedVersion: 3
             time: 1
-            value: 1
+            value: 1.5
             inSlope: 0
             outSlope: 0
             tangentMode: 0

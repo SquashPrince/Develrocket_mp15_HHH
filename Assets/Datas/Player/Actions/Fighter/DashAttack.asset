@@ -37,8 +37,8 @@ MonoBehaviour:
   _energyCost: 0
   _chargeTime: 0.6
   _inputBuffer: 0.1
-  _useLegRun: 1
-  _alwaysLegRun: 1
+  _useLegRun: 0
+  _alwaysLegRun: 0
   _canDashCancel: 1
   _canUltimateCancel: 1
   _isInvincibleOnSwing: 0
