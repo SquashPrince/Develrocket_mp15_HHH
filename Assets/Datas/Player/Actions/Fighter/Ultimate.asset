@@ -16,7 +16,7 @@ MonoBehaviour:
   _steps:
   - _animationState: Ultimate 1
     _hitMode: 0
-    _windowTiming: 1
+    _windowTiming: 0
     _hitInterval: 0.035
     _hitCount: 2
     _reactOnFirstHitOnly: 0
@@ -26,8 +26,8 @@ MonoBehaviour:
     _hitSize: {x: 1.5, y: 1.5, z: 2}
     _hitRadius: 1.5
     _hitLength: 3
-    _advanceDistance: 6
-    _advanceDuration: 4
+    _advanceDistance: 9
+    _advanceDuration: 0.325
     _fadeTime: 0.1
   _energyGain: 5
   _ultimateGaugeGain: 50

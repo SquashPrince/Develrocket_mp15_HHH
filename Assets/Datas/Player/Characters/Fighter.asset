@@ -15,7 +15,7 @@ MonoBehaviour:
   _maxHealth: 100
   _maxEnergy: 120
   _energyRegenPerSecond: 1
-  _maxUltimateGauge: 1
+  _maxUltimateGauge: 3000
   _parryGaugeGain: 300
   _perfectDodgeGaugeGain: 300
   _walkSpeed: 5

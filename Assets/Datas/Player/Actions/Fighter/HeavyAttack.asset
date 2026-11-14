@@ -18,7 +18,7 @@ MonoBehaviour:
     _hitMode: 0
     _windowTiming: 1
     _hitInterval: 0.05
-    _hitCount: 5
+    _hitCount: 7
     _reactOnFirstHitOnly: 0
     _hitLagTime: 0.035
     _hitShape: 1
@@ -26,8 +26,8 @@ MonoBehaviour:
     _hitSize: {x: 1.5, y: 1.5, z: 2}
     _hitRadius: 1.5
     _hitLength: 3
-    _advanceDistance: 4.5
-    _advanceDuration: 0.5
+    _advanceDistance: 4
+    _advanceDuration: 0.75
     _fadeTime: 0.25
   _energyGain: 5
   _ultimateGaugeGain: 50
@@ -41,6 +41,6 @@ MonoBehaviour:
   _alwaysLegRun: 0
   _canDashCancel: 0
   _canUltimateCancel: 1
-  _isInvincibleOnSwing: 0
+  _isInvincibleOnSwing: 1
   _groggyGain: 0
   _teleport: {fileID: 0}

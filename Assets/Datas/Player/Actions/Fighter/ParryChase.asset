@@ -18,7 +18,7 @@ MonoBehaviour:
     _hitMode: 0
     _windowTiming: 1
     _hitInterval: 0.035
-    _hitCount: 6
+    _hitCount: 5
     _reactOnFirstHitOnly: 0
     _hitLagTime: 0.035
     _hitShape: 0

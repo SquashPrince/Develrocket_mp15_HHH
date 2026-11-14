@@ -34,7 +34,7 @@ MonoBehaviour:
   _power: 10
   _staggerLevel: 1
   _staggerTime: 0.5
-  _energyCost: 60
+  _energyCost: 90
   _chargeTime: 0.01
   _inputBuffer: 0.4
   _useLegRun: 0

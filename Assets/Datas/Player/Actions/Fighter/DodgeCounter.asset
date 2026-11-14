@@ -18,7 +18,7 @@ MonoBehaviour:
     _hitMode: 0
     _windowTiming: 0
     _hitInterval: 0.035
-    _hitCount: 5
+    _hitCount: 7
     _reactOnFirstHitOnly: 0
     _hitLagTime: 0.035
     _hitShape: 0
@@ -39,7 +39,7 @@ MonoBehaviour:
   _inputBuffer: 0.1
   _useLegRun: 0
   _alwaysLegRun: 0
-  _canDashCancel: 0
+  _canDashCancel: 1
   _canUltimateCancel: 1
   _isInvincibleOnSwing: 1
   _groggyGain: 0

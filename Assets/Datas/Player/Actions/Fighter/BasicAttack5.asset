@@ -26,8 +26,8 @@ MonoBehaviour:
     _hitSize: {x: 1.5, y: 1.5, z: 2}
     _hitRadius: 1.5
     _hitLength: 3
-    _advanceDistance: 3
-    _advanceDuration: 0.45
+    _advanceDistance: 2
+    _advanceDuration: 0.25
     _fadeTime: 0.1
   _energyGain: 1.25
   _ultimateGaugeGain: 50
