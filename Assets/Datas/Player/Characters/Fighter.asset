@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5738e84ba5848c09dac4e7a54a12e96, type: 3}
   m_Name: Fighter
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
-  _maxHealth: 100
+  _maxHealth: 1543
   _maxEnergy: 120
-  _energyRegenPerSecond: 1
+  _energyRegenPerSecond: 0.96
   _maxUltimateGauge: 3000
-  _parryGaugeGain: 300
-  _perfectDodgeGaugeGain: 300
+  _parryGaugeGain: 130
+  _perfectDodgeGaugeGain: 45
   _walkSpeed: 5
-  _runSpeed: 15
+  _runSpeed: 10
   _turnTime: 0.1
   _autoRunDelay: 1
   _dashDistance: 5
@@ -28,7 +28,7 @@ MonoBehaviour:
   _dodgeDuration: 0.25
   _dashCooldown: 1
   _dashChainInterval: 0.25
-  _dashInvincibleTime: 0.25
+  _dashInvincibleTime: 0.35
   _comboSteps:
   - {fileID: 11400000, guid: 3c1139319d12f6d47bbb0e2537388928, type: 2}
   - {fileID: 11400000, guid: 7570cba6d207d2342a198ad176df579f, type: 2}

@@ -20,7 +20,10 @@ public class EnemyHealth : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     [Tooltip("록온 표시를 띄울 위치 (머리 · 가슴 등에 둔 빈 자식 오브젝트). 비워 두면 타겟팅 기능의 기본 높이에 띄운다")]
     [SerializeField] private Transform _lockOnPoint;
 
-    private float _currentHealth;
+    [Header("[확인용] 현재 값")]
+    [Tooltip("현재 체력. 실행 중 확인용이며, 시작할 때 최대 체력으로 정한다")]
+    [SerializeField] private float _currentHealth;
+
     private float _corpseTimer;
     private float _radius;
     private bool _isDead;
@@ -44,10 +47,6 @@ public class EnemyHealth : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
         if(_isDead) return;
 
         _currentHealth = Mathf.Max(0f, _currentHealth - power);
-
-#if UNITY_EDITOR
-        Debug.Log($"[적 체력] {name} -{power} → {_currentHealth:F0} / {_maxHealth:F0}");
-#endif
 
         Damaged?.Invoke(isImpact);
 

@@ -61,10 +61,6 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
         _timer = duration;
         _state = State.Stagger;
 
-#if UNITY_EDITOR
-        Debug.Log($"[적 경직] {name} {duration}초 (경직 레벨 {staggerLevel})");
-#endif
-
         Staggered?.Invoke();
     }
 
@@ -77,10 +73,6 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
         if(IsGroggy || amount <= 0f) return;
 
         _currentGroggy = Mathf.Min(_currentGroggy + amount, _maxGroggy);
-
-#if UNITY_EDITOR
-        Debug.Log($"[적 그로기 게이지] {name} +{amount} → {_currentGroggy:F0} / {_maxGroggy:F0}");
-#endif
 
         if(_currentGroggy >= _maxGroggy) EnterGroggy();
     }

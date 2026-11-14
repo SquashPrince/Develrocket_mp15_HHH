@@ -15,7 +15,7 @@
 - PlayerAttackJudge : 타격 판정. 판정 범위 찾기와 맞은 적 처리
 - PlayerAnimation : 모델 Animator 제어 (상태 재생 · 이동 속도 값 · 하체 달리기 레이어)
 - PlayerAnimationEventRelay : 모델의 애니메이션 이벤트를 플레이어 기능으로 넘긴다
-- CharacterDebugger : [개발용] 판정 범위 표시 · 적중 로그 (위력 · 에너지 · 그로기 누적량)
+- CharacterDebugger : [개발용] 판정 범위를 Scene 창에 표시. 빼도 다른 기능은 그대로 동작한다
 - TeleportManager : 대상 앞 순간 이동 규칙 (특수 행동이 함께 쓴다)
 - BodyRadius : 대상 몸의 수평 반지름을 재는 규칙 (순간 이동 · 공격 정지 거리가 함께 쓴다)
 - CharacterData : 캐릭터 하나의 능력치 · 이동 · 대시 수치와 카테고리별 액션

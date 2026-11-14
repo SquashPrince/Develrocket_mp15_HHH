@@ -14,7 +14,7 @@ using UnityEngine;
 // 범위 찾기 : 동작의 모양(상자 · 구 · 캡슐)대로 캐릭터 기준 범위를 확인한다.
 // 맞은 적 처리 : 체력 감소 · 에너지 · 필살기 게이지 획득 · 경직 · 그로기 누적 · 콤보 스킬 발동과 연계.
 // 두 과정을 나눠 둔 이유는, 나중에 검기처럼 날아가며 판정하는 공격도 같은 맞은 적 처리를 쓰게 하기 위해서다.
-// 범위를 찾을 때와 적을 맞혔을 때 이벤트로 알려, 디버그 기능이 범위 표시 · 적중 로그를 남긴다.
+// 범위를 찾을 때 이벤트로 알려, 디버그 기능이 범위를 표시한다. 디버그 기능이 없어도 판정은 그대로다.
 [RequireComponent(typeof(PlayerStatus), typeof(PlayerActionTrigger))]
 public class PlayerAttackJudge : MonoBehaviour
 {
@@ -27,7 +27,6 @@ public class PlayerAttackJudge : MonoBehaviour
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
     private PlayerStatus _status;
     private PlayerActionTrigger _actionTrigger;
-    private PlayerAttackState.AttackType _windowType;
     private ActionData _windowAction;
     private ActionStep _windowStep;
     // 다음 판정 시작에 쓸 구간 길이와 강타로 끝나는지. 이벤트 전달 기능이 판정 시작 직전에 알려 준다.
@@ -42,8 +41,6 @@ public class PlayerAttackJudge : MonoBehaviour
 
     // 판정 범위를 찾을 때마다 알린다. 전달 값 : 범위를 찾은 동작
     public event Action<ActionStep> RangeChecked;
-    // 적을 맞혔을 때마다 알린다. 전달 값 : 공격 종류, 액션, 강타인지
-    public event Action<PlayerAttackState.AttackType, ActionData, bool> EnemyHit;
 
     // 구간 판정이 켜져 있는지
     public bool IsWindowOpen { get; private set; }
@@ -60,21 +57,19 @@ public class PlayerAttackJudge : MonoBehaviour
 
     // 판정 시작 이벤트. 구간 판정 동작이면 판정을 켜고 시작 시점의 타격을 바로 한다. 한 순간 판정 동작이면 이 순간 한 번만 판정한다.
     // 판정 범위 · 방식은 동작(step), 위력 · 게이지 같은 타격 값은 액션(action)에서 읽는다.
-    public void BeginHit(PlayerAttackState.AttackType type, ActionData action, ActionStep step)
+    public void BeginHit(ActionData action, ActionStep step)
     {
         EndHit();
 
         if(step.Mode == ActionStep.HitMode.Instant)
         {
-            HitInRange(type, action, step, false, true);
+            HitInRange(action, step, false, true);
             return;
         }
 
 #if UNITY_EDITOR
         if(step.Timing == ActionStep.WindowTiming.Count && _preparedLength < 0f) Debug.LogWarning($"[판정] {step.AnimationState} : 횟수 방식인데 판정 시작 뒤에 판정 끝 · 강타 끝 이벤트가 없어 시작 시점에 한 번만 타격한다");
 #endif
-
-        _windowType = type;
         _windowAction = action;
         _windowStep = step;
         _windowStartTime = _status.LocalTime;
@@ -108,12 +103,12 @@ public class PlayerAttackJudge : MonoBehaviour
     // 강타 끝 이벤트. 구간 끝 전의 타격을 마치고, 이 순간 범위 안의 적에게 강타 판정을 한 번 한 뒤 판정을 끈다.
     // 강타는 범위 안의 적마다 한 번씩 맞고 항상 경직 · 히트렉을 건다.
     // 그로기 적에게 맞으면 판정을 모두 마친 뒤 콤보 스킬을 발동한다. 콤보 스킬 중이면 새로 발동하지 않고, 콤보 스킬 대상에게 맞았을 때 다음 연계를 잇게 한다.
-    public void PerformImpact(PlayerAttackState.AttackType type, ActionData action, ActionStep step)
+    public void PerformImpact(ActionData action, ActionStep step)
     {
         if(IsWindowOpen) HitDueTicks(GetWindowEndTime());
 
         EndHit();
-        HitInRange(type, action, step, true, true);
+        HitInRange(action, step, true, true);
     }
 
     // 캡슐의 양 끝 구 중심. 캐릭터 앞쪽 방향으로 전체 길이만큼 뻗고, 길이가 반지름의 두 배보다 짧으면 두 점이 겹쳐 구가 된다.
@@ -145,7 +140,7 @@ public class PlayerAttackJudge : MonoBehaviour
             // 첫 타격에만 반응하는 동작이면, 이 구간에서 이미 경직 · 히트렉을 걸었을 때 이번 타격은 반응 없이 맞힌다.
             bool canReact = !_windowStep.ReactOnFirstHitOnly || !_hasReacted;
 
-            if(HitInRange(_windowType, _windowAction, _windowStep, false, canReact) && canReact) _hasReacted = true;
+            if(HitInRange(_windowAction, _windowStep, false, canReact) && canReact) _hasReacted = true;
         }
     }
 
@@ -186,7 +181,7 @@ public class PlayerAttackJudge : MonoBehaviour
 
     // 범위 안의 적을 찾아 맞히고, 한 명이라도 맞았으면 true 를 돌려준다.
     // canReact 이면 맞은 적을 경직시키고, 한 번의 찾기에서 여러 적을 맞혀도 히트렉은 한 번만 건다.
-    private bool HitInRange(PlayerAttackState.AttackType type, ActionData action, ActionStep step, bool isImpact, bool canReact)
+    private bool HitInRange(ActionData action, ActionStep step, bool isImpact, bool canReact)
     {
         int count = FindHitColliders(step);
         IEnemyTargetable comboSkillTarget = null;
@@ -205,7 +200,6 @@ public class PlayerAttackJudge : MonoBehaviour
             if(enemy == null || !_hitTargets.Add(enemy)) continue;
 
             ApplyHit(enemy, action, isImpact, canReact, ref comboSkillTarget, ref comboSkillMaxChain);
-            EnemyHit?.Invoke(type, action, isImpact);
             hasHit = true;
         }
 

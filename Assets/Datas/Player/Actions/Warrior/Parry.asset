@@ -44,11 +44,11 @@ MonoBehaviour:
     _advanceDistance: 0.5
     _advanceDuration: 0.15
     _fadeTime: 0.1
-  _energyGain: 5
-  _ultimateGaugeGain: 50
-  _power: 10
-  _staggerLevel: 1
-  _staggerTime: 0
+  _energyGain: 0
+  _ultimateGaugeGain: 0
+  _power: 0
+  _staggerLevel: 2
+  _staggerTime: 2
   _energyCost: 0
   _chargeTime: 0.6
   _inputBuffer: 0.4
@@ -57,5 +57,5 @@ MonoBehaviour:
   _canDashCancel: 0
   _canUltimateCancel: 0
   _isInvincibleOnSwing: 1
-  _groggyGain: 50
+  _groggyGain: 150
   _teleport: {fileID: 11400000, guid: ed6427ef9bfe3d64ba9b3799f8fe8333, type: 2}

@@ -29,8 +29,8 @@ MonoBehaviour:
     _advanceDistance: 2.5
     _advanceDuration: 0.55
     _fadeTime: 0.2
-  _energyGain: 1.25
-  _ultimateGaugeGain: 50
+  _energyGain: 0.8
+  _ultimateGaugeGain: 10
   _power: 10
   _staggerLevel: 1
   _staggerTime: 0.15
@@ -39,8 +39,8 @@ MonoBehaviour:
   _inputBuffer: 0.1
   _useLegRun: 1
   _alwaysLegRun: 0
-  _canDashCancel: 0
+  _canDashCancel: 1
   _canUltimateCancel: 1
-  _isInvincibleOnSwing: 1
-  _groggyGain: 50
+  _isInvincibleOnSwing: 0
+  _groggyGain: 5
   _teleport: {fileID: 0}
