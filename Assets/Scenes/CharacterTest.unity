@@ -1383,6 +1383,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Earth Golem (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4073899793546742747, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8764900569801773859, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
