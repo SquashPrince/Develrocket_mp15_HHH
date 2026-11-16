@@ -105,6 +105,16 @@
                     "interactions": "",
                     "initialStateCheck": false,
                     "priority": 0
+                },
+                {
+                    "name": "ComboCancel",
+                    "type": "Button",
+                    "id": "6b3f2d8e-4a1c-4f7e-9d25-3c8b7a6e1f04",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
                 }
             ],
             "bindings": [
@@ -534,6 +544,50 @@
                     "processors": "",
                     "groups": ";Switch",
                     "action": "ParryNext",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a4e9c1b7-2f63-4d8a-b05e-7c1d9f3a2e61",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ComboCancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c8d2f5a1-9b47-4e3c-8a16-5e0b7d4c9f22",
+                    "path": "<Mouse>/forwardButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ComboCancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e1b7a3c9-6d25-4f8e-b94a-2a7c6e0d5b13",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "ComboCancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f5c3e8b2-1a96-4d7f-a83c-9b4e2f6a0d74",
+                    "path": "<SwitchJoyConLHID>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Switch",
+                    "action": "ComboCancel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

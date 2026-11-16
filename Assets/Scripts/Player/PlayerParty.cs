@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.Behavior;
 using UnityEngine;
 
@@ -19,11 +20,14 @@ using UnityEngine;
 //            이전 캐릭터는 보통 교체처럼 하던 동작을 마친 뒤 퇴장한다. 현재 캐릭터가 직접 패링하지는 않는다.
 // 빠른 지원 : 조작 중인 캐릭터가 넉백되면 입력 시간이 열리고, 그 안에 교체하면 새 캐릭터가 넉백시킨 적 앞으로 순간 이동해 빠른 지원 액션을 쓴다.
 //            넉백된 캐릭터는 일어난 뒤 퇴장한다. 지원 공격보다 먼저 본다.
+// 콤보 스킬 이어받기 : 콤보 스킬 선택(같은 오브젝트)이 고른 캐릭터를 교체처럼 이전 자리에 꺼내 콤보 스킬로 들여보낸다.
+//                     선택 중에는 교체 키 · 캐릭터 입력을 막는다.
 // 대기 : 필드에 없는 캐릭터는 꺼 둔다. 꺼진 오브젝트는 적에게 맞거나 대상으로 잡히지 않는다.
 //        대기 캐릭터의 에너지는 파티가 초당 회복량 × 대기 회복 배율로 채운다.
 // 적의 공격 대상 : 시작할 때와 교체할 때 씬의 적 행동 그래프의 Target 을 조작 중인 캐릭터로 바꾼다.
 //   적은 공격을 시작할 때 대상을 따로 저장하므로, 진행 중인 공격은 이전 캐릭터의 위치로 끝까지 시전하고 다음 공격부터 새 캐릭터를 노린다.
 [RequireComponent(typeof(BattleSlowMotion), typeof(PlayerLockOn), typeof(ParryTelegraphView))]
+[RequireComponent(typeof(ComboSkillSelector))]
 public class PlayerParty : MonoBehaviour
 {
     private const int PREVIOUS = -1;
@@ -53,6 +57,9 @@ public class PlayerParty : MonoBehaviour
     public PlayerLockOn LockOn { get; private set; }
     // 교체할 수 있는 대기 캐릭터가 있는지. 없으면 지원 공격(교체 패링)을 할 수 없어 적의 패링 공격 예고가 패링 불가로 뜬다.
     public bool HasStandby => FindStandbyIndex(NEXT) >= 0;
+    public ComboSkillSelector ComboSelector { get; private set; }
+    // 콤보 스킬 캐릭터 선택 중이라 플레이어 입력(교체 · 캐릭터 행동 · 록온)을 막는지
+    public bool IsInputBlocked => ComboSelector.IsBlockingInput;
 
     // 조작 중인 캐릭터가 바뀌면 알린다. 시작할 때도 첫 캐릭터로 한 번 알린다. 카메라가 따라갈 대상을 바꾸는 데 쓴다.
     public event Action<PlayerController> ControlledChanged;
@@ -139,8 +146,11 @@ public class PlayerParty : MonoBehaviour
         _quickSupportTimer = 0f;
     }
 
+    // 콤보 스킬 캐릭터 선택 중에는 교체 키를 선택이 쓰므로 교체하지 않는다.
     private void ReadSwapInput()
     {
+        if(IsInputBlocked) return;
+
         if(_common.ParryPreviousAction.action.WasPressedThisFrame()) TrySwap(PREVIOUS);
         else if(_common.ParryNextAction.action.WasPressedThisFrame()) TrySwap(NEXT);
     }
@@ -158,13 +168,52 @@ public class PlayerParty : MonoBehaviour
         PlayerController previous = Controlled;
         PlayerController next = _members[nextIndex];
 
-        SlowMotion.End();
+        PlaceNext(previous, next);
+        EnterNext(previous, next);
+        FinishSwap(previous, nextIndex);
+    }
 
-        // 꺼져 있는 동안 옮겨 두어야 켜지는 순간 CharacterController 가 새 위치에서 시작한다.
+    // 콤보 스킬 선택에서 고른 캐릭터를 콤보 스킬로 들여보낸다. 교체처럼 이전 캐릭터 자리에 꺼내 놓고 조작 캐릭터로 바꾼다.
+    // 이전 캐릭터 자리에서 콤보 스킬의 순간 이동을 하므로, 남아 있는 이전 캐릭터 위치를 기준으로 비켜 선다.
+    // 이전 캐릭터(강타를 맞힌 캐릭터 · 앞 연계의 콤보 스킬 캐릭터)는 하던 동작을 마친 뒤 퇴장한다.
+    public void EnterComboSkill(PlayerController next, IEnemyTargetable target)
+    {
+        PlayerController previous = Controlled;
+
+        ClearQuickSupport();
+        PlaceNext(previous, next);
+        next.ActionTrigger.BeginComboSkill(target);
+        FinishSwap(previous, Array.IndexOf(_members, next));
+    }
+
+    // 조작 중인 캐릭터에서 isNext 쪽으로 한 칸씩 가며, 대기 중이고 used 에 없는 캐릭터를 찾는다. 없으면 null 이다.
+    // 콤보 스킬 선택이 이번 연계에서 아직 쓰지 않은 후보를 고를 때 쓴다.
+    public PlayerController FindComboCandidate(bool isNext, HashSet<PlayerController> used)
+    {
+        int direction = isNext ? NEXT : PREVIOUS;
+
+        for(int step = 1; step < _members.Length; step++)
+        {
+            PlayerController member = _members[(_controlledIndex + direction * step + _members.Length) % _members.Length];
+
+            if(!member.gameObject.activeSelf && !used.Contains(member)) return member;
+        }
+
+        return null;
+    }
+
+    // 슬로모션을 끝내고, 다음 캐릭터를 이전 캐릭터 자리에 꺼내 놓는다. 어떻게 들어올지는 부른 쪽이 정한다.
+    // 꺼져 있는 동안 옮겨 두어야 켜지는 순간 CharacterController 가 새 위치에서 시작한다.
+    private void PlaceNext(PlayerController previous, PlayerController next)
+    {
+        SlowMotion.End();
         next.transform.SetPositionAndRotation(previous.transform.position, previous.transform.rotation);
         next.gameObject.SetActive(true);
+    }
 
-        EnterNext(previous, next);
+    // 이전 캐릭터의 퇴장을 예약하고 조작 캐릭터를 바꾼다.
+    private void FinishSwap(PlayerController previous, int nextIndex)
+    {
         previous.ReserveSwapOut();
         SetControlled(nextIndex);
     }
@@ -229,6 +278,7 @@ public class PlayerParty : MonoBehaviour
     {
         SlowMotion = GetComponent<BattleSlowMotion>();
         LockOn = GetComponent<PlayerLockOn>();
+        ComboSelector = GetComponent<ComboSkillSelector>();
     }
 
     private void Init()

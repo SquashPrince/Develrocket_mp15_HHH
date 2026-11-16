@@ -5,6 +5,8 @@ using UnityEngine;
 // 경직은 경직을 거는 쪽의 경직 레벨이 지금의 경직 저항 레벨 이상일 때만 걸린다.
 // 지금의 경직 저항 레벨은 평소 저항 레벨과, 공격 중이면 그 공격의 저항 레벨 중 큰 값이다.
 // 그로기 중에는 경직이 걸려도 그로기를 유지한다. 그로기가 될 때마다 콤보 스킬 기회가 한 번 생긴다.
+// 그로기 시간 정지 : 플레이어 쪽이 콤보 스킬 흐름에 맞춰 정해진 시간 동안 멈추거나(정지 시간), 캐릭터 선택 동안 멈춘다.
+//   멈춘 동안 남은 그로기 시간은 그대로이고, 다시 흐를 때 이어서 줄어든다.
 // 그로기 게이지 : 플레이어 공격 적중 · 패링 성공으로 쌓이고, 최대치에 이르면 그로기가 된다. 시간이 지나도 줄지 않는다.
 //   그로기 중에는 더 쌓이지 않고, 그로기가 끝나면 0 부터 다시 쌓는다.
 // 적의 공격 기능은 알림을 받아 진행 중인 공격을 끊고, 경직 · 그로기 동안에는 공격하지 않는다.
@@ -33,12 +35,17 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
 
     private State _state;
     private float _timer;
+    // 그로기 시간이 줄지 않는 남은 시간. 플레이어 쪽이 콤보 스킬 흐름에 맞춰 건다.
+    private float _groggyHoldTimer;
     // 진행 중인 공격의 경직 저항 레벨. 공격 기능이 공격을 시작할 때 정하고, 공격이 끝나거나 끊기면 0 으로 돌린다.
     private int _attackStaggerResistLevel;
     // 이번 그로기에서 콤보 스킬을 아직 발동하지 않았는지. 그로기가 될 때마다 한 번 생긴다.
     private bool _hasComboSkillChance;
+    // 콤보 스킬 캐릭터 선택 동안 그로기 시간을 멈추는지
+    private bool _isGroggyPaused;
 
     public bool IsGroggy => _state == State.Groggy;
+    public bool HasComboSkillChance => IsGroggy && _hasComboSkillChance;
     // 경직 · 그로기 중인지. 이 동안 적은 공격하지 않는다.
     public bool IsRestricted => _state != State.None;
     public int MaxComboChain => _maxComboChain;
@@ -68,14 +75,26 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
     public void SetAttackStaggerResistLevel(int level) => _attackStaggerResistLevel = level;
 
     // 그로기 게이지를 쌓고, 최대치에 이르면 그로기가 된다. 그로기 중에는 쌓지 않는다.
-    public void AddGroggy(float amount)
+    // 이번에 그로기가 되었으면 true 를 돌려준다. 플레이어 쪽이 그로기 진입 순간의 시간 정지를 걸 때 쓴다.
+    public bool AddGroggy(float amount)
     {
-        if(IsGroggy || amount <= 0f) return;
+        if(IsGroggy || amount <= 0f) return false;
 
         _currentGroggy = Mathf.Min(_currentGroggy + amount, _maxGroggy);
 
-        if(_currentGroggy >= _maxGroggy) EnterGroggy();
+        if(_currentGroggy < _maxGroggy) return false;
+
+        EnterGroggy();
+        return true;
     }
+
+    // 그로기 중일 때만 건다. 멈춰 있던 남은 시간은 버리고 duration 부터 다시 센다.
+    public void HoldGroggy(float duration)
+    {
+        if(IsGroggy) _groggyHoldTimer = duration;
+    }
+
+    public void SetGroggyPaused(bool isPaused) => _isGroggyPaused = isPaused;
 
     public bool TryConsumeComboSkillChance()
     {
@@ -91,6 +110,8 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
         _timer = _groggyTime;
         _state = State.Groggy;
         _hasComboSkillChance = true;
+        _groggyHoldTimer = 0f;
+        _isGroggyPaused = false;
 
 #if UNITY_EDITOR
         Debug.Log($"[적 그로기] {name} {_groggyTime}초");
@@ -99,9 +120,18 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
         GroggyEntered?.Invoke();
     }
 
+    // 그로기는 선택 중 멈춤 → 정지 시간 → 남은 시간 순서로 줄인다. 정지 시간이 끝난 뒤에만 남은 그로기 시간이 줄어든다.
     private void UpdateTimer()
     {
         if(_state == State.None) return;
+
+        if(IsGroggy && _isGroggyPaused) return;
+
+        if(IsGroggy && _groggyHoldTimer > 0f)
+        {
+            _groggyHoldTimer -= EnemyTime.DeltaTime;
+            return;
+        }
 
         _timer -= EnemyTime.DeltaTime;
 

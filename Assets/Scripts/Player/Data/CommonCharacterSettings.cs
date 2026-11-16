@@ -79,6 +79,14 @@ public class CommonCharacterSettings : ScriptableObject
     [Tooltip("대기 중인 캐릭터의 초당 에너지 회복에 곱하는 배율. 1 이면 필드에 있을 때와 같은 속도로 찬다. 대기 중에는 공격으로 얻는 에너지가 없다")]
     [SerializeField, Min(0f)] private float _standbyEnergyRegenRate = 1f;
 
+    [Header("콤보 스킬 이어받기")]
+    [Tooltip("콤보 스킬을 이어받을 캐릭터를 고르는 시간(초, 실제 시간). 게임이 느려져도 이 시간은 실제 시간으로 줄어든다")]
+    [SerializeField, Min(0.1f)] private float _comboSelectTime = 3f;
+    [Tooltip("캐릭터를 고르는 동안 게임 전체(적 · 캐릭터 · 타격 간격 · 카메라)의 시간 배율")]
+    [SerializeField, Range(0.01f, 1f)] private float _comboSelectTimeScale = 0.1f;
+    [Tooltip("그로기 시간이 줄지 않는 시간(초). 그로기 진입 순간, 연계의 콤보 스킬 시전 시작, 남은 연계가 있는 캔슬에 건다. 대기 캐릭터가 없으면(1인) 걸지 않고, 마지막 연계를 콤보 스킬 없이 캔슬하면 걸지 않는다")]
+    [SerializeField, Min(0f)] private float _groggyHoldTime = 1f;
+
     [Header("필살기")]
     [Tooltip("발동할 때 이 거리 안의 대상(록온 대상 우선, 없으면 자동 조준 대상)을 찾는다. 필살기 액션에 순간 이동 옵션이 있으면 그 대상 앞으로 순간 이동한다")]
     [SerializeField, Min(0f)] private float _ultimateTargetSearchRange = 10f;
@@ -96,6 +104,10 @@ public class CommonCharacterSettings : ScriptableObject
 
     [Header("입력 : 타겟팅")]
     [SerializeField] private InputActionReference _lockOnAction;
+
+    [Header("입력 : 콤보 스킬")]
+    [Tooltip("콤보 스킬 캐릭터 선택 중 이번 연계를 캔슬하는 입력")]
+    [SerializeField] private InputActionReference _comboCancelAction;
 
     public float Gravity => _gravity;
     public float DashStartDelay => _dashStartDelay;
@@ -125,6 +137,9 @@ public class CommonCharacterSettings : ScriptableObject
     public float SwapOutRunDelay => _swapOutRunDelay;
     public float QuickSupportInputTime => _quickSupportInputTime;
     public float StandbyEnergyRegenRate => _standbyEnergyRegenRate;
+    public float ComboSelectTime => _comboSelectTime;
+    public float ComboSelectTimeScale => _comboSelectTimeScale;
+    public float GroggyHoldTime => _groggyHoldTime;
     public float UltimateTargetSearchRange => _ultimateTargetSearchRange;
     public InputActionReference MoveAction => _moveAction;
     public InputActionReference DashAction => _dashAction;
@@ -134,4 +149,5 @@ public class CommonCharacterSettings : ScriptableObject
     public InputActionReference ParryPreviousAction => _parryPreviousAction;
     public InputActionReference ParryNextAction => _parryNextAction;
     public InputActionReference LockOnAction => _lockOnAction;
+    public InputActionReference ComboCancelAction => _comboCancelAction;
 }

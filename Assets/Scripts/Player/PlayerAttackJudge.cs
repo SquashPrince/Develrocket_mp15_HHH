@@ -28,6 +28,7 @@ public class PlayerAttackJudge : MonoBehaviour
     private PlayerStatus _status;
     private PlayerActionTrigger _actionTrigger;
     private PlayerInputReader _input;
+    private PlayerController _controller;
     private ActionData _windowAction;
     private ActionStep _windowStep;
     // 다음 판정 시작에 쓸 구간 길이와 강타로 끝나는지. 이벤트 전달 기능이 판정 시작 직전에 알려 준다.
@@ -42,6 +43,9 @@ public class PlayerAttackJudge : MonoBehaviour
 
     // 판정 범위를 찾을 때마다 알린다. 전달 값 : 범위를 찾은 동작
     public event Action<ActionStep> RangeChecked;
+
+    // 콤보 스킬 발동 판정은 전투 공통 규칙이라 파티의 콤보 스킬 선택이 맡는다.
+    private ComboSkillSelector ComboSelector => _controller.Party.ComboSelector;
 
     // 구간 판정이 켜져 있는지
     public bool IsWindowOpen { get; private set; }
@@ -186,7 +190,7 @@ public class PlayerAttackJudge : MonoBehaviour
     {
         int count = FindHitColliders(step);
         IEnemyTargetable comboSkillTarget = null;
-        int comboSkillMaxChain = 0;
+        IEnemyGroggyable comboSkillGroggyable = null;
         bool hasHit = false;
 
         RangeChecked?.Invoke(step);
@@ -200,14 +204,15 @@ public class PlayerAttackJudge : MonoBehaviour
 
             if(enemy == null || !_hitTargets.Add(enemy)) continue;
 
-            ApplyHit(enemy, action, isImpact, canReact, ref comboSkillTarget, ref comboSkillMaxChain);
+            ApplyHit(enemy, action, isImpact, canReact, ref comboSkillTarget, ref comboSkillGroggyable);
             hasHit = true;
         }
 
         if(hasHit && canReact) _status.BeginHitLag(step.HitLagTime);
 
-        // 판정을 모두 마친 뒤 상태를 바꿔, 같은 판정의 다른 적도 에너지 · 게이지 · 경직을 받게 한다.
-        if(comboSkillTarget != null) _actionTrigger.BeginComboSkill(comboSkillTarget, comboSkillMaxChain);
+        // 판정을 모두 마친 뒤 콤보 스킬 선택을 열어, 같은 판정의 다른 적도 에너지 · 게이지 · 경직을 받게 한다.
+        // 고를 대기 캐릭터가 없으면 열리지 않고 적의 발동 기회도 남는다.
+        if(comboSkillTarget != null) ComboSelector.TryBeginChain(comboSkillTarget, comboSkillGroggyable);
 
         return hasHit;
     }
@@ -231,8 +236,9 @@ public class PlayerAttackJudge : MonoBehaviour
     // canReact 이고 액션의 경직 시간이 0보다 크면, 경직 저항 레벨이 액션의 경직 레벨 이하인 적을 경직시킨다.
     // 그로기 게이지는 반응 여부와 상관없이 모든 적중마다 액션의 그로기 값만큼 쌓는다.
     // 강타가 그로기 적에게 맞으면 콤보 스킬 대상으로 고른다. 한 번의 판정에서 콤보 스킬은 하나의 적에게만 발동한다.
-    // 그로기를 쌓은 뒤 콤보 스킬을 확인하므로, 게이지를 채운 강타가 바로 콤보 스킬을 발동한다.
-    private void ApplyHit(IEnemyDamageable enemy, ActionData action, bool isImpact, bool canReact, ref IEnemyTargetable comboSkillTarget, ref int comboSkillMaxChain)
+    // 그로기를 쌓은 뒤 콤보 스킬을 확인하므로, 게이지를 채운 강타가 바로 콤보 스킬 선택을 연다.
+    // 이 적중으로 그로기에 들어갔으면 콤보 스킬 선택에 알려 그로기 정지 시간을 걸게 한다.
+    private void ApplyHit(IEnemyDamageable enemy, ActionData action, bool isImpact, bool canReact, ref IEnemyTargetable comboSkillTarget, ref IEnemyGroggyable comboSkillGroggyable)
     {
         enemy.TakeDamage(action.Power, isImpact);
         _status.AddEnergy(action.EnergyGain);
@@ -246,11 +252,11 @@ public class PlayerAttackJudge : MonoBehaviour
 
         bool hasGroggy = enemy.transform.TryGetComponent(out IEnemyGroggyable groggyable);
 
-        if(hasGroggy) groggyable.AddGroggy(action.GroggyGain);
+        if(hasGroggy && groggyable.AddGroggy(action.GroggyGain)) ComboSelector.OnGroggyEntered(groggyable);
 
         if(!isImpact) return;
 
-        // 콤보 스킬 중의 강타는 새로 발동하지 않고, 콤보 스킬 대상에게 맞았으면 다음 연계를 잇게 한다.
+        // 콤보 스킬 중의 강타는 새로 시작하지 않고, 콤보 스킬 선택에 알려 연계 대상이면 다음 캐릭터를 고르게 한다.
         if(!_actionTrigger.CanStartComboSkill)
         {
             _actionTrigger.OnComboSkillImpactHit(enemy);
@@ -261,13 +267,13 @@ public class PlayerAttackJudge : MonoBehaviour
         // 발동 기회도 소모하지 않아, 조작 중인 캐릭터가 강타를 맞히면 그때 발동한다.
         if(!_input.IsControlled) return;
 
-        // 발동 기회는 실제로 발동할 적에게서만 소모한다. 그로기 기능이 없는 적은 콤보 스킬을 받을 수 없다.
-        if(comboSkillTarget != null) return;
-
-        if(!hasGroggy || !groggyable.TryConsumeComboSkillChance()) return;
+        // 기회가 남은 그로기 적이나, 캔슬 · 강타 없는 콤보 뒤 연계가 남아 강타를 기다리는 적 하나만 고른다.
+        // 기회는 콤보 스킬 선택이 실제로 열릴 때 소모한다. 그로기 기능이 없는 적은 콤보 스킬을 받을 수 없다.
+        if(comboSkillTarget != null || !hasGroggy) return;
+        if(!groggyable.HasComboSkillChance && !ComboSelector.IsAwaitingStrikeOn(groggyable)) return;
 
         enemy.transform.TryGetComponent(out comboSkillTarget);
-        comboSkillMaxChain = groggyable.MaxComboChain;
+        comboSkillGroggyable = groggyable;
     }
 
     private void CacheComponent()
@@ -275,5 +281,6 @@ public class PlayerAttackJudge : MonoBehaviour
         _status = GetComponent<PlayerStatus>();
         _actionTrigger = GetComponent<PlayerActionTrigger>();
         _input = GetComponent<PlayerInputReader>();
+        _controller = GetComponent<PlayerController>();
     }
 }
