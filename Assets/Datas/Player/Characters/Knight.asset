@@ -18,8 +18,8 @@ MonoBehaviour:
   _maxEnergy: 120
   _energyRegenPerSecond: 0.78
   _maxUltimateGauge: 3000
-  _parryGaugeGain: 250
-  _perfectDodgeGaugeGain: 20
+  _parryGaugeGain: 225
+  _perfectDodgeGaugeGain: 25
   _walkSpeed: 5
   _runSpeed: 10
   _turnTime: 0.1

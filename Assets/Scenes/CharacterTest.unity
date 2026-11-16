@@ -176,6 +176,9 @@ MonoBehaviour:
   _healthTrail: {fileID: 1954960503}
   _energySlider: {fileID: 1945294312}
   _ultimateGaugeText: {fileID: 272402998}
+  _ultimateTiers: []
+  _tierUpScale: 1.3
+  _tierUpDuration: 0.25
 --- !u!1 &11626934
 GameObject:
   m_ObjectHideFlags: 0
@@ -1693,6 +1696,9 @@ MonoBehaviour:
   _healthTrail: {fileID: 886848304}
   _energySlider: {fileID: 1837346008}
   _ultimateGaugeText: {fileID: 272402998}
+  _ultimateTiers: []
+  _tierUpScale: 1.3
+  _tierUpDuration: 0.25
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -1755,7 +1761,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60.000004
+  field of view: 64.49285
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1781,8 +1787,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000000007907639, y: 0.99232495, z: -0.12365775, w: 0.00000006345698}
-  m_LocalPosition: {x: -0.00000029555372, y: 2.105867, z: 3.3807406}
+  m_LocalRotation: {x: 0.123657785, y: -0.000000027985775, z: 0.0000000034874252, w: 0.99232495}
+  m_LocalPosition: {x: 0, y: 2.105867, z: -3.3807404}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2179,6 +2185,19 @@ MonoBehaviour:
   _healthTrail: {fileID: 883517634}
   _energySlider: {fileID: 2028043420}
   _ultimateGaugeText: {fileID: 272402998}
+  _ultimateTiers:
+  - _minValue: 1000
+    _color: {r: 0, g: 1, b: 0.5442674, a: 1}
+  - _minValue: 1500
+    _color: {r: 0, g: 0.57862425, b: 1, a: 1}
+  - _minValue: 2000
+    _color: {r: 1, g: 0.93516773, b: 0, a: 1}
+  - _minValue: 2500
+    _color: {r: 1, g: 0.57398313, b: 0, a: 1}
+  - _minValue: 3000
+    _color: {r: 1, g: 0, b: 0, a: 1}
+  _tierUpScale: 1.3
+  _tierUpDuration: 0.25
 --- !u!1 &494170274
 GameObject:
   m_ObjectHideFlags: 0

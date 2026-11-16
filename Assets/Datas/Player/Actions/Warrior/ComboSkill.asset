@@ -47,7 +47,7 @@ MonoBehaviour:
     _fadeTime: 0.1
     _interrupts: 0
   _energyGain: 2.25
-  _ultimateGaugeGain: 40
+  _ultimateGaugeGain: 90
   _power: 10
   _staggerLevel: 3
   _staggerTime: 1
