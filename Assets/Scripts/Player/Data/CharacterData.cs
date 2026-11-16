@@ -8,6 +8,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewCharacterData", menuName = "HHH/Character Data")]
 public class CharacterData : ScriptableObject
 {
+    [Header("표시")]
+    [Tooltip("화면(파티 HUD · 콤보 선택)에 보일 캐릭터 이름. 비워 두면 에셋 이름을 보여준다")]
+    [SerializeField] private string _displayName;
+
     [Header("능력치")]
     [SerializeField, Min(1f)] private float _maxHealth = 100f;
     [SerializeField, Min(0f)] private float _maxEnergy = 120f;
@@ -76,6 +80,7 @@ public class CharacterData : ScriptableObject
     [Tooltip("한 번의 콤보 스킬 액션. 동작 목록 순서대로 이어 재생한다. 동작 수와 연계 수는 관계없다. 하체 달리기 · 대시 캔슬 · 입력 버퍼 · 필살기로 끊기 값은 쓰지 않는다")]
     [SerializeField] private ActionData _comboSkill;
 
+    public string DisplayName => string.IsNullOrEmpty(_displayName) ? name : _displayName;
     public float MaxHealth => _maxHealth;
     public float MaxEnergy => _maxEnergy;
     public float EnergyRegenPerSecond => _energyRegenPerSecond;

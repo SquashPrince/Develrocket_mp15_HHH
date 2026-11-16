@@ -51,6 +51,8 @@ public class ComboSkillSelector : MonoBehaviour
     // 선택 중이거나 선택을 마친 프레임이면 플레이어 입력을 막는다.
     public bool IsBlockingInput => IsSelecting || _closedFrame == Time.frameCount;
     public float RemainingTime => _remainingTime;
+    // 남은 선택 시간의 비율(1 → 0). 화면의 원형 · 막대 표시에 쓴다.
+    public float RemainingRatio => Mathf.Clamp01(_remainingTime / Common.ComboSelectTime);
     public PlayerController PreviousCandidate => _previousCandidate;
     public PlayerController NextCandidate => _nextCandidate;
     private CommonCharacterSettings Common => _party.Common;

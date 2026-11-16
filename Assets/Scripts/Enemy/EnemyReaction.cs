@@ -49,13 +49,20 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
     // 경직 · 그로기 중인지. 이 동안 적은 공격하지 않는다.
     public bool IsRestricted => _state != State.None;
     public int MaxComboChain => _maxComboChain;
+    public float CurrentGroggy => _currentGroggy;
+    public float MaxGroggy => _maxGroggy;
+    // 그로기 중 남은 그로기 시간의 비율(1 → 0). 정지 중에는 줄지 않는다. 그로기가 아니면 0 이다.
+    public float GroggyTimeRatio => IsGroggy && _groggyTime > 0f ? Mathf.Clamp01(_timer / _groggyTime) : 0f;
 
     public event Action Staggered;
     public event Action GroggyEntered;
     // 경직 · 그로기가 끝났을 때 알린다.
     public event Action Recovered;
+    // 그로기 게이지가 바뀌면 알린다. 쌓일 때와, 그로기가 끝나 0 이 될 때다.
+    public event Action GroggyGaugeChanged;
 
-    private void Start() => Init();
+    // 확인용 그로기 게이지는 다른 오브젝트를 참조하지 않으므로 Awake 에서 정해, 화면이 시작 단계에서 읽어도 맞게 한다.
+    private void Awake() => Init();
     private void Update() => UpdateTimer();
 
     // 경직한다. 경직 중 다시 걸면 경직 시간을 처음부터 센다.
@@ -81,6 +88,7 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
         if(IsGroggy || amount <= 0f) return false;
 
         _currentGroggy = Mathf.Min(_currentGroggy + amount, _maxGroggy);
+        GroggyGaugeChanged?.Invoke();
 
         if(_currentGroggy < _maxGroggy) return false;
 
@@ -138,7 +146,11 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
         if(_timer > 0f) return;
 
         // 그로기가 끝나면 게이지를 0 부터 다시 쌓는다.
-        if(IsGroggy) _currentGroggy = 0f;
+        if(IsGroggy)
+        {
+            _currentGroggy = 0f;
+            GroggyGaugeChanged?.Invoke();
+        }
 
         _state = State.None;
         Recovered?.Invoke();
