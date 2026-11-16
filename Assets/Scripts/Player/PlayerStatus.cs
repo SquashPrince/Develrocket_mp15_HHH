@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 // 플레이어의 체력 · 에너지 · 필살기 게이지와 무적 시간. 모두 캐릭터마다 따로 가지는 값이다.
@@ -32,18 +33,33 @@ public class PlayerStatus : MonoBehaviour
     private bool _isAttackInvincible;
 
     public float MaxHealth => _controller.Character.MaxHealth;
-    public float CurrentHealth => _currentHealth;
-    // 값을 바꿀 때 항상 0 ~ 최대치 사이로 맞춘다.
+    public float MaxEnergy => _controller.Character.MaxEnergy;
+    public float MaxUltimateGauge => _controller.Character.MaxUltimateGauge;
+    // 값을 바꿀 때 항상 0 ~ 최대치 사이로 맞추고, 바뀌었음을 알린다.
+    public float CurrentHealth
+    {
+        get => _currentHealth;
+        private set
+        {
+            _currentHealth = Mathf.Clamp(value, 0f, MaxHealth);
+            HealthChanged?.Invoke();
+        }
+    }
+    // 값을 바꿀 때 항상 0 ~ 최대치 사이로 맞춘다. 시간이 지나며 매 프레임 바뀌므로 알림 없이, 화면은 매 프레임 읽는다.
     public float CurrentEnergy
     {
         get => _currentEnergy;
         private set => _currentEnergy = Mathf.Clamp(value, 0f, _controller.Character.MaxEnergy);
     }
-    // 값을 바꿀 때 항상 0 ~ 최대치 사이로 맞춘다.
+    // 값을 바꿀 때 항상 0 ~ 최대치 사이로 맞추고, 바뀌었음을 알린다.
     public float CurrentUltimateGauge
     {
         get => _currentUltimateGauge;
-        private set => _currentUltimateGauge = Mathf.Clamp(value, 0f, _controller.Character.MaxUltimateGauge);
+        private set
+        {
+            _currentUltimateGauge = Mathf.Clamp(value, 0f, _controller.Character.MaxUltimateGauge);
+            UltimateGaugeChanged?.Invoke();
+        }
     }
     public bool IsUltimateGaugeFull => _currentUltimateGauge >= _controller.Character.MaxUltimateGauge;
     // 시간으로 거는 무적(대시 · 넉백)이나 시전 중 무적 공격의 무적 중인지
@@ -57,8 +73,16 @@ public class PlayerStatus : MonoBehaviour
     public float LocalTime { get; private set; }
     public bool IsHitLag => _hitLagTimer > 0f;
 
-    private void Awake() => CacheComponent();
-    private void Start() => Init();
+    // 체력 · 필살기 게이지가 바뀌면 알린다. 화면 표시가 바뀔 때만 다시 그리는 데 쓴다.
+    public event Action HealthChanged;
+    public event Action UltimateGaugeChanged;
+
+    // 처음 값은 다른 오브젝트를 참조하지 않으므로 Awake 에서 정한다. 화면 등 다른 기능이 시작 단계에서 읽어도 값이 준비되어 있게 하기 위해서다.
+    private void Awake()
+    {
+        CacheComponent();
+        Init();
+    }
     private void Update()
     {
         UpdateHitLag();
@@ -123,7 +147,7 @@ public class PlayerStatus : MonoBehaviour
             return false;
         }
 
-        _currentHealth = Mathf.Max(0f, _currentHealth - attack.Power);
+        CurrentHealth = _currentHealth - attack.Power;
 
         _controller.StartHit(attack, attacker.transform);
         return true;
@@ -198,9 +222,9 @@ public class PlayerStatus : MonoBehaviour
     // 확인용으로 보이는 현재 값은 Inspector 에서 바꿔 두었더라도 시작할 때 다시 정한다.
     private void Init()
     {
-        _currentHealth = MaxHealth;
+        CurrentHealth = MaxHealth;
         _currentEnergy = 0f;
-        _currentUltimateGauge = 0f;
+        CurrentUltimateGauge = 0f;
         _timeScale = 1f;
         _hitLagTimer = 0f;
     }

@@ -53,6 +53,8 @@ public class PlayerParty : MonoBehaviour
     public CommonCharacterSettings Common => _common;
     public Camera MainCamera => _mainCamera;
     public PlayerController Controlled => _members[_controlledIndex];
+    // 파티 캐릭터 목록 (교체 순서). 화면이 대기 캐릭터 칸을 채우는 데 쓴다.
+    public IReadOnlyList<PlayerController> Members => _members;
     public BattleSlowMotion SlowMotion { get; private set; }
     public PlayerLockOn LockOn { get; private set; }
     // 교체할 수 있는 대기 캐릭터가 있는지. 없으면 지원 공격(교체 패링)을 할 수 없어 적의 패링 공격 예고가 패링 불가로 뜬다.

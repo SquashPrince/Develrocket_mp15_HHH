@@ -39,7 +39,10 @@ public class EnemyHealth : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     // 처치될 때 한 번 알린다.
     public event Action Died;
 
-    private void Start() => Init();
+    // 체력은 다른 오브젝트를 참조하지 않으므로 Awake 에서 정한다. 화면 등 다른 기능이 시작 단계에서 읽어도 값이 준비되어 있게 하기 위해서다.
+    // 몸 반지름은 콜라이더 경계가 잡힌 뒤에 재도록 Start 에서 잰다.
+    private void Awake() => Init();
+    private void Start() => MeasureRadius();
     private void Update() => UpdateCorpse();
 
     public void TakeDamage(float power, bool isImpact)
@@ -76,10 +79,13 @@ public class EnemyHealth : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
         if(_corpseTimer <= 0f) gameObject.SetActive(false);
     }
 
+    private void MeasureRadius()
+    {
+        if(TryGetComponent(out Collider bodyCollider)) _radius = BodyRadius.Measure(bodyCollider);
+    }
+
     private void Init()
     {
         _currentHealth = _maxHealth;
-
-        if(TryGetComponent(out Collider bodyCollider)) _radius = BodyRadius.Measure(bodyCollider);
     }
 }
