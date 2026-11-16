@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a9f773bc8cc2084c99a3f374aa2c120, type: 3}
   m_Name: ParryTeleport
   m_EditorClassIdentifier: Assembly-CSharp::TeleportOption
-  _side: 0
-  _sideAngleMin: 0
-  _sideAngleMax: 0
+  _side: 1
+  _sideAngleMin: 25
+  _sideAngleMax: 45

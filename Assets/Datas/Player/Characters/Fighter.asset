@@ -22,10 +22,10 @@ MonoBehaviour:
   _runSpeed: 10
   _turnTime: 0.1
   _autoRunDelay: 1
-  _dashDistance: 5
-  _dashDuration: 0.25
+  _dashDistance: 3
+  _dashDuration: 0.35
   _dodgeDistance: 3
-  _dodgeDuration: 0.25
+  _dodgeDuration: 0.35
   _dashCooldown: 1
   _dashChainInterval: 0.25
   _dashInvincibleTime: 0.35
@@ -40,6 +40,9 @@ MonoBehaviour:
   _dodgeCounter: {fileID: 11400000, guid: 6d08a7bd08383ff4cb4b975b2e77436f, type: 2}
   _parry: {fileID: 11400000, guid: d7cdcb544ebf63740a4f9ba3985a93f2, type: 2}
   _parryChase: {fileID: 11400000, guid: 6e14b9d0e67bfc84db2f91032304fa4d, type: 2}
+  _quickSupport: {fileID: 11400000, guid: 02d756f895f29584089c261703cea0ad, type: 2}
+  _swapInBodyPart: 0
+  _swapOutBodyPart: 0
   _skill: {fileID: 11400000, guid: 295c71f9b69657c4a83192c1f5842b33, type: 2}
   _specialSkill: {fileID: 11400000, guid: 52b0e34188c571749984e905291d63cb, type: 2}
   _ultimate: {fileID: 11400000, guid: 7c2917ea266817c4b90385c5812ff175, type: 2}

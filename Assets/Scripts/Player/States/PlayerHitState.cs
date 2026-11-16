@@ -4,7 +4,7 @@ using UnityEngine;
 // 피격 : 공격한 적 쪽을 보고 경직 시간 동안 멈춘 뒤 이동 상태로 돌아간다. 경직 중 다시 맞으면 새 피격으로 바뀐다.
 //        공격 설정에 밀림 거리가 있으면 경직이 시작될 때 공격 반대 방향으로 밀려난다.
 // 큰 피격 : 피격과 같은 경직 · 밀림 흐름이고, 모션만 큰 피격(HeavyHit)으로 나온다. (강공격)
-// 넉백 : 공격한 적 반대 방향으로 밀려난 뒤 일어나고, 일어나기가 끝나면 이동 상태로 돌아간다.
+// 넉백 : 공격한 적 반대 방향으로 밀려난 뒤 일어나고, 일어나기가 끝나면 이동 상태로 돌아간다. 넉백되는 순간 파티의 빠른 지원 입력 시간이 열린다.
 //        넉백 · 일어나기 동안은 무적이다. 연속으로 맞으며 계속 띄워지는 것을 막기 위해서다.
 // 공격 설정에서 대시 캔슬을 허용한 공격이면 피격 · 넉백 중 대시 · 회피로 끊을 수 있다.
 public class PlayerHitState : PlayerState
@@ -23,6 +23,7 @@ public class PlayerHitState : PlayerState
     }
 
     private EnemyAttackSetting _attack;
+    private Transform _attacker;
     private Vector3 _awayDirection;
     private Phase _phase;
     private float _timer;
@@ -31,11 +32,12 @@ public class PlayerHitState : PlayerState
     {
     }
 
-    // attackerPosition : 공격한 적의 위치. 이 위치의 반대 방향으로 밀려난다.
-    public void Setup(EnemyAttackSetting attack, Vector3 attackerPosition)
+    // attacker : 공격한 적. 이 적의 반대 방향으로 밀려나고, 넉백이면 파티가 빠른 지원으로 이 적 앞에 다음 캐릭터를 보낸다.
+    public void Setup(EnemyAttackSetting attack, Transform attacker)
     {
         _attack = attack;
-        _awayDirection = Controller.transform.position - attackerPosition;
+        _attacker = attacker;
+        _awayDirection = Controller.transform.position - attacker.position;
         _awayDirection.y = 0f;
 
         // 적과 위치가 겹치면 방향을 알 수 없으므로 뒤로 밀려난다.
@@ -59,6 +61,7 @@ public class PlayerHitState : PlayerState
         }
 
         _phase = Phase.Knockback;
+        Controller.Party.OpenQuickSupport(Controller, _attacker);
         Controller.Status.BeginInvincible(_attack.KnockbackDuration + _attack.GetUpTime);
         Controller.Animation.Play(KNOCKBACK_ANIMATION);
     }

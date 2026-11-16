@@ -56,6 +56,12 @@ public class CharacterData : ScriptableObject
     [SerializeField] private ActionData _parry;
     [Tooltip("패링 반응 중 공격 입력으로 나가는 추격 공격. 시전 중 무적을 켜 두어야 기획대로 추격 중 무적이 된다")]
     [SerializeField] private ActionData _parryChase;
+    [Tooltip("빠른 지원 액션. 이전 캐릭터가 넉백된 뒤 입력 시간 안에 교체하면 넉백시킨 적 앞으로 순간 이동해 쓴다. 순간 이동 옵션(대상 정면)과 시전 중 무적을 켜 둔다. 비워 두면 보통 교체로 들어온다")]
+    [SerializeField] private ActionData _quickSupport;
+    [Tooltip("입장 때 캐릭터 클립으로 덮을 부위. 입장은 모든 캐릭터가 같은 공용 모션을 재생하고, 고른 부위만 Override 에 넣은 이 캐릭터의 클립으로 덮는다. 없음이면 공용 모션만, 전신이면 하체 · 상체 모두 덮는다")]
+    [SerializeField] private PlayerAnimation.BodyPart _swapInBodyPart = PlayerAnimation.BodyPart.None;
+    [Tooltip("퇴장 때 캐릭터 클립으로 덮을 부위. 없음이면 공용 모션만, 전신이면 하체 · 상체 모두 덮는다")]
+    [SerializeField] private PlayerAnimation.BodyPart _swapOutBodyPart = PlayerAnimation.BodyPart.None;
 
     [Header("스킬")]
     [SerializeField] private ActionData _skill;
@@ -93,6 +99,9 @@ public class CharacterData : ScriptableObject
     public ActionData DodgeCounter => _dodgeCounter;
     public ActionData Parry => _parry;
     public ActionData ParryChase => _parryChase;
+    public ActionData QuickSupport => _quickSupport;
+    public PlayerAnimation.BodyPart SwapInBodyPart => _swapInBodyPart;
+    public PlayerAnimation.BodyPart SwapOutBodyPart => _swapOutBodyPart;
     public ActionData Skill => _skill;
     public ActionData SpecialSkill => _specialSkill;
     public ActionData Ultimate => _ultimate;

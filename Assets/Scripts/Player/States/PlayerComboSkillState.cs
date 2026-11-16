@@ -30,6 +30,8 @@ public class PlayerComboSkillState : PlayerState
     }
 
     public bool IsActive { get; private set; }
+    // 지금 동작의 끼어들기 허용을 따른다. 첫 동작을 시작하기 전(-1)에는 교체하지 않는다.
+    public override bool CanSwap => _step >= 0 && _trigger.ComboSkillAction.GetStep(_step).Allows(ActionStep.Interrupt.Swap);
 
     // target : 콤보 스킬을 발동시킨 그로기 적. 순간 이동과 단계별 접근의 대상이 된다.
     // maxChain : 그 적의 최대 연계 수

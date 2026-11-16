@@ -8,4 +8,7 @@ public interface IEnemyParryable
     Transform transform { get; }
 
     bool IsParryWindowOpen { get; }
+
+    // 패링 공격 예고 표시를 띄울 위치. 표시는 플레이어 쪽이 대기 파티원 수에 따라 색을 골라 띄운다.
+    Transform TelegraphPoint { get; }
 }
