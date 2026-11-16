@@ -31842,7 +31842,6 @@ GameObject:
   - component: {fileID: 1818900934031685384}
   - component: {fileID: 6695114068962537715}
   - component: {fileID: 3495393291802485486}
-  - component: {fileID: 3260304514223116691}
   - component: {fileID: 4500917182947509189}
   m_Layer: 7
   m_Name: Knight
@@ -31919,7 +31918,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   _cameraTransform: {fileID: 0}
   _character: {fileID: 11400000, guid: b26c4d85624b42cd8b510949bee0b4a0, type: 2}
-  _common: {fileID: 11400000, guid: ef69c664edeb2f1449529a56f5024eba, type: 2}
 --- !u!114 &7492969571146502241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31988,18 +31986,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
   _animator: {fileID: 3735240450347513969}
---- !u!114 &3260304514223116691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7306029376340620380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d53ac335d93bf30439db97d31415e33d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerSlowMotion
 --- !u!114 &4500917182947509189
 MonoBehaviour:
   m_ObjectHideFlags: 0

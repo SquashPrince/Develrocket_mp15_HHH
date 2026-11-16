@@ -2811,7 +2811,6 @@ GameObject:
   - component: {fileID: 9077769647617640347}
   - component: {fileID: 2209540083353082972}
   - component: {fileID: 7013964450345776751}
-  - component: {fileID: 6488998729736255319}
   - component: {fileID: 4340611844739287583}
   m_Layer: 7
   m_Name: Warrior
@@ -2819,7 +2818,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &469888735859391846
 Transform:
   m_ObjectHideFlags: 0
@@ -2873,7 +2872,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de5b05c6812b88d41b77232ef7bcaec0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputReader
-  _isControlled: 1
+  _isControlled: 0
 --- !u!114 &2427562605538363246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2888,7 +2887,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   _cameraTransform: {fileID: 0}
   _character: {fileID: 11400000, guid: 3fc30e34dab134247855b35a326918a0, type: 2}
-  _common: {fileID: 11400000, guid: ef69c664edeb2f1449529a56f5024eba, type: 2}
 --- !u!114 &2234564587569997188
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2957,18 +2955,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
   _animator: {fileID: 2667076879600923893}
---- !u!114 &6488998729736255319
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 752887230483005231}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d53ac335d93bf30439db97d31415e33d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerSlowMotion
 --- !u!114 &4340611844739287583
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -37587,7 +37587,6 @@ GameObject:
   - component: {fileID: 9161201700164462936}
   - component: {fileID: 6715545007783438477}
   - component: {fileID: 4670862040014280236}
-  - component: {fileID: 9210035181908771140}
   - component: {fileID: 3126899296500088865}
   m_Layer: 7
   m_Name: Fighter
@@ -37595,7 +37594,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5519931953987422134
 Transform:
   m_ObjectHideFlags: 0
@@ -37649,7 +37648,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de5b05c6812b88d41b77232ef7bcaec0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputReader
-  _isControlled: 1
+  _isControlled: 0
 --- !u!114 &6129519013014003249
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37664,7 +37663,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   _cameraTransform: {fileID: 0}
   _character: {fileID: 11400000, guid: 85d2ffd3c6104d34a836caf05ae44ba8, type: 2}
-  _common: {fileID: 11400000, guid: ef69c664edeb2f1449529a56f5024eba, type: 2}
 --- !u!114 &7320277439426231713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37733,18 +37731,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
   _animator: {fileID: 2117362260137661612}
---- !u!114 &9210035181908771140
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8698875331694340960}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d53ac335d93bf30439db97d31415e33d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerSlowMotion
 --- !u!114 &3126899296500088865
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -30,6 +30,8 @@ public class PlayerController : MonoBehaviour
     private PlayerDashState _dashState;
     private PlayerAttackState _attackState;
     private PlayerHitState _hitState;
+    private PlayerSwapInState _swapInState;
+    private PlayerSwapOutState _swapOutState;
     // 이 캐릭터가 속한 파티. 파티가 Awake 에서 알려 준다.
     private PlayerParty _party;
     private float _dashCooldownTimer;
@@ -40,6 +42,8 @@ public class PlayerController : MonoBehaviour
     private int _dashStack;
     private int _nextComboStep;
     private bool _isCharging;
+    // 교체로 나가야 하지만 하던 동작이 남아 있어 퇴장을 미뤄 둔 상태인지
+    private bool _isSwapOutReserved;
 
     // 상태가 이번 프레임에 정한 수평 속도. 매 프레임 상태 실행 뒤 중력과 함께 반영한다.
     public Vector3 HorizontalVelocity { get; set; }
@@ -79,6 +83,21 @@ public class PlayerController : MonoBehaviour
 
     // 파티가 시작할 때 부른다. 이후 이 캐릭터의 기능은 파티의 공통 설정을 쓴다.
     public void JoinParty(PlayerParty party) => _party = party;
+
+    // 교체로 필드에 들어온다. 파티가 이전 캐릭터 자리로 옮기고 켠 뒤 부른다.
+    public void SwapIn() => EnterState(_swapInState);
+
+    // 교체로 필드에서 나간다. 이동 상태(하던 동작이 없음)면 바로 퇴장하고,
+    // 공격 · 피격 같은 동작 중이면 그 동작이 끝나 이동 상태로 돌아가는 순간 퇴장한다.
+    // 모든 동작은 끝나면 이동 상태로 돌아가므로, 퇴장 시점을 이동 상태로 돌아가는 한곳에서 정한다.
+    public void ReserveSwapOut()
+    {
+        if(_stateMachine.CurrentState == _locomotionState) EnterState(_swapOutState);
+        else _isSwapOutReserved = true;
+    }
+
+    // 퇴장이 끝나면 캐릭터를 꺼 대기 상태로 만든다. 꺼진 캐릭터는 적에게 맞거나 대상으로 잡히지 않는다.
+    public void Standby() => gameObject.SetActive(false);
 
     // 입력을 카메라 기준의 월드 수평 방향으로 바꾼다. 스틱을 살짝 기울이면 길이가 1보다 작다.
     // 이동 중 카메라가 캐릭터 뒤로 자동 복귀하면 기준이 바뀌어 원을 그리므로, 이동 중 복귀는 CameraRecenterBlocker 가 막는다.
@@ -246,9 +265,16 @@ public class PlayerController : MonoBehaviour
         _stateMachine.CurrentState.OnAnimationEvent(type, stateHash);
     }
 
-    // 이동 상태로 돌아가면 진행 중이던 차지는 끊는다.
+    // 이동 상태로 돌아가면 진행 중이던 차지는 끊는다. 퇴장이 예약되어 있으면 이동 상태 대신 퇴장한다.
     public void EnterLocomotion(bool startRunning)
     {
+        if(_isSwapOutReserved)
+        {
+            _isSwapOutReserved = false;
+            EnterState(_swapOutState);
+            return;
+        }
+
         _isCharging = false;
         _locomotionState.SetStartRunning(startRunning);
         _stateMachine.ChangeState(_locomotionState);
@@ -319,6 +345,8 @@ public class PlayerController : MonoBehaviour
         _dashState = new PlayerDashState(this);
         _attackState = new PlayerAttackState(this);
         _hitState = new PlayerHitState(this);
+        _swapInState = new PlayerSwapInState(this);
+        _swapOutState = new PlayerSwapOutState(this);
         _dashStack = MAX_DASH_STACK;
 
         EnterLocomotion(false);

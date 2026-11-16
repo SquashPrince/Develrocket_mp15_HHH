@@ -26,10 +26,6 @@ public class PlayerInputReader : MonoBehaviour
     public bool IsAttackHeld => _isControlled && Common.AttackAction.action.IsPressed();
     public bool WasSkillPressed => WasPressed(Common.SkillAction);
     public bool WasUltimatePressed => WasPressed(Common.UltimateAction);
-    // 패링 두 키는 지금은 같은 동작이다. 파티 전투에서 교체 방향을 나눌 때 각각 쓴다.
-    public bool WasParryPreviousPressed => WasPressed(Common.ParryPreviousAction);
-    public bool WasParryNextPressed => WasPressed(Common.ParryNextAction);
-    public bool WasParryPressed => WasParryPreviousPressed || WasParryNextPressed;
     public bool WasLockOnPressed => WasPressed(Common.LockOnAction);
     private CommonCharacterSettings Common => _controller.Common;
 

@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CommonCharacterSettings
   _gravity: -20
   _attackableDistance: 0
-  _attackRange: 15
-  _lockOnRange: 20
+  _attackRange: 10
+  _lockOnRange: 15
   _obstacleLayers:
     serializedVersion: 2
     m_Bits: 3072
@@ -30,12 +30,12 @@ MonoBehaviour:
   _groundSearchHeight: 2
   _groundSearchDepth: 2
   _slowMotionDuration: 1
-  _slowMotionEnemyTimeScale: 0.35
+  _slowMotionEnemyTimeScale: 0.25
   _slowMotionMarkerPrefab: {fileID: 4365308044123951882, guid: ab2927bfddf64e34c8a41ba60305abf6, type: 3}
   _parryReadyTime: 1
-  _parryReactDistance: 7.5
+  _parryReactDistance: 5
   _parryReactTime: 1
-  _ultimateTargetSearchRange: 10
+  _ultimateTargetSearchRange: 15
   _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _dashAction: {fileID: 504704208043311331, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _attackAction: {fileID: -2737370060291335809, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}

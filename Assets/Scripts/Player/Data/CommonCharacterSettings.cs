@@ -53,6 +53,10 @@ public class CommonCharacterSettings : ScriptableObject
     [Tooltip("패링 성공 후 반응 시간(초). 이 시간에 걸쳐 점점 느려지며 밀려나고, 이 동안 닿은 노란 공격은 자동으로 패링된다. 이 동안 공격 키를 누르면 끝난 뒤 추격 공격이 나간다")]
     [SerializeField, Min(0.01f)] private float _parryReactTime = 1f;
 
+    [Header("파티 교체")]
+    [Tooltip("교체로 나가는 캐릭터가 퇴장 모션을 시작한 뒤 사라질 때까지의 시간(초). 이 동안 무적이다")]
+    [SerializeField, Min(0f)] private float _swapOutTime = 0.5f;
+
     [Header("필살기")]
     [Tooltip("발동할 때 이 거리 안의 대상(록온 대상 우선, 없으면 자동 조준 대상)을 찾는다. 필살기 액션에 순간 이동 옵션이 있으면 그 대상 앞으로 순간 이동한다")]
     [SerializeField, Min(0f)] private float _ultimateTargetSearchRange = 10f;
@@ -64,7 +68,7 @@ public class CommonCharacterSettings : ScriptableObject
     [SerializeField] private InputActionReference _skillAction;
     [SerializeField] private InputActionReference _ultimateAction;
 
-    [Header("입력 : 패링 · 교체")]
+    [Header("입력 : 교체 (이전 · 다음 캐릭터)")]
     [SerializeField] private InputActionReference _parryPreviousAction;
     [SerializeField] private InputActionReference _parryNextAction;
 
@@ -88,6 +92,7 @@ public class CommonCharacterSettings : ScriptableObject
     public float ParryReadyTime => _parryReadyTime;
     public float ParryReactDistance => _parryReactDistance;
     public float ParryReactTime => _parryReactTime;
+    public float SwapOutTime => _swapOutTime;
     public float UltimateTargetSearchRange => _ultimateTargetSearchRange;
     public InputActionReference MoveAction => _moveAction;
     public InputActionReference DashAction => _dashAction;

@@ -22,10 +22,10 @@ MonoBehaviour:
   _runSpeed: 10
   _turnTime: 0.1
   _autoRunDelay: 1
-  _dashDistance: 5
-  _dashDuration: 0.25
+  _dashDistance: 3
+  _dashDuration: 0.35
   _dodgeDistance: 3
-  _dodgeDuration: 0.25
+  _dodgeDuration: 0.35
   _dashCooldown: 1
   _dashChainInterval: 0.25
   _dashInvincibleTime: 0.35

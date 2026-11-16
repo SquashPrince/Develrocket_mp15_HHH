@@ -334,7 +334,7 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 1781024353}
+    TrackingTarget: {fileID: 120928522}
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
@@ -630,7 +630,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1781024353}
+    m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 469888735859391846, guid: e71a8d1335b81b34189ff6cbf6cbf031, type: 3}
       propertyPath: m_LocalPosition.x
@@ -676,10 +676,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Warrior
       objectReference: {fileID: 0}
-    - target: {fileID: 752887230483005231, guid: e71a8d1335b81b34189ff6cbf6cbf031, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2234564587569997188, guid: e71a8d1335b81b34189ff6cbf6cbf031, type: 3}
       propertyPath: _cameraTransform
       value: 
@@ -688,21 +684,9 @@ PrefabInstance:
       propertyPath: _cameraTransform
       value: 
       objectReference: {fileID: 330585546}
-    - target: {fileID: 3701390489185377857, guid: e71a8d1335b81b34189ff6cbf6cbf031, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.000000031358418
-      objectReference: {fileID: 0}
-    - target: {fileID: 5957343518831582229, guid: e71a8d1335b81b34189ff6cbf6cbf031, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.039751194
-      objectReference: {fileID: 0}
-    - target: {fileID: 6719813671479299378, guid: e71a8d1335b81b34189ff6cbf6cbf031, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.03543303
-      objectReference: {fileID: 0}
     - target: {fileID: 8535314406258156703, guid: e71a8d1335b81b34189ff6cbf6cbf031, type: 3}
       propertyPath: _isControlled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -747,7 +731,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1781024353}
+    m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
       propertyPath: _cameraTransform
@@ -797,10 +781,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Knight
       objectReference: {fileID: 0}
-    - target: {fileID: 7306029376340620380, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7492969571146502241, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
       propertyPath: _cameraTransform
       value: 
@@ -821,11 +801,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9203f4226a7a84e47b14121d6a8d407a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
---- !u!4 &927009024 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 469888735859391846, guid: e71a8d1335b81b34189ff6cbf6cbf031, type: 3}
-  m_PrefabInstance: {fileID: 369626742}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1160234425
 GameObject:
   m_ObjectHideFlags: 0
@@ -1034,6 +1009,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1781024353}
   - component: {fileID: 1781024354}
+  - component: {fileID: 1781024355}
   m_Layer: 0
   m_Name: Party
   m_TagString: Untagged
@@ -1053,10 +1029,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 120928522}
-  - {fileID: 927009024}
-  - {fileID: 7183380445868500478}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1781024354
@@ -1076,6 +1049,18 @@ MonoBehaviour:
   - {fileID: 927009021}
   - {fileID: 7183380445868500475}
   _common: {fileID: 11400000, guid: ef69c664edeb2f1449529a56f5024eba, type: 2}
+--- !u!114 &1781024355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1781024352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d76ad4dcd39235a429bc8bc9084b1d38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleSlowMotion
 --- !u!1 &1872903721
 GameObject:
   m_ObjectHideFlags: 0
@@ -1353,7 +1338,7 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 1781024353}
+    TrackingTarget: {fileID: 120928522}
     LookAtTarget: {fileID: 2145229456}
     CustomLookAtTarget: 1
   Lens:
@@ -1833,11 +1818,11 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1781024353}
+    m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1013216729187491711, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
       propertyPath: _isControlled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5519931953987422134, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1891,10 +1876,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Fighter
       objectReference: {fileID: 0}
-    - target: {fileID: 8698875331694340960, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1911,11 +1892,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9203f4226a7a84e47b14121d6a8d407a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
---- !u!4 &7183380445868500478 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5519931953987422134, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
-  m_PrefabInstance: {fileID: 3399390385370279526}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7566492000710507795
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2048,6 +2024,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 1480635579}
   - {fileID: 1160234427}
+  - {fileID: 1781024353}
   - {fileID: 330585546}
   - {fileID: 253891560}
   - {fileID: 1942779150}
@@ -2058,4 +2035,6 @@ SceneRoots:
   - {fileID: 2092468134}
   - {fileID: 8885747548961755386}
   - {fileID: 1937489844}
-  - {fileID: 1781024353}
+  - {fileID: 901580288}
+  - {fileID: 369626742}
+  - {fileID: 3399390385370279526}
