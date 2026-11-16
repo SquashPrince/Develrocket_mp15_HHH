@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: CommonCharacterSettings
   m_EditorClassIdentifier: Assembly-CSharp::CommonCharacterSettings
   _gravity: -20
+  _dashStartDelay: 0.1
+  _dodgeStartDelay: 0.1
   _attackableDistance: 0
   _attackRange: 10
   _lockOnRange: 15

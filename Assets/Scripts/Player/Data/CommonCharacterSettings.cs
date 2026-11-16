@@ -11,6 +11,12 @@ public class CommonCharacterSettings : ScriptableObject
     [Header("이동")]
     [SerializeField] private float _gravity = -20f;
 
+    [Header("대시 · 회피")]
+    [Tooltip("대시를 시작한 뒤 제자리에 있다가 전진을 시작하기까지의 시간(초). 무적 · 완벽 회피 판정은 시작부터 열려 있다. 대시 시간 안에 포함되므로 대시 시간보다 짧게 둔다")]
+    [SerializeField, Min(0f)] private float _dashStartDelay;
+    [Tooltip("회피(백스텝)를 시작한 뒤 제자리에 있다가 전진을 시작하기까지의 시간(초). 회피 시간 안에 포함되므로 회피 시간보다 짧게 둔다")]
+    [SerializeField, Min(0f)] private float _dodgeStartDelay;
+
     [Header("공격 간격")]
     [Tooltip("공격할 때 대상 앞에서 멈추거나 순간 이동할 때, 대상 몸 표면과 플레이어 몸 표면 사이를 이 간격만큼 띄운다. 중심 사이 거리는 대상 반지름 + 플레이어 반지름 + 간격이다")]
     [SerializeField, Min(0f)] private float _attackableDistance = 1.5f;
@@ -92,6 +98,8 @@ public class CommonCharacterSettings : ScriptableObject
     [SerializeField] private InputActionReference _lockOnAction;
 
     public float Gravity => _gravity;
+    public float DashStartDelay => _dashStartDelay;
+    public float DodgeStartDelay => _dodgeStartDelay;
     public float AttackRange => _attackRange;
     public float LockOnRange => _lockOnRange;
     public LayerMask ObstacleLayers => _obstacleLayers;
