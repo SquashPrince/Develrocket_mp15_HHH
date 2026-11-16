@@ -9,8 +9,10 @@ using UnityEngine;
 public class CharacterData : ScriptableObject
 {
     [Header("표시")]
-    [Tooltip("화면(파티 HUD · 콤보 선택)에 보일 캐릭터 이름. 비워 두면 에셋 이름을 보여준다")]
+    [Tooltip("[예정] 캐릭터 이름. 결과 화면 등에서 쓸 값이다. 비워 두면 에셋 이름을 쓴다. 지금 전투 화면은 이름 대신 초상화를 보여준다")]
     [SerializeField] private string _displayName;
+    [Tooltip("화면(파티 HUD · 콤보 선택)에 보일 캐릭터 초상화")]
+    [SerializeField] private Sprite _portrait;
 
     [Header("능력치")]
     [SerializeField, Min(1f)] private float _maxHealth = 100f;
@@ -81,6 +83,7 @@ public class CharacterData : ScriptableObject
     [SerializeField] private ActionData _comboSkill;
 
     public string DisplayName => string.IsNullOrEmpty(_displayName) ? name : _displayName;
+    public Sprite Portrait => _portrait;
     public float MaxHealth => _maxHealth;
     public float MaxEnergy => _maxEnergy;
     public float EnergyRegenPerSecond => _energyRegenPerSecond;

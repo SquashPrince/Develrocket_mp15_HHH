@@ -2,15 +2,18 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// 캐릭터 칸 하나. 이름 · 체력 · 에너지 막대와 [선택] 필살기 게이지 숫자를 보여준다. 조작 캐릭터 칸과 대기 캐릭터 칸이 함께 쓴다.
+// 캐릭터 칸 하나. 초상화 · 체력 · 에너지 막대와 [선택] 필살기 게이지 숫자를 보여준다. 조작 캐릭터 칸과 대기 캐릭터 칸이 함께 쓴다.
 // 체력 · 필살기 게이지는 상태 기능의 알림이 올 때만 다시 그리고, 에너지는 시간이 지나며 계속 차므로 매 프레임 읽는다.
 // 맡은 캐릭터가 바뀌면 이전 캐릭터의 알림을 해제하고 새 캐릭터의 알림을 구독한다. 해제하지 않으면 다른 캐릭터의 값으로 그려지기 때문이다.
 // 막대는 Slider(0 ~ 1)로 그린다. 채움 영역의 크기가 줄어드는 방식이라 막대 끝 장식(9-slice)이 줄어들어도 유지된다.
+// 체력 막대 뒤의 잔상 막대는 맞아서 줄어든 체력만 잔상으로 남긴다. 맡은 캐릭터가 바뀌거나 처음 그릴 때는 잔상 없이 바로 맞춘다.
 // 필살기 게이지는 막대 대신 현재 값을 1 의 자리까지 숫자로 보여준다. 조작 캐릭터 칸에만 두어, 교체하면 필드에 있는 캐릭터의 값으로 바뀐다.
 public class CharacterGauge : MonoBehaviour
 {
-    [SerializeField] private TMP_Text _nameText;
+    [SerializeField] private Image _portraitImage;
     [SerializeField] private Slider _healthSlider;
+    [Tooltip("체력 막대 뒤에 겹친 잔상 막대")]
+    [SerializeField] private GaugeTrail _healthTrail;
     [SerializeField] private Slider _energySlider;
     [Tooltip("[선택] 필살기 게이지 현재 값을 보여줄 글자. 대기 캐릭터 칸처럼 보이지 않을 칸은 비워 둔다")]
     [SerializeField] private TMP_Text _ultimateGaugeText;
@@ -31,13 +34,23 @@ public class CharacterGauge : MonoBehaviour
 
         _character = character;
         _status = character.Status;
-        _nameText.text = character.Character.DisplayName;
+        _portraitImage.sprite = character.Character.Portrait;
 
         // 꺼져 있는 칸은 켜질 때(OnEnable) 구독한다. 여기서도 구독하면 두 번 구독된다.
         if(isActiveAndEnabled) BindStatusEvent();
     }
 
-    private void RefreshHealth() => _healthSlider.value = _status.CurrentHealth / _status.MaxHealth;
+    private void OnHealthChanged() => RefreshHealth(false);
+
+    // isSnap : 잔상 없이 바로 맞출지. 체력 변경 알림이 아닌 처음 그리기 · 캐릭터 바뀜에서 켠다.
+    private void RefreshHealth(bool isSnap)
+    {
+        float ratio = _status.CurrentHealth / _status.MaxHealth;
+        _healthSlider.value = ratio;
+
+        if(isSnap) _healthTrail.Snap(ratio);
+        else _healthTrail.SetValue(ratio);
+    }
 
     private void RefreshEnergy()
     {
@@ -59,7 +72,7 @@ public class CharacterGauge : MonoBehaviour
     {
         if(_status == null) return;
 
-        RefreshHealth();
+        RefreshHealth(true);
         RefreshUltimateGauge();
         RefreshEnergy();
     }
@@ -69,7 +82,7 @@ public class CharacterGauge : MonoBehaviour
     {
         if(_status == null) return;
 
-        _status.HealthChanged += RefreshHealth;
+        _status.HealthChanged += OnHealthChanged;
         _status.UltimateGaugeChanged += RefreshUltimateGauge;
         RefreshAll();
     }
@@ -78,7 +91,7 @@ public class CharacterGauge : MonoBehaviour
     {
         if(_status == null) return;
 
-        _status.HealthChanged -= RefreshHealth;
+        _status.HealthChanged -= OnHealthChanged;
         _status.UltimateGaugeChanged -= RefreshUltimateGauge;
     }
 }

@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5738e84ba5848c09dac4e7a54a12e96, type: 3}
   m_Name: Fighter
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  _displayName: 
+  _portrait: {fileID: 21300000, guid: b29ce5e2feae14a54b35b2d3adcde178, type: 3}
   _maxHealth: 1543
   _maxEnergy: 120
   _energyRegenPerSecond: 0.96

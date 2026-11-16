@@ -1,10 +1,15 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 // 적 하나의 체력 · 그로기 막대(Slider 0 ~ 1). 일반 적 머리 위 바와 화면 위쪽 보스 바가 함께 쓴다.
 // 대상을 비워 두면 부모에서 찾는다. 일반 적 Prefab 의 자식으로 붙이면 따로 연결하지 않아도 된다. 보스 바는 씬의 보스를 연결한다.
 // 체력 · 그로기 게이지는 적 기능의 알림이 올 때만 다시 그린다.
-// 그로기 중에는 그로기 막대가 남은 그로기 시간을 보여주므로, 그로기 중에만 매 프레임 읽는다. 그로기 중에는 막대 채움 색을 그로기 색으로 바꿔 덮는다.
+// 그로기가 아닐 때는 쌓인 그로기 게이지를 퍼센트 숫자로도 보여주고, 그로기 중에는 숫자를 숨긴다.
+// 그로기 중에는 그로기 막대가 남은 그로기 시간을 보여주므로, 그로기 중에만 매 프레임 읽는다.
+// 그로기 중 막대 채움 색은 콤보 스킬 연계가 남았는지에 따라 두 색 중 하나로 덮는다. 연계를 쓴 순간을 알리는 알림이 없어, 그로기 중 매 프레임 읽을 때 함께 확인한다.
+// 체력 막대 뒤의 잔상 막대는 맞아서 줄어든 체력만 잔상으로 남긴다. 처음 그릴 때는 잔상 없이 바로 맞춘다.
 // 대상이 처치되면 막대 묶음을 숨긴다.
 public class EnemyGauge : MonoBehaviour
 {
@@ -13,9 +18,16 @@ public class EnemyGauge : MonoBehaviour
     [Tooltip("처치되면 숨길 막대 묶음")]
     [SerializeField] private GameObject _root;
     [SerializeField] private Slider _healthSlider;
+    [Tooltip("체력 막대 뒤에 겹친 잔상 막대")]
+    [SerializeField] private GaugeTrail _healthTrail;
     [SerializeField] private Slider _groggySlider;
-    [Tooltip("그로기 중 그로기 막대 채움 영역에 덮어 띄울 색. 그로기가 끝나면 원래 색으로 돌아간다")]
-    [SerializeField] private Color _groggyFillColor = new Color(1f, 0.5f, 0f);
+    [Tooltip("[선택] 그로기 게이지 퍼센트 숫자. 그로기가 아닐 때만 보인다")]
+    [SerializeField] private TMP_Text _groggyPercentText;
+    [Tooltip("그로기 중, 콤보 스킬 연계가 남아 있을 때 그로기 막대 채움 영역에 덮어 띄울 색. 그로기가 끝나면 원래 색으로 돌아간다")]
+    [FormerlySerializedAs("_groggyFillColor")]
+    [SerializeField] private Color _comboReadyFillColor = new Color(1f, 0.5f, 0f);
+    [Tooltip("그로기 중, 콤보 스킬 연계를 모두 썼거나 이어받을 대기 캐릭터가 없을 때 그로기 막대 채움 영역에 덮어 띄울 색")]
+    [SerializeField] private Color _comboUsedFillColor = new Color(0.5f, 0.5f, 0.5f);
 
     private EnemyReaction _reaction;
     // 그로기 막대 채움 영역의 이미지와 원래 색
@@ -29,24 +41,45 @@ public class EnemyGauge : MonoBehaviour
     private void OnDisable() => UnbindEnemyEvent();
     private void Update() => RefreshGroggyTime();
 
-    private void RefreshHealth(bool isImpact) => _healthSlider.value = _target.CurrentHealth / _target.MaxHealth;
+    private void OnDamaged(bool isImpact) => RefreshHealth(false);
+
+    // isSnap : 잔상 없이 바로 맞출지. 대미지 알림이 아닌 처음 그리기에서 켠다.
+    private void RefreshHealth(bool isSnap)
+    {
+        float ratio = _target.CurrentHealth / _target.MaxHealth;
+        _healthSlider.value = ratio;
+
+        if(isSnap) _healthTrail.Snap(ratio);
+        else _healthTrail.SetValue(ratio);
+    }
 
     // 그로기가 아닐 때는 쌓인 게이지, 그로기 중에는 남은 시간을 보여준다.
+    // 퍼센트는 소수점 아래를 버린다. 반올림하면 가득 차기 전에 100 으로 보일 수 있기 때문이다.
+    // 항상 두 자리(00 ~ 99)로 보여준다. 100 이 되면 그로기에 들어가 숫자가 숨겨진다.
     private void RefreshGroggyGauge()
     {
         if(_reaction.IsGroggy) return;
 
-        _groggySlider.value = _reaction.CurrentGroggy / _reaction.MaxGroggy;
+        float ratio = _reaction.CurrentGroggy / _reaction.MaxGroggy;
+        _groggySlider.value = ratio;
+
+        if(_groggyPercentText != null) _groggyPercentText.text = Mathf.FloorToInt(ratio * 100f).ToString("00");
     }
 
+    // 그로기 중에만 남은 시간과 남은 연계 여부에 따른 막대 색을 그린다.
     private void RefreshGroggyTime()
     {
-        if(_reaction.IsGroggy) _groggySlider.value = _reaction.GroggyTimeRatio;
+        if(!_reaction.IsGroggy) return;
+
+        _groggySlider.value = _reaction.GroggyTimeRatio;
+        _groggyFillImage.color = _reaction.HasRemainingComboChain ? _comboReadyFillColor : _comboUsedFillColor;
     }
 
+    // 그로기에 들어가거나 풀릴 때 퍼센트 숫자를 켜고 끄고, 막대를 그 상태에 맞게 다시 그린다.
     private void RefreshGroggyState()
     {
-        _groggyFillImage.color = _reaction.IsGroggy ? _groggyFillColor : _normalFillColor;
+        if(_groggyPercentText != null) _groggyPercentText.gameObject.SetActive(!_reaction.IsGroggy);
+        if(!_reaction.IsGroggy) _groggyFillImage.color = _normalFillColor;
 
         RefreshGroggyGauge();
         RefreshGroggyTime();
@@ -57,7 +90,7 @@ public class EnemyGauge : MonoBehaviour
     // 구독할 때 현재 값으로 한 번 그린다.
     private void BindEnemyEvent()
     {
-        _target.Damaged += RefreshHealth;
+        _target.Damaged += OnDamaged;
         _target.Died += Hide;
         _reaction.GroggyGaugeChanged += RefreshGroggyGauge;
         _reaction.GroggyEntered += RefreshGroggyState;
@@ -68,13 +101,13 @@ public class EnemyGauge : MonoBehaviour
     private void RefreshAll()
     {
         _root.SetActive(_target.IsAlive);
-        RefreshHealth(false);
+        RefreshHealth(true);
         RefreshGroggyState();
     }
 
     private void UnbindEnemyEvent()
     {
-        _target.Damaged -= RefreshHealth;
+        _target.Damaged -= OnDamaged;
         _target.Died -= Hide;
         _reaction.GroggyGaugeChanged -= RefreshGroggyGauge;
         _reaction.GroggyEntered -= RefreshGroggyState;

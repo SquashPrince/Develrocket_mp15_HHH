@@ -65,6 +65,10 @@ public class PlayerController : MonoBehaviour
     public float AutoRunDelay => _character.AutoRunDelay;
     public float DashChainInterval => _character.DashChainInterval;
     public float DashInvincibleTime => _character.DashInvincibleTime;
+    // 대시 · 회피를 쓸 수 있는 남은 횟수가 있는지. 전투 화면이 회피 칸의 쿨타임 표시를 켤지 정할 때 쓴다.
+    public bool HasDashStack => _dashStack > 0;
+    // 다음 대시 횟수가 찰 때까지 남은 쿨타임의 비율(1 → 0). 횟수가 가득 차 있으면 0 이다.
+    public float DashCooldownRatio => _dashStack >= MAX_DASH_STACK || _character.DashCooldown <= 0f ? 0f : 1f - _dashCooldownTimer / _character.DashCooldown;
     // 완벽 회피 후 슬로모션 중인지. 이 동안의 공격 입력은 대시 공격보다 회피 반격이 우선한다.
     public bool IsPerfectDodge => _party.SlowMotion.IsActive;
     // 현재 상태에서 필살기를 쓸 수 있는지. 상태마다 스스로 정한다.
