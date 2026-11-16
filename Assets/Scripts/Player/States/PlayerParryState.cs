@@ -33,6 +33,8 @@ public class PlayerParryState : PlayerState
 
     // 패링 준비 · 반응 중인지. 이 동안 닿은 노란 공격은 패링된다.
     public bool IsActive { get; private set; }
+    // 준비 중에는 패링 액션의 준비 동작, 성공 반응 중에는 반응 동작의 끼어들기 허용을 따른다.
+    public override bool CanSwap => _trigger.ParryAction.GetStep(_phase == Phase.Ready ? READY_STEP : REACT_STEP).Allows(ActionStep.Interrupt.Swap);
 
     public override void Enter()
     {

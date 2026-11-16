@@ -1,11 +1,12 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 // 적 공격. 일반 · 엘리트 · 보스가 함께 쓰고, 공격 목록 · 설정값으로 차이를 둔다.
 // 행동 그래프가 공격 시작을 요청하면, 쓸 수 있는 공격 중 하나를 골라 단계별 Animator 상태를 순서대로 재생한다.
 // 각 단계는 그 상태의 재생이 끝나면 다음 단계로 넘어가고, 마지막 단계가 끝나면 공격이 끝난다.
 // 판정은 지금 단계 클립의 Hit 이벤트에서 한다. 첫 Hit 이벤트 전까지는 대상 쪽으로 돌고, 그 뒤에는 방향을 고정한다.
-// 판정 지속 공격은 Hit 이벤트부터 그 단계가 끝날 때까지 매 프레임 판정한다. 어느 쪽이든 플레이어는 공격 한 번에 한 번만 맞는다.
-// 패링 공격은 Telegraph 이벤트부터 첫 Hit 이벤트까지 패링 가능 시간을 열고 예고 표시를 켠다. 예고 시점은 이벤트 프레임으로 조정한다.
+// 판정 지속 공격은 Hit 이벤트부터 그 단계가 끝날 때까지 매 프레임 판정한다. 어느 쪽이든 공격 한 번에 범위 안의 캐릭터마다 한 번씩만 맞는다. (파티 전투에서 필드에 캐릭터가 여럿일 수 있다)
+// 패링 공격은 Telegraph 이벤트부터 첫 Hit 이벤트까지 패링 가능 시간을 연다. 예고 시점은 이벤트 프레임으로 조정한다. 예고 표시는 플레이어 쪽(파티)이 예고 위치에 띄운다.
 // 공격 시작부터 그 공격의 경직 저항 레벨을 적용하고, 첫 Hit 이벤트(또는 설정에 따라 ResistEnd 이벤트)에서 푼다.
 // 경직 · 그로기 · 처치되면 진행 중인 공격을 끊는다. 끊긴 공격도 쓴 것으로 보고 쿨타임을 시작한다.
 // 공격 선택 : 쿨타임 중이거나 대상이 사용 최소 거리보다 가까운 공격은 빼고, 가중치(기본 가중치 + 증가량 × 마지막으로 쓴 뒤 다른 공격이 선택된 횟수)에 비례해 무작위로 고른다.
@@ -21,20 +22,19 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     [SerializeField] private LayerMask _targetLayers = ~0;
     [Tooltip("공격 중 판정 전까지 대상 쪽으로 도는 초당 각도")]
     [SerializeField, Min(0f)] private float _turnSpeed = 360f;
-    [Tooltip("[임시] 패링 공격 예고 표시로 쓸 프리팹. 패링 가능 시간 동안만 켜진다. 나중에 이펙트로 바꾼다")]
-    [SerializeField] private GameObject _parryTelegraphPrefab;
-    [Tooltip("예고 표시를 만들 위치. 록온 표시와 겹치지 않도록 적 안에 따로 둔 부모")]
+    [Tooltip("패링 공격 예고 표시를 띄울 위치. 록온 표시와 겹치지 않도록 적 안에 따로 둔 자식. 표시는 플레이어 쪽이 띄운다")]
     [SerializeField] private Transform _telegraphPoint;
     [Tooltip("이 적이 쓰는 공격 목록")]
     [SerializeField] private EnemyAttackSetting[] _attacks = { new EnemyAttackSetting() };
 
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
+    // 이번 공격에 이미 맞은 캐릭터. 공격 한 번에 캐릭터마다 한 번만 맞힌다.
+    private readonly List<PlayerStatus> _landedTargets = new List<PlayerStatus>();
     private EnemyHealth _health;
     private EnemyReaction _reaction;
     private EnemyAnimation _animation;
     // 도약 공격이 있는 적만 가진다. 없으면 null 이다.
     private EnemyLeap _leap;
-    private GameObject _parryTelegraph;
     private Transform _target;
     // 공격별 남은 쿨타임과, 마지막으로 쓴 뒤 다른 공격이 선택된 횟수
     private float[] _cooldownTimers;
@@ -44,13 +44,12 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     private int _phaseHash;
     // 첫 Hit 이벤트가 지났는지. 지나면 대상 쪽으로 돌지 않고 패링 가능 시간을 닫는다.
     private bool _isHitStarted;
-    // 플레이어를 이미 맞혔는지. 공격 한 번에 한 번만 맞힌다.
-    private bool _hasLanded;
     // 판정 지속 공격에서 지금 단계의 판정이 켜져 있는지. 단계가 바뀌면 끈다.
     private bool _isHitActive;
     private bool _isParryWindowOpen;
 
     public bool IsParryWindowOpen => _isParryWindowOpen;
+    public Transform TelegraphPoint => _telegraphPoint;
     public bool IsAttacking => _attackIndex >= 0;
     // 마지막 공격이 경직 · 그로기 · 처치로 끊겼는지. 행동 그래프가 공격 노드의 성공 · 실패를 정할 때 쓴다.
     public bool WasLastAttackInterrupted { get; private set; }
@@ -98,7 +97,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         _attackIndex = index;
         _phaseIndex = -1;
         _isHitStarted = false;
-        _hasLanded = false;
+        _landedTargets.Clear();
         WasLastAttackInterrupted = false;
 
         _reaction.SetAttackStaggerResistLevel(CurrentAttack.StaggerResistLevel);
@@ -153,7 +152,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
         if(!_isHitStarted) TurnTowardsTarget();
 
-        if(_isHitActive && !_hasLanded) _hasLanded = HitTarget(CurrentAttack);
+        if(_isHitActive) HitTargets(CurrentAttack);
 
         if(_animation.IsStateFinished(_phaseHash)) StartNextPhase();
     }
@@ -193,10 +192,8 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
             if(!CurrentAttack.ResistUntilEvent) _reaction.SetAttackStaggerResistLevel(0);
         }
 
-        if(_hasLanded) return;
-
         if(CurrentAttack.IsContinuousHit) _isHitActive = true;
-        else if(isFirstHit) _hasLanded = HitTarget(CurrentAttack);
+        else if(isFirstHit) HitTargets(CurrentAttack);
     }
 
     // 공격을 끝낸다. 끊겼든 끝까지 했든 쿨타임을 시작하고, 패링 가능 시간 · 경직 저항을 닫는다.
@@ -258,8 +255,11 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
     private float GetWeight(int index) => _attacks[index].BaseWeight + _attacks[index].WeightGrowth * _skipCounts[index];
 
-    // 판정 구 안에 플레이어가 있으면 한 번 맞히고 true 를 돌려준다. 콜라이더가 여러 개여도 플레이어는 하나이므로 처음 찾은 대상만 맞힌다.
-    private bool HitTarget(EnemyAttackSetting attack)
+    // 판정 구 안의 캐릭터 중 이번 공격에 아직 맞지 않은 캐릭터를 모두 맞힌다. 콜라이더가 여러 개인 캐릭터도 한 번만 맞힌다.
+    // 맞은 결과(피격 · 무적 · 완벽 회피 · 패링)와 상관없이 판정을 받은 캐릭터는 이번 공격에서 다시 판정하지 않는다.
+    //   지원 공격처럼 무적인 이전 캐릭터와 패링 중인 새 캐릭터가 함께 있어도, 새 캐릭터가 따로 판정을 받는다.
+    // 패링당해 공격이 끊기면 남은 캐릭터는 맞히지 않는다.
+    private void HitTargets(EnemyAttackSetting attack)
     {
         Vector3 center = transform.position + transform.rotation * attack.HitCenter;
         int count = Physics.OverlapSphereNonAlloc(center, attack.HitRadius, _hitColliders, _targetLayers, QueryTriggerInteraction.Ignore);
@@ -268,13 +268,13 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         {
             PlayerStatus status = _hitColliders[i].GetComponentInParent<PlayerStatus>();
 
-            if(status == null) continue;
+            if(status == null || _landedTargets.Contains(status)) continue;
 
+            _landedTargets.Add(status);
             status.TakeHit(attack, this);
-            return true;
-        }
 
-        return false;
+            if(!IsAttacking) return;
+        }
     }
 
     private void TurnTowardsTarget()
@@ -309,7 +309,6 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         ParryWindow.Open(this);
         _isParryWindowOpen = true;
 
-        if(_parryTelegraph != null) _parryTelegraph.SetActive(true);
     }
 
     private void CloseParryWindow()
@@ -319,7 +318,6 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         ParryWindow.Close(this);
         _isParryWindowOpen = false;
 
-        if(_parryTelegraph != null) _parryTelegraph.SetActive(false);
     }
 
     // 경직 · 그로기 · 처치되면 진행 중인 공격을 끊는다. 모션은 적 모션 기능이 반응 모션으로 바꾼다.
@@ -343,16 +341,10 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         _leap = GetComponent<EnemyLeap>();
     }
 
-    // 예고 표시는 미리 한 번 만들어 꺼 두고, 패링 가능 시간마다 켜고 끈다. 예고 표시 프리팹은 넣지 않아도 된다.
     private void Init()
     {
         _cooldownTimers = new float[_attacks.Length];
         _skipCounts = new int[_attacks.Length];
-
-        if(_parryTelegraphPrefab == null) return;
-
-        _parryTelegraph = Instantiate(_parryTelegraphPrefab, _telegraphPoint);
-        _parryTelegraph.SetActive(false);
     }
 
     private void BindReactionEvent()

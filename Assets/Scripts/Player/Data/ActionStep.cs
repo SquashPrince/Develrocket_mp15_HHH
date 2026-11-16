@@ -35,6 +35,17 @@ public class ActionStep
         Count
     }
 
+    // 이 동작 중 끼어들 수 있는 행동. 여러 개를 함께 고르는 값이라 각 항목이 비트 하나를 차지한다.
+    // Inspector 에 저장된 값은 비트를 더한 숫자이므로, 새 항목은 항상 맨 뒤에 다음 비트로 추가한다.
+    [Flags]
+    public enum Interrupt
+    {
+        None = 0,
+        Dash = 1 << 0,
+        Ultimate = 1 << 1,
+        Swap = 1 << 2
+    }
+
     [Tooltip("재생할 Animator 상태 이름. Animator Controller 의 상태 이름과 같아야 한다")]
     [SerializeField] private string _animationState = "";
 
@@ -72,6 +83,10 @@ public class ActionStep
     [Tooltip("이전 모션에서 이 모션으로 섞으며 넘어가는 시간(초)")]
     [SerializeField, Min(0f)] private float _fadeTime = 0.1f;
 
+    [Header("끼어들기")]
+    [Tooltip("이 동작 중 허용할 행동. 체크한 것만 허용한다.\n대시 : 휘두르는 중 대시 · 회피로 끊기 (후딜은 항상 끊을 수 있다)\n필살기 : 게이지가 가득 차 있으면 필살기로 끊기 (공격 액션만 사용)\n교체 : 교체 키로 다른 캐릭터와 교체. 막힌 동작 중 누른 교체 키는 무시한다")]
+    [SerializeField] private Interrupt _interrupts = Interrupt.Dash | Interrupt.Ultimate | Interrupt.Swap;
+
     public string AnimationState => _animationState;
     // 재생 · 이벤트 구분에 쓰는 상태 해시. 상태 이름으로 매번 계산한다.
     public int AnimationHash => Animator.StringToHash(_animationState);
@@ -89,4 +104,7 @@ public class ActionStep
     public float AdvanceDistance => _advanceDistance;
     public float AdvanceDuration => _advanceDuration;
     public float FadeTime => _fadeTime;
+
+    // 이 동작 중 interrupt 행동을 허용하는지
+    public bool Allows(Interrupt interrupt) => (_interrupts & interrupt) != 0;
 }

@@ -975,6 +975,7 @@ GameObject:
   - component: {fileID: 1781024354}
   - component: {fileID: 1781024355}
   - component: {fileID: 1781024356}
+  - component: {fileID: 1781024357}
   m_Layer: 0
   m_Name: Party
   m_TagString: Untagged
@@ -1040,6 +1041,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLockOn
   _markerHeight: 2.5
+--- !u!114 &1781024357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1781024352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a446b4e93937b34398bb256b208850c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ParryTelegraphView
 --- !u!1 &1872903721
 GameObject:
   m_ObjectHideFlags: 0

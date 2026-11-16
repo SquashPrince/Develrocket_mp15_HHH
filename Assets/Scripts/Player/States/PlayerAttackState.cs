@@ -17,7 +17,8 @@ public class PlayerAttackState : PlayerState
         SpecialSkill,
         DashAttack,
         DodgeCounter,
-        ParryChase
+        ParryChase,
+        QuickSupport
     }
 
     private enum Phase
@@ -44,16 +45,17 @@ public class PlayerAttackState : PlayerState
     {
     }
 
-    // 공격마다 공격 설정에서 필살기로 끊을 수 있는지 정한다.
-    public override bool CanUseUltimate => _action.CanUltimateCancel;
+    // 지금 동작의 끼어들기 허용에서 필살기로 끊을 수 있는지 · 교체할 수 있는지 정한다.
+    public override bool CanUseUltimate => _motion.Allows(ActionStep.Interrupt.Ultimate);
+    public override bool CanSwap => _motion.Allows(ActionStep.Interrupt.Swap);
 
     private bool IsSkill => _type == AttackType.Skill || _type == AttackType.SpecialSkill;
     // 콤보의 마지막 단계는 마무리 공격이다. 끝났다는 느낌을 주기 위해 후딜이 끝날 때까지 공격 입력을 받지 않는다.
     private bool IsFinisher => _type == AttackType.Basic && _step == Controller.ComboStepCount - 1;
-    // 휘두르는 중 선입력을 저장해 공격 동작이 끝나면 기본 공격으로 이어가는 공격. 대시 공격 · 패링 추격 뒤에는 콤보 1단으로 이어진다.
-    private bool CanBufferBasicAttack => _type == AttackType.Basic || _type == AttackType.DashAttack || _type == AttackType.ParryChase;
-    // 대시 공격 · 회피 반격 · 패링 추격은 휘두르는 중 공격 키를 눌러도 차지하지 않는다. 무적 · 후딜이 붙을 동작이라 강공격으로 끊지 못하게 한다.
-    private bool CanChargeInSwing => _type != AttackType.DashAttack && _type != AttackType.DodgeCounter && _type != AttackType.ParryChase;
+    // 휘두르는 중 선입력을 저장해 공격 동작이 끝나면 기본 공격으로 이어가는 공격. 대시 공격 · 패링 추격 · 빠른 지원 뒤에는 콤보 1단으로 이어진다.
+    private bool CanBufferBasicAttack => _type == AttackType.Basic || _type == AttackType.DashAttack || _type == AttackType.ParryChase || _type == AttackType.QuickSupport;
+    // 대시 공격 · 회피 반격 · 패링 추격 · 빠른 지원은 휘두르는 중 공격 키를 눌러도 차지하지 않는다. 무적 · 후딜이 붙을 동작이라 강공격으로 끊지 못하게 한다.
+    private bool CanChargeInSwing => _type != AttackType.DashAttack && _type != AttackType.DodgeCounter && _type != AttackType.ParryChase && _type != AttackType.QuickSupport;
 
     // step : 기본 공격 단계(0부터). 기본 공격이 아니면 사용하지 않는다.
     // priorityTarget : 록온 중이 아닐 때 자동 조준보다 먼저 노릴 대상. 없으면 null
@@ -94,7 +96,7 @@ public class PlayerAttackState : PlayerState
 
         Vector3 moveDirection = Controller.ReadMoveDirection();
 
-        bool canDashCancel = _phase == Phase.Recovery || _action.CanDashCancel;
+        bool canDashCancel = _phase == Phase.Recovery || _motion.Allows(ActionStep.Interrupt.Dash);
 
         if(canDashCancel && Controller.WasDashPressed && Controller.TryStartDash(moveDirection)) return;
 

@@ -48,6 +48,7 @@ public class PlayerController : MonoBehaviour
     public PlayerAnimation Animation { get; private set; }
     public PlayerInputReader Input => _input;
     public PlayerTargeting Targeting => _targeting;
+    public PlayerActionTrigger ActionTrigger { get; private set; }
     // 캐릭터 몸(CharacterController). 순간 이동 규칙이 몸 크기를 재고 위치를 옮길 때 쓴다.
     public CharacterController Body => _characterController;
     // 이번 프레임의 캐릭터 시간(초). 히트렉처럼 이 캐릭터만 멈추는 효과가 반영된다. 상태 · 기능의 타이머 · 이동은 이 값을 쓴다.
@@ -68,6 +69,8 @@ public class PlayerController : MonoBehaviour
     public bool IsPerfectDodge => _party.SlowMotion.IsActive;
     // 현재 상태에서 필살기를 쓸 수 있는지. 상태마다 스스로 정한다.
     public bool CanUseUltimate => _stateMachine.CurrentState.CanUseUltimate;
+    // 현재 상태에서 교체할 수 있는지. 상태마다 스스로 정한다.
+    public bool CanSwap => _stateMachine.CurrentState.CanSwap;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -177,12 +180,27 @@ public class PlayerController : MonoBehaviour
     // 완벽 회피 슬로모션 중 공격 입력으로 회피 반격을 시작한다. 슬로모션은 공격 상태에 들어가면서 끝난다.
     public void StartDodgeCounter() => StartAttack(PlayerAttackState.AttackType.DodgeCounter, _character.DodgeCounter);
 
+    // 빠른 지원 : 교체로 막 들어온 이 캐릭터가 이전 캐릭터를 넉백시킨 적 앞으로 순간 이동해 빠른 지원 액션을 쓴다. 파티가 교체할 때 부른다.
+    // 서는 방향 · 옆 각도는 빠른 지원 액션의 순간 이동 옵션이 정하고, 순간 이동할 자리가 막혀 있으면 제자리에서 쓴다.
+    // 공격은 그 적을 우선 대상으로 노린다. 빠른 지원 액션이 없으면 false 를 돌려주고, 파티는 보통 입장으로 교체한다.
+    public bool TryStartQuickSupport(Transform target)
+    {
+        ActionData action = _character.QuickSupport;
+
+        if(action == null || target == null) return false;
+
+        TeleportManager.TryTeleportTo(this, target, action.Teleport);
+        target.TryGetComponent(out IEnemyTargetable priorityTarget);
+        StartAttack(PlayerAttackState.AttackType.QuickSupport, action, priorityTarget);
+        return true;
+    }
+
     // 적 공격에 맞으면 어떤 상태에서든 피격 상태로 넘어간다. 진행 중이던 공격 · 차지는 끊고, 이후 콤보는 1단부터 시작한다.
-    public void StartHit(EnemyAttackSetting attack, Vector3 attackerPosition)
+    public void StartHit(EnemyAttackSetting attack, Transform attacker)
     {
         _isCharging = false;
         _comboExpireTime = 0f;
-        _hitState.Setup(attack, attackerPosition);
+        _hitState.Setup(attack, attacker);
         _stateMachine.ChangeState(_hitState);
     }
 
@@ -335,6 +353,7 @@ public class PlayerController : MonoBehaviour
         _input = GetComponent<PlayerInputReader>();
         _targeting = GetComponent<PlayerTargeting>();
         AttackJudge = GetComponent<PlayerAttackJudge>();
+        ActionTrigger = GetComponent<PlayerActionTrigger>();
         Animation = GetComponent<PlayerAnimation>();
         Status = GetComponent<PlayerStatus>();
     }

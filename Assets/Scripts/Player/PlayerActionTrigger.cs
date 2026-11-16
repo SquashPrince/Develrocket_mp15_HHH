@@ -82,27 +82,28 @@ public class PlayerActionTrigger : MonoBehaviour
     // 콤보 스킬 중 강타가 맞은 적을 알린다. 콤보 스킬 대상이면 다음 연계를 잇는다.
     public void OnComboSkillImpactHit(IEnemyDamageable enemy) => _comboSkillState.QueueChain(enemy.transform);
 
-    // TODO(#41 5단계) 지원 공격에서 파티가 교체로 나온 캐릭터에게 부르도록 연결한다.
-    private void TryStartParry()
+    // 지원 공격 : 교체로 막 들어온 이 캐릭터가 패링을 시작한다. 파티가 교체할 때 부르고, 패링을 시작했으면 true 를 돌려준다.
+    // 록온 사거리 안에 패링 가능 시간을 연 적이 없으면 시작하지 않고 false 를 돌려준다. 이때 파티는 보통 입장으로 교체한다.
+    public bool TryStartSupportParry()
     {
-        if(_parryState.IsActive || _controller.Status.IsAttackInvincible) return;
+        if(_parryState.IsActive || _controller.Status.IsAttackInvincible) return false;
+
+        _selectedParryAttacker = SelectParryAttacker();
+
+        if(_selectedParryAttacker == null) return false;
 
         // 패링 액션이 연결되지 않았으면 패링을 시작하지 않는다. 상태에 들어간 뒤 멈추면 준비 모션 없이 패링 판정만 켜져,
-        // 준비 성공 → 반응 → 추격 순서가 깨지기 때문이다. 상태가 바뀌기 전에 막아 진행 중이던 동작도 끊지 않는다.
-        // 패링 액션에 준비 · 반응 두 동작이 없을 때도 같은 이유로 막는다.
+        // 준비 성공 → 반응 → 추격 순서가 깨지기 때문이다. 패링 액션에 준비 · 반응 두 동작이 없을 때도 같은 이유로 막는다.
         if(ParryAction == null || ParryAction.StepCount <= PlayerParryState.REACT_STEP)
         {
 #if UNITY_EDITOR
             Debug.LogWarning($"[패링] {_controller.Character.name} 의 패링 액션이 비어 있거나 준비 · 반응 동작이 없어 패링하지 않는다");
 #endif
-            return;
+            return false;
         }
 
-        _selectedParryAttacker = SelectParryAttacker();
-
-        if(_selectedParryAttacker == null) return;
-
         _controller.EnterState(_parryState);
+        return true;
     }
 
     // 진행 중이던 강공격 차지는 상태를 넘길 때 끊긴다.

@@ -52,16 +52,26 @@ public class CommonCharacterSettings : ScriptableObject
     [SerializeField, Min(0f)] private float _parryReactDistance = 2f;
     [Tooltip("패링 성공 후 반응 시간(초). 이 시간에 걸쳐 점점 느려지며 밀려나고, 이 동안 닿은 노란 공격은 자동으로 패링된다. 이 동안 공격 키를 누르면 끝난 뒤 추격 공격이 나간다")]
     [SerializeField, Min(0.01f)] private float _parryReactTime = 1f;
+    [Tooltip("[임시 표시] 적이 패링 공격 예고를 시작할 때, 교체할 대기 캐릭터가 있으면(패링 가능) 띄우는 Prefab. 적의 예고 위치에 붙인다")]
+    [SerializeField] private GameObject _parryTelegraphPrefab;
+    [Tooltip("[임시 표시] 적이 패링 공격 예고를 시작할 때, 교체할 대기 캐릭터가 없으면(패링 불가) 띄우는 Prefab")]
+    [SerializeField] private GameObject _unparryableTelegraphPrefab;
 
     [Header("파티 교체")]
     [Tooltip("교체로 들어온 캐릭터가 입장 모션을 마치고 움직일 수 있을 때까지의 시간(초). 이 동안 입력은 필살기만 받는다")]
     [SerializeField, Min(0f)] private float _swapInTime = 0.5f;
     [Tooltip("입장하는 동안 이전 캐릭터 자리에서 앞으로 나아가는 거리. 입장 시간에 걸쳐 점점 느려지며 멈춘다. 0 이면 제자리에서 입장한다")]
     [SerializeField, Min(0f)] private float _swapInAdvanceDistance = 2f;
+    [Tooltip("입장을 시작한 뒤 공격 · 스킬을 쓸 수 있게 되는 시간(초). 그 전에 누른 공격 · 스킬은 기억해 두었다가 이 시간에 바로 나간다. 입장 시간보다 길면 입장이 끝날 때 나간다")]
+    [SerializeField, Min(0f)] private float _swapInActionDelay = 0.25f;
     [Tooltip("교체로 나가는 캐릭터가 퇴장 모션을 시작한 뒤 사라질 때까지의 시간(초). 이 동안 무적이다")]
     [SerializeField, Min(0f)] private float _swapOutTime = 0.5f;
     [Tooltip("퇴장 모션(뒤돌기)을 시작한 뒤 달리기로 바꿔 달려 나가기까지의 시간(초). 퇴장 시간보다 짧아야 달리기가 보인다")]
     [SerializeField, Min(0f)] private float _swapOutRunDelay = 0.3f;
+    [Tooltip("조작 중인 캐릭터가 넉백된 뒤 빠른 지원을 쓸 수 있는 시간(초, 실제 시간). 이 안에 교체하면 다음 캐릭터가 넉백시킨 적 앞으로 순간 이동해 빠른 지원 액션을 쓴다")]
+    [SerializeField, Min(0f)] private float _quickSupportInputTime = 3f;
+    [Tooltip("대기 중인 캐릭터의 초당 에너지 회복에 곱하는 배율. 1 이면 필드에 있을 때와 같은 속도로 찬다. 대기 중에는 공격으로 얻는 에너지가 없다")]
+    [SerializeField, Min(0f)] private float _standbyEnergyRegenRate = 1f;
 
     [Header("필살기")]
     [Tooltip("발동할 때 이 거리 안의 대상(록온 대상 우선, 없으면 자동 조준 대상)을 찾는다. 필살기 액션에 순간 이동 옵션이 있으면 그 대상 앞으로 순간 이동한다")]
@@ -98,10 +108,15 @@ public class CommonCharacterSettings : ScriptableObject
     public float ParryReadyTime => _parryReadyTime;
     public float ParryReactDistance => _parryReactDistance;
     public float ParryReactTime => _parryReactTime;
+    public GameObject ParryTelegraphPrefab => _parryTelegraphPrefab;
+    public GameObject UnparryableTelegraphPrefab => _unparryableTelegraphPrefab;
     public float SwapInTime => _swapInTime;
     public float SwapInAdvanceDistance => _swapInAdvanceDistance;
+    public float SwapInActionDelay => _swapInActionDelay;
     public float SwapOutTime => _swapOutTime;
     public float SwapOutRunDelay => _swapOutRunDelay;
+    public float QuickSupportInputTime => _quickSupportInputTime;
+    public float StandbyEnergyRegenRate => _standbyEnergyRegenRate;
     public float UltimateTargetSearchRange => _ultimateTargetSearchRange;
     public InputActionReference MoveAction => _moveAction;
     public InputActionReference DashAction => _dashAction;

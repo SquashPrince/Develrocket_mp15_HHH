@@ -14,6 +14,10 @@ public abstract class PlayerState
     // 새 상태를 추가할 때 따로 적지 않아도 필살기가 막히도록 기본값을 불가로 둔다.
     public virtual bool CanUseUltimate => false;
 
+    // 이 상태에서 교체 키로 다른 캐릭터와 교체할 수 있는지. 기본은 가능하다.
+    // 액션을 쓰는 상태(공격 · 패링 · 필살기 · 콤보 스킬)는 지금 동작의 끼어들기 허용을 따른다.
+    public virtual bool CanSwap => true;
+
     public virtual void Enter()
     {
     }

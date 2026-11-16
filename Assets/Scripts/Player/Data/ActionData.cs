@@ -45,7 +45,7 @@ public class ActionData : ScriptableObject
     [Tooltip("이 액션을 쓸 때 드는 에너지. 지금은 특수스킬만 쓴다. 스킬 입력 시 에너지가 이보다 적으면 일반 스킬이 나간다")]
     [SerializeField, Min(0f)] private float _energyCost;
 
-    [Header("입력 · 캔슬")]
+    [Header("입력 · 하체 달리기 · 무적")]
     [Tooltip("[강공격만 사용] 공격 키를 누르고 있으면 이 시간 뒤 강공격이 나간다")]
     [SerializeField, Min(0.01f)] private float _chargeTime = 0.6f;
     [Tooltip("[콤보 단계만 사용] 마지막 동작이 끝난 뒤 이 시간 안에 공격하면 다음 콤보 단계로 이어진다")]
@@ -54,10 +54,6 @@ public class ActionData : ScriptableObject
     [SerializeField] private bool _useLegRun = true;
     [Tooltip("하체 달리기를 쓸 때, 대상과 거리에 상관없이 전진하는 동안 항상 하체 달리기를 보여줄지 여부 (대시 공격처럼 달려 나가는 공격)")]
     [SerializeField] private bool _alwaysLegRun;
-    [Tooltip("휘두르는 중 대시 · 회피로 끊을 수 있는지. 끄면 휘두르기가 끝날 때까지 대시 입력을 무시한다. 후딜은 항상 끊을 수 있다")]
-    [SerializeField] private bool _canDashCancel = true;
-    [Tooltip("이 공격 중(휘두르기 · 후딜) 필살기 게이지가 가득 차 있으면 필살기로 끊을 수 있는지")]
-    [SerializeField] private bool _canUltimateCancel = true;
     [Tooltip("휘두르는 동안 적 공격에 맞지 않는지 여부. 회피하지 않아도 무적이며, 후딜에 들어가면 풀린다. 무적 중 들어온 노란 공격은 패링되지 않는다")]
     [SerializeField] private bool _isInvincibleOnSwing;
 
@@ -81,8 +77,6 @@ public class ActionData : ScriptableObject
     public float InputBuffer => _inputBuffer;
     public bool UseLegRun => _useLegRun;
     public bool AlwaysLegRun => _alwaysLegRun;
-    public bool CanDashCancel => _canDashCancel;
-    public bool CanUltimateCancel => _canUltimateCancel;
     public bool IsInvincibleOnSwing => _isInvincibleOnSwing;
     public float GroggyGain => _groggyGain;
     public TeleportOption Teleport => _teleport;

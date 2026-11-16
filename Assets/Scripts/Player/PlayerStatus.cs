@@ -125,7 +125,7 @@ public class PlayerStatus : MonoBehaviour
 
         _currentHealth = Mathf.Max(0f, _currentHealth - attack.Power);
 
-        _controller.StartHit(attack, attacker.transform.position);
+        _controller.StartHit(attack, attacker.transform);
         return true;
     }
 
