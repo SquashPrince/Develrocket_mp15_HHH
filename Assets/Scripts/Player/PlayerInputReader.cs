@@ -20,17 +20,19 @@ public class PlayerInputReader : MonoBehaviour
         set => _isControlled = value;
     }
 
-    public Vector2 MoveInput => _isControlled ? Common.MoveAction.action.ReadValue<Vector2>() : Vector2.zero;
+    public Vector2 MoveInput => CanRead ? Common.MoveAction.action.ReadValue<Vector2>() : Vector2.zero;
     public bool WasDashPressed => WasPressed(Common.DashAction);
     public bool WasAttackPressed => WasPressed(Common.AttackAction);
-    public bool IsAttackHeld => _isControlled && Common.AttackAction.action.IsPressed();
+    public bool IsAttackHeld => CanRead && Common.AttackAction.action.IsPressed();
     public bool WasSkillPressed => WasPressed(Common.SkillAction);
     public bool WasUltimatePressed => WasPressed(Common.UltimateAction);
     private CommonCharacterSettings Common => _controller.Common;
+    // 조작 중이고, 파티가 콤보 스킬 캐릭터 선택으로 입력을 막고 있지 않을 때만 입력을 읽는다.
+    private bool CanRead => _isControlled && !_controller.Party.IsInputBlocked;
 
     private void Awake() => CacheComponent();
 
-    private bool WasPressed(InputActionReference actionReference) => _isControlled && actionReference.action.WasPressedThisFrame();
+    private bool WasPressed(InputActionReference actionReference) => CanRead && actionReference.action.WasPressedThisFrame();
 
     private void CacheComponent()
     {

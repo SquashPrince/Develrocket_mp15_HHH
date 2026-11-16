@@ -1,9 +1,9 @@
 using UnityEngine;
 
-// 콤보 스킬 상태. 그로기 적 앞으로 순간 이동한 뒤 콤보 스킬 액션의 동작 목록을 순서대로 이어 쓰고 이동으로 돌아간다.
+// 콤보 스킬 상태. 그로기 적 둘레로 순간 이동한 뒤 콤보 스킬 액션의 동작 목록을 순서대로 한 번 쓰고 이동으로 돌아간다.
 // 한 번의 콤보 스킬은 필살기처럼 단계 설정 수만큼의 동작으로 이루어진다. 단계 수와 연계 수는 관계없다.
-// 콤보 스킬 중 대상에게 강타(Impact)가 맞으면 다음 연계를 예약하고, 마지막 단계가 끝나면 콤보 스킬을 처음 단계부터 다시 쓴다.
-// 연계는 대상 적의 최대 연계 수까지만 이어진다. 강타가 맞지 않았거나 최대 연계 수에 닿으면 이동 상태로 돌아간다.
+// 누가 언제 쓸지는 파티의 콤보 스킬 선택이 정한다. 콤보 스킬 중 강타가 맞으면 판정 기능이 콤보 스킬 선택에 알려,
+//   연계가 남았으면 다음 캐릭터가 이어받는다. 이 캐릭터는 남은 단계를 마친 뒤 이동 상태로 돌아가며 퇴장한다.
 // 각 단계는 모션 끝 이벤트(AttackMotionEnd)를 받으면 다음 단계로 넘어간다.
 // 같은 상태를 연속으로 다시 재생하면 처음부터 재생되지 않거나 이전 회차의 이벤트와 구분할 수 없어, 같은 클립이라도 단계마다 상태를 나눈다.
 // 단계마다 일반 공격처럼 대상 앞 정지 거리까지 다가간다.
@@ -15,14 +15,9 @@ public class PlayerComboSkillState : PlayerState
     private Vector3 _advanceVelocity;
     private float _advanceTimer;
     private float _advanceDuration;
-    // 대상 적의 최대 연계 수와, 지금 몇 번째 연계인지(0부터)
-    private int _maxChain;
-    private int _chain;
-    // 지금 연계에서 몇 번째 단계인지(0부터)
+    // 지금 몇 번째 단계인지(0부터)
     private int _step;
     private int _animationHash;
-    // 이번 연계 중 대상에게 강타가 맞아 다음 연계가 예약됐는지
-    private bool _isNextChainQueued;
 
     public PlayerComboSkillState(PlayerController controller, PlayerActionTrigger trigger) : base(controller)
     {
@@ -33,42 +28,32 @@ public class PlayerComboSkillState : PlayerState
     // 지금 동작의 끼어들기 허용을 따른다. 첫 동작을 시작하기 전(-1)에는 교체하지 않는다.
     public override bool CanSwap => _step >= 0 && _trigger.ComboSkillAction.GetStep(_step).Allows(ActionStep.Interrupt.Swap);
 
-    // target : 콤보 스킬을 발동시킨 그로기 적. 순간 이동과 단계별 접근의 대상이 된다.
-    // maxChain : 그 적의 최대 연계 수
-    public void Setup(IEnemyTargetable target, int maxChain)
-    {
-        _target = target;
-        _maxChain = maxChain;
-    }
-
-    // 콤보 스킬 중 강타가 맞은 적이 대상이면 다음 연계를 예약한다. 최대 연계 수에 닿았으면 예약하지 않는다.
-    public void QueueChain(Transform hitEnemy)
-    {
-        if(!IsActive || hitEnemy != _target.transform || _chain + 1 >= _maxChain) return;
-
-        _isNextChainQueued = true;
-    }
+    // target : 콤보 스킬 대상인 그로기 적. 순간 이동과 단계별 접근의 대상이 된다.
+    public void Setup(IEnemyTargetable target) => _target = target;
 
     public override void Enter()
     {
         IsActive = true;
-        _chain = 0;
 
         // 남아 있을 수 있는 대시 무적 · 완벽 회피 판정을 지운 뒤, 콤보 스킬이 끝날 때까지 무적으로 둔다.
-        // 공격 무적 중에는 패링 입력도 무시되므로 패링 · 교체 키로도 끊기지 않는다.
         Controller.Status.EndInvincible();
         Controller.Status.SetAttackInvincible(true);
 
         // 콤보 스킬 액션의 순간 이동 옵션대로 대상 둘레로 비켜 선 곳에 순간 이동한다. 막혀 있으면 제자리에 있는다.
+        // 이전 캐릭터 자리에서 들어오므로, 남아 있는 이전 캐릭터 위치를 기준으로 비켜 선다.
         TeleportManager.TryTeleportTo(Controller, _target.transform, _trigger.ComboSkillAction.Teleport);
-        StartChain();
+
+        _step = -1;
+        StartNextStep();
     }
 
+    // 끝나면 콤보 스킬 선택에 알린다. 다음 캐릭터를 고르지 않은 채 끝났고 연계가 남았으면 강타 대기로 넘어간다.
     public override void Exit()
     {
         Controller.AttackJudge.EndHit();
         IsActive = false;
         Controller.Status.SetAttackInvincible(false);
+        Controller.Party.ComboSelector.OnComboSkillEnded(Controller);
     }
 
     public override void Tick() => Controller.HorizontalVelocity = UpdateAdvance();
@@ -95,19 +80,7 @@ public class PlayerComboSkillState : PlayerState
         }
     }
 
-    // 콤보 스킬을 처음 단계부터 쓴다.
-    private void StartChain()
-    {
-#if UNITY_EDITOR
-        Debug.Log($"[콤보 스킬] 연계 {_chain + 1} / {_maxChain}");
-#endif
-
-        _step = -1;
-        _isNextChainQueued = false;
-        StartNextStep();
-    }
-
-    // 다음 단계로 넘어간다. 마지막 단계가 끝났으면, 다음 연계가 예약됐을 때만 콤보 스킬을 다시 쓰고 아니면 이동 상태로 돌아간다.
+    // 다음 단계로 넘어간다. 마지막 단계가 끝났으면 이동 상태로 돌아간다.
     private void StartNextStep()
     {
         Controller.AttackJudge.EndHit();
@@ -115,20 +88,13 @@ public class PlayerComboSkillState : PlayerState
 
         if(_step >= _trigger.ComboSkillAction.StepCount)
         {
-            if(!_isNextChainQueued)
-            {
-                Controller.EnterLocomotion(false);
-                return;
-            }
-
-            _chain++;
-            StartChain();
+            Controller.EnterLocomotion(false);
             return;
         }
 
         ActionStep step = _trigger.ComboSkillAction.GetStep(_step);
 
-        // 발동시킨 그로기 적 쪽으로 돌아 대상 앞 정지 거리까지, 단계의 전진 시간 동안 다가간다. 도중에 록온이 바뀌어도 대상은 그대로다.
+        // 대상인 그로기 적 쪽으로 돌아 대상 앞 정지 거리까지, 단계의 전진 시간 동안 다가간다. 도중에 록온이 바뀌어도 대상은 그대로다.
         float advanceDistance = Controller.AimFixedTarget(step, _target);
 
         _advanceDuration = step.AdvanceDuration;

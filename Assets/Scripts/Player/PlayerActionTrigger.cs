@@ -10,10 +10,9 @@ using UnityEngine;
 //        패링 공격을 하는 적이 여럿이면 공격 대상 기준(록온 대상 → 자동 조준 대상)을 따르고, 둘 다 아니면 록온 사거리 안에서 가장 최근에 예고를 시작한 적을 고른다.
 // 필살기 : 게이지가 가득 차 있고 현재 상태가 필살기를 허용할 때 필살기 키를 누르면 게이지를 전부 소모하고 필살기 상태로 넘긴다.
 //          패링(준비 · 반응)과 추격 중에는 상태가 필살기를 허용하지 않아 쓸 수 없다.
-// 콤보 스킬 : 그로기 적에게 강타가 맞으면 타격 판정이 발동을 요청한다. 그로기마다 한 번 발동한다.
+// 콤보 스킬 : 언제 누가 쓸지는 파티의 콤보 스킬 선택이 정하고(전투 공통 규칙), 이 기능은 고른 캐릭터의 콤보 스킬 상태를 시작한다.
 //             한 번의 콤보 스킬은 단계(동작) 여러 개를 순서대로 이어 쓴다. 단계 수와 연계 수는 관계없다.
-//             콤보 스킬 중 대상에게 강타가 맞으면 다음 연계를 잇는다. 최대 연계 수는 대상 적이 정한다.
-//             코어 전투에서는 1인이라 같은 콤보 스킬을 다시 쓴다. 파티 전투에서는 다음 캐릭터가 이어받도록 확장한다.
+//             콤보 스킬 중 강타가 맞으면 콤보 스킬 선택에 알려, 연계가 남았으면 다음 캐릭터를 고르게 한다.
 [RequireComponent(typeof(PlayerController), typeof(PlayerTargeting), typeof(PlayerInputReader))]
 public class PlayerActionTrigger : MonoBehaviour
 {
@@ -56,7 +55,8 @@ public class PlayerActionTrigger : MonoBehaviour
         // 패링 성공 경직은 패링당한 공격의 저항 레벨을 경직 레벨로 쓴다. 레벨이 같으면 경직되므로 패링 성공은 항상 경직을 건다.
         if(attacker.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(attack.ParryStaggerTime, attack.StaggerResistLevel);
 
-        if(attacker.transform.TryGetComponent(out IEnemyGroggyable groggyable)) groggyable.AddGroggy(ParryAction.GroggyGain);
+        // 이 패링으로 그로기에 들어갔으면 콤보 스킬 선택에 알려 그로기 정지 시간을 걸게 한다.
+        if(attacker.transform.TryGetComponent(out IEnemyGroggyable groggyable) && groggyable.AddGroggy(ParryAction.GroggyGain)) _controller.Party.ComboSelector.OnGroggyEntered(groggyable);
 
         _controller.Status.AddParryGauge();
         attacker.transform.TryGetComponent(out IEnemyTargetable parriedTarget);
@@ -67,20 +67,19 @@ public class PlayerActionTrigger : MonoBehaviour
     // 공격 대상 기준(록온 대상 → 공통 설정의 찾는 거리 안의 자동 조준 대상)으로 필살기 대상을 고른다. 없으면 null 이다.
     public IEnemyTargetable FindUltimateTarget() => _targeting.FindAttackTarget(_controller.Common.UltimateTargetSearchRange);
 
-    // 그로기 적을 대상으로 콤보 스킬 상태로 넘긴다. 진행 중이던 공격 · 필살기는 끊긴다.
-    // maxChain : 대상 적의 최대 연계 수
-    public void BeginComboSkill(IEnemyTargetable target, int maxChain)
+    // 그로기 적을 대상으로 콤보 스킬 상태로 넘긴다. 콤보 스킬 선택에서 고른 캐릭터에게 파티가 부른다.
+    public void BeginComboSkill(IEnemyTargetable target)
     {
 #if UNITY_EDITOR
-        Debug.Log($"[콤보 스킬] {target.transform.name} (최대 연계 {maxChain})");
+        Debug.Log($"[콤보 스킬] {_controller.Character.name} → {target.transform.name}");
 #endif
 
-        _comboSkillState.Setup(target, maxChain);
+        _comboSkillState.Setup(target);
         _controller.EnterState(_comboSkillState);
     }
 
-    // 콤보 스킬 중 강타가 맞은 적을 알린다. 콤보 스킬 대상이면 다음 연계를 잇는다.
-    public void OnComboSkillImpactHit(IEnemyDamageable enemy) => _comboSkillState.QueueChain(enemy.transform);
+    // 콤보 스킬 중 강타가 맞은 적을 콤보 스킬 선택에 알린다. 연계 대상이고 연계가 남았으면 다음 캐릭터를 고르는 단계가 열린다.
+    public void OnComboSkillImpactHit(IEnemyDamageable enemy) => _controller.Party.ComboSelector.RequestNextChain(_controller, enemy.transform);
 
     // 지원 공격 : 교체로 막 들어온 이 캐릭터가 패링을 시작한다. 파티가 교체할 때 부르고, 패링을 시작했으면 true 를 돌려준다.
     // 록온 사거리 안에 패링 가능 시간을 연 적이 없으면 시작하지 않고 false 를 돌려준다. 이때 파티는 보통 입장으로 교체한다.

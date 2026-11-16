@@ -46,6 +46,9 @@ MonoBehaviour:
   _swapOutRunDelay: 0.375
   _quickSupportInputTime: 2
   _standbyEnergyRegenRate: 1
+  _comboSelectTime: 3
+  _comboSelectTimeScale: 0.15
+  _groggyHoldTime: 2
   _ultimateTargetSearchRange: 15
   _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _dashAction: {fileID: 504704208043311331, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
@@ -55,3 +58,4 @@ MonoBehaviour:
   _parryPreviousAction: {fileID: -3882990654037931100, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _parryNextAction: {fileID: 3151153704128378850, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _lockOnAction: {fileID: 694580335105051867, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _comboCancelAction: {fileID: 7690360551188721490, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}

@@ -31,7 +31,7 @@ public class PlayerLockOn : MonoBehaviour
     // 록온 사거리 안에 적이 없으면 록온 입력은 아무 일도 하지 않는다.
     private void UpdateLockOn()
     {
-        if(Common.LockOnAction.action.WasPressedThisFrame())
+        if(!_party.IsInputBlocked && Common.LockOnAction.action.WasPressedThisFrame())
         {
             if(_lockTarget != null) SetLockTarget(null);
             else SetLockTarget(Targeting.FindTarget(Common.LockOnRange, true));
