@@ -26,7 +26,6 @@ public class PlayerStatus : MonoBehaviour
     [SerializeField] private float _hitLagTimer;
 
     private PlayerController _controller;
-    private PlayerSlowMotion _slowMotion;
     private PlayerActionTrigger _actionTrigger;
     private float _invincibleTimer;
     private float _perfectDodgeTimer;
@@ -168,7 +167,7 @@ public class PlayerStatus : MonoBehaviour
         Debug.Log($"[완벽 회피] {attack.Name}");
 #endif
 
-        _slowMotion.Begin();
+        _controller.Party.SlowMotion.Begin(transform.position);
         AddUltimateGauge(_controller.Character.PerfectDodgeGaugeGain);
         return true;
     }
@@ -193,7 +192,6 @@ public class PlayerStatus : MonoBehaviour
     private void CacheComponent()
     {
         _controller = GetComponent<PlayerController>();
-        _slowMotion = GetComponent<PlayerSlowMotion>();
         _actionTrigger = GetComponent<PlayerActionTrigger>();
     }
 

@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerController))]
 public class PlayerInputReader : MonoBehaviour
 {
-    [Tooltip("조작 중인 캐릭터인지. 끄면 이 캐릭터는 입력에 반응하지 않는다. 파티 전투에서 교체 기능이 바꾼다")]
+    [Tooltip("조작 중인 캐릭터인지. 끄면 이 캐릭터는 입력에 반응하지 않는다. 실행 중에는 파티가 조작 캐릭터를 정할 때 바꾼다")]
     [SerializeField] private bool _isControlled = true;
 
     private PlayerController _controller;

@@ -156,12 +156,14 @@ public class PlayerTargeting : MonoBehaviour
 
     // Scene 창에서 플레이어를 선택하면 공격 사거리(노랑)와 록온 사거리(하늘)를 보여준다.
     // 플레이 중에는 지금 공격하면 선택될 대상까지 선을 긋는다.
-    // 에디터에서는 Awake 가 돌지 않아 참조가 비어 있으므로 컨트롤러에서 공통 설정을 직접 찾고, 연결 전이면 그리지 않는다.
+    // 에디터에서는 파티가 캐릭터에 자신을 알려 주기 전이므로, 실행 중이 아니면 씬의 파티를 직접 찾는다. 파티나 공통 설정이 없으면 그리지 않는다.
     private void DrawRange()
     {
-        CommonCharacterSettings common = GetComponent<PlayerController>().Common;
+        PlayerParty party = Application.isPlaying ? GetComponent<PlayerController>().Party : FindAnyObjectByType<PlayerParty>();
 
-        if(common == null) return;
+        if(party == null || party.Common == null) return;
+
+        CommonCharacterSettings common = party.Common;
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, common.AttackRange);
