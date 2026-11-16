@@ -35,6 +35,10 @@ MonoBehaviour:
   _parryReadyTime: 1
   _parryReactDistance: 5
   _parryReactTime: 1
+  _swapInTime: 0.5
+  _swapInAdvanceDistance: 1.5
+  _swapOutTime: 0.75
+  _swapOutRunDelay: 0.375
   _ultimateTargetSearchRange: 15
   _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _dashAction: {fileID: 504704208043311331, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}

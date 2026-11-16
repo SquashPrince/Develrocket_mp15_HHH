@@ -4,7 +4,7 @@ using UnityEngine;
 // 모든 캐릭터가 같이 쓰는 규칙 값 · 입력은 공통 설정(CommonCharacterSettings)에 있다. 공통 설정은 파티(PlayerParty)가 들고, 다른 기능은 이 클래스를 통해 꺼내 쓴다.
 // 입력은 입력 기능, 타격 판정은 판정 기능, Animator 제어는 애니메이션 기능, 순간 이동은 순간 이동 규칙(TeleportManager)이 맡고, 상태 클래스는 이 클래스를 통해 그 기능들을 꺼내 쓴다.
 // 실제 동작은 상태 클래스(이동 · 대시 · 공격 · 피격)가 처리하고, 이 클래스는 매 프레임 상태를 실행한 뒤 이동을 반영한다.
-// 이동 방향은 매 프레임 카메라가 보는 수평 방향을 기준으로 한다.
+// 이동 방향은 매 프레임 카메라(파티의 메인 카메라)가 보는 수평 방향을 기준으로 한다.
 [RequireComponent(typeof(CharacterController), typeof(PlayerTargeting))]
 [RequireComponent(typeof(PlayerStatus), typeof(PlayerActionTrigger))]
 [RequireComponent(typeof(PlayerInputReader), typeof(PlayerAttackJudge), typeof(PlayerAnimation))]
@@ -13,10 +13,6 @@ public class PlayerController : MonoBehaviour
     private const int MAX_DASH_STACK = 2;
     // 땅에 붙어 있도록 누르는 작은 아래 방향 속도 (0 이면 경사에서 isGrounded 가 흔들린다)
     private const float GROUNDED_VERTICAL_SPEED = -2f;
-
-    [Header("참조")]
-    [Tooltip("이동 방향의 기준이 되는 카메라 (Main Camera)")]
-    [SerializeField] private Transform _cameraTransform;
 
     [Header("캐릭터")]
     [Tooltip("이 캐릭터의 능력치 · 이동 · 대시 수치와 액션. 파티 전투에서는 캐릭터마다 다른 에셋을 넣는다")]
@@ -51,6 +47,7 @@ public class PlayerController : MonoBehaviour
     public PlayerAttackJudge AttackJudge { get; private set; }
     public PlayerAnimation Animation { get; private set; }
     public PlayerInputReader Input => _input;
+    public PlayerTargeting Targeting => _targeting;
     // 캐릭터 몸(CharacterController). 순간 이동 규칙이 몸 크기를 재고 위치를 옮길 때 쓴다.
     public CharacterController Body => _characterController;
     // 이번 프레임의 캐릭터 시간(초). 히트렉처럼 이 캐릭터만 멈추는 효과가 반영된다. 상태 · 기능의 타이머 · 이동은 이 값을 쓴다.
@@ -78,6 +75,10 @@ public class PlayerController : MonoBehaviour
     {
         RechargeDashStack();
         _stateMachine.Tick();
+
+        // 퇴장이 끝나 이번 프레임에 캐릭터가 꺼졌으면 꺼진 CharacterController 를 움직이지 않는다.
+        if(!gameObject.activeSelf) return;
+
         ApplyMovement();
     }
 
@@ -106,7 +107,7 @@ public class PlayerController : MonoBehaviour
         Vector2 input = _input.MoveInput;
         Vector3 localDirection = Vector3.ClampMagnitude(new Vector3(input.x, 0f, input.y), 1f);
 
-        return Quaternion.Euler(0f, _cameraTransform.eulerAngles.y, 0f) * localDirection;
+        return Quaternion.Euler(0f, _party.MainCamera.transform.eulerAngles.y, 0f) * localDirection;
     }
 
     public void TurnTowards(Vector3 direction)

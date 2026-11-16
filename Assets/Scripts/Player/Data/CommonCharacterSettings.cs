@@ -54,8 +54,14 @@ public class CommonCharacterSettings : ScriptableObject
     [SerializeField, Min(0.01f)] private float _parryReactTime = 1f;
 
     [Header("파티 교체")]
+    [Tooltip("교체로 들어온 캐릭터가 입장 모션을 마치고 움직일 수 있을 때까지의 시간(초). 이 동안 입력은 필살기만 받는다")]
+    [SerializeField, Min(0f)] private float _swapInTime = 0.5f;
+    [Tooltip("입장하는 동안 이전 캐릭터 자리에서 앞으로 나아가는 거리. 입장 시간에 걸쳐 점점 느려지며 멈춘다. 0 이면 제자리에서 입장한다")]
+    [SerializeField, Min(0f)] private float _swapInAdvanceDistance = 2f;
     [Tooltip("교체로 나가는 캐릭터가 퇴장 모션을 시작한 뒤 사라질 때까지의 시간(초). 이 동안 무적이다")]
     [SerializeField, Min(0f)] private float _swapOutTime = 0.5f;
+    [Tooltip("퇴장 모션(뒤돌기)을 시작한 뒤 달리기로 바꿔 달려 나가기까지의 시간(초). 퇴장 시간보다 짧아야 달리기가 보인다")]
+    [SerializeField, Min(0f)] private float _swapOutRunDelay = 0.3f;
 
     [Header("필살기")]
     [Tooltip("발동할 때 이 거리 안의 대상(록온 대상 우선, 없으면 자동 조준 대상)을 찾는다. 필살기 액션에 순간 이동 옵션이 있으면 그 대상 앞으로 순간 이동한다")]
@@ -92,7 +98,10 @@ public class CommonCharacterSettings : ScriptableObject
     public float ParryReadyTime => _parryReadyTime;
     public float ParryReactDistance => _parryReactDistance;
     public float ParryReactTime => _parryReactTime;
+    public float SwapInTime => _swapInTime;
+    public float SwapInAdvanceDistance => _swapInAdvanceDistance;
     public float SwapOutTime => _swapOutTime;
+    public float SwapOutRunDelay => _swapOutRunDelay;
     public float UltimateTargetSearchRange => _ultimateTargetSearchRange;
     public InputActionReference MoveAction => _moveAction;
     public InputActionReference DashAction => _dashAction;

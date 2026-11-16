@@ -2,13 +2,28 @@ using UnityEngine;
 
 // 플레이어 모델의 Animator 제어. 상태 재생, 이동 속도 파라미터, 하체 달리기 레이어를 맡는다.
 // 어떤 모션을 재생할지는 상태 클래스가 정하고, 이 기능은 Animator 를 다루는 방법만 맡는다.
+// 부위 덮기 : 기본 레이어에서 모션을 재생하는 동안, 고른 부위는 그 부위만 덮는 마스크 레이어에서 같은 이름의 상태를 함께 재생한다.
+//   마스크 레이어의 상태에는 기본 레이어와 다른 클립을 넣어 두고 캐릭터별 Override 로 바꿔 끼운다.
+//   여러 캐릭터가 함께 쓰는 공용 모션에서, 무기를 든 자세처럼 캐릭터에 맞지 않는 부위만 캐릭터 클립으로 덮기 위해서다.
 public class PlayerAnimation : MonoBehaviour
 {
+    // 캐릭터 클립으로 덮을 몸 부위. 없음이면 기본 레이어의 모션만 재생한다.
+    public enum BodyPart
+    {
+        None,
+        LowerBody,
+        UpperBody,
+        FullBody
+    }
+
     private static readonly int SPEED_PARAMETER = Animator.StringToHash("Speed");
     private static readonly int LEG_RUN_ANIMATION = Animator.StringToHash("LegRun");
 
     // Animator Controller 의 하체 달리기 레이어 이름과 같아야 한다. 하체만 덮는 Avatar Mask 를 씌운 레이어다.
     private const string LEG_RUN_LAYER_NAME = "LegRun";
+    // Animator Controller 의 부위 덮기 레이어 이름과 같아야 한다. 각각 하체 · 상체만 덮는 Avatar Mask 를 씌운 레이어다.
+    private const string LOWER_BODY_LAYER_NAME = "LowerBody";
+    private const string UPPER_BODY_LAYER_NAME = "UpperBody";
 
     // 애니메이션을 바꿀 때 이전 모션과 섞는 시간(초)
     public const float DEFAULT_FADE_TIME = 0.1f;
@@ -21,12 +36,39 @@ public class PlayerAnimation : MonoBehaviour
     private PlayerController _controller;
     private float _legRunTargetWeight;
     private int _legRunLayer;
+    private int _lowerBodyLayer;
+    private int _upperBodyLayer;
 
     private void Awake() => CacheComponent();
     private void Update()
     {
         ApplyTimeScale();
         UpdateLegRunWeight();
+    }
+
+    // 기본 레이어에서 stateHash 모션을 재생하고, coverPart 에 해당하는 마스크 레이어를 켜 같은 상태를 함께 재생한다.
+    // 하체 · 상체는 그 레이어 하나, 전신은 두 레이어를 모두 켠다. 없음이면 기본 레이어만 재생한다.
+    // 부위 덮기를 쓰는 상태는 나갈 때 EndBodyPart 를 불러 레이어를 끈다.
+    public void PlayOnBodyPart(int stateHash, BodyPart coverPart)
+    {
+        EndBodyPart();
+        Play(stateHash);
+
+        if(coverPart == BodyPart.LowerBody || coverPart == BodyPart.FullBody) CoverLayer(_lowerBodyLayer, stateHash);
+        if(coverPart == BodyPart.UpperBody || coverPart == BodyPart.FullBody) CoverLayer(_upperBodyLayer, stateHash);
+    }
+
+    // 부위 덮기 레이어를 모두 끈다.
+    public void EndBodyPart()
+    {
+        _animator.SetLayerWeight(_lowerBodyLayer, 0f);
+        _animator.SetLayerWeight(_upperBodyLayer, 0f);
+    }
+
+    private void CoverLayer(int layer, int stateHash)
+    {
+        _animator.CrossFadeInFixedTime(stateHash, DEFAULT_FADE_TIME, layer);
+        _animator.SetLayerWeight(layer, 1f);
     }
 
     // Animator 의 상태를 이름(해시)으로 직접 재생한다. 전이선 대신 코드가 어떤 모션을 재생할지 정한다.
@@ -67,5 +109,7 @@ public class PlayerAnimation : MonoBehaviour
     {
         _controller = GetComponent<PlayerController>();
         _legRunLayer = _animator.GetLayerIndex(LEG_RUN_LAYER_NAME);
+        _lowerBodyLayer = _animator.GetLayerIndex(LOWER_BODY_LAYER_NAME);
+        _upperBodyLayer = _animator.GetLayerIndex(UPPER_BODY_LAYER_NAME);
     }
 }

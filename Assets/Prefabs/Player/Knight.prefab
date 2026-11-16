@@ -31916,7 +31916,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9203f4226a7a84e47b14121d6a8d407a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  _cameraTransform: {fileID: 0}
   _character: {fileID: 11400000, guid: b26c4d85624b42cd8b510949bee0b4a0, type: 2}
 --- !u!114 &7492969571146502241
 MonoBehaviour:
@@ -31930,8 +31929,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d16b8cc6c2cb09b4990c4e01cbb45567, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTargeting
-  _cameraTransform: {fileID: 0}
-  _markerHeight: 2.5
 --- !u!114 &7823694639924144761
 MonoBehaviour:
   m_ObjectHideFlags: 0

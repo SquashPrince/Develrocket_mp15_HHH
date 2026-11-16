@@ -2818,7 +2818,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &469888735859391846
 Transform:
   m_ObjectHideFlags: 0
@@ -2872,7 +2872,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de5b05c6812b88d41b77232ef7bcaec0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputReader
-  _isControlled: 0
+  _isControlled: 1
 --- !u!114 &2427562605538363246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2885,7 +2885,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9203f4226a7a84e47b14121d6a8d407a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  _cameraTransform: {fileID: 0}
   _character: {fileID: 11400000, guid: 3fc30e34dab134247855b35a326918a0, type: 2}
 --- !u!114 &2234564587569997188
 MonoBehaviour:
@@ -2899,8 +2898,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d16b8cc6c2cb09b4990c4e01cbb45567, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTargeting
-  _cameraTransform: {fileID: 0}
-  _markerHeight: 2.5
 --- !u!114 &1706546055188079284
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,43 +1,27 @@
 using UnityEngine;
 
-// 공격 · 록온 대상을 찾고 록온 상태를 관리한다.
-// 록온 입력으로 록온 사거리 안의 대상을 고정하거나 해제하고, 대상이 록온 사거리 밖으로 나가면 자동으로 해제한다.
+// 이 캐릭터를 기준으로 공격 · 록온 대상을 찾는다. 대상 찾기는 캐릭터 위치에 따라 달라 캐릭터마다 둔다.
+// 록온 상태(대상 · 표시 · 록온 입력)는 플레이어가 고른 대상 하나라 파티의 록온 기능(PlayerLockOn)이 들고, 여기서는 읽기만 한다.
 // 범위 안의 플레이어 앞쪽 적 중 카메라 중앙 레이와의 수직 거리가 가장 짧은 적을 대상으로 고른다.
 // 같은 화면 위치라면 가까운 적일수록 레이와의 거리가 짧아 근접 공격 대상으로 우선된다.
-// 사거리 · 가림 판정 값과 록온 표시 Prefab 은 모든 캐릭터가 같이 쓰는 공통 설정에서 읽는다. 록온 표시는 시작할 때 Prefab 으로 만든다.
-[RequireComponent(typeof(PlayerController), typeof(PlayerInputReader))]
+// 사거리 · 가림 판정 값은 공통 설정에서, 카메라는 파티에서 읽는다.
+[RequireComponent(typeof(PlayerController))]
 public class PlayerTargeting : MonoBehaviour
 {
     // 한 번의 대상 찾기에서 검사할 수 있는 최대 콜라이더 수
     private const int MAX_CANDIDATE_COLLIDERS = 32;
 
-    [Header("참조")]
-    [Tooltip("화면 중앙 레이의 기준이 되는 카메라 (Main Camera)")]
-    [SerializeField] private Transform _cameraTransform;
-
-    [Header("록온 표시")]
-    [Tooltip("대상에 록온 표시 위치가 없을 때, 대상 위치에서 이만큼 위에 띄운다")]
-    [SerializeField] private float _markerHeight = 2.5f;
-
     private readonly Collider[] _candidateColliders = new Collider[MAX_CANDIDATE_COLLIDERS];
     private PlayerController _controller;
-    private PlayerInputReader _input;
-    private Camera _camera;
-    private Transform _lockOnMarker;
-    private Collider _lockTargetCollider;
-    private IEnemyTargetable _lockTarget;
-    private bool _isLockTargetBlocked;
 
-    public IEnemyTargetable LockTarget => _lockTarget;
-    // 록온 대상이 벽에 가려져 있는지. 가려져도 록온은 유지하며, 록온 카메라가 구도를 바꾸는 데 쓴다.
-    public bool IsLockTargetBlocked => _isLockTargetBlocked;
+    // 파티의 록온 대상. 교체해도 같은 대상이다.
+    public IEnemyTargetable LockTarget => _controller.Party.LockOn.LockTarget;
     public float AttackRange => Common.AttackRange;
     public float LockOnRange => Common.LockOnRange;
     private CommonCharacterSettings Common => _controller.Common;
+    private Camera Camera => _controller.Party.MainCamera;
 
     private void Awake() => CacheComponent();
-    private void Start() => Init();
-    private void Update() => UpdateLockOn();
     private void OnDrawGizmosSelected() => DrawRange();
 
     // 공격 대상을 고른다. 록온 대상 → 우선 대상 → range 안의 자동 조준 대상 순서다. 없으면 null 이다.
@@ -45,7 +29,9 @@ public class PlayerTargeting : MonoBehaviour
     // priorityTarget : 록온 중이 아닐 때 자동 조준보다 먼저 노릴 대상. 패링 추격은 패링한 적을 넘긴다.
     public IEnemyTargetable FindAttackTarget(float range, IEnemyTargetable priorityTarget = null)
     {
-        if(_lockTarget != null) return _lockTarget;
+        IEnemyTargetable lockTarget = LockTarget;
+
+        if(lockTarget != null) return lockTarget;
         if(priorityTarget != null) return priorityTarget;
 
         return FindTarget(range);
@@ -60,8 +46,8 @@ public class PlayerTargeting : MonoBehaviour
     public IEnemyTargetable FindTarget(float range, bool onlyOnScreen = false)
     {
         int count = Physics.OverlapSphereNonAlloc(transform.position, range, _candidateColliders, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-        Vector3 rayOrigin = _cameraTransform.position;
-        Vector3 rayDirection = _cameraTransform.forward;
+        Vector3 rayOrigin = Camera.transform.position;
+        Vector3 rayDirection = Camera.transform.forward;
         IEnemyTargetable frontEnemy = null;
         IEnemyTargetable backEnemy = null;
         float frontSqrDistance = float.MaxValue;
@@ -103,55 +89,22 @@ public class PlayerTargeting : MonoBehaviour
         return frontEnemy != null ? frontEnemy : backEnemy;
     }
 
-    // 록온 입력마다 록온과 해제를 번갈아 하고, 록온 중이면 거리 확인 · 가림 확인 · 표시 위치 갱신을 한다.
-    // 록온 사거리 안에 적이 없으면 록온 입력은 아무 일도 하지 않는다.
-    private void UpdateLockOn()
-    {
-        if(_input.WasLockOnPressed)
-        {
-            if(_lockTarget != null) SetLockTarget(null);
-            else SetLockTarget(FindTarget(LockOnRange, true));
-        }
-
-        if(_lockTarget == null) return;
-
-        // 록온 대상이 처치되었거나 록온 사거리 밖으로 나가면 록온을 푼다.
-        if(!_lockTarget.IsAlive || (_lockTarget.transform.position - transform.position).sqrMagnitude > LockOnRange * LockOnRange)
-        {
-            SetLockTarget(null);
-            return;
-        }
-
-        // 가림 판정은 대상 찾기와 같게 콜라이더 중심을 쓴다. 대상의 위치(발밑일 수 있음)를 쓰면 바닥에 막혀 항상 가려진 것으로 판정될 수 있다.
-        _isLockTargetBlocked = IsBlocked(_lockTargetCollider.bounds.center);
-        // 대상이 알려주는 록온 표시 위치(머리 · 가슴 등)가 있으면 그 위치를 따라가고, 없으면 기본 높이에 띄운다.
-        Transform lockOnPoint = _lockTarget.LockOnPoint;
-        _lockOnMarker.position = lockOnPoint != null ? lockOnPoint.position : _lockTarget.transform.position + Vector3.up * _markerHeight;
-    }
-
-    // 화면 좌표(Viewport)는 화면 왼쪽 아래가 (0, 0), 오른쪽 위가 (1, 1) 이고, z 는 카메라 앞쪽 거리다.
-    // z 가 0 이하면 카메라 뒤에 있다는 뜻이다.
-    private bool IsOnScreen(Vector3 position)
-    {
-        Vector3 viewport = _camera.WorldToViewportPoint(position);
-
-        return viewport.z > 0f && viewport.x >= 0f && viewport.x <= 1f && viewport.y >= 0f && viewport.y <= 1f;
-    }
-
     // 플레이어 가슴 높이에서 적 중심까지 선을 그어 장애물 Layer 에 닿으면 막힌 것으로 본다.
-    private bool IsBlocked(Vector3 position)
+    // 파티의 록온 기능도 록온 대상이 가려졌는지 이 캐릭터 기준으로 확인할 때 쓴다.
+    public bool IsBlocked(Vector3 position)
     {
         Vector3 sightOrigin = transform.position + Vector3.up * Common.SightHeight;
 
         return Physics.Linecast(sightOrigin, position, Common.ObstacleLayers, QueryTriggerInteraction.Ignore);
     }
 
-    private void SetLockTarget(IEnemyTargetable target)
+    // 화면 좌표(Viewport)는 화면 왼쪽 아래가 (0, 0), 오른쪽 위가 (1, 1) 이고, z 는 카메라 앞쪽 거리다.
+    // z 가 0 이하면 카메라 뒤에 있다는 뜻이다.
+    private bool IsOnScreen(Vector3 position)
     {
-        _lockTarget = target;
-        _lockTargetCollider = target != null ? target.transform.GetComponentInChildren<Collider>() : null;
-        _isLockTargetBlocked = false;
-        _lockOnMarker.gameObject.SetActive(target != null);
+        Vector3 viewport = Camera.WorldToViewportPoint(position);
+
+        return viewport.z > 0f && viewport.x >= 0f && viewport.x <= 1f && viewport.y >= 0f && viewport.y <= 1f;
     }
 
     // Scene 창에서 플레이어를 선택하면 공격 사거리(노랑)와 록온 사거리(하늘)를 보여준다.
@@ -182,15 +135,6 @@ public class PlayerTargeting : MonoBehaviour
 
     private void CacheComponent()
     {
-        _camera = _cameraTransform.GetComponent<Camera>();
         _controller = GetComponent<PlayerController>();
-        _input = GetComponent<PlayerInputReader>();
-    }
-
-    // 록온 표시를 공통 설정의 Prefab 으로 만들고 숨겨 둔다.
-    private void Init()
-    {
-        _lockOnMarker = Instantiate(Common.LockOnMarkerPrefab).transform;
-        SetLockTarget(null);
     }
 }

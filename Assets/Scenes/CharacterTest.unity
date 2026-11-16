@@ -119,11 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!4 &120928522 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3907669777063714774, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-  m_PrefabInstance: {fileID: 901580288}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &160307530 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 362406810184043471, guid: df2ca08c06889d340b79104967a64347, type: 3}
@@ -334,7 +329,7 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 120928522}
+    TrackingTarget: {fileID: 1781024353}
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
@@ -676,18 +671,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Warrior
       objectReference: {fileID: 0}
-    - target: {fileID: 2234564587569997188, guid: e71a8d1335b81b34189ff6cbf6cbf031, type: 3}
-      propertyPath: _cameraTransform
-      value: 
-      objectReference: {fileID: 330585546}
-    - target: {fileID: 2427562605538363246, guid: e71a8d1335b81b34189ff6cbf6cbf031, type: 3}
-      propertyPath: _cameraTransform
-      value: 
-      objectReference: {fileID: 330585546}
-    - target: {fileID: 8535314406258156703, guid: e71a8d1335b81b34189ff6cbf6cbf031, type: 3}
-      propertyPath: _isControlled
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -733,10 +716,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _cameraTransform
-      value: 
-      objectReference: {fileID: 330585546}
     - target: {fileID: 3907669777063714774, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -781,10 +760,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Knight
       objectReference: {fileID: 0}
-    - target: {fileID: 7492969571146502241, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-      propertyPath: _cameraTransform
-      value: 
-      objectReference: {fileID: 330585546}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -850,17 +825,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1347898846 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7492969571146502241, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
-  m_PrefabInstance: {fileID: 901580288}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d16b8cc6c2cb09b4990c4e01cbb45567, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerTargeting
 --- !u!114 &1347898847 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3848066476718012999, guid: 484855ccb700c6643991a3f0c3c2b2be, type: 3}
@@ -1010,6 +974,7 @@ GameObject:
   - component: {fileID: 1781024353}
   - component: {fileID: 1781024354}
   - component: {fileID: 1781024355}
+  - component: {fileID: 1781024356}
   m_Layer: 0
   m_Name: Party
   m_TagString: Untagged
@@ -1049,6 +1014,7 @@ MonoBehaviour:
   - {fileID: 927009021}
   - {fileID: 7183380445868500475}
   _common: {fileID: 11400000, guid: ef69c664edeb2f1449529a56f5024eba, type: 2}
+  _mainCamera: {fileID: 330585545}
 --- !u!114 &1781024355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1061,6 +1027,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d76ad4dcd39235a429bc8bc9084b1d38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleSlowMotion
+--- !u!114 &1781024356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1781024352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd5fb708e560bc742bf9e6d9c72d89e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLockOn
+  _markerHeight: 2.5
 --- !u!1 &1872903721
 GameObject:
   m_ObjectHideFlags: 0
@@ -1311,6 +1290,7 @@ GameObject:
   - component: {fileID: 1942779152}
   - component: {fileID: 1942779151}
   - component: {fileID: 1942779154}
+  - component: {fileID: 1942779155}
   m_Layer: 0
   m_Name: LockOn Camera
   m_TagString: Untagged
@@ -1338,7 +1318,7 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 120928522}
+    TrackingTarget: {fileID: 1781024353}
     LookAtTarget: {fileID: 2145229456}
     CustomLookAtTarget: 1
   Lens:
@@ -1519,13 +1499,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ff55638ad2a490449d826b70ab07b8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LockOnCamera
-  _targeting: {fileID: 1347898846}
+  _party: {fileID: 1781024354}
   _lockOnCamera: {fileID: 1942779149}
   _orbitalFollow: {fileID: 1942779153}
   _targetGroup: {fileID: 2145229457}
   _turnTime: 0.2
   _targetRadius: 1
   _blockedBlendTime: 0.5
+--- !u!114 &1942779155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942779148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24bbc790ef4cadb42a5a173078784de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraTargetSwitcher
+  _party: {fileID: 1781024354}
+  _cameras:
+  - {fileID: 253891559}
+  - {fileID: 1942779149}
+  _targetGroup: {fileID: 2145229457}
 --- !u!1001 &2092468134
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1820,10 +1817,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1013216729187491711, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
-      propertyPath: _isControlled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5519931953987422134, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1864,14 +1857,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6129519013014003249, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
-      propertyPath: _cameraTransform
-      value: 
-      objectReference: {fileID: 330585546}
-    - target: {fileID: 7320277439426231713, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
-      propertyPath: _cameraTransform
-      value: 
-      objectReference: {fileID: 330585546}
     - target: {fileID: 8698875331694340960, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
       propertyPath: m_Name
       value: Fighter
@@ -1903,6 +1888,10 @@ PrefabInstance:
     - target: {fileID: 4073899793546742747, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
       propertyPath: m_Name
       value: Earth Golem
+      objectReference: {fileID: 0}
+    - target: {fileID: 4073899793546742747, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8764900569801773859, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2012,6 +2001,10 @@ PrefabInstance:
     - target: {fileID: 8592957830441349726, guid: 93a8a783d0bf5514e9fb126bcde5f762, type: 3}
       propertyPath: m_Name
       value: Boss_Black Knight
+      objectReference: {fileID: 0}
+    - target: {fileID: 8592957830441349726, guid: 93a8a783d0bf5514e9fb126bcde5f762, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

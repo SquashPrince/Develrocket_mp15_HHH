@@ -7,7 +7,8 @@ using UnityEngine;
 // 카메라 사이의 전환은 Cinemachine Brain 이 섞어 준다.
 public class LockOnCamera : MonoBehaviour
 {
-    [SerializeField] private PlayerTargeting _targeting;
+    [Tooltip("록온 상태를 들고 있는 파티. 록온 대상과 조작 중인 캐릭터를 읽는다")]
+    [SerializeField] private PlayerParty _party;
     [SerializeField] private CinemachineCamera _lockOnCamera;
     [Tooltip("록온 카메라의 Orbital Follow. Binding Mode 는 World Space 여야 가로 각도가 월드 방향과 일치한다")]
     [SerializeField] private CinemachineOrbitalFollow _orbitalFollow;
@@ -28,7 +29,7 @@ public class LockOnCamera : MonoBehaviour
 
     private void FollowLockTarget()
     {
-        IEnemyTargetable lockTarget = _targeting.LockTarget;
+        IEnemyTargetable lockTarget = _party.LockOn.LockTarget;
         Transform target = lockTarget != null ? lockTarget.transform : null;
 
         if(target != _groupedTarget) ChangeLockTarget(target);
@@ -51,7 +52,7 @@ public class LockOnCamera : MonoBehaviour
     {
         CinemachineTargetGroup.Target member = _targetGroup.Targets[_targetGroup.FindMember(_groupedTarget)];
 
-        if(_targeting.IsLockTargetBlocked) member.Weight = 0f;
+        if(_party.LockOn.IsLockTargetBlocked) member.Weight = 0f;
         else member.Weight = Mathf.MoveTowards(member.Weight, 1f, Time.deltaTime / _blockedBlendTime);
     }
 
@@ -75,7 +76,7 @@ public class LockOnCamera : MonoBehaviour
     // 플레이어에서 대상을 향하는 수평 방향의 각도(월드 기준, 도). 카메라는 이 방향의 반대편, 곧 플레이어 뒤에 선다.
     private float GetYawToTarget(Transform target)
     {
-        Vector3 toTarget = target.position - _targeting.transform.position;
+        Vector3 toTarget = target.position - _party.Controlled.transform.position;
 
         return Mathf.Atan2(toTarget.x, toTarget.z) * Mathf.Rad2Deg;
     }

@@ -26,7 +26,6 @@ public class PlayerInputReader : MonoBehaviour
     public bool IsAttackHeld => _isControlled && Common.AttackAction.action.IsPressed();
     public bool WasSkillPressed => WasPressed(Common.SkillAction);
     public bool WasUltimatePressed => WasPressed(Common.UltimateAction);
-    public bool WasLockOnPressed => WasPressed(Common.LockOnAction);
     private CommonCharacterSettings Common => _controller.Common;
 
     private void Awake() => CacheComponent();
