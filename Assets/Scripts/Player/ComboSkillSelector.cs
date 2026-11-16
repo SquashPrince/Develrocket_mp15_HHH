@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 // 어느 캐릭터의 강타든 같은 규칙을 따르는 전투 공통 규칙이라, 캐릭터가 아닌 파티 오브젝트에 하나만 둔다.
 //
 // 연계 : 한 적의 그로기에서 쓸 수 있는 연계 횟수는 그 적의 최대 연계 수다. 콤보 스킬 시전과 캔슬이 각각 1회를 쓴다.
+//        남은 연계 수는 적이 센다. 적의 바가 남은 연계 여부를 보여줄 수 있게, 이 기능은 횟수를 따로 세지 않고 적에게 쓰고 묻는다.
 //        첫 강타(조작 캐릭터)와 콤보 스킬 중 대상에게 맞은 강타가 선택 단계를 연다.
 //        캔슬했거나 콤보 스킬이 강타 없이 끝났는데 연계가 남았으면, 조작 캐릭터가 같은 적에게 강타를 맞혀 다시 선택 단계를 연다.
 //        이번 연계에서 아직 콤보 스킬을 쓰지 않은 대기 캐릭터만 고를 수 있다. 그로기가 끝나거나 대상이 처치되면 남은 연계는 사라진다.
@@ -41,9 +42,6 @@ public class ComboSkillSelector : MonoBehaviour
     private PlayerController _performer;
     private ChainState _state;
     private float _remainingTime;
-    private int _maxChain;
-    // 이번 연계에서 쓴 횟수 (콤보 스킬 시전 + 캔슬)
-    private int _usedChainCount;
     // 선택을 마친 프레임. 선택에 쓴 입력이 같은 프레임에 교체 · 공격으로 다시 읽히지 않게 이 프레임까지 입력을 막는다.
     private int _closedFrame = -1;
 
@@ -56,7 +54,7 @@ public class ComboSkillSelector : MonoBehaviour
     public PlayerController PreviousCandidate => _previousCandidate;
     public PlayerController NextCandidate => _nextCandidate;
     private CommonCharacterSettings Common => _party.Common;
-    private bool IsLastChainUsed => _usedChainCount >= _maxChain;
+    private bool IsLastChainUsed => !_groggyable.HasRemainingComboChain;
 
     private void Awake() => CacheComponent();
     private void Update()
@@ -74,9 +72,11 @@ public class ComboSkillSelector : MonoBehaviour
     }
 
     // 적이 그로기에 들어갔을 때 그로기를 쌓은 쪽(판정 · 패링)이 부른다. 대기 캐릭터가 있을 때만 정지 시간을 건다.
+    // 대기 캐릭터가 없으면(1인) 콤보 스킬을 이어받을 수 없으므로, 적의 연계를 없애 적의 바가 처음부터 연계 없음으로 보이게 한다.
     public void OnGroggyEntered(IEnemyGroggyable groggyable)
     {
         if(_party.HasStandby) groggyable.HoldGroggy(Common.GroggyHoldTime);
+        else groggyable.ClearComboChain();
     }
 
     // 강타 대기 중인 연계의 대상인지. 판정 기능이 기회를 이미 쓴 그로기 적도 콤보 대상으로 고를 때 쓴다.
@@ -99,8 +99,6 @@ public class ComboSkillSelector : MonoBehaviour
 
         _target = target;
         _groggyable = groggyable;
-        _maxChain = groggyable.MaxComboChain;
-        _usedChainCount = 0;
         _performer = null;
 
         OpenSelection();
@@ -168,7 +166,7 @@ public class ComboSkillSelector : MonoBehaviour
             return;
         }
 
-        _usedChainCount++;
+        _groggyable.UseComboChain();
         _usedCharacters.Add(candidate);
         _performer = candidate;
         _state = ChainState.Casting;
@@ -185,7 +183,7 @@ public class ComboSkillSelector : MonoBehaviour
     {
         CloseSelection();
 
-        _usedChainCount++;
+        _groggyable.UseComboChain();
 
         if(IsLastChainUsed)
         {

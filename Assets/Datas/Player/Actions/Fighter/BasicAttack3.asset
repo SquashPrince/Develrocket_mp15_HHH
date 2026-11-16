@@ -31,7 +31,7 @@ MonoBehaviour:
     _fadeTime: 0.2
     _interrupts: -1
   _energyGain: 0.39
-  _ultimateGaugeGain: 2.4
+  _ultimateGaugeGain: 4.8
   _power: 10
   _staggerLevel: 1
   _staggerTime: 0.35
@@ -41,5 +41,5 @@ MonoBehaviour:
   _useLegRun: 0
   _alwaysLegRun: 0
   _isInvincibleOnSwing: 1
-  _groggyGain: 2.88
+  _groggyGain: 3.096
   _teleport: {fileID: 0}

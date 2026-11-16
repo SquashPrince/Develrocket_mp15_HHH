@@ -41,14 +41,16 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
     private int _attackStaggerResistLevel;
     // 이번 그로기에서 콤보 스킬을 아직 발동하지 않았는지. 그로기가 될 때마다 한 번 생긴다.
     private bool _hasComboSkillChance;
+    // 이번 그로기에서 남은 연계 수. 그로기가 될 때마다 최대 연계 수로 채우고, 콤보 스킬 시전 · 캔슬마다 1 씩 준다.
+    private int _remainingComboChain;
     // 콤보 스킬 캐릭터 선택 동안 그로기 시간을 멈추는지
     private bool _isGroggyPaused;
 
     public bool IsGroggy => _state == State.Groggy;
     public bool HasComboSkillChance => IsGroggy && _hasComboSkillChance;
+    public bool HasRemainingComboChain => IsGroggy && _remainingComboChain > 0;
     // 경직 · 그로기 중인지. 이 동안 적은 공격하지 않는다.
     public bool IsRestricted => _state != State.None;
-    public int MaxComboChain => _maxComboChain;
     public float CurrentGroggy => _currentGroggy;
     public float MaxGroggy => _maxGroggy;
     // 그로기 중 남은 그로기 시간의 비율(1 → 0). 정지 중에는 줄지 않는다. 그로기가 아니면 0 이다.
@@ -112,12 +114,26 @@ public class EnemyReaction : MonoBehaviour, IEnemyStaggerable, IEnemyGroggyable
         return true;
     }
 
-    // 그로기가 된다. 그로기마다 콤보 스킬 기회가 한 번 생긴다.
+    // 그로기 중일 때만 남은 연계를 1 회 쓴다. 남은 연계가 없으면 그대로 둔다.
+    public void UseComboChain()
+    {
+        if(HasRemainingComboChain) _remainingComboChain--;
+    }
+
+    // 이번 그로기의 콤보 스킬 기회와 남은 연계를 모두 없앤다.
+    public void ClearComboChain()
+    {
+        _hasComboSkillChance = false;
+        _remainingComboChain = 0;
+    }
+
+    // 그로기가 된다. 그로기마다 콤보 스킬 기회가 한 번 생기고, 남은 연계 수를 최대 연계 수로 채운다.
     private void EnterGroggy()
     {
         _timer = _groggyTime;
         _state = State.Groggy;
         _hasComboSkillChance = true;
+        _remainingComboChain = _maxComboChain;
         _groggyHoldTimer = 0f;
         _isGroggyPaused = false;
 

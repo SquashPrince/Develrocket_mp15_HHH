@@ -41,5 +41,5 @@ MonoBehaviour:
   _useLegRun: 1
   _alwaysLegRun: 0
   _isInvincibleOnSwing: 0
-  _groggyGain: 4.06
+  _groggyGain: 6.09
   _teleport: {fileID: 0}
