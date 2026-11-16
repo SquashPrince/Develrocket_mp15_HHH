@@ -27,6 +27,7 @@ public class PlayerAttackJudge : MonoBehaviour
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
     private PlayerStatus _status;
     private PlayerActionTrigger _actionTrigger;
+    private PlayerInputReader _input;
     private ActionData _windowAction;
     private ActionStep _windowStep;
     // 다음 판정 시작에 쓸 구간 길이와 강타로 끝나는지. 이벤트 전달 기능이 판정 시작 직전에 알려 준다.
@@ -256,6 +257,10 @@ public class PlayerAttackJudge : MonoBehaviour
             return;
         }
 
+        // 조작 중이 아닌 캐릭터(교체로 나가며 하던 동작을 마치는 이전 캐릭터)의 강타는 콤보 스킬을 발동하지 않는다.
+        // 발동 기회도 소모하지 않아, 조작 중인 캐릭터가 강타를 맞히면 그때 발동한다.
+        if(!_input.IsControlled) return;
+
         // 발동 기회는 실제로 발동할 적에게서만 소모한다. 그로기 기능이 없는 적은 콤보 스킬을 받을 수 없다.
         if(comboSkillTarget != null) return;
 
@@ -269,5 +274,6 @@ public class PlayerAttackJudge : MonoBehaviour
     {
         _status = GetComponent<PlayerStatus>();
         _actionTrigger = GetComponent<PlayerActionTrigger>();
+        _input = GetComponent<PlayerInputReader>();
     }
 }
