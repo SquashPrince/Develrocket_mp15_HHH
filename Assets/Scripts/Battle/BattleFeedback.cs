@@ -15,16 +15,19 @@ public static class BattleFeedback
         Knockback
     }
 
-    // 순간이 일어날 때 알린다. 구독하는 쪽은 꺼질 때 반드시 해제한다.
-    public static event Action<Moment> Occurred;
+    // 순간과 그 순간의 충격 방향을 알린다. 구독하는 쪽은 꺼질 때 반드시 해제한다.
+    // 충격 방향 : 조작 캐릭터가 밀리는 월드 방향(적 → 캐릭터). 방향이 없는 순간은 Vector3.zero 다.
+    public static event Action<Moment, Vector3> Occurred;
 
-    public static void Raise(Moment moment)
+    public static void Raise(Moment moment) => Raise(moment, Vector3.zero);
+
+    public static void Raise(Moment moment, Vector3 direction)
     {
 #if UNITY_EDITOR
         Debug.Log($"[전투 연출] {moment}");
 #endif
 
-        Occurred?.Invoke(moment);
+        Occurred?.Invoke(moment, direction);
     }
 
     // 도메인 리로드를 끈 채 플레이를 다시 시작해도 이전 플레이의 구독이 남지 않게 한다.

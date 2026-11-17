@@ -35,6 +35,11 @@ MonoBehaviour:
   _steps:
   - _animationState: ParryAttackReady
     _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.2
+    _hitCount: 3
+    _useFinalReaction: 0
+    _finalReaction: 2
     _hitShape: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
     _hitSize: {x: 2, y: 2, z: 2}
@@ -43,10 +48,19 @@ MonoBehaviour:
     _hitAngle: 90
     _hitInnerRadius: 0
     _hitHeight: 2
+    _followsTarget: 0
+    _followSpeedRate: 1
+    _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
+    _continuesOnParry: 0
   - _animationState: ParryAttackAction
     _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.2
+    _hitCount: 3
+    _useFinalReaction: 0
+    _finalReaction: 2
     _hitShape: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
     _hitSize: {x: 2, y: 2, z: 2}
@@ -55,10 +69,19 @@ MonoBehaviour:
     _hitAngle: 90
     _hitInnerRadius: 0
     _hitHeight: 2
-    _isParryable: 0
+    _followsTarget: 0
+    _followSpeedRate: 1
+    _facesTarget: 0
+    _isParryable: 1
     _parryStaggerTime: 2
+    _continuesOnParry: 0
   - _animationState: ParryAttackEnd
     _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.2
+    _hitCount: 3
+    _useFinalReaction: 0
+    _finalReaction: 2
     _hitShape: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
     _hitSize: {x: 2, y: 2, z: 2}
@@ -67,5 +90,9 @@ MonoBehaviour:
     _hitAngle: 90
     _hitInnerRadius: 0
     _hitHeight: 2
-    _isParryable: 0
+    _followsTarget: 0
+    _followSpeedRate: 1
+    _facesTarget: 0
+    _isParryable: 1
     _parryStaggerTime: 2
+    _continuesOnParry: 0
