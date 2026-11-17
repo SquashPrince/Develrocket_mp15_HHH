@@ -47,6 +47,7 @@ public class PlayerParryState : PlayerState
         TeleportManager.TryTeleportTo(Controller, _trigger.SelectedParryAttacker.transform, _trigger.ParryAction.Teleport);
         Controller.HorizontalVelocity = Vector3.zero;
         PlayStep(READY_STEP);
+        BattleFeedback.Raise(BattleFeedback.Moment.ParryStart);
     }
 
     public override void Exit() => IsActive = false;

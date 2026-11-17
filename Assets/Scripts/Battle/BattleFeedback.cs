@@ -9,6 +9,8 @@ public static class BattleFeedback
     {
         // 강타가 적에게 맞음. 한 번의 판정에서 여러 적을 맞혀도 한 번만 알린다.
         ImpactHit,
+        // 패링 준비를 시작함 (적 앞으로 순간 이동해 자세를 잡는 순간)
+        ParryStart,
         ParrySuccess,
         PerfectDodge,
         // 조작 중인 캐릭터가 넉백됨

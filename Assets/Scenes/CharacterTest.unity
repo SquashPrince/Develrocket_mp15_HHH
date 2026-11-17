@@ -455,6 +455,114 @@ MonoBehaviour:
   _impactHitShake: {fileID: 1871799910}
   _parrySuccessShake: {fileID: 2038312266}
   _knockbackShake: {fileID: 1828446719}
+  _parryStartFov:
+    _amount: -25
+    _duration: 1
+    _curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.2
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  _parrySuccessFov:
+    _amount: -15
+    _duration: 1.5
+    _curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.15
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  _perfectDodgeFov:
+    _amount: -10
+    _duration: 0.5
+    _curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.15
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
 --- !u!4 &97138653
 Transform:
   m_ObjectHideFlags: 0
@@ -831,6 +939,7 @@ GameObject:
   - component: {fileID: 253891564}
   - component: {fileID: 253891562}
   - component: {fileID: 253891563}
+  - component: {fileID: 253891565}
   m_Layer: 0
   m_Name: FreeLook Camera
   m_TagString: Untagged
@@ -951,7 +1060,7 @@ MonoBehaviour:
   TargetOffset: {x: 0, y: 1.2, z: 0}
   TrackerSettings:
     BindingMode: 4
-    PositionDamping: {x: 0, y: 0, z: 0}
+    PositionDamping: {x: 0.2, y: 0.2, z: 0.2}
     AngularDampingMode: 0
     RotationDamping: {x: 1, y: 1, z: 1}
     QuaternionDamping: 1
@@ -1149,6 +1258,19 @@ MonoBehaviour:
     FrequencyGain: 1
     Duration: 0.2
     m_NoiseOffsets: {x: 0, y: 0, z: 0}
+--- !u!114 &253891565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 253891554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bd1a814f43445742982ab76c15c8e36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraFovOffset
+  _feedback: {fileID: 97138651}
 --- !u!1001 &266308652
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1758,7 +1880,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineBrain
   ShowDebugText: 0
   ShowCameraFrustum: 1
-  IgnoreTimeScale: 0
+  IgnoreTimeScale: 1
   WorldUpOverride: {fileID: 0}
   ChannelMask: -1
   UpdateMethod: 2
@@ -5671,6 +5793,7 @@ GameObject:
   - component: {fileID: 1781024353}
   - component: {fileID: 1781024354}
   - component: {fileID: 1781024355}
+  - component: {fileID: 1781024360}
   - component: {fileID: 1781024356}
   - component: {fileID: 1781024357}
   - component: {fileID: 1781024359}
@@ -5763,6 +5886,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5310382bf2e438243b7e59dc3951b90e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ComboSkillSelector
+--- !u!114 &1781024360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1781024352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f6708ff4d9a5264885aeec4a3658289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleHitStop
+  _parrySuccessStop: 0.1
 --- !u!1 &1796199771
 GameObject:
   m_ObjectHideFlags: 0
@@ -6794,9 +6930,10 @@ GameObject:
   - component: {fileID: 1942779153}
   - component: {fileID: 1942779152}
   - component: {fileID: 1942779151}
-  - component: {fileID: 1942779156}
   - component: {fileID: 1942779154}
+  - component: {fileID: 1942779156}
   - component: {fileID: 1942779155}
+  - component: {fileID: 1942779157}
   m_Layer: 0
   m_Name: LockOn Camera
   m_TagString: Untagged
@@ -6924,7 +7061,7 @@ MonoBehaviour:
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
   TargetOffset: {x: 0, y: 1.25, z: 0}
-  Damping: {x: 0.5, y: 0.5}
+  Damping: {x: 0, y: 0}
   Lookahead:
     Enabled: 0
     Time: 0
@@ -6945,7 +7082,7 @@ MonoBehaviour:
   TargetOffset: {x: 0, y: 1.2, z: 0}
   TrackerSettings:
     BindingMode: 4
-    PositionDamping: {x: 0.5, y: 0.5, z: 0.5}
+    PositionDamping: {x: 0.2, y: 0.2, z: 0.2}
     AngularDampingMode: 0
     RotationDamping: {x: 1, y: 1, z: 1}
     QuaternionDamping: 1
@@ -7053,6 +7190,19 @@ MonoBehaviour:
     FrequencyGain: 1
     Duration: 0.2
     m_NoiseOffsets: {x: 0, y: 0, z: 0}
+--- !u!114 &1942779157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942779148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bd1a814f43445742982ab76c15c8e36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraFovOffset
+  _feedback: {fileID: 97138651}
 --- !u!224 &2025123427 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6979271331268430416, guid: e32676b64677f4fd487ad21921d5c8aa, type: 3}
@@ -7546,6 +7696,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Earth Golem
       objectReference: {fileID: 0}
+    - target: {fileID: 4073899793546742747, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8764900569801773859, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
       propertyPath: m_LocalPosition.x
       value: -10
@@ -7650,6 +7804,10 @@ PrefabInstance:
     - target: {fileID: 8592957830441349726, guid: 93a8a783d0bf5514e9fb126bcde5f762, type: 3}
       propertyPath: m_Name
       value: Boss_Black Knight
+      objectReference: {fileID: 0}
+    - target: {fileID: 8592957830441349726, guid: 93a8a783d0bf5514e9fb126bcde5f762, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
