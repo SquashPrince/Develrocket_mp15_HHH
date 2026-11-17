@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3429d26852410cb42bc440acdc0cb08a, type: 3}
   m_Name: Assult
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackData
-  _cooldown: 10
+  _cooldown: 5
   _baseWeight: 20
   _weightGrowth: 5
   _minUseDistance: 7.5
@@ -35,7 +35,22 @@ MonoBehaviour:
   _steps:
   - _animationState: AssultAttack
     _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.2
+    _hitCount: 3
+    _useFinalReaction: 0
+    _finalReaction: 2
+    _hitShape: 1
     _hitCenter: {x: 0, y: 1.5, z: 2}
+    _hitSize: {x: 2, y: 2, z: 2}
     _hitRadius: 5
+    _hitLength: 3
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
+    _followsTarget: 0
+    _followSpeedRate: 1
+    _facesTarget: 0
     _isParryable: 0
     _parryStaggerTime: 2
+    _continuesOnParry: 0

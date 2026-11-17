@@ -104,6 +104,9 @@ public class PlayerController : MonoBehaviour
         else _isSwapOutReserved = true;
     }
 
+    // 예약된 퇴장을 지운다. 연속 패링 패턴 중 필드에 남아 있던 이 캐릭터를 다시 조작해 패링할 때 부른다.
+    public void CancelSwapOut() => _isSwapOutReserved = false;
+
     // 퇴장이 끝나면 캐릭터를 꺼 대기 상태로 만든다. 꺼진 캐릭터는 적에게 맞거나 대상으로 잡히지 않는다.
     public void Standby() => gameObject.SetActive(false);
 

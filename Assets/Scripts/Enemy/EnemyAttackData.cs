@@ -94,5 +94,19 @@ public class EnemyAttackData : ScriptableObject
     public bool CanDashCancel => _canDashCancel;
     public int StepCount => _steps.Length;
 
+    // 패링 이어가기 동작이 있는 공격(연속 패링 패턴)인지
+    public bool HasParryChain
+    {
+        get
+        {
+            foreach(EnemyAttackStep step in _steps)
+            {
+                if(step.ContinuesOnParry) return true;
+            }
+
+            return false;
+        }
+    }
+
     public EnemyAttackStep GetStep(int index) => _steps[index];
 }

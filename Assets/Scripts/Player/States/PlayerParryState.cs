@@ -2,7 +2,7 @@ using UnityEngine;
 
 // 패링 상태. 준비(ParryReady) → 패링 성공 시 반응(ParryReact) → 추격 공격 또는 이동으로 돌아간다.
 // 준비 : 패링 공격을 하는 적 앞으로 순간 이동한 뒤 자세를 유지한다. 적 공격이 끊겨도 정해진 시간까지 유지하고, 그동안 노란 공격이 오지 않으면 이동으로 돌아간다.
-// 반응 : 공격한 적 반대 방향으로 점점 느려지며 밀려난다. 패링 한 번은 노란 공격 한 번만 막는다. 반응 중 닿은 노란 공격은 패링되지 않는다.
+// 반응 : 공격한 적 반대 방향으로 점점 느려지며 밀려난다. 밀려나는 동안은 무적이다. 패링 한 번은 노란 공격 한 번만 막는다. 반응 중 닿은 노란 공격은 패링되지 않는다.
 //        적이 이어서 패링 공격을 하면(연속 패링 패턴) 다시 패링 입력을 해야 막을 수 있다.
 // 추격 : 반응 동안 공격 키를 눌렀으면 반응이 끝난 뒤 추격 공격이 나간다.
 //        추격 대상은 록온 중이면 록온 대상, 아니면 패링한 적이다.
@@ -52,10 +52,12 @@ public class PlayerParryState : PlayerState
     public override void Exit() => IsActive = false;
 
     // 공격한 적 쪽을 보고, 그 반대 방향으로 밀려나기 시작한다. 이후 닿는 노란 공격은 이 패링으로 막지 않는다.
+    // 밀려나는 동안(반응 시간)은 무적이라, 성공 → 추격 사이에 어떤 공격에도 맞지 않는다. 반응 중 온 노란 공격도 흘려보낸다.
     // 패링한 적을 기억해, 록온 중이 아니면 추격 공격이 그 적에게 나가게 한다.
     public void OnParrySuccess(IEnemyTargetable parriedTarget)
     {
         IsActive = false;
+        Controller.Status.BeginInvincible(_trigger.ParryReactTime);
         _parriedTarget = parriedTarget;
         _awayDirection = Controller.transform.position - parriedTarget.transform.position;
         _awayDirection.y = 0f;

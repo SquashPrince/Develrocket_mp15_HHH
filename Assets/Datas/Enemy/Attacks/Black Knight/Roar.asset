@@ -35,6 +35,11 @@ MonoBehaviour:
   _steps:
   - _animationState: HeavyAttack
     _hitMode: 1
+    _windowTiming: 0
+    _hitInterval: 0.2
+    _hitCount: 3
+    _useFinalReaction: 0
+    _finalReaction: 2
     _hitShape: 3
     _hitCenter: {x: 0, y: 3.5, z: 0}
     _hitSize: {x: 2, y: 2, z: 2}
@@ -43,5 +48,9 @@ MonoBehaviour:
     _hitAngle: 270
     _hitInnerRadius: 0
     _hitHeight: 2
+    _followsTarget: 0
+    _followSpeedRate: 1
+    _facesTarget: 0
     _isParryable: 0
     _parryStaggerTime: 1.5
+    _continuesOnParry: 0

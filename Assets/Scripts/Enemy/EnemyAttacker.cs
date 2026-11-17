@@ -83,6 +83,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     private void OnDisable()
     {
         CloseParryWindow();
+        ParryWindow.EndChain(this);
         UnbindReactionEvent();
     }
     private void Update()
@@ -121,6 +122,9 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         WasLastAttackInterrupted = false;
 
         _state.SetAttackStaggerResistLevel(CurrentAttack.StaggerResistLevel);
+
+        // 이어가기 동작이 있는 공격이면 연속 패링 패턴 시작을 알린다. 공격이 끝나거나 끊길 때 끝을 알린다.
+        if(CurrentAttack.HasParryChain) ParryWindow.BeginChain(this);
 
 #if UNITY_EDITOR
         Debug.Log($"[적 공격] {name} {CurrentAttack.name}");
@@ -365,12 +369,13 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         return true;
     }
 
-    // 공격을 끝낸다. 끊겼든 끝까지 했든 쿨타임을 시작하고, 패링 가능 시간 · 경직 저항을 닫는다.
+    // 공격을 끝낸다. 끊겼든 끝까지 했든 쿨타임을 시작하고, 패링 가능 시간 · 연속 패링 패턴 · 경직 저항을 닫는다.
     private void EndAttack(bool isInterrupted)
     {
         if(!IsAttacking) return;
 
         CloseParryWindow();
+        ParryWindow.EndChain(this);
         if(_leap != null) _leap.Stop();
         _state.SetAttackStaggerResistLevel(0);
         _cooldownTimers[_attackIndex] = CurrentAttack.Cooldown;
