@@ -107,6 +107,8 @@ public class PlayerActionTrigger : MonoBehaviour
             return false;
         }
 
+        // 이 예고는 이 캐릭터가 패링한다고 기록해, 같은 예고에 다른 캐릭터가 겹쳐 패링하지 않게 한다.
+        _controller.Party.ClaimParry(_selectedParryAttacker);
         _controller.EnterState(_parryState);
         return true;
     }
@@ -133,17 +135,17 @@ public class PlayerActionTrigger : MonoBehaviour
 
         IEnemyParryable aimAttacker = GetOpenParryAttacker(_targeting.FindTarget(_targeting.AttackRange));
 
-        return aimAttacker != null ? aimAttacker : ParryWindow.FindLatestWithin(transform.position, _targeting.LockOnRange, _controller.Party.IsParryable);
+        return aimAttacker != null ? aimAttacker : ParryWindow.FindLatestWithin(transform.position, _targeting.LockOnRange, _controller.Party.CanStartParry);
     }
 
     // 대상이 록온 사거리 안에서 패링 가능 시간을 연 적이고 패링할 수 있으면 그 적을, 아니면 null 을 돌려준다.
-    // 예고가 뜬 순간 패링 불가(빨간 예고)였던 적은 그 뒤 대기 캐릭터가 생겨도 고르지 않는다.
+    // 예고가 뜬 순간 패링 불가(빨간 예고)였던 적은 그 뒤 대기 캐릭터가 생겨도 고르지 않는다. 이미 다른 캐릭터가 패링을 시작한 예고도 고르지 않는다.
     private IEnemyParryable GetOpenParryAttacker(IEnemyTargetable target)
     {
         if(target == null) return null;
 
         if(!target.transform.TryGetComponent(out IEnemyParryable attacker) || !attacker.IsParryWindowOpen) return null;
-        if(!_controller.Party.IsParryable(attacker)) return null;
+        if(!_controller.Party.CanStartParry(attacker)) return null;
 
         float lockOnRange = _targeting.LockOnRange;
 

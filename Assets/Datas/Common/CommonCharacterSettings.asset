@@ -39,6 +39,7 @@ MonoBehaviour:
   _parryReactTime: 1
   _parryTelegraphPrefab: {fileID: 362406810184043471, guid: df2ca08c06889d340b79104967a64347, type: 3}
   _unparryableTelegraphPrefab: {fileID: 362406810184043471, guid: 6d03919f2fbae284db26337abab6114e, type: 3}
+  _swapCooldown: 0.1
   _swapInTime: 0.5
   _swapInAdvanceDistance: 1.5
   _swapInActionDelay: 0.25

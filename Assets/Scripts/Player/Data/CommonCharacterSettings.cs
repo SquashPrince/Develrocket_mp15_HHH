@@ -64,6 +64,8 @@ public class CommonCharacterSettings : ScriptableObject
     [SerializeField] private GameObject _unparryableTelegraphPrefab;
 
     [Header("파티 교체")]
+    [Tooltip("일반 교체의 최소 간격(초, 실제 시간). 마지막 교체(패링 · 빠른 지원 포함)부터 이 시간이 지나야 일반 교체를 할 수 있다. 빠른 지원 · 패링이 되는 교체는 막지 않는다")]
+    [SerializeField, Min(0f)] private float _swapCooldown = 0.5f;
     [Tooltip("교체로 들어온 캐릭터가 입장 모션을 마치고 움직일 수 있을 때까지의 시간(초). 이 동안 입력은 필살기만 받는다")]
     [SerializeField, Min(0f)] private float _swapInTime = 0.5f;
     [Tooltip("입장하는 동안 이전 캐릭터 자리에서 앞으로 나아가는 거리. 입장 시간에 걸쳐 점점 느려지며 멈춘다. 0 이면 제자리에서 입장한다")]
@@ -131,6 +133,7 @@ public class CommonCharacterSettings : ScriptableObject
     public GameObject ParryTelegraphPrefab => _parryTelegraphPrefab;
     public GameObject UnparryableTelegraphPrefab => _unparryableTelegraphPrefab;
     public float SwapInTime => _swapInTime;
+    public float SwapCooldown => _swapCooldown;
     public float SwapInAdvanceDistance => _swapInAdvanceDistance;
     public float SwapInActionDelay => _swapInActionDelay;
     public float SwapOutTime => _swapOutTime;

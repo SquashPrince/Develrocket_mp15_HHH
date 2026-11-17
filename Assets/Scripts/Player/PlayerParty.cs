@@ -12,12 +12,13 @@ using UnityEngine;
 //
 // 교체 : 이전 · 다음 캐릭터 키로 목록 순서대로 돌아가며 교체한다. (마지막 다음은 처음, 처음 이전은 마지막)
 //        다음 순서의 캐릭터가 아직 필드에 있으면(퇴장 중) 건너뛰고 같은 방향의 다음 대기 캐릭터로 교체한다.
-//        대기 캐릭터가 없으면(모두 필드에 있음) 교체하지 않는다. 쿨타임은 없다.
+//        대기 캐릭터가 없으면(모두 필드에 있음) 교체하지 않는다. 일반 교체는 마지막 교체부터 최소 간격(실제 시간)이 지나야 하고, 빠른 지원 · 패링이 되는 교체는 간격과 상관없이 한다.
 //        조작 중인 캐릭터의 지금 동작이 교체를 허용하지 않으면(액션 동작의 끼어들기 허용) 교체 키를 무시한다.
 //        새 캐릭터는 이전 캐릭터 자리에서 입장하고, 이전 캐릭터는 하던 동작을 마친 뒤 퇴장한다.
 //        슬로모션 중에 교체하면 슬로모션이 끝난다. 록온 대상은 그대로 이어진다.
 // 지원 공격 : 적이 패링 가능 시간을 열었을 때 교체하면, 새 캐릭터가 입장 대신 바로 패링 상태로 들어가 그 적 앞으로 순간 이동한다.
 //            이전 캐릭터는 보통 교체처럼 하던 동작을 마친 뒤 퇴장한다. 현재 캐릭터가 직접 패링하지는 않는다.
+//            예고 하나는 캐릭터 하나만 패링한다. 이미 패링을 시작한 예고에 교체 키를 다시 누르면 패링이 아닌 일반 교체로 본다.
 // 빠른 지원 : 조작 중인 캐릭터가 넉백되면 입력 시간이 열리고, 그 안에 교체하면 새 캐릭터가 넉백시킨 적 앞으로 순간 이동해 빠른 지원 액션을 쓴다.
 //            넉백된 캐릭터는 일어난 뒤 퇴장한다. 지원 공격보다 먼저 본다.
 // 콤보 스킬 이어받기 : 콤보 스킬 선택(같은 오브젝트)이 고른 캐릭터를 교체처럼 이전 자리에 꺼내 콤보 스킬로 들여보낸다.
@@ -44,11 +45,15 @@ public class PlayerParty : MonoBehaviour
 
     // 패링 가능 시간을 연 적마다, 예고가 뜬 순간 정한 패링 가능 여부. 패링 가능 시간이 닫히면 지운다.
     private readonly Dictionary<IEnemyParryable, bool> _parryableAtOpen = new Dictionary<IEnemyParryable, bool>();
+    // 이번 패링 가능 시간에 이미 패링을 시작한 적. 예고 하나에 캐릭터 하나만 패링하게 한다. 패링 가능 시간이 닫히면 지운다.
+    private readonly HashSet<IEnemyParryable> _claimedParryAttackers = new HashSet<IEnemyParryable>();
     // 빠른 지원 : 넉백된 캐릭터와 그 캐릭터를 넉백시킨 적. 입력 시간이 지나거나 쓰면 비운다.
     private PlayerController _quickSupportSource;
     private Transform _quickSupportTarget;
     private int _controlledIndex;
     private float _quickSupportTimer;
+    // 마지막 교체 시각(실제 시간). 일반 교체의 최소 간격을 잰다.
+    private float _lastSwapTime = float.NegativeInfinity;
     // 처음 조작하지 않는 캐릭터들을 껐는지
     private bool _isStandbyReady;
 
@@ -101,6 +106,13 @@ public class PlayerParty : MonoBehaviour
 
         return isParryable;
     }
+
+    // attacker 를 지금 새로 패링할 수 있는지. 예고가 뜬 순간 패링 가능이었고, 이번 패링 가능 시간에 아직 아무도 패링을 시작하지 않았어야 한다.
+    // 교체 키를 빠르게 여러 번 눌러도 예고 하나에 캐릭터 여럿이 동시에 패링하지 않게 하기 위해서다.
+    public bool CanStartParry(IEnemyParryable attacker) => IsParryable(attacker) && !_claimedParryAttackers.Contains(attacker);
+
+    // 캐릭터가 attacker 의 패링을 시작했음을 기록한다. 지원 패링을 시작할 때 부른다.
+    public void ClaimParry(IEnemyParryable attacker) => _claimedParryAttackers.Add(attacker);
 
     // 조작 중인 캐릭터가 넉백될 때 피격 상태가 부른다. 입력 시간 동안 교체하면 빠른 지원이 된다.
     // 퇴장하려고 하던 동작을 마치는 이전 캐릭터가 넉백된 것은 빠른 지원을 열지 않는다.
@@ -189,6 +201,7 @@ public class PlayerParty : MonoBehaviour
     // direction 쪽으로 목록을 돌며 처음 만나는 대기 캐릭터로 교체한다.
     // 대기 캐릭터가 없으면 교체하지 않는다. 단 적이 연속 패링 패턴 중이면 필드의 파티원으로 다시 패링한다.
     // 조작 중인 캐릭터의 지금 동작이 교체를 허용하지 않으면 교체 키를 무시한다.
+    // 일반 교체는 마지막 교체부터 최소 간격이 지나야 한다. 빠른 지원 · 패링이 되는 교체는 간격과 상관없이 한다.
     private void TrySwap(int direction)
     {
         if(!Controlled.CanSwap) return;
@@ -200,6 +213,8 @@ public class PlayerParty : MonoBehaviour
             TryChainParry(direction);
             return;
         }
+
+        if(!IsSupportSwap() && Time.unscaledTime < _lastSwapTime + _common.SwapCooldown) return;
 
         PlayerController previous = Controlled;
         PlayerController next = _members[nextIndex];
@@ -264,12 +279,16 @@ public class PlayerParty : MonoBehaviour
         next.gameObject.SetActive(true);
     }
 
-    // 이전 캐릭터의 퇴장을 예약하고 조작 캐릭터를 바꾼다.
+    // 이전 캐릭터의 퇴장을 예약하고 조작 캐릭터를 바꾼다. 교체 시각을 기록해 일반 교체의 최소 간격을 잰다.
     private void FinishSwap(PlayerController previous, int nextIndex)
     {
         previous.ReserveSwapOut();
         SetControlled(nextIndex);
+        _lastSwapTime = Time.unscaledTime;
     }
+
+    // 이번 교체가 빠른 지원이나 지원 패링이 되는지. 들어올 캐릭터는 지금 캐릭터 자리에 나오므로 지금 캐릭터 기준으로 본다.
+    private bool IsSupportSwap() => (_quickSupportTimer > 0f && _quickSupportSource == Controlled) || Controlled.ActionTrigger.HasParryTarget;
 
     // 새 캐릭터가 어떻게 들어올지 정한다. 우선순위는 빠른 지원 → 지원 공격 → 보통 입장이다.
     //   빠른 지원 : 이전 캐릭터가 넉백된 뒤 입력 시간 안이면, 넉백시킨 적 앞으로 순간 이동해 빠른 지원 액션을 쓴다.
@@ -351,9 +370,14 @@ public class PlayerParty : MonoBehaviour
         ParryWindow.Opened -= OnParryWindowOpened;
         ParryWindow.Closed -= OnParryWindowClosed;
         _parryableAtOpen.Clear();
+        _claimedParryAttackers.Clear();
     }
 
     private void OnParryWindowOpened(IEnemyParryable attacker) => IsParryable(attacker);
 
-    private void OnParryWindowClosed(IEnemyParryable attacker) => _parryableAtOpen.Remove(attacker);
+    private void OnParryWindowClosed(IEnemyParryable attacker)
+    {
+        _parryableAtOpen.Remove(attacker);
+        _claimedParryAttackers.Remove(attacker);
+    }
 }
