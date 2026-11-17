@@ -48,8 +48,6 @@ public class CommonCharacterSettings : ScriptableObject
     [SerializeField, Min(0f)] private float _slowMotionDuration = 1f;
     [Tooltip("슬로모션 동안 적의 시간 배율")]
     [SerializeField, Range(0.05f, 1f)] private float _slowMotionEnemyTimeScale = 0.5f;
-    [Tooltip("[임시 표시] 슬로모션 동안 플레이어 위치에 만들어 두는 Prefab. 비워 두면 만들지 않는다")]
-    [SerializeField] private GameObject _slowMotionMarkerPrefab;
 
     [Header("패링")]
     [Tooltip("패링 준비 자세를 유지하는 시간(초). 적 공격이 끊겨도 끝까지 유지한다")]
@@ -126,7 +124,6 @@ public class CommonCharacterSettings : ScriptableObject
     public float GroundSearchDepth => _groundSearchDepth;
     public float SlowMotionDuration => _slowMotionDuration;
     public float SlowMotionEnemyTimeScale => _slowMotionEnemyTimeScale;
-    public GameObject SlowMotionMarkerPrefab => _slowMotionMarkerPrefab;
     public float ParryReadyTime => _parryReadyTime;
     public float ParryReactDistance => _parryReactDistance;
     public float ParryReactTime => _parryReactTime;

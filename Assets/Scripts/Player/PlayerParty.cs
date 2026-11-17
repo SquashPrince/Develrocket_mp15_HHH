@@ -66,6 +66,9 @@ public class PlayerParty : MonoBehaviour
     public PlayerLockOn LockOn { get; private set; }
     // 교체할 수 있는 대기 캐릭터가 있는지. 없으면 지원 공격(교체 패링)을 할 수 없어 적의 패링 공격 예고가 패링 불가로 뜬다.
     public bool HasStandby => FindStandbyIndex(NEXT) >= 0;
+    // 콤보 스킬을 이어받을 파티원(조작 캐릭터 말고)이 있는지. 필드에 나와 있어도(연속 패링 · 퇴장 중) 이어받을 수 있다.
+    // 플레이어 캐릭터에는 아직 사망이 없어 조작 캐릭터를 뺀 모든 파티원이 해당한다. 사망이 생기면 살아 있는 파티원만 센다.
+    public bool HasComboMember => _members.Length > 1;
     // 지금 교체 키로 패링할 수 있는지. 대기 캐릭터가 있거나, 적이 연속 패링 패턴 중이면(필드의 파티원이 다시 패링) true 다.
     public bool CanParry => HasStandby || ParryWindow.IsChainActive;
     public ComboSkillSelector ComboSelector { get; private set; }
@@ -244,18 +247,26 @@ public class PlayerParty : MonoBehaviour
     // 콤보 스킬 선택에서 고른 캐릭터를 콤보 스킬로 들여보낸다. 교체처럼 이전 캐릭터 자리에 꺼내 놓고 조작 캐릭터로 바꾼다.
     // 이전 캐릭터 자리에서 콤보 스킬의 순간 이동을 하므로, 남아 있는 이전 캐릭터 위치를 기준으로 비켜 선다.
     // 이전 캐릭터(강타를 맞힌 캐릭터 · 앞 연계의 콤보 스킬 캐릭터)는 하던 동작을 마친 뒤 퇴장한다.
+    // 고른 캐릭터가 이미 필드에 있으면(연속 패링 · 퇴장 중) 옮기지 않고 그 자리에서 들어오며, 퇴장 예약을 지운다. (연속 패링과 같은 방식)
     public void EnterComboSkill(PlayerController next, IEnemyTargetable target)
     {
         PlayerController previous = Controlled;
 
         ClearQuickSupport();
-        PlaceNext(previous, next);
+
+        if(next.gameObject.activeSelf)
+        {
+            SlowMotion.End();
+            next.CancelSwapOut();
+        }
+        else PlaceNext(previous, next);
+
         next.ActionTrigger.BeginComboSkill(target);
         FinishSwap(previous, Array.IndexOf(_members, next));
     }
 
-    // 조작 중인 캐릭터에서 isNext 쪽으로 한 칸씩 가며, 대기 중이고 used 에 없는 캐릭터를 찾는다. 없으면 null 이다.
-    // 콤보 스킬 선택이 이번 연계에서 아직 쓰지 않은 후보를 고를 때 쓴다.
+    // 조작 중인 캐릭터에서 isNext 쪽으로 한 칸씩 가며, used 에 없는 캐릭터를 찾는다. 없으면 null 이다.
+    // 콤보 스킬 선택이 이번 연계에서 아직 쓰지 않은 후보를 고를 때 쓴다. 필드에 나와 있는 파티원도 후보다. (HasComboMember 와 같은 기준)
     public PlayerController FindComboCandidate(bool isNext, HashSet<PlayerController> used)
     {
         int direction = isNext ? NEXT : PREVIOUS;
@@ -264,7 +275,7 @@ public class PlayerParty : MonoBehaviour
         {
             PlayerController member = _members[(_controlledIndex + direction * step + _members.Length) % _members.Length];
 
-            if(!member.gameObject.activeSelf && !used.Contains(member)) return member;
+            if(!used.Contains(member)) return member;
         }
 
         return null;

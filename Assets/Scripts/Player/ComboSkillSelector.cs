@@ -71,11 +71,12 @@ public class ComboSkillSelector : MonoBehaviour
         EndChain();
     }
 
-    // 적이 그로기에 들어갔을 때 그로기를 쌓은 쪽(판정 · 패링)이 부른다. 대기 캐릭터가 있을 때만 정지 시간을 건다.
-    // 대기 캐릭터가 없으면(1인) 콤보 스킬을 이어받을 수 없으므로, 적의 연계를 없애 적의 바가 처음부터 연계 없음으로 보이게 한다.
+    // 적이 그로기에 들어갔을 때 그로기를 쌓은 쪽(판정 · 패링)이 부른다. 이어받을 파티원이 있을 때만 정지 시간을 건다.
+    // 이어받을 파티원이 없으면(1인) 콤보 스킬을 이어받을 수 없으므로, 적의 연계를 없애 적의 바가 처음부터 연계 없음으로 보이게 한다.
+    // 연속 패링 중처럼 파티원이 모두 필드에 나와 있어도 이어받을 수 있으므로, 대기(꺼짐) 여부가 아닌 파티원 기준으로 본다.
     public void OnGroggyEntered(IEnemyGroggyable groggyable)
     {
-        if(_party.HasStandby) groggyable.HoldGroggy(Common.GroggyHoldTime);
+        if(_party.HasComboMember) groggyable.HoldGroggy(Common.GroggyHoldTime);
         else groggyable.ClearComboChain();
     }
 
