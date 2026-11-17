@@ -9,6 +9,10 @@ public class EnemyData : ScriptableObject
     [Tooltip("보스는 등장할 때 보스 바를 띄운다. 엘리트는 지금은 일반 적과 같게 동작한다")]
     [SerializeField] private EnemyGrade _grade;
 
+    [Header("표시")]
+    [Tooltip("[선택] 초상화 Image 를 연결한 막대(보스 바)에 띄울 초상화. 비워 두면 빈 Image 로 보인다")]
+    [SerializeField] private Sprite _portrait;
+
     [Header("스테이터스")]
     [SerializeField, Min(1f)] private float _maxHealth = 100f;
     [Tooltip("끄면 체력이 0 이어도 강타에 처치되지 않는다 (시험용 허수아비 등)")]
@@ -61,6 +65,7 @@ public class EnemyData : ScriptableObject
     [SerializeField, Min(0f)] private float _attackInterval = 2f;
 
     public EnemyGrade Grade => _grade;
+    public Sprite Portrait => _portrait;
     public float MaxHealth => _maxHealth;
     public bool CanDie => _canDie;
     public float CorpseDuration => _corpseDuration;

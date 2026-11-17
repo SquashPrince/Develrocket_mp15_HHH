@@ -5,6 +5,9 @@ using UnityEngine;
 // 다른 기능(플레이어 등)이 적을 찾을 때 쓰는 인터페이스(대상 · 대미지 · 경직 · 그로기)도 이 컴포넌트가 모두 가진다.
 //   실제 처리는 EnemyState 가 하고, 이 컴포넌트는 그대로 넘겨준다. 패링(IEnemyParryable)은 공격 흐름을 아는 EnemyAttacker 가 가진다.
 // 대상 정보 : 몸 반지름은 시작할 때 같은 오브젝트의 콜라이더로 한 번 재 둔다. 연출 · 도약 중 콜라이더가 꺼져도 값이 유지된다.
+// 보스 바 : 등급이 보스인 적은 등장할 때 자기 보스 바 Prefab 을 화면 HUD 아래에 만들고 자신을 대상으로 넘겨준다.
+//   지금은 오브젝트가 켜지는 순간을 등장으로 본다. 다시 켜져도 이미 만든 보스 바를 그대로 쓴다.
+//   화면 HUD 는 씬에 놓은 보스면 Inspector 에서 연결한다. 이후 웨이브 관리 기능이 보스를 만들 때는 그쪽이 넘겨준다.
 [RequireComponent(typeof(EnemyState))]
 public class EnemyController : MonoBehaviour, IEnemyTargetable, IEnemyDamageable, IEnemyStaggerable, IEnemyGroggyable
 {
@@ -13,7 +16,15 @@ public class EnemyController : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     [Tooltip("록온 표시를 띄울 위치 (머리 · 가슴 등에 둔 빈 자식 오브젝트). 비워 두면 타겟팅 기능의 기본 높이에 띄운다")]
     [SerializeField] private Transform _lockOnPoint;
 
+    [Header("보스")]
+    [Tooltip("[보스만] 등장할 때 화면에 띄울 보스 바 Prefab")]
+    [SerializeField] private EnemyGauge _bossGaugePrefab;
+    [Tooltip("[보스만] 보스 바를 띄울 화면 HUD (Screen Space Canvas 안)")]
+    [SerializeField] private Transform _hudRoot;
+
     private EnemyState _state;
+    // 이미 만든 보스 바. 다시 켜질 때 또 만들지 않도록 들고 있는다.
+    private EnemyGauge _bossGauge;
     private float _radius;
 
     public EnemyData Data => _data;
@@ -26,6 +37,7 @@ public class EnemyController : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     public bool HasRemainingComboChain => _state.HasRemainingComboChain;
 
     private void Awake() => CacheComponent();
+    private void OnEnable() => ShowBossGauge();
     // 몸 반지름은 콜라이더 경계가 잡힌 뒤에 재도록 Start 에서 잰다.
     private void Start() => Init();
 
@@ -37,6 +49,15 @@ public class EnemyController : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     public void ClearComboChain() => _state.ClearComboChain();
     public void HoldGroggy(float duration) => _state.HoldGroggy(duration);
     public void SetGroggyPaused(bool isPaused) => _state.SetGroggyPaused(isPaused);
+
+    // 보스면 등장할 때 보스 바를 한 번 만들고 자신을 대상으로 넘겨준다.
+    private void ShowBossGauge()
+    {
+        if(_data.Grade != EnemyGrade.Boss || _bossGauge != null) return;
+
+        _bossGauge = Instantiate(_bossGaugePrefab, _hudRoot);
+        _bossGauge.SetTarget(_state);
+    }
 
     private void CacheComponent()
     {

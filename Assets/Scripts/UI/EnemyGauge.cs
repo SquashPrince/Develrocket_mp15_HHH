@@ -4,19 +4,23 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 // 적 하나의 체력 · 그로기 막대(Slider 0 ~ 1). 일반 적 머리 위 바와 화면 위쪽 보스 바가 함께 쓴다.
-// 대상을 비워 두면 부모에서 찾는다. 일반 적 Prefab 의 자식으로 붙이면 따로 연결하지 않아도 된다. 보스 바는 씬의 보스를 연결한다.
+// 대상을 비워 두면 부모에서 찾는다. 일반 적 Prefab 의 자식으로 붙이면 따로 연결하지 않아도 된다.
+// 보스 바는 보스(EnemyController)가 등장할 때 직접 만들고 대상을 넘겨준다(SetTarget).
 // 체력 · 그로기 게이지는 적 기능의 알림이 올 때만 다시 그린다.
 // 그로기가 아닐 때는 쌓인 그로기 게이지를 퍼센트 숫자로도 보여주고, 그로기 중에는 숫자를 숨긴다.
 // 그로기 중에는 그로기 막대가 남은 그로기 시간을 보여주므로, 그로기 중에만 매 프레임 읽는다.
 // 그로기 중 막대 채움 색은 콤보 스킬 연계가 남았는지에 따라 두 색 중 하나로 덮는다. 연계를 쓴 순간을 알리는 알림이 없어, 그로기 중 매 프레임 읽을 때 함께 확인한다.
 // 체력 막대 뒤의 잔상 막대는 맞아서 줄어든 체력만 잔상으로 남긴다. 처음 그릴 때는 잔상 없이 바로 맞춘다.
 // 대상이 처치되면 막대 묶음을 숨긴다.
+// 초상화 : 초상화 Image 를 연결한 막대(보스 바)만 적 데이터의 초상화를 띄운다. 비워 두면 초상화 없이 동작한다 (일반 적 머리 위 바).
 public class EnemyGauge : MonoBehaviour
 {
-    [Tooltip("[선택] 보여줄 적. 비워 두면 부모에서 찾는다 (일반 적 머리 위 바)")]
+    [Tooltip("[선택] 보여줄 적. 비워 두면 부모에서 찾는다 (일반 적 머리 위 바). 보스 바는 보스가 넘겨주므로 비워 둔다")]
     [SerializeField] private EnemyState _target;
     [Tooltip("처치되면 숨길 막대 묶음")]
     [SerializeField] private GameObject _root;
+    [Tooltip("[선택] 적 데이터의 초상화를 띄울 Image. 비워 두면 초상화 없이 동작한다")]
+    [SerializeField] private Image _portraitImage;
     [SerializeField] private Slider _healthSlider;
     [Tooltip("체력 막대 뒤에 겹친 잔상 막대")]
     [SerializeField] private GaugeTrail _healthTrail;
@@ -34,11 +38,23 @@ public class EnemyGauge : MonoBehaviour
     private Color _normalFillColor;
 
     private void Awake() => CacheComponent();
-    private void OnEnable() => BindEnemyEvent();
+    // 보스 바는 만들어지며 처음 켜질 때 아직 대상이 없으므로, 대상을 넘겨받을 때(SetTarget) 구독한다.
+    private void OnEnable()
+    {
+        if(_target != null) BindEnemyEvent();
+    }
+
     // 다른 오브젝트의 Awake 가 모두 끝난 뒤 처음 값을 한 번 더 그린다. OnEnable 이 대상의 처음 값보다 먼저 돌 수 있기 때문이다.
     private void Start() => RefreshAll();
     private void OnDisable() => UnbindEnemyEvent();
     private void Update() => RefreshGroggyTime();
+
+    // 만든 쪽이 보여줄 적을 넘겨준다. 만든 직후 한 번만 부른다.
+    public void SetTarget(EnemyState target)
+    {
+        _target = target;
+        BindEnemyEvent();
+    }
 
     private void OnDamaged(bool isImpact) => RefreshHealth(false);
 
@@ -84,6 +100,11 @@ public class EnemyGauge : MonoBehaviour
         RefreshGroggyTime();
     }
 
+    private void RefreshPortrait()
+    {
+        if(_portraitImage != null) _portraitImage.sprite = _target.GetComponent<EnemyController>().Data.Portrait;
+    }
+
     private void Hide() => _root.SetActive(false);
 
     // 구독할 때 현재 값으로 한 번 그린다.
@@ -100,6 +121,7 @@ public class EnemyGauge : MonoBehaviour
     private void RefreshAll()
     {
         _root.SetActive(_target.IsAlive);
+        RefreshPortrait();
         RefreshHealth(true);
         RefreshGroggyState();
     }
