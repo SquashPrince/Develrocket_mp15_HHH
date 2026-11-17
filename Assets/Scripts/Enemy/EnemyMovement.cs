@@ -49,13 +49,16 @@ public class EnemyMovement : MonoBehaviour
         if(playsMoveAnimation) _animation.SetMoving(true, lookTarget != null);
     }
 
-    public void Stop()
+    // playsIdle : false 면 대기 모션으로 바꾸지 않고 이동만 멈춘다. 공격 중 대상 따라가기처럼 다른 기능이 모션을 재생하는 중일 때 쓴다.
+    //   대기 모션으로 바꾸면 재생 중이던 공격 모션이 끊겨 공격이 끝나지 않기 때문이다.
+    public void Stop(bool playsIdle = true)
     {
         if(!_isMoving) return;
 
         _isMoving = false;
         _agent.ResetPath();
-        _animation.SetMoving(false);
+
+        if(playsIdle) _animation.SetMoving(false);
     }
 
     private void UpdateMove()

@@ -200,11 +200,12 @@ public class PlayerController : MonoBehaviour
     }
 
     // 적 공격에 맞으면 어떤 상태에서든 피격 상태로 넘어간다. 진행 중이던 공격 · 차지는 끊고, 이후 콤보는 1단부터 시작한다.
-    public void StartHit(EnemyAttackData attack, Transform attacker)
+    // reaction : 이 타격의 반응. 연타의 막타는 공격의 반응과 다를 수 있다.
+    public void StartHit(EnemyAttackData attack, EnemyAttackData.HitReaction reaction, Transform attacker)
     {
         _isCharging = false;
         _comboExpireTime = 0f;
-        _hitState.Setup(attack, attacker);
+        _hitState.Setup(attack, reaction, attacker);
         _stateMachine.ChangeState(_hitState);
     }
 

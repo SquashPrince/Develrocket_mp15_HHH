@@ -21,11 +21,14 @@ MonoBehaviour:
     _hitCount: 2
     _reactOnFirstHitOnly: 1
     _hitLagTime: 0.1
-    _hitShape: 2
-    _hitCenter: {x: 0, y: 1, z: 1.5}
-    _hitSize: {x: 0.5, y: 2, z: 2}
+    _hitShape: 0
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1, y: 2, z: 2}
     _hitRadius: 1
     _hitLength: 4
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
     _advanceDistance: 5
     _advanceDuration: 0.5
     _fadeTime: 0.2

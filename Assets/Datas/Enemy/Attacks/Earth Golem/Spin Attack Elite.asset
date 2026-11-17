@@ -20,14 +20,14 @@ MonoBehaviour:
   _turnSpeed: 360
   _leapHeight: 0
   _overshootDistance: 0
-  _power: 10
+  _power: 2
   _staggerResistLevel: 2
   _resistUntilEvent: 1
   _canPerfectDodge: 1
-  _reaction: 2
+  _reaction: 1
   _hitStunTime: 0.4
-  _hitPushDistance: 0
-  _hitPushDuration: 0.2
+  _hitPushDistance: 0.1
+  _hitPushDuration: 0.25
   _knockbackDistance: 7.5
   _knockbackDuration: 0.725
   _getUpTime: 1
@@ -35,43 +35,141 @@ MonoBehaviour:
   _steps:
   - _animationState: ParryAttackReady
     _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.2
+    _hitCount: 3
+    _useFinalReaction: 0
+    _finalReaction: 2
+    _hitShape: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
+    _hitSize: {x: 2, y: 2, z: 2}
     _hitRadius: 1.5
+    _hitLength: 3
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
+    _followsTarget: 0
+    _followSpeedRate: 1
+    _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
   - _animationState: ParryAttackAction
     _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.5
+    _hitCount: 10
+    _useFinalReaction: 0
+    _finalReaction: 2
+    _hitShape: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
+    _hitSize: {x: 2, y: 2, z: 2}
     _hitRadius: 1.5
+    _hitLength: 3
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
+    _followsTarget: 1
+    _followSpeedRate: 1.25
+    _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
   - _animationState: ParryAttackAction
     _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.5
+    _hitCount: 10
+    _useFinalReaction: 0
+    _finalReaction: 2
+    _hitShape: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
+    _hitSize: {x: 2, y: 2, z: 2}
     _hitRadius: 1.5
+    _hitLength: 3
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
+    _followsTarget: 1
+    _followSpeedRate: 1.25
+    _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
   - _animationState: ParryAttackAction
     _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.5
+    _hitCount: 10
+    _useFinalReaction: 0
+    _finalReaction: 2
+    _hitShape: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
+    _hitSize: {x: 2, y: 2, z: 2}
     _hitRadius: 1.5
+    _hitLength: 3
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
+    _followsTarget: 1
+    _followSpeedRate: 1.25
+    _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
   - _animationState: ParryAttackAction
     _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.5
+    _hitCount: 10
+    _useFinalReaction: 0
+    _finalReaction: 2
+    _hitShape: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
+    _hitSize: {x: 2, y: 2, z: 2}
     _hitRadius: 1.5
+    _hitLength: 3
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
+    _followsTarget: 1
+    _followSpeedRate: 1.25
+    _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
   - _animationState: ParryAttackAction
     _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.5
+    _hitCount: 10
+    _useFinalReaction: 1
+    _finalReaction: 2
+    _hitShape: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
+    _hitSize: {x: 2, y: 2, z: 2}
     _hitRadius: 1.5
+    _hitLength: 3
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
+    _followsTarget: 1
+    _followSpeedRate: 1.25
+    _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
   - _animationState: ParryAttackEnd
     _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.2
+    _hitCount: 3
+    _useFinalReaction: 0
+    _finalReaction: 2
+    _hitShape: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
+    _hitSize: {x: 2, y: 2, z: 2}
     _hitRadius: 1.5
+    _hitLength: 3
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
+    _followsTarget: 0
+    _followSpeedRate: 1
+    _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2

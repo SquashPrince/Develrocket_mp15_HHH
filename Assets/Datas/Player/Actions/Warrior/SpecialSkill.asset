@@ -24,8 +24,11 @@ MonoBehaviour:
     _hitShape: 0
     _hitCenter: {x: 0, y: 1, z: 1}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
+    _hitRadius: 2
+    _hitLength: 6
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
     _advanceDistance: 10
     _advanceDuration: 1.125
     _fadeTime: 0.1

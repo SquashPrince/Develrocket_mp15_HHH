@@ -7,14 +7,6 @@ using UnityEngine;
 [Serializable]
 public class ActionStep
 {
-    // 판정 범위 모양. Inspector 에 저장된 값은 순서 번호이므로, 새 모양은 항상 맨 뒤에 추가한다.
-    public enum HitShape
-    {
-        Box,
-        Sphere,
-        Capsule
-    }
-
     // 판정 방식. Inspector 에 저장된 값은 순서 번호이므로, 새 방식은 항상 맨 뒤에 추가한다.
     //   구간 : 판정 시작(HitStart) ~ 판정 끝(HitEnd) · 강타 끝(ImpactEnd) 사이에 타격 시점을 두고, 시점마다 범위 안의 적을 모두 맞힌다
     //   한 순간 : 판정 시작(HitStart) 순간에 한 번만 판정한다
@@ -64,16 +56,22 @@ public class ActionStep
     [SerializeField, Min(0f)] private float _hitLagTime;
 
     [Header("판정 범위")]
-    [Tooltip("상자 : 중심 · 크기 / 구 : 중심 · 반지름 / 캡슐 : 중심 · 반지름 · 길이 (캐릭터 앞쪽으로 긴 막대)")]
+    [Tooltip("상자 : 중심 · 크기 / 구 : 중심 · 반지름 / 캡슐 : 중심 · 반지름 · 길이 (캐릭터 앞쪽으로 긴 막대) / 부채꼴 : 중심 · 반지름 · 각도 · 안쪽 반지름 · 높이")]
     [SerializeField] private HitShape _hitShape = HitShape.Box;
     [Tooltip("판정 범위의 중심 (캐릭터 기준 위치)")]
     [SerializeField] private Vector3 _hitCenter = new Vector3(0f, 1f, 1f);
     [Tooltip("[상자] 판정 상자의 크기 (좌우 · 위아래 · 앞뒤)")]
     [SerializeField] private Vector3 _hitSize = new Vector3(1.5f, 1.5f, 2f);
-    [Tooltip("[구 · 캡슐] 반지름")]
+    [Tooltip("[구 · 캡슐 · 부채꼴] 반지름 (부채꼴은 바깥 반지름)")]
     [SerializeField, Min(0f)] private float _hitRadius = 1.5f;
     [Tooltip("[캡슐] 캐릭터 앞쪽 방향으로의 전체 길이. 반지름의 두 배보다 짧으면 구와 같다")]
     [SerializeField, Min(0f)] private float _hitLength = 3f;
+    [Tooltip("[부채꼴] 정면 기준 펼친 각도. 좌우로 절반씩 펼친다 (180 = 반원, 360 = 원)")]
+    [SerializeField, Range(0f, 360f)] private float _hitAngle = 90f;
+    [Tooltip("[부채꼴] 안쪽 반지름. 이보다 가까운 대상은 맞지 않는다 (0 보다 크면 도넛형)")]
+    [SerializeField, Min(0f)] private float _hitInnerRadius;
+    [Tooltip("[부채꼴] 판정 높이(위아래 합친 두께). 중심 높이 기준 위아래로 절반씩이다")]
+    [SerializeField, Min(0f)] private float _hitHeight = 2f;
 
     [Header("이동 · 연결")]
     [Tooltip("이 동작을 시작할 때 앞으로 나아가는 거리. 대상이 있으면 대상 앞까지 다가가는 거리를 대신 쓴다")]
@@ -96,11 +94,8 @@ public class ActionStep
     public int HitCount => _hitCount;
     public bool ReactOnFirstHitOnly => _reactOnFirstHitOnly;
     public float HitLagTime => _hitLagTime;
-    public HitShape Shape => _hitShape;
-    public Vector3 HitCenter => _hitCenter;
-    public Vector3 HitSize => _hitSize;
-    public float HitRadius => _hitRadius;
-    public float HitLength => _hitLength;
+    // 판정 범위. 찾기 · 그리기는 공용 판정 범위가 한다.
+    public HitRange Range => new HitRange(_hitShape, _hitCenter, _hitSize, _hitRadius, _hitLength, _hitAngle, _hitInnerRadius, _hitHeight);
     public float AdvanceDistance => _advanceDistance;
     public float AdvanceDuration => _advanceDuration;
     public float FadeTime => _fadeTime;

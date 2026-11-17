@@ -17,7 +17,7 @@ MonoBehaviour:
   _weightGrowth: 10
   _minUseDistance: 0
   _canUseOutOfRange: 0
-  _turnSpeed: 360
+  _turnSpeed: 120
   _leapHeight: 0
   _overshootDistance: 0
   _power: 10
@@ -35,7 +35,13 @@ MonoBehaviour:
   _steps:
   - _animationState: HeavyAttack
     _hitMode: 1
-    _hitCenter: {x: 0, y: 3.5, z: 1.65}
-    _hitRadius: 5
+    _hitShape: 3
+    _hitCenter: {x: 0, y: 3.5, z: 0}
+    _hitSize: {x: 2, y: 2, z: 2}
+    _hitRadius: 10
+    _hitLength: 3
+    _hitAngle: 270
+    _hitInnerRadius: 0
+    _hitHeight: 2
     _isParryable: 0
     _parryStaggerTime: 1.5

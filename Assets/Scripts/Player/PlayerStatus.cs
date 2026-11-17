@@ -136,16 +136,19 @@ public class PlayerStatus : MonoBehaviour
         _timeScale = 1f;
     }
 
-    // 맞았으면 true 를 돌려준다. 완벽 회피 · 패링했거나 무적이면 무시하고 false 를 돌려준다.
-    // 판정 순서 : 완벽 회피 → 패링 → 무적 → 피격
+    // 적의 타격 한 번에 맞았을 때 부른다. 맞았으면 true 를 돌려준다. 완벽 회피 · 패링했거나 무적이면 무시하고 false 를 돌려준다.
+    // 연타 공격은 타격마다 부르므로, 한 공격 안에서도 타격마다 완벽 회피 · 패링 · 피격을 따로 판정한다.
+    // 판정 순서 : 완벽 회피 → 패링 → 무적(슬로모션 중 포함) → 피격
+    //   슬로모션 중에는 무적이라 맞지 않는다. 그 사이 다시 대시 · 회피해 완벽 회피 판정 시간에 타격이 닿으면 완벽 회피가 다시 발동한다.
     // step : 판정한 동작. 패링 가능 여부 · 패링 경직 시간은 동작마다 다르다.
+    // reaction : 이 타격의 반응. 막타면 동작의 막타 반응이다.
     // attacker : 패링 성공을 알리고, 넉백 방향을 정할 때 위치를 쓰는 공격한 적
-    public bool TakeHit(EnemyAttackData attack, EnemyAttackStep step, IEnemyParryable attacker)
+    public bool TakeHit(EnemyAttackData attack, EnemyAttackStep step, EnemyAttackData.HitReaction reaction, IEnemyParryable attacker)
     {
         if(TryPerfectDodge(attack)) return false;
         if(_actionTrigger.TryParry(attack, step, attacker)) return false;
 
-        if(IsInvincible)
+        if(IsInvincible || _controller.Party.SlowMotion.IsActive)
         {
 #if UNITY_EDITOR
             Debug.Log($"[피격 무시] {attack.name} : 무적");
@@ -155,7 +158,7 @@ public class PlayerStatus : MonoBehaviour
 
         CurrentHealth = _currentHealth - attack.Power;
 
-        _controller.StartHit(attack, attacker.transform);
+        _controller.StartHit(attack, reaction, attacker.transform);
         return true;
     }
 

@@ -23,6 +23,7 @@ public class PlayerHitState : PlayerState
     }
 
     private EnemyAttackData _attack;
+    private EnemyAttackData.HitReaction _reaction;
     private Transform _attacker;
     private Vector3 _awayDirection;
     private Phase _phase;
@@ -32,10 +33,12 @@ public class PlayerHitState : PlayerState
     {
     }
 
+    // reaction : 이 타격의 반응. 경직 · 밀림 · 넉백 값은 공격(attack)의 값을 쓴다.
     // attacker : 공격한 적. 이 적의 반대 방향으로 밀려나고, 넉백이면 파티가 빠른 지원으로 이 적 앞에 다음 캐릭터를 보낸다.
-    public void Setup(EnemyAttackData attack, Transform attacker)
+    public void Setup(EnemyAttackData attack, EnemyAttackData.HitReaction reaction, Transform attacker)
     {
         _attack = attack;
+        _reaction = reaction;
         _attacker = attacker;
         _awayDirection = Controller.transform.position - attacker.position;
         _awayDirection.y = 0f;
@@ -53,10 +56,10 @@ public class PlayerHitState : PlayerState
         Controller.HorizontalVelocity = Vector3.zero;
 
         // 피격과 큰 피격은 같은 경직 흐름을 쓰고 모션만 다르다.
-        if(_attack.Reaction != EnemyAttackData.HitReaction.Knockback)
+        if(_reaction != EnemyAttackData.HitReaction.Knockback)
         {
             _phase = Phase.Stun;
-            Controller.Animation.Play(_attack.Reaction == EnemyAttackData.HitReaction.HeavyHit ? HEAVY_HIT_ANIMATION : HIT_ANIMATION);
+            Controller.Animation.Play(_reaction == EnemyAttackData.HitReaction.HeavyHit ? HEAVY_HIT_ANIMATION : HIT_ANIMATION);
             return;
         }
 
