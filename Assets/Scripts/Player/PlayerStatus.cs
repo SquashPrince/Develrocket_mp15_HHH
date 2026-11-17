@@ -200,7 +200,7 @@ public class PlayerStatus : MonoBehaviour
         Debug.Log($"[완벽 회피] {attack.name}");
 #endif
 
-        _controller.Party.SlowMotion.Begin(transform.position);
+        _controller.Party.SlowMotion.Begin();
         AddUltimateGauge(_controller.Character.PerfectDodgeGaugeGain);
         return true;
     }

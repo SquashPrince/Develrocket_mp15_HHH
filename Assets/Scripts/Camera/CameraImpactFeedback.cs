@@ -57,6 +57,8 @@ public class CameraImpactFeedback : MonoBehaviour
     // 지금 더할 FOV 변화량(도). 효과가 없으면 0 이다.
     public float FovOffset { get; private set; }
 
+    // 히트스톱으로 게임 시간이 멈춰도 흔들림이 진행되게 한다. (Cinemachine Brain 의 Ignore Time Scale 과 함께 켠다)
+    private void Awake() => CinemachineImpulseManager.Instance.IgnoreTimeScale = true;
     private void OnEnable() => BindFeedbackEvent();
     private void Update() => UpdateFov();
 
