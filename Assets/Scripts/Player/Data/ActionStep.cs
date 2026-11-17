@@ -35,7 +35,9 @@ public class ActionStep
         None = 0,
         Dash = 1 << 0,
         Ultimate = 1 << 1,
-        Swap = 1 << 2
+        Swap = 1 << 2,
+        // 적이 패링 가능 시간을 열어 교체가 지원 패링이 될 때만 교체를 허용한다. 연속 패링을 받아칠 때 쓴다.
+        ParrySwap = 1 << 3
     }
 
     [Tooltip("재생할 Animator 상태 이름. Animator Controller 의 상태 이름과 같아야 한다")]
@@ -82,7 +84,7 @@ public class ActionStep
     [SerializeField, Min(0f)] private float _fadeTime = 0.1f;
 
     [Header("끼어들기")]
-    [Tooltip("이 동작 중 허용할 행동. 체크한 것만 허용한다.\n대시 : 휘두르는 중 대시 · 회피로 끊기 (후딜은 항상 끊을 수 있다)\n필살기 : 게이지가 가득 차 있으면 필살기로 끊기 (공격 액션만 사용)\n교체 : 교체 키로 다른 캐릭터와 교체. 막힌 동작 중 누른 교체 키는 무시한다")]
+    [Tooltip("이 동작 중 허용할 행동. 체크한 것만 허용한다.\n대시 : 휘두르는 중 대시 · 회피로 끊기 (후딜은 항상 끊을 수 있다)\n필살기 : 게이지가 가득 차 있으면 필살기로 끊기 (공격 액션만 사용)\n교체 : 교체 키로 다른 캐릭터와 교체. 막힌 동작 중 누른 교체 키는 무시한다\n패링 교체 : 적이 패링 가능 시간을 열었을 때만 교체(지원 패링)를 허용한다. 교체를 켜면 이 항목은 필요 없다 (예 : 패링 반응 중 연속 패링)")]
     [SerializeField] private Interrupt _interrupts = Interrupt.Dash | Interrupt.Ultimate | Interrupt.Swap;
 
     public string AnimationState => _animationState;

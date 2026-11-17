@@ -36,6 +36,9 @@ public class PlayerActionTrigger : MonoBehaviour
     public IEnemyParryable SelectedParryAttacker => _selectedParryAttacker;
     // 콤보 스킬 중에는 다른 그로기 적에게 강타가 맞아도 다시 발동하지 않는다.
     public bool CanStartComboSkill => !_comboSkillState.IsActive;
+    // 지금 교체하면 지원 패링이 되는지. 이 캐릭터 기준 록온 사거리 안에 패링 가능 시간을 연 적이 있으면 true 다.
+    // 교체로 나오는 캐릭터는 이 캐릭터 옆에 나오므로, 이 캐릭터 기준으로 본다.
+    public bool HasParryTarget => SelectParryAttacker() != null;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
@@ -43,7 +46,8 @@ public class PlayerActionTrigger : MonoBehaviour
     private void Update() => TryStartUltimate();
 
     // 패링 준비 · 반응 중 노란 동작(패링할 수 있는 동작)이 닿으면 패링 성공으로 처리하고 true 를 돌려준다. 상태 기능이 맞았을 때 부른다.
-    // 패링한 적은 경직되고 패링 액션의 그로기 값만큼 그로기가 쌓이며, 패링 추격은 이 적을 노린다.
+    // 적에게는 패링당했다고 알리기만 한다. 경직할지 다음 동작으로 이어갈지는 적이 지금 동작 설정으로 정한다.
+    // 그로기 · 필살기 게이지 · 패링 추격은 패링할 때마다 얻는다. 이어가는 공격이면 추격할지 다음 패링을 할지 플레이어가 고른다.
     public bool TryParry(EnemyAttackData attack, EnemyAttackStep step, IEnemyParryable attacker)
     {
         if(!_parryState.IsActive || !step.IsParryable) return false;
@@ -52,8 +56,7 @@ public class PlayerActionTrigger : MonoBehaviour
         Debug.Log($"[패링 성공] {attack.name}");
 #endif
 
-        // 패링 성공 경직은 패링당한 공격의 저항 레벨을 경직 레벨로 쓴다. 레벨이 같으면 경직되므로 패링 성공은 항상 경직을 건다.
-        if(attacker.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(step.ParryStaggerTime, attack.StaggerResistLevel);
+        attacker.OnParried();
 
         // 이 패링으로 그로기에 들어갔으면 콤보 스킬 선택에 알려 그로기 정지 시간을 걸게 한다.
         if(attacker.transform.TryGetComponent(out IEnemyGroggyable groggyable) && groggyable.AddGroggy(ParryAction.GroggyGain)) _controller.Party.ComboSelector.OnGroggyEntered(groggyable);
@@ -80,6 +83,9 @@ public class PlayerActionTrigger : MonoBehaviour
 
     // 콤보 스킬 중 강타가 맞은 적을 콤보 스킬 선택에 알린다. 연계 대상이고 연계가 남았으면 다음 캐릭터를 고르는 단계가 열린다.
     public void OnComboSkillImpactHit(IEnemyDamageable enemy) => _controller.Party.ComboSelector.RequestNextChain(_controller, enemy.transform);
+
+    // 동작 step 중에 교체 키를 받을지. 교체를 허용하거나, 패링 교체를 허용하고 지금 교체가 지원 패링이 될 때다.
+    public bool AllowsSwap(ActionStep step) => step.Allows(ActionStep.Interrupt.Swap) || (step.Allows(ActionStep.Interrupt.ParrySwap) && HasParryTarget);
 
     // 지원 공격 : 교체로 막 들어온 이 캐릭터가 패링을 시작한다. 파티가 교체할 때 부르고, 패링을 시작했으면 true 를 돌려준다.
     // 록온 사거리 안에 패링 가능 시간을 연 적이 없으면 시작하지 않고 false 를 돌려준다. 이때 파티는 보통 입장으로 교체한다.

@@ -73,8 +73,10 @@ public class EnemyAttackStep
     [Header("패링")]
     [Tooltip("패링할 수 있는 동작인지 여부. 켜면 클립의 Telegraph 이벤트부터 첫 판정까지 패링 가능 시간이 열리고 예고 표시가 켜진다. Telegraph 이벤트는 준비 단계 클립에 넣는다")]
     [SerializeField] private bool _isParryable;
-    [Tooltip("[패링] 패링당했을 때 적이 경직하는 시간(초)")]
+    [Tooltip("[패링] 패링당했을 때 적이 경직하는 시간(초). 이어가기를 켜면 쓰지 않는다")]
     [SerializeField, Min(0f)] private float _parryStaggerTime = 1.5f;
+    [Tooltip("[패링] 켜면 패링당해도 경직하지 않고 공격을 이어간다 (연속 패링 패턴). 막힌 동작은 더 판정하지 않고 모션을 끝까지 재생한 뒤 다음 동작으로 넘어간다. 끄면 경직하고 공격이 끝난다. 다음 동작도 패링하게 하려면 그 동작 클립에 Telegraph 이벤트를 넣는다")]
+    [SerializeField] private bool _continuesOnParry;
 
     public string AnimationState => _animationState;
     public HitMode Mode => _hitMode;
@@ -90,4 +92,5 @@ public class EnemyAttackStep
     public bool FacesTarget => _facesTarget;
     public bool IsParryable => _isParryable;
     public float ParryStaggerTime => _parryStaggerTime;
+    public bool ContinuesOnParry => _continuesOnParry;
 }

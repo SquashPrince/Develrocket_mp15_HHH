@@ -2,9 +2,10 @@ using UnityEngine;
 
 // 패링 상태. 준비(ParryReady) → 패링 성공 시 반응(ParryReact) → 추격 공격 또는 이동으로 돌아간다.
 // 준비 : 패링 공격을 하는 적 앞으로 순간 이동한 뒤 자세를 유지한다. 적 공격이 끊겨도 정해진 시간까지 유지하고, 그동안 노란 공격이 오지 않으면 이동으로 돌아간다.
-// 반응 : 공격한 적 반대 방향으로 점점 느려지며 밀려난다. 반응 동안 노란 공격이 다시 닿으면(연속 패링) 반응을 처음부터 다시 시작한다.
-// 추격 : 반응 동안 공격 키를 눌렀으면 반응이 끝난 뒤 추격 공격이 나간다. 연속 패링이 일어나면 이전 입력은 지우고 마지막 반응의 입력만 본다.
-//        추격 대상은 록온 중이면 록온 대상, 아니면 마지막으로 패링한 적이다.
+// 반응 : 공격한 적 반대 방향으로 점점 느려지며 밀려난다. 패링 한 번은 노란 공격 한 번만 막는다. 반응 중 닿은 노란 공격은 패링되지 않는다.
+//        적이 이어서 패링 공격을 하면(연속 패링 패턴) 다시 패링 입력을 해야 막을 수 있다.
+// 추격 : 반응 동안 공격 키를 눌렀으면 반응이 끝난 뒤 추격 공격이 나간다.
+//        추격 대상은 록온 중이면 록온 대상, 아니면 패링한 적이다.
 // 노란색이 아닌 공격은 패링되지 않고 기존처럼 맞는다.
 // 준비 · 반응 모션은 패링 액션의 동작 목록에서 읽는다. 첫 동작이 준비, 두 번째 동작이 반응이다.
 public class PlayerParryState : PlayerState
@@ -31,10 +32,10 @@ public class PlayerParryState : PlayerState
         _trigger = trigger;
     }
 
-    // 패링 준비 · 반응 중인지. 이 동안 닿은 노란 공격은 패링된다.
+    // 패링 준비 중인지. 이 동안 닿은 노란 공격은 패링된다. 패링에 성공하면 꺼져, 한 번의 패링으로 노란 공격 하나만 막는다.
     public bool IsActive { get; private set; }
     // 준비 중에는 패링 액션의 준비 동작, 성공 반응 중에는 반응 동작의 끼어들기 허용을 따른다.
-    public override bool CanSwap => _trigger.ParryAction.GetStep(_phase == Phase.Ready ? READY_STEP : REACT_STEP).Allows(ActionStep.Interrupt.Swap);
+    public override bool CanSwap => _trigger.AllowsSwap(_trigger.ParryAction.GetStep(_phase == Phase.Ready ? READY_STEP : REACT_STEP));
 
     public override void Enter()
     {
@@ -50,10 +51,11 @@ public class PlayerParryState : PlayerState
 
     public override void Exit() => IsActive = false;
 
-    // 공격한 적 쪽을 보고, 그 반대 방향으로 밀려나기 시작한다. 연속 패링이면 반응과 추격 입력을 처음부터 다시 시작한다.
-    // 마지막으로 패링한 적을 기억해, 록온 중이 아니면 추격 공격이 그 적에게 나가게 한다.
+    // 공격한 적 쪽을 보고, 그 반대 방향으로 밀려나기 시작한다. 이후 닿는 노란 공격은 이 패링으로 막지 않는다.
+    // 패링한 적을 기억해, 록온 중이 아니면 추격 공격이 그 적에게 나가게 한다.
     public void OnParrySuccess(IEnemyTargetable parriedTarget)
     {
+        IsActive = false;
         _parriedTarget = parriedTarget;
         _awayDirection = Controller.transform.position - parriedTarget.transform.position;
         _awayDirection.y = 0f;

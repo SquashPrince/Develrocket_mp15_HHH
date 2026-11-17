@@ -53,6 +53,7 @@ MonoBehaviour:
     _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
+    _continuesOnParry: 1
   - _animationState: ParryAttackAction
     _hitMode: 0
     _windowTiming: 0
@@ -73,6 +74,7 @@ MonoBehaviour:
     _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
+    _continuesOnParry: 1
   - _animationState: ParryAttackAction
     _hitMode: 0
     _windowTiming: 0
@@ -93,6 +95,7 @@ MonoBehaviour:
     _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
+    _continuesOnParry: 1
   - _animationState: ParryAttackAction
     _hitMode: 0
     _windowTiming: 0
@@ -113,6 +116,7 @@ MonoBehaviour:
     _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
+    _continuesOnParry: 1
   - _animationState: ParryAttackAction
     _hitMode: 0
     _windowTiming: 0
@@ -133,6 +137,7 @@ MonoBehaviour:
     _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
+    _continuesOnParry: 1
   - _animationState: ParryAttackAction
     _hitMode: 0
     _windowTiming: 0
@@ -153,6 +158,7 @@ MonoBehaviour:
     _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
+    _continuesOnParry: 0
   - _animationState: ParryAttackEnd
     _hitMode: 0
     _windowTiming: 0
@@ -173,3 +179,4 @@ MonoBehaviour:
     _facesTarget: 0
     _isParryable: 1
     _parryStaggerTime: 2
+    _continuesOnParry: 0

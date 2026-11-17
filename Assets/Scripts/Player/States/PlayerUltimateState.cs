@@ -28,7 +28,7 @@ public class PlayerUltimateState : PlayerState
     }
 
     // 연출 구간은 액션의 동작이 아니라 끼어들기 값이 없으므로 교체하지 않는다. 공격 단계부터는 지금 동작의 끼어들기 허용을 따른다.
-    public override bool CanSwap => _step != CUTSCENE_STEP && _trigger.UltimateAction.GetStep(_step).Allows(ActionStep.Interrupt.Swap);
+    public override bool CanSwap => _step != CUTSCENE_STEP && _trigger.AllowsSwap(_trigger.UltimateAction.GetStep(_step));
 
     public override void Enter()
     {

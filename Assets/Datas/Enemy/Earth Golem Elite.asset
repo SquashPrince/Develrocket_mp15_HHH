@@ -18,7 +18,7 @@ MonoBehaviour:
   _canDie: 1
   _corpseDuration: 2
   _baseStaggerResistLevel: 1
-  _maxGroggy: 1000
+  _maxGroggy: 10000
   _groggyTime: 12
   _maxComboChain: 2
   _moveSpeed: 3

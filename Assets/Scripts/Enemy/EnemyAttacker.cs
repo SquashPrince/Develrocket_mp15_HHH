@@ -13,7 +13,10 @@ using UnityEngine;
 // 타격마다 대미지 · 경직 · 완벽 회피 · 패링을 따로 판정한다. 한 타격에서는 범위 안의 캐릭터마다 한 번씩만 맞는다. (파티 전투에서 필드에 캐릭터가 여럿일 수 있다)
 //   그래서 연타 공격 하나 안에서 완벽 회피 → 회피 반격 → 다시 완벽 회피를 반복할 수 있다.
 // 대상 따라가기를 켠 동작은 그 동작 동안 대상 쪽으로 이동하고, 서로의 몸 반지름이 닿으면 멈춘다. 이동 모션은 재생하지 않는다.
-// 패링할 수 있는 동작은 Telegraph 이벤트부터 첫 HitStart 이벤트까지 패링 가능 시간을 연다. 예고 시점은 이벤트 프레임으로 조정한다. 예고 표시는 플레이어 쪽(파티)이 예고 위치에 띄운다.
+// 패링할 수 있는 동작은 Telegraph 이벤트부터 그 동작의 첫 HitStart 이벤트까지 패링 가능 시간을 연다. 예고 시점은 이벤트 프레임으로 조정한다. 예고 표시는 플레이어 쪽(파티)이 예고 위치에 띄운다.
+// 패링당하면 플레이어는 알림만 보내고, 지금 동작이 이어가기면 경직하지 않고 아니면 경직한다. (연속 패링 패턴)
+//   이어가기 동작은 공격을 끊지 않고, 막힌 동작은 더 판정하지 않은 채 모션을 끝까지 재생한 뒤 다음 동작으로 넘어간다.
+//   다음 동작도 자기 클립의 Telegraph 이벤트로 패링 가능 시간을 다시 열고, 플레이어는 다시 패링해야 막을 수 있다.
 // 공격 시작부터 그 공격의 경직 저항 레벨을 적용하고, 첫 HitStart 이벤트(또는 설정에 따라 ResistEnd 이벤트)에서 푼다.
 // 경직 · 그로기 · 처치되면 진행 중인 공격을 끊는다. 끊긴 공격도 쓴 것으로 보고 쿨타임을 시작한다.
 // 공격 선택 : 쿨타임 중이거나 대상이 사용 최소 거리보다 가까운 공격은 빼고, 가중치(기본 가중치 + 증가량 × 마지막으로 쓴 뒤 다른 공격이 선택된 횟수)에 비례해 무작위로 고른다.
@@ -50,8 +53,13 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     private int _attackIndex = -1;
     private int _stepIndex;
     private int _stepHash;
-    // 첫 HitStart 이벤트가 지났는지. 지나면 대상 쪽으로 돌지 않고 패링 가능 시간을 닫는다.
+    // 이 공격의 첫 HitStart 이벤트가 지났는지. 지나면 대상 쪽으로 돌지 않는다.
     private bool _isHitStarted;
+    // 지금 동작의 첫 HitStart 이벤트가 지났는지. 지나면 이 동작의 패링 가능 시간을 닫고, Telegraph 이벤트가 와도 열지 않는다.
+    // 동작마다 따로 세서, 패링으로 이어간 다음 동작이 자기 Telegraph 이벤트로 패링 가능 시간을 다시 열 수 있게 한다.
+    private bool _isStepHitStarted;
+    // 지금 동작이 패링당해 막혔는지(이어가기 동작). 막힌 동작은 모션을 끝까지 재생하지만 더 판정하지 않는다.
+    private bool _isStepParried;
     // 구간 판정 동작에서 지금 동작의 판정이 켜져 있는지. HitEnd 이벤트에서 · 동작이 바뀌면 끈다.
     private bool _isHitActive;
     private bool _isParryWindowOpen;
@@ -122,6 +130,26 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         return true;
     }
 
+    // 플레이어가 지금 동작을 패링했다는 알림. 아니면 동작의 패링 경직 시간만큼 경직한다.
+    // 이어가기 동작은 공격을 끊지 않는다. 막힌 동작은 더 판정하지 않고 모션을 끝까지 재생한 뒤, 평소처럼 다음 동작으로 넘어간다.
+    // 경직은 패링당한 공격의 저항 레벨을 경직 레벨로 건다. 레벨이 같으면 경직되므로 패링 성공은 항상 경직을 건다. 경직 알림에서 공격이 끊긴다.
+    public void OnParried()
+    {
+        if(!IsAttacking) return;
+
+        if(CurrentStep.ContinuesOnParry)
+        {
+#if UNITY_EDITOR
+            Debug.Log($"[적 공격] {name} {CurrentAttack.name} : 패링당했지만 공격을 이어간다");
+#endif
+            _isStepParried = true;
+            _isHitActive = false;
+            return;
+        }
+
+        _state.Stagger(CurrentStep.ParryStaggerTime, CurrentAttack.StaggerResistLevel);
+    }
+
     // 이전 동작 클립과 섞이는 동안 들어오는 이전 클립의 이벤트는 무시한다.
     public void HandleAnimationEvent(EnemyAnimationEventType type, AnimationEvent animationEvent)
     {
@@ -130,7 +158,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         switch(type)
         {
             case EnemyAnimationEventType.Telegraph:
-                if(CurrentStep.IsParryable && !_isHitStarted) OpenParryWindow();
+                if(CurrentStep.IsParryable && !_isStepHitStarted) OpenParryWindow();
                 break;
             case EnemyAnimationEventType.HitStart:
                 PerformHit(FindWindowLength(animationEvent));
@@ -179,6 +207,8 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     {
         _stepIndex++;
         _isHitActive = false;
+        _isStepHitStarted = false;
+        _isStepParried = false;
         _movement.Stop(false);
 
         if(_stepIndex >= CurrentAttack.StepCount)
@@ -192,24 +222,30 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         _animation.PlayState(_stepHash);
     }
 
-    // 첫 HitStart 이벤트에서 패링 가능 시간을 닫고, 경직 저항을 이벤트까지 유지하는 공격이 아니면 경직 저항도 푼다.
+    // 동작의 첫 HitStart 이벤트에서 그 동작의 패링 가능 시간을 닫는다.
+    // 공격의 첫 HitStart 이벤트에서는 경직 저항을 이벤트까지 유지하는 공격이 아니면 경직 저항도 푼다.
     // 구간 판정 동작은 HitStart 이벤트마다 구간을 새로 열고 시작 시점의 타격을 바로 한다. 한 순간 판정 동작은 HitStart 이벤트마다 한 번 판정한다.
-    // 판정 중 패링당해 경직하면 경직 알림에서 공격이 끊긴다.
+    // 판정 중 패링당하면 패링 알림(OnParried)에서 경직하거나, 이어가기 동작이면 그 동작의 판정을 멈춘다. 막힌 동작은 HitStart 이벤트가 더 와도 판정하지 않는다.
     // windowLength : 이 HitStart 부터 같은 클립의 다음 HitEnd 까지의 길이(초). 없으면 -1 이다.
     private void PerformHit(float windowLength)
     {
-        bool isFirstHit = !_isHitStarted;
+        if(_isStepParried) return;
 
-        if(isFirstHit)
+        if(!_isHitStarted)
         {
 #if UNITY_EDITOR
             if(CurrentStep.IsParryable && !_isParryWindowOpen) Debug.LogWarning($"[적 공격] {name} {CurrentAttack.name} : 패링 동작인데 HitStart 전에 Telegraph 이벤트가 없어 패링할 수 없다. 준비 단계 클립에 Telegraph 이벤트를 넣는다");
 #endif
 
             _isHitStarted = true;
-            CloseParryWindow();
 
             if(!CurrentAttack.ResistUntilEvent) _state.SetAttackStaggerResistLevel(0);
+        }
+
+        if(!_isStepHitStarted)
+        {
+            _isStepHitStarted = true;
+            CloseParryWindow();
         }
 
         if(CurrentStep.Mode == EnemyAttackStep.HitMode.Instant)
@@ -393,7 +429,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     // 맞은 결과(피격 · 무적 · 완벽 회피 · 패링)는 캐릭터마다 따로 판정한다.
     //   지원 공격처럼 무적인 이전 캐릭터와 패링 중인 새 캐릭터가 함께 있어도, 새 캐릭터가 따로 판정을 받는다.
     // reaction : 이 타격으로 맞은 캐릭터의 반응. 막타면 동작의 막타 반응이다.
-    // 패링당해 공격이 끊기면 남은 캐릭터는 맞히지 않는다.
+    // 패링당해 공격이 끊기거나 이 동작이 막히면, 남은 캐릭터는 이 타격으로 맞히지 않는다.
     private void HitTargets(EnemyAttackData.HitReaction reaction)
     {
         EnemyAttackData attack = CurrentAttack;
@@ -411,7 +447,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
             _landedTargets.Add(status);
             status.TakeHit(attack, step, reaction, this);
 
-            if(!IsAttacking) return;
+            if(!IsAttacking || _isStepParried) return;
         }
     }
 
