@@ -116,17 +116,6 @@ public class PlayerAttackJudge : MonoBehaviour
         HitInRange(action, step, true, true);
     }
 
-    // 캡슐의 양 끝 구 중심. 캐릭터 앞쪽 방향으로 전체 길이만큼 뻗고, 길이가 반지름의 두 배보다 짧으면 두 점이 겹쳐 구가 된다.
-    // 디버그 기능이 같은 모양으로 범위를 그릴 때도 쓴다.
-    public void GetCapsulePoints(ActionStep step, out Vector3 start, out Vector3 end)
-    {
-        Vector3 center = transform.TransformPoint(step.HitCenter);
-        float halfSegment = Mathf.Max(0f, step.HitLength * 0.5f - step.HitRadius);
-
-        start = center - transform.forward * halfSegment;
-        end = center + transform.forward * halfSegment;
-    }
-
     // 구간 판정이 켜져 있으면 지금까지 지난 타격 시점의 타격을 한다.
     private void UpdateWindow()
     {
@@ -188,7 +177,7 @@ public class PlayerAttackJudge : MonoBehaviour
     // canReact 이면 맞은 적을 경직시키고, 한 번의 찾기에서 여러 적을 맞혀도 히트렉은 한 번만 건다.
     private bool HitInRange(ActionData action, ActionStep step, bool isImpact, bool canReact)
     {
-        int count = FindHitColliders(step);
+        int count = step.Range.Overlap(transform, _hitColliders, Physics.AllLayers);
         IEnemyTargetable comboSkillTarget = null;
         IEnemyGroggyable comboSkillGroggyable = null;
         bool hasHit = false;
@@ -215,21 +204,6 @@ public class PlayerAttackJudge : MonoBehaviour
         if(comboSkillTarget != null) ComboSelector.TryBeginChain(comboSkillTarget, comboSkillGroggyable);
 
         return hasHit;
-    }
-
-    // 동작의 판정 모양대로 판정 범위 안의 콜라이더를 찾아 버퍼에 담고, 찾은 수를 돌려준다.
-    private int FindHitColliders(ActionStep step)
-    {
-        switch(step.Shape)
-        {
-            case ActionStep.HitShape.Sphere:
-                return Physics.OverlapSphereNonAlloc(transform.TransformPoint(step.HitCenter), step.HitRadius, _hitColliders, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-            case ActionStep.HitShape.Capsule:
-                GetCapsulePoints(step, out Vector3 start, out Vector3 end);
-                return Physics.OverlapCapsuleNonAlloc(start, end, step.HitRadius, _hitColliders, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-            default:
-                return Physics.OverlapBoxNonAlloc(transform.TransformPoint(step.HitCenter), step.HitSize * 0.5f, _hitColliders, transform.rotation, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-        }
     }
 
     // 맞은 적 하나에 결과를 적용한다. 체력은 액션의 위력만큼 줄고, 에너지와 필살기 게이지를 얻는다.

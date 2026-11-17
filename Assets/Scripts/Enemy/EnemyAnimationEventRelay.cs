@@ -10,7 +10,8 @@ public class EnemyAnimationEventRelay : MonoBehaviour
     // 상태가 바뀌며 이전 클립과 섞이는 동안에는 이전 클립의 이벤트도 발생하므로,
     // 어느 Animator 상태에서 온 이벤트인지 함께 넘겨 지금 공격 단계의 이벤트만 처리하게 한다.
     private void Telegraph(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.Telegraph, animationEvent);
-    private void Hit(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.Hit, animationEvent);
+    private void HitStart(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.HitStart, animationEvent);
+    private void HitEnd(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.HitEnd, animationEvent);
     private void ResistEnd(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.ResistEnd, animationEvent);
     private void LeapStart(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.LeapStart, animationEvent);
     private void LeapLock(AnimationEvent animationEvent) => Relay(EnemyAnimationEventType.LeapLock, animationEvent);

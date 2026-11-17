@@ -408,7 +408,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Attack02
       takeName: Take 001
-      internalID: 0
+      internalID: 7400000
       firstFrame: 0
       lastFrame: 45
       wrapMode: 0
@@ -510,7 +510,7 @@ ModelImporter:
           rotationOrder: 4
       events:
       - time: 0.5005085
-        functionName: Hit
+        functionName: HitStart
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

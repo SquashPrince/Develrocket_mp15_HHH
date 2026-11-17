@@ -408,7 +408,7 @@ ModelImporter:
     - serializedVersion: 16
       name: ParryAttackReady
       takeName: Take 001
-      internalID: 0
+      internalID: 1827226128182048838
       firstFrame: 0
       lastFrame: 9
       wrapMode: 0
@@ -640,21 +640,14 @@ ModelImporter:
           rotationOrder: 4
       events:
       - time: 0.17229845
-        functionName: Hit
+        functionName: HitStart
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.34175304
-        functionName: Hit
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.50134957
-        functionName: Hit
+      - time: 0.5795892
+        functionName: HitEnd
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -808,7 +801,7 @@ ModelImporter:
         intParameter: 0
         messageOptions: 0
       - time: 0.47036624
-        functionName: Hit
+        functionName: HitStart
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

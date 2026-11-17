@@ -31,6 +31,8 @@ public class PlayerStatus : MonoBehaviour
     private float _invincibleTimer;
     private float _perfectDodgeTimer;
     private bool _isAttackInvincible;
+    // 다른 캐릭터의 필살기 연출 동안 멈춰 있는지. 히트렉과 따로 두어, 히트렉이 끝나며 배율을 되돌려도 멈춘 채로 남게 한다.
+    private bool _isFrozen;
 
     public float MaxHealth => _controller.Character.MaxHealth;
     public float MaxEnergy => _controller.Character.MaxEnergy;
@@ -65,8 +67,8 @@ public class PlayerStatus : MonoBehaviour
     // 시간으로 거는 무적(대시 · 넉백)이나 시전 중 무적 공격의 무적 중인지
     public bool IsInvincible => _invincibleTimer > 0f || _isAttackInvincible;
     public bool IsAttackInvincible => _isAttackInvincible;
-    // 캐릭터 시간 배율. 1 이면 원래 속도, 0 이면 멈춤
-    public float TimeScale => _timeScale;
+    // 캐릭터 시간 배율. 1 이면 원래 속도, 0 이면 멈춤 (히트렉 · 다른 캐릭터의 필살기 연출)
+    public float TimeScale => _isFrozen ? 0f : _timeScale;
     // 이번 프레임의 캐릭터 시간(초). Unity 프레임 시간에 캐릭터 시간 배율을 곱한 값이다.
     public float DeltaTime => Time.deltaTime * TimeScale;
     // 캐릭터 시간으로 잰 시계(초). 콤보 입력 유지처럼 "언제까지" 를 재는 데 쓴다. 배율이 0 인 동안은 흐르지 않는다.
@@ -123,6 +125,9 @@ public class PlayerStatus : MonoBehaviour
         _timeScale = 0f;
     }
 
+    // 다른 캐릭터의 필살기 연출 동안 이 캐릭터를 멈추거나 다시 움직인다. 파티가 시전자를 뺀 캐릭터에게 건다.
+    public void SetFrozen(bool isFrozen) => _isFrozen = isFrozen;
+
     // 히트렉을 끝내고, 겹친 효과와 상관없이 캐릭터 시간 배율을 원래 속도(1)로 되돌린다.
     // 시간이 다 되었을 때와, 필살기처럼 히트렉 중에 바로 원래 속도로 시작해야 하는 행동이 부른다.
     public void EndHitLag()
@@ -131,25 +136,29 @@ public class PlayerStatus : MonoBehaviour
         _timeScale = 1f;
     }
 
-    // 맞았으면 true 를 돌려준다. 완벽 회피 · 패링했거나 무적이면 무시하고 false 를 돌려준다.
-    // 판정 순서 : 완벽 회피 → 패링 → 무적 → 피격
+    // 적의 타격 한 번에 맞았을 때 부른다. 맞았으면 true 를 돌려준다. 완벽 회피 · 패링했거나 무적이면 무시하고 false 를 돌려준다.
+    // 연타 공격은 타격마다 부르므로, 한 공격 안에서도 타격마다 완벽 회피 · 패링 · 피격을 따로 판정한다.
+    // 판정 순서 : 완벽 회피 → 패링 → 무적(슬로모션 중 포함) → 피격
+    //   슬로모션 중에는 무적이라 맞지 않는다. 그 사이 다시 대시 · 회피해 완벽 회피 판정 시간에 타격이 닿으면 완벽 회피가 다시 발동한다.
+    // step : 판정한 동작. 패링 가능 여부 · 패링 경직 시간은 동작마다 다르다.
+    // reaction : 이 타격의 반응. 막타면 동작의 막타 반응이다.
     // attacker : 패링 성공을 알리고, 넉백 방향을 정할 때 위치를 쓰는 공격한 적
-    public bool TakeHit(EnemyAttackSetting attack, IEnemyParryable attacker)
+    public bool TakeHit(EnemyAttackData attack, EnemyAttackStep step, EnemyAttackData.HitReaction reaction, IEnemyParryable attacker)
     {
         if(TryPerfectDodge(attack)) return false;
-        if(_actionTrigger.TryParry(attack, attacker)) return false;
+        if(_actionTrigger.TryParry(attack, step, attacker)) return false;
 
-        if(IsInvincible)
+        if(IsInvincible || _controller.Party.SlowMotion.IsActive)
         {
 #if UNITY_EDITOR
-            Debug.Log($"[피격 무시] {attack.Name} : 무적");
+            Debug.Log($"[피격 무시] {attack.name} : 무적");
 #endif
             return false;
         }
 
         CurrentHealth = _currentHealth - attack.Power;
 
-        _controller.StartHit(attack, attacker.transform);
+        _controller.StartHit(attack, reaction, attacker.transform);
         return true;
     }
 
@@ -181,14 +190,14 @@ public class PlayerStatus : MonoBehaviour
 
     // 판정 시간 안에 완벽 회피할 수 있는 공격이 닿으면 완벽 회피로 처리하고 슬로모션을 시작한다.
     // 한 번의 대시 · 회피에서 한 번만 발동하도록 판정을 바로 닫는다. 남은 무적 동안 함께 닿은 공격은 무적으로 무시된다.
-    private bool TryPerfectDodge(EnemyAttackSetting attack)
+    private bool TryPerfectDodge(EnemyAttackData attack)
     {
         if(_perfectDodgeTimer <= 0f || !attack.CanPerfectDodge) return false;
 
         _perfectDodgeTimer = 0f;
 
 #if UNITY_EDITOR
-        Debug.Log($"[완벽 회피] {attack.Name}");
+        Debug.Log($"[완벽 회피] {attack.name}");
 #endif
 
         _controller.Party.SlowMotion.Begin(transform.position);
@@ -227,5 +236,6 @@ public class PlayerStatus : MonoBehaviour
         CurrentUltimateGauge = 0f;
         _timeScale = 1f;
         _hitLagTimer = 0f;
+        _isFrozen = false;
     }
 }

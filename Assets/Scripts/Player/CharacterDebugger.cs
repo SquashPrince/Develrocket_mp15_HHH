@@ -32,34 +32,7 @@ public class CharacterDebugger : MonoBehaviour
         if(!Application.isPlaying || _lastRangeStep == null || Time.time - _lastRangeTime > _rangeDisplayTime) return;
 
         Gizmos.color = Color.red;
-
-        switch(_lastRangeStep.Shape)
-        {
-            case ActionStep.HitShape.Sphere:
-                Gizmos.DrawWireSphere(transform.TransformPoint(_lastRangeStep.HitCenter), _lastRangeStep.HitRadius);
-                break;
-            case ActionStep.HitShape.Capsule:
-                DrawCapsule(_lastRangeStep);
-                break;
-            default:
-                Gizmos.matrix = Matrix4x4.TRS(transform.TransformPoint(_lastRangeStep.HitCenter), transform.rotation, Vector3.one);
-                Gizmos.DrawWireCube(Vector3.zero, _lastRangeStep.HitSize);
-                Gizmos.matrix = Matrix4x4.identity;
-                break;
-        }
-    }
-
-    // 캡슐은 양 끝 구와 그 사이를 잇는 선으로 그린다.
-    private void DrawCapsule(ActionStep step)
-    {
-        _judge.GetCapsulePoints(step, out Vector3 start, out Vector3 end);
-
-        Gizmos.DrawWireSphere(start, step.HitRadius);
-        Gizmos.DrawWireSphere(end, step.HitRadius);
-        Gizmos.DrawLine(start + transform.right * step.HitRadius, end + transform.right * step.HitRadius);
-        Gizmos.DrawLine(start - transform.right * step.HitRadius, end - transform.right * step.HitRadius);
-        Gizmos.DrawLine(start + transform.up * step.HitRadius, end + transform.up * step.HitRadius);
-        Gizmos.DrawLine(start - transform.up * step.HitRadius, end - transform.up * step.HitRadius);
+        _lastRangeStep.Range.DrawGizmos(transform);
     }
 
     private void CacheComponent()

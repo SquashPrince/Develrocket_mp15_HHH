@@ -2,7 +2,7 @@ using UnityEngine;
 
 // 적 한 종류의 값. 같은 종류의 적은 이 에셋 하나를 함께 쓴다.
 // 사람이 조정하는 값만 둔다. 오브젝트 참조(록온 표시 위치 · 예고 위치 · Animator 등)와 실행 중 현재값은 Prefab 에 남긴다.
-// 적 공격 설정은 적 공격 데이터 작업에서 이 에셋으로 옮긴다.
+// 이 적이 쓰는 공격은 공격 데이터 에셋 목록으로 가진다. 같은 공격을 여러 적이 함께 쓸 수 있다.
 [CreateAssetMenu(fileName = "NewEnemyData", menuName = "HHH/Enemy Data")]
 public class EnemyData : ScriptableObject
 {
@@ -63,6 +63,8 @@ public class EnemyData : ScriptableObject
     [SerializeField, Min(0f)] private float _attackRange = 2f;
     [Tooltip("공격을 마친 뒤 다음 행동까지 기다리는 시간(초, 적 전용 시간)")]
     [SerializeField, Min(0f)] private float _attackInterval = 2f;
+    [Tooltip("이 적이 쓰는 공격 목록 (적 공격 데이터 에셋)")]
+    [SerializeField] private EnemyAttackData[] _attacks;
 
     public EnemyGrade Grade => _grade;
     public Sprite Portrait => _portrait;
@@ -85,6 +87,7 @@ public class EnemyData : ScriptableObject
     public float BackStepSpeedRate => _backStepSpeedRate;
     public float AttackRange => _attackRange;
     public float AttackInterval => _attackInterval;
+    public EnemyAttackData[] Attacks => _attacks;
 
     // 이번 거리 유지 시간을 최소 ~ 최대 사이에서 무작위로 정한다. 최대가 최소보다 작으면 최소를 쓴다.
     public float PickKeepDistanceTime() => Random.Range(_keepDistanceTimeMin, Mathf.Max(_keepDistanceTimeMin, _keepDistanceTimeMax));

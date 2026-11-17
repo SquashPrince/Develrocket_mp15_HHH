@@ -28,7 +28,7 @@ public class PlayerUltimateState : PlayerState
     }
 
     // 연출 구간은 액션의 동작이 아니라 끼어들기 값이 없으므로 교체하지 않는다. 공격 단계부터는 지금 동작의 끼어들기 허용을 따른다.
-    public override bool CanSwap => _step != CUTSCENE_STEP && _trigger.UltimateAction.GetStep(_step).Allows(ActionStep.Interrupt.Swap);
+    public override bool CanSwap => _step != CUTSCENE_STEP && _trigger.AllowsSwap(_trigger.UltimateAction.GetStep(_step));
 
     public override void Enter()
     {
@@ -40,6 +40,8 @@ public class PlayerUltimateState : PlayerState
         // 슬로모션은 끝날 때 적 배속을 1로 되돌리므로, 먼저 끝낸 뒤 적을 멈춰야 연출 도중 적이 다시 움직이지 않는다.
         Controller.EndSlowMotion();
         EnemyTime.Scale = 0f;
+        // 필드에 남아 있는 다른 파티원(지원 공격 · 퇴장 중인 캐릭터)도 적과 같이 연출 구간 동안 멈춘다.
+        Controller.Party.SetOthersFrozen(Controller, true);
 
         // 히트렉으로 멈춘 순간 발동해도 필살기는 원래 속도로 시작하고, 연출이 끝나면 플레이어는 원래 속도다.
         Controller.Status.EndHitLag();
@@ -59,11 +61,11 @@ public class PlayerUltimateState : PlayerState
         Controller.Animation.Play(CUTSCENE_ANIMATION);
     }
 
-    // 슬로모션 중 발동했더라도 적은 원래 속도로 돌아온다. 공격 단계 시작 때 이미 돌렸지만, 어떤 경우에도 멈춘 채 남지 않도록 나갈 때도 돌린다.
+    // 슬로모션 중 발동했더라도 적 · 다른 파티원은 원래 속도로 돌아온다. 공격 단계 시작 때 이미 돌렸지만, 어떤 경우에도 멈춘 채 남지 않도록 나갈 때도 돌린다.
     public override void Exit()
     {
         Controller.AttackJudge.EndHit();
-        EnemyTime.Scale = 1f;
+        ResumeOthers();
         Controller.Status.SetAttackInvincible(false);
     }
 
@@ -96,8 +98,8 @@ public class PlayerUltimateState : PlayerState
     {
         Controller.AttackJudge.EndHit();
 
-        // 연출이 끝나고 첫 공격 단계가 시작되면 적 시간이 다시 흐른다.
-        if(_step == CUTSCENE_STEP) EnemyTime.Scale = 1f;
+        // 연출이 끝나고 첫 공격 단계가 시작되면 적 시간과 다른 파티원 시간이 다시 흐른다.
+        if(_step == CUTSCENE_STEP) ResumeOthers();
 
         _step++;
 
@@ -128,5 +130,12 @@ public class PlayerUltimateState : PlayerState
         _advanceTimer += Controller.DeltaTime;
 
         return _advanceTimer < _advanceDuration ? _advanceVelocity : Vector3.zero;
+    }
+
+    // 연출 구간에 멈췄던 적과 다른 파티원을 원래 속도로 돌린다.
+    private void ResumeOthers()
+    {
+        EnemyTime.Scale = 1f;
+        Controller.Party.SetOthersFrozen(Controller, false);
     }
 }

@@ -35,3 +35,10 @@ MonoBehaviour:
   _backStepSpeedRate: 0.35
   _attackRange: 5
   _attackInterval: 0.5
+  _attacks:
+  - {fileID: 11400000, guid: 0a558762325205a40a1bfa790a933784, type: 2}
+  - {fileID: 11400000, guid: 7ac771ad86ae0e84aa1eba11d1924d3a, type: 2}
+  - {fileID: 11400000, guid: e982e038895e64548922cfb4dbd7d272, type: 2}
+  - {fileID: 11400000, guid: d5d0c1ad13088314d9c0edd350c532fe, type: 2}
+  - {fileID: 11400000, guid: 4fbc3257e92d03c41a421a9ee118ce1b, type: 2}
+  - {fileID: 11400000, guid: b9aca38489d9df7479454d447beae4d0, type: 2}

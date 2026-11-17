@@ -26,10 +26,13 @@ MonoBehaviour:
     _hitSize: {x: 0.5, y: 2, z: 2}
     _hitRadius: 1
     _hitLength: 4
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
     _advanceDistance: 3.5
     _advanceDuration: 0.15
     _fadeTime: 0.2
-    _interrupts: 6
+    _interrupts: 14
   _energyGain: 0.143
   _ultimateGaugeGain: 2.08
   _power: 10

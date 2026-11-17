@@ -104,6 +104,9 @@ public class PlayerController : MonoBehaviour
         else _isSwapOutReserved = true;
     }
 
+    // 예약된 퇴장을 지운다. 연속 패링 패턴 중 필드에 남아 있던 이 캐릭터를 다시 조작해 패링할 때 부른다.
+    public void CancelSwapOut() => _isSwapOutReserved = false;
+
     // 퇴장이 끝나면 캐릭터를 꺼 대기 상태로 만든다. 꺼진 캐릭터는 적에게 맞거나 대상으로 잡히지 않는다.
     public void Standby() => gameObject.SetActive(false);
 
@@ -200,11 +203,12 @@ public class PlayerController : MonoBehaviour
     }
 
     // 적 공격에 맞으면 어떤 상태에서든 피격 상태로 넘어간다. 진행 중이던 공격 · 차지는 끊고, 이후 콤보는 1단부터 시작한다.
-    public void StartHit(EnemyAttackSetting attack, Transform attacker)
+    // reaction : 이 타격의 반응. 연타의 막타는 공격의 반응과 다를 수 있다.
+    public void StartHit(EnemyAttackData attack, EnemyAttackData.HitReaction reaction, Transform attacker)
     {
         _isCharging = false;
         _comboExpireTime = 0f;
-        _hitState.Setup(attack, attacker);
+        _hitState.Setup(attack, reaction, attacker);
         _stateMachine.ChangeState(_hitState);
     }
 
