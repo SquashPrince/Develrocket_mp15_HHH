@@ -93,6 +93,15 @@ public class PlayerParty : MonoBehaviour
         _quickSupportTimer = _common.QuickSupportInputTime;
     }
 
+    // 필살기 연출 동안 시전한 캐릭터를 뺀 파티원을 멈추거나 다시 움직인다. 필드에 없는 캐릭터에 걸어도 영향이 없다.
+    public void SetOthersFrozen(PlayerController caster, bool isFrozen)
+    {
+        for(int i = 0; i < _members.Length; i++)
+        {
+            if(_members[i] != caster) _members[i].Status.SetFrozen(isFrozen);
+        }
+    }
+
     private void JoinMembers()
     {
         for(int i = 0; i < _members.Length; i++)

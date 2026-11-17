@@ -4,20 +4,19 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 // 적 하나의 체력 · 그로기 막대(Slider 0 ~ 1). 일반 적 머리 위 바와 화면 위쪽 보스 바가 함께 쓴다.
-// 대상을 비워 두면 부모에서 찾는다. 일반 적 Prefab 의 자식으로 붙이면 따로 연결하지 않아도 된다.
-// 보스 바는 보스(EnemyController)가 등장할 때 직접 만들고 대상을 넘겨준다(SetTarget).
+// 적 바는 적(EnemyController)이 등장할 때 그 적이 연결한 HUD 아래에 직접 만들고 대상을 넘겨준다(SetTarget).
+//   보스 바는 화면 Canvas, 머리 위 바는 적 몸에 붙은 월드 공간 Canvas 아래에 만들어진다.
+//   대상은 넘겨받을 때만 정한다. 만들어지는 순간에는 자식(잔상 막대 등)이 아직 준비되지 않았을 수 있어, 그때 그리면 오류가 나기 때문이다.
 // 체력 · 그로기 게이지는 적 기능의 알림이 올 때만 다시 그린다.
 // 그로기가 아닐 때는 쌓인 그로기 게이지를 퍼센트 숫자로도 보여주고, 그로기 중에는 숫자를 숨긴다.
 // 그로기 중에는 그로기 막대가 남은 그로기 시간을 보여주므로, 그로기 중에만 매 프레임 읽는다.
 // 그로기 중 막대 채움 색은 콤보 스킬 연계가 남았는지에 따라 두 색 중 하나로 덮는다. 연계를 쓴 순간을 알리는 알림이 없어, 그로기 중 매 프레임 읽을 때 함께 확인한다.
 // 체력 막대 뒤의 잔상 막대는 맞아서 줄어든 체력만 잔상으로 남긴다. 처음 그릴 때는 잔상 없이 바로 맞춘다.
-// 대상이 처치되면 막대 묶음을 숨긴다.
+// 대상이 처치되거나, 콤보 스킬 선택으로 전투 HUD 를 숨기는 동안(BattleHudVisibility) 막대 묶음을 숨긴다.
 // 초상화 : 초상화 Image 를 연결한 막대(보스 바)만 적 데이터의 초상화를 띄운다. 비워 두면 초상화 없이 동작한다 (일반 적 머리 위 바).
 public class EnemyGauge : MonoBehaviour
 {
-    [Tooltip("[선택] 보여줄 적. 비워 두면 부모에서 찾는다 (일반 적 머리 위 바). 보스 바는 보스가 넘겨주므로 비워 둔다")]
-    [SerializeField] private EnemyState _target;
-    [Tooltip("처치되면 숨길 막대 묶음")]
+    [Tooltip("처치되거나 콤보 스킬 선택 중일 때 숨길 막대 묶음")]
     [SerializeField] private GameObject _root;
     [Tooltip("[선택] 적 데이터의 초상화를 띄울 Image. 비워 두면 초상화 없이 동작한다")]
     [SerializeField] private Image _portraitImage;
@@ -33,12 +32,21 @@ public class EnemyGauge : MonoBehaviour
     [Tooltip("그로기 중, 콤보 스킬 연계를 모두 썼거나 이어받을 대기 캐릭터가 없을 때 그로기 막대 채움 영역에 덮어 띄울 색")]
     [SerializeField] private Color _comboUsedFillColor = new Color(0.5f, 0.5f, 0.5f);
 
+    // 보여줄 적. 바를 만든 적이 넘겨준다.
+    private EnemyState _target;
     // 그로기 막대 채움 영역의 이미지와 원래 색
     private Image _groggyFillImage;
     private Color _normalFillColor;
 
-    private void Awake() => CacheComponent();
-    // 보스 바는 만들어지며 처음 켜질 때 아직 대상이 없으므로, 대상을 넘겨받을 때(SetTarget) 구독한다.
+    // HUD 숨김 알림은 바가 있는 동안 내내 받는다. 막대 묶음이 바 자신이면 숨길 때 이 컴포넌트도 꺼지므로, 켜짐 · 꺼짐에 묶으면 다시 보여 달라는 알림을 받지 못한다.
+    private void Awake()
+    {
+        CacheComponent();
+        BindHudVisibilityEvent();
+    }
+
+    private void OnDestroy() => UnbindHudVisibilityEvent();
+    // 만들어지며 처음 켜질 때는 아직 대상이 없으므로 넘겨받을 때(SetTarget) 구독한다. 다시 켜질 때는 대상이 있어 여기서 구독한다.
     private void OnEnable()
     {
         if(_target != null) BindEnemyEvent();
@@ -105,13 +113,17 @@ public class EnemyGauge : MonoBehaviour
         if(_portraitImage != null) _portraitImage.sprite = _target.GetComponent<EnemyController>().Data.Portrait;
     }
 
-    private void Hide() => _root.SetActive(false);
+    // 처치된 적이거나 전투 HUD 를 숨기는 중(콤보 스킬 선택)이면 막대 묶음을 숨긴다. 대상을 넘겨받기 전에는 그리지 않는다.
+    private void RefreshVisibility()
+    {
+        if(_target != null) _root.SetActive(_target.IsAlive && BattleHudVisibility.IsVisible);
+    }
 
     // 구독할 때 현재 값으로 한 번 그린다.
     private void BindEnemyEvent()
     {
         _target.Damaged += OnDamaged;
-        _target.Died += Hide;
+        _target.Died += RefreshVisibility;
         _target.GroggyGaugeChanged += RefreshGroggyGauge;
         _target.GroggyEntered += RefreshGroggyState;
         _target.Recovered += RefreshGroggyState;
@@ -120,7 +132,7 @@ public class EnemyGauge : MonoBehaviour
 
     private void RefreshAll()
     {
-        _root.SetActive(_target.IsAlive);
+        RefreshVisibility();
         RefreshPortrait();
         RefreshHealth(true);
         RefreshGroggyState();
@@ -129,16 +141,24 @@ public class EnemyGauge : MonoBehaviour
     private void UnbindEnemyEvent()
     {
         _target.Damaged -= OnDamaged;
-        _target.Died -= Hide;
+        _target.Died -= RefreshVisibility;
         _target.GroggyGaugeChanged -= RefreshGroggyGauge;
         _target.GroggyEntered -= RefreshGroggyState;
         _target.Recovered -= RefreshGroggyState;
     }
 
+    private void BindHudVisibilityEvent()
+    {
+        BattleHudVisibility.Changed += RefreshVisibility;
+    }
+
+    private void UnbindHudVisibilityEvent()
+    {
+        BattleHudVisibility.Changed -= RefreshVisibility;
+    }
+
     private void CacheComponent()
     {
-        if(_target == null) _target = GetComponentInParent<EnemyState>();
-
         _groggyFillImage = _groggySlider.fillRect.GetComponent<Image>();
         _normalFillColor = _groggyFillImage.color;
     }

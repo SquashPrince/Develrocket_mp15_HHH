@@ -31,6 +31,8 @@ public class PlayerStatus : MonoBehaviour
     private float _invincibleTimer;
     private float _perfectDodgeTimer;
     private bool _isAttackInvincible;
+    // 다른 캐릭터의 필살기 연출 동안 멈춰 있는지. 히트렉과 따로 두어, 히트렉이 끝나며 배율을 되돌려도 멈춘 채로 남게 한다.
+    private bool _isFrozen;
 
     public float MaxHealth => _controller.Character.MaxHealth;
     public float MaxEnergy => _controller.Character.MaxEnergy;
@@ -65,8 +67,8 @@ public class PlayerStatus : MonoBehaviour
     // 시간으로 거는 무적(대시 · 넉백)이나 시전 중 무적 공격의 무적 중인지
     public bool IsInvincible => _invincibleTimer > 0f || _isAttackInvincible;
     public bool IsAttackInvincible => _isAttackInvincible;
-    // 캐릭터 시간 배율. 1 이면 원래 속도, 0 이면 멈춤
-    public float TimeScale => _timeScale;
+    // 캐릭터 시간 배율. 1 이면 원래 속도, 0 이면 멈춤 (히트렉 · 다른 캐릭터의 필살기 연출)
+    public float TimeScale => _isFrozen ? 0f : _timeScale;
     // 이번 프레임의 캐릭터 시간(초). Unity 프레임 시간에 캐릭터 시간 배율을 곱한 값이다.
     public float DeltaTime => Time.deltaTime * TimeScale;
     // 캐릭터 시간으로 잰 시계(초). 콤보 입력 유지처럼 "언제까지" 를 재는 데 쓴다. 배율이 0 인 동안은 흐르지 않는다.
@@ -122,6 +124,9 @@ public class PlayerStatus : MonoBehaviour
         _hitLagTimer = Mathf.Max(_hitLagTimer, duration);
         _timeScale = 0f;
     }
+
+    // 다른 캐릭터의 필살기 연출 동안 이 캐릭터를 멈추거나 다시 움직인다. 파티가 시전자를 뺀 캐릭터에게 건다.
+    public void SetFrozen(bool isFrozen) => _isFrozen = isFrozen;
 
     // 히트렉을 끝내고, 겹친 효과와 상관없이 캐릭터 시간 배율을 원래 속도(1)로 되돌린다.
     // 시간이 다 되었을 때와, 필살기처럼 히트렉 중에 바로 원래 속도로 시작해야 하는 행동이 부른다.
@@ -227,5 +232,6 @@ public class PlayerStatus : MonoBehaviour
         CurrentUltimateGauge = 0f;
         _timeScale = 1f;
         _hitLagTimer = 0f;
+        _isFrozen = false;
     }
 }

@@ -12,6 +12,8 @@ using UnityEngine.UI;
 // 필살기 숫자는 게이지 값이 단계 기준을 넘을 때마다 단계 색으로 바뀌고, 단계가 오르는 순간 잠깐 커졌다 돌아온다.
 // 단계 기준은 게이지 값 그대로(예 : 1000)라, 화면에 보이는 숫자와 같은 기준으로 정한다.
 // 맡은 캐릭터가 바뀌거나 처음 그릴 때는 그 값의 단계 색만 칠하고 강조하지 않는다. 강조 연출은 실제 시간으로 흐른다.
+// 에너지 : 특수 스킬을 쓸 만큼 에너지가 찼으면 막대 채움 색을 스킬 사용 가능 색으로 덮는다. 버튼 HUD 의 스킬 아이콘과 같은 기준이다.
+//   [선택] 눈금을 연결하면 맡은 캐릭터의 특수 스킬 에너지 요구량 위치에 놓는다. 캐릭터마다 요구량이 달라 맡은 캐릭터가 바뀔 때 다시 놓는다.
 public class CharacterGauge : MonoBehaviour
 {
     // 필살기 숫자 단계 하나. 게이지 값이 기준 이상이면 이 단계다.
@@ -34,6 +36,12 @@ public class CharacterGauge : MonoBehaviour
     [Tooltip("[선택] 필살기 게이지 현재 값을 보여줄 글자. 대기 캐릭터 칸처럼 보이지 않을 칸은 비워 둔다")]
     [SerializeField] private TMP_Text _ultimateGaugeText;
 
+    [Header("에너지")]
+    [Tooltip("특수 스킬을 쓸 만큼 에너지가 찼을 때 에너지 막대 채움 영역에 덮어 띄울 색. 모자라면 원래 색으로 돌아간다")]
+    [SerializeField] private Color _skillReadyFillColor = new Color(1f, 0.85f, 0.2f);
+    [Tooltip("[선택] 특수 스킬 에너지 요구량 위치에 놓을 눈금. 막대 가로 길이를 가득 채운 오브젝트(Fill Area 등)의 자식으로 둔다")]
+    [SerializeField] private RectTransform _energyCostMarker;
+
     [Header("필살기 숫자 단계")]
     [Tooltip("[선택] 필살기 숫자 단계 목록. 기준 값이 낮은 단계부터 차례로 둔다. 비워 두면 글자 색을 바꾸지 않는다")]
     [SerializeField] private UltimateGaugeTier[] _ultimateTiers;
@@ -44,12 +52,18 @@ public class CharacterGauge : MonoBehaviour
 
     private PlayerController _character;
     private PlayerStatus _status;
+    // 에너지 막대 채움 영역의 이미지와 원래 색
+    private Image _energyFillImage;
+    private Color _energyBaseFillColor;
     // 지금 보여주는 필살기 숫자 단계 번호. 단계 목록에서 기준을 넘은 마지막 단계이며, 어느 단계도 넘지 않았으면 -1 이다.
     private int _ultimateTier = -1;
     // 필살기 숫자의 원래 색 · 크기. 어느 단계도 넘지 않았을 때와 강조가 끝났을 때 쓴다.
     private Color _ultimateTextBaseColor;
     private Vector3 _ultimateTextBaseScale;
     private float _tierUpTimer;
+
+    // 맡은 캐릭터의 특수 스킬 에너지 요구량
+    private float SkillEnergyCost => _character.Character.SpecialSkill.EnergyCost;
 
     private void Awake() => CacheComponent();
     private void OnEnable() => BindStatusEvent();
@@ -92,6 +106,19 @@ public class CharacterGauge : MonoBehaviour
         if(_status == null) return;
 
         _energySlider.value = _status.CurrentEnergy / _status.MaxEnergy;
+        _energyFillImage.color = _status.CurrentEnergy >= SkillEnergyCost ? _skillReadyFillColor : _energyBaseFillColor;
+    }
+
+    // 눈금을 맡은 캐릭터의 특수 스킬 에너지 요구량 위치(막대 비율)에 놓는다.
+    private void RefreshEnergyCostMarker()
+    {
+        if(_energyCostMarker == null) return;
+
+        float ratio = Mathf.Clamp01(SkillEnergyCost / _status.MaxEnergy);
+
+        _energyCostMarker.anchorMin = new Vector2(ratio, _energyCostMarker.anchorMin.y);
+        _energyCostMarker.anchorMax = new Vector2(ratio, _energyCostMarker.anchorMax.y);
+        _energyCostMarker.anchoredPosition = new Vector2(0f, _energyCostMarker.anchoredPosition.y);
     }
 
     private void OnUltimateGaugeChanged() => RefreshUltimateGauge(false);
@@ -103,7 +130,7 @@ public class CharacterGauge : MonoBehaviour
     {
         if(_ultimateGaugeText == null || _character != _character.Party.Controlled) return;
 
-        _ultimateGaugeText.text = Mathf.FloorToInt(_status.CurrentUltimateGauge).ToString();
+        _ultimateGaugeText.text = Mathf.FloorToInt(_status.CurrentUltimateGauge).ToString() + "<size=40>PTS</size>";
         RefreshUltimateTier(isSnap);
     }
 
@@ -151,6 +178,7 @@ public class CharacterGauge : MonoBehaviour
         RefreshHealth(true);
         RefreshUltimateGauge(true);
         RefreshEnergy();
+        RefreshEnergyCostMarker();
     }
 
     // 구독할 때 현재 값으로 한 번 그려, 알림이 오기 전에도 막대가 맞게 보이게 한다.
@@ -173,6 +201,9 @@ public class CharacterGauge : MonoBehaviour
 
     private void CacheComponent()
     {
+        _energyFillImage = _energySlider.fillRect.GetComponent<Image>();
+        _energyBaseFillColor = _energyFillImage.color;
+
         if(_ultimateGaugeText == null) return;
 
         _ultimateTextBaseColor = _ultimateGaugeText.color;
