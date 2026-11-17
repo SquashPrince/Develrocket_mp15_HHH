@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: ParryTeleport
   m_EditorClassIdentifier: Assembly-CSharp::TeleportOption
   _side: 1
-  _sideAngleMin: 25
-  _sideAngleMax: 45
+  _sideAngleMin: 20
+  _sideAngleMax: 30

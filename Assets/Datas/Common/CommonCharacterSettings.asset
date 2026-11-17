@@ -35,7 +35,7 @@ MonoBehaviour:
   _slowMotionEnemyTimeScale: 0.25
   _slowMotionMarkerPrefab: {fileID: 4365308044123951882, guid: ab2927bfddf64e34c8a41ba60305abf6, type: 3}
   _parryReadyTime: 1
-  _parryReactDistance: 5
+  _parryReactDistance: 3
   _parryReactTime: 1
   _parryTelegraphPrefab: {fileID: 362406810184043471, guid: df2ca08c06889d340b79104967a64347, type: 3}
   _unparryableTelegraphPrefab: {fileID: 362406810184043471, guid: 6d03919f2fbae284db26337abab6114e, type: 3}
@@ -49,7 +49,7 @@ MonoBehaviour:
   _standbyEnergyRegenRate: 1
   _comboSelectTime: 3
   _comboSelectTimeScale: 0.15
-  _groggyHoldTime: 2
+  _groggyHoldTime: 3
   _ultimateTargetSearchRange: 15
   _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _dashAction: {fileID: 504704208043311331, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
