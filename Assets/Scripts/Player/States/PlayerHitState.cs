@@ -67,6 +67,9 @@ public class PlayerHitState : PlayerState
         Controller.Party.OpenQuickSupport(Controller, _attacker);
         Controller.Status.BeginInvincible(_attack.KnockbackDuration + _attack.GetUpTime);
         Controller.Animation.Play(KNOCKBACK_ANIMATION);
+
+        // 화면의 주인공이 아닌 캐릭터(퇴장 중인 이전 캐릭터 등)가 넉백될 때는 연출하지 않는다.
+        if(Controller.Party.Controlled == Controller) BattleFeedback.Raise(BattleFeedback.Moment.Knockback);
     }
 
     // 넉백 중 대시로 끊으면 남은 넉백 무적을 지운다. 대시 무적은 대시 상태가 들어오면서 다시 건다.

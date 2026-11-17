@@ -72,6 +72,7 @@ public class PlayerParryState : PlayerState
         _timer = 0f;
         _hasChaseInput = false;
         PlayStep(REACT_STEP);
+        BattleFeedback.Raise(BattleFeedback.Moment.ParrySuccess);
     }
 
     public override void Tick()

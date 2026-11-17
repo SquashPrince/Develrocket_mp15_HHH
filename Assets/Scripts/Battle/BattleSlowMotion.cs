@@ -30,6 +30,8 @@ public class BattleSlowMotion : MonoBehaviour
 #if UNITY_EDITOR
         Debug.Log($"[슬로모션 시작] 적 배속 {Common.SlowMotionEnemyTimeScale} / {Common.SlowMotionDuration}초");
 #endif
+
+        BattleFeedback.Raise(BattleFeedback.Moment.PerfectDodge);
     }
 
     // 슬로모션 중일 때만 끝낸다. 공격 시작 · 컴포넌트 비활성화 때 부른다.
