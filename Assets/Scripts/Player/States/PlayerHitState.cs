@@ -22,7 +22,7 @@ public class PlayerHitState : PlayerState
         GetUp
     }
 
-    private EnemyAttackSetting _attack;
+    private EnemyAttackData _attack;
     private Transform _attacker;
     private Vector3 _awayDirection;
     private Phase _phase;
@@ -33,7 +33,7 @@ public class PlayerHitState : PlayerState
     }
 
     // attacker : 공격한 적. 이 적의 반대 방향으로 밀려나고, 넉백이면 파티가 빠른 지원으로 이 적 앞에 다음 캐릭터를 보낸다.
-    public void Setup(EnemyAttackSetting attack, Transform attacker)
+    public void Setup(EnemyAttackData attack, Transform attacker)
     {
         _attack = attack;
         _attacker = attacker;
@@ -53,10 +53,10 @@ public class PlayerHitState : PlayerState
         Controller.HorizontalVelocity = Vector3.zero;
 
         // 피격과 큰 피격은 같은 경직 흐름을 쓰고 모션만 다르다.
-        if(_attack.Reaction != EnemyAttackSetting.HitReaction.Knockback)
+        if(_attack.Reaction != EnemyAttackData.HitReaction.Knockback)
         {
             _phase = Phase.Stun;
-            Controller.Animation.Play(_attack.Reaction == EnemyAttackSetting.HitReaction.HeavyHit ? HEAVY_HIT_ANIMATION : HIT_ANIMATION);
+            Controller.Animation.Play(_attack.Reaction == EnemyAttackData.HitReaction.HeavyHit ? HEAVY_HIT_ANIMATION : HIT_ANIMATION);
             return;
         }
 

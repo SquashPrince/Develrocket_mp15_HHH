@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Earth Golem
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   _grade: 0
+  _portrait: {fileID: 0}
   _maxHealth: 784
   _canDie: 1
   _corpseDuration: 2
@@ -34,3 +35,8 @@ MonoBehaviour:
   _backStepSpeedRate: 0.75
   _attackRange: 2
   _attackInterval: 2
+  _attacks:
+  - {fileID: 11400000, guid: 73a2789a139fc4840adda169f22b6733, type: 2}
+  - {fileID: 11400000, guid: b94737e5415f9c345b6228ca915817c6, type: 2}
+  - {fileID: 11400000, guid: 3cc429e31cf311f4cb7f47b374c5eeb8, type: 2}
+  - {fileID: 11400000, guid: fe40af2289196544face30c290c3bb7a, type: 2}

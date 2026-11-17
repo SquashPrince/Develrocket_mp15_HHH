@@ -111,7 +111,7 @@ ModelImporter:
           rotationOrder: 4
       events:
       - time: 0.45219746
-        functionName: Hit
+        functionName: HitStart
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

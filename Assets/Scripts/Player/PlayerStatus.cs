@@ -138,16 +138,17 @@ public class PlayerStatus : MonoBehaviour
 
     // 맞았으면 true 를 돌려준다. 완벽 회피 · 패링했거나 무적이면 무시하고 false 를 돌려준다.
     // 판정 순서 : 완벽 회피 → 패링 → 무적 → 피격
+    // step : 판정한 동작. 패링 가능 여부 · 패링 경직 시간은 동작마다 다르다.
     // attacker : 패링 성공을 알리고, 넉백 방향을 정할 때 위치를 쓰는 공격한 적
-    public bool TakeHit(EnemyAttackSetting attack, IEnemyParryable attacker)
+    public bool TakeHit(EnemyAttackData attack, EnemyAttackStep step, IEnemyParryable attacker)
     {
         if(TryPerfectDodge(attack)) return false;
-        if(_actionTrigger.TryParry(attack, attacker)) return false;
+        if(_actionTrigger.TryParry(attack, step, attacker)) return false;
 
         if(IsInvincible)
         {
 #if UNITY_EDITOR
-            Debug.Log($"[피격 무시] {attack.Name} : 무적");
+            Debug.Log($"[피격 무시] {attack.name} : 무적");
 #endif
             return false;
         }
@@ -186,14 +187,14 @@ public class PlayerStatus : MonoBehaviour
 
     // 판정 시간 안에 완벽 회피할 수 있는 공격이 닿으면 완벽 회피로 처리하고 슬로모션을 시작한다.
     // 한 번의 대시 · 회피에서 한 번만 발동하도록 판정을 바로 닫는다. 남은 무적 동안 함께 닿은 공격은 무적으로 무시된다.
-    private bool TryPerfectDodge(EnemyAttackSetting attack)
+    private bool TryPerfectDodge(EnemyAttackData attack)
     {
         if(_perfectDodgeTimer <= 0f || !attack.CanPerfectDodge) return false;
 
         _perfectDodgeTimer = 0f;
 
 #if UNITY_EDITOR
-        Debug.Log($"[완벽 회피] {attack.Name}");
+        Debug.Log($"[완벽 회피] {attack.name}");
 #endif
 
         _controller.Party.SlowMotion.Begin(transform.position);

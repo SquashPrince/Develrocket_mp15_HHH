@@ -200,7 +200,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // 적 공격에 맞으면 어떤 상태에서든 피격 상태로 넘어간다. 진행 중이던 공격 · 차지는 끊고, 이후 콤보는 1단부터 시작한다.
-    public void StartHit(EnemyAttackSetting attack, Transform attacker)
+    public void StartHit(EnemyAttackData attack, Transform attacker)
     {
         _isCharging = false;
         _comboExpireTime = 0f;

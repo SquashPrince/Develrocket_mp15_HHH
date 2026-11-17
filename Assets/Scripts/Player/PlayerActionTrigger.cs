@@ -42,18 +42,18 @@ public class PlayerActionTrigger : MonoBehaviour
     // 패링은 현재 캐릭터가 직접 하지 않는다. 파티 전투에서 교체 키로 나온 캐릭터가 패링한다(지원 공격).
     private void Update() => TryStartUltimate();
 
-    // 패링 준비 · 반응 중 노란 공격이 닿으면 패링 성공으로 처리하고 true 를 돌려준다. 상태 기능이 맞았을 때 부른다.
+    // 패링 준비 · 반응 중 노란 동작(패링할 수 있는 동작)이 닿으면 패링 성공으로 처리하고 true 를 돌려준다. 상태 기능이 맞았을 때 부른다.
     // 패링한 적은 경직되고 패링 액션의 그로기 값만큼 그로기가 쌓이며, 패링 추격은 이 적을 노린다.
-    public bool TryParry(EnemyAttackSetting attack, IEnemyParryable attacker)
+    public bool TryParry(EnemyAttackData attack, EnemyAttackStep step, IEnemyParryable attacker)
     {
-        if(!_parryState.IsActive || !attack.IsParryable) return false;
+        if(!_parryState.IsActive || !step.IsParryable) return false;
 
 #if UNITY_EDITOR
-        Debug.Log($"[패링 성공] {attack.Name}");
+        Debug.Log($"[패링 성공] {attack.name}");
 #endif
 
         // 패링 성공 경직은 패링당한 공격의 저항 레벨을 경직 레벨로 쓴다. 레벨이 같으면 경직되므로 패링 성공은 항상 경직을 건다.
-        if(attacker.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(attack.ParryStaggerTime, attack.StaggerResistLevel);
+        if(attacker.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(step.ParryStaggerTime, attack.StaggerResistLevel);
 
         // 이 패링으로 그로기에 들어갔으면 콤보 스킬 선택에 알려 그로기 정지 시간을 걸게 한다.
         if(attacker.transform.TryGetComponent(out IEnemyGroggyable groggyable) && groggyable.AddGroggy(ParryAction.GroggyGain)) _controller.Party.ComboSelector.OnGroggyEntered(groggyable);
