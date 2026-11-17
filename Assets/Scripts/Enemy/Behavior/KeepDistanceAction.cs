@@ -41,7 +41,7 @@ public partial class KeepDistanceAction : Action
 
     private EnemyMovement _movement;
     private EnemyAnimation _animation;
-    private EnemyBehaviorSetting _setting;
+    private EnemyData _data;
     private float _timer;
     // 1 이면 위에서 볼 때 시계 방향, -1 이면 반시계 방향으로 돈다.
     private float _strafeSign;
@@ -53,8 +53,8 @@ public partial class KeepDistanceAction : Action
 
         _movement = GameObject.GetComponent<EnemyMovement>();
         _animation = GameObject.GetComponent<EnemyAnimation>();
-        _setting = GameObject.GetComponent<EnemyBehaviorSetting>();
-        _timer = _setting.PickKeepDistanceTime();
+        _data = GameObject.GetComponent<EnemyController>().Data;
+        _timer = _data.PickKeepDistanceTime();
         _strafeSign = Random.value < 0.5f ? 1f : -1f;
         _mode = PickMode();
 
@@ -83,8 +83,8 @@ public partial class KeepDistanceAction : Action
     {
         float roll = Random.value;
 
-        if(roll < _setting.BackStepChance) return _animation.TryPlayBackStep() ? Mode.BackStep : Mode.Strafe;
-        if(roll < _setting.BackStepChance + _setting.IdleChance) return Mode.Idle;
+        if(roll < _data.BackStepChance) return _animation.TryPlayBackStep() ? Mode.BackStep : Mode.Strafe;
+        if(roll < _data.BackStepChance + _data.IdleChance) return Mode.Idle;
 
         return Mode.Strafe;
     }
@@ -106,7 +106,7 @@ public partial class KeepDistanceAction : Action
 
         Vector3 awayDirection = GetDirectionFromTarget();
         Vector3 destination = GameObject.transform.position + awayDirection * BACK_STEP_LOOK_AHEAD;
-        float speed = _movement.MoveSpeed * _setting.BackStepSpeedRate;
+        float speed = _movement.MoveSpeed * _data.BackStepSpeedRate;
 
         _movement.MoveTo(destination, speed, Target.Value, false);
         return Status.Running;
@@ -123,9 +123,9 @@ public partial class KeepDistanceAction : Action
         fromTarget.y = 0f;
 
         Vector3 circleDirection = Quaternion.Euler(0f, STRAFE_LEAD_ANGLE * _strafeSign, 0f) * GetDirectionFromTarget();
-        Vector3 destination = targetPosition + circleDirection * _setting.KeepDistance;
-        bool isTooFar = fromTarget.magnitude > _setting.KeepDistance + _setting.KeepDistanceTolerance;
-        float speed = isTooFar ? _movement.MoveSpeed : _setting.StrafeSpeed;
+        Vector3 destination = targetPosition + circleDirection * _data.KeepDistance;
+        bool isTooFar = fromTarget.magnitude > _data.KeepDistance + _data.KeepDistanceTolerance;
+        float speed = isTooFar ? _movement.MoveSpeed : _data.StrafeSpeed;
 
         _movement.MoveTo(destination, speed, Target.Value);
         return Status.Running;

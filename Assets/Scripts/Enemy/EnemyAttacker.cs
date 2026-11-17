@@ -12,7 +12,7 @@ using UnityEngine;
 // 공격 선택 : 쿨타임 중이거나 대상이 사용 최소 거리보다 가까운 공격은 빼고, 가중치(기본 가중치 + 증가량 × 마지막으로 쓴 뒤 다른 공격이 선택된 횟수)에 비례해 무작위로 고른다.
 //   사거리 밖 공격만 요청받으면(대상이 공격 사거리 밖) 사거리 밖에서 쓸 수 있는 공격 중에서만 고른다.
 // 모션은 루트 모션 없이 제자리에서 재생한다. 도약 · 돌진 공격은 LeapStart · LeapLock · LeapEnd 이벤트를 도약 기능(EnemyLeap)에 넘겨 목표 지점으로 옮긴다.
-[RequireComponent(typeof(EnemyHealth), typeof(EnemyReaction), typeof(EnemyAnimation))]
+[RequireComponent(typeof(EnemyState), typeof(EnemyAnimation))]
 public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 {
     // 한 번의 판정에서 검사할 수 있는 최대 콜라이더 수
@@ -30,8 +30,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
     // 이번 공격에 이미 맞은 캐릭터. 공격 한 번에 캐릭터마다 한 번만 맞힌다.
     private readonly List<PlayerStatus> _landedTargets = new List<PlayerStatus>();
-    private EnemyHealth _health;
-    private EnemyReaction _reaction;
+    private EnemyState _state;
     private EnemyAnimation _animation;
     // 도약 공격이 있는 적만 가진다. 없으면 null 이다.
     private EnemyLeap _leap;
@@ -100,7 +99,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         _landedTargets.Clear();
         WasLastAttackInterrupted = false;
 
-        _reaction.SetAttackStaggerResistLevel(CurrentAttack.StaggerResistLevel);
+        _state.SetAttackStaggerResistLevel(CurrentAttack.StaggerResistLevel);
 
 #if UNITY_EDITOR
         Debug.Log($"[적 공격] {name} {CurrentAttack.Name}");
@@ -124,7 +123,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
                 PerformHit();
                 break;
             case EnemyAnimationEventType.ResistEnd:
-                if(CurrentAttack.ResistUntilEvent) _reaction.SetAttackStaggerResistLevel(0);
+                if(CurrentAttack.ResistUntilEvent) _state.SetAttackStaggerResistLevel(0);
                 break;
             case EnemyAnimationEventType.LeapStart:
                 StartLeap(animationEvent);
@@ -189,7 +188,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
             _isHitStarted = true;
             CloseParryWindow();
 
-            if(!CurrentAttack.ResistUntilEvent) _reaction.SetAttackStaggerResistLevel(0);
+            if(!CurrentAttack.ResistUntilEvent) _state.SetAttackStaggerResistLevel(0);
         }
 
         if(CurrentAttack.IsContinuousHit) _isHitActive = true;
@@ -203,7 +202,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
         CloseParryWindow();
         if(_leap != null) _leap.Stop();
-        _reaction.SetAttackStaggerResistLevel(0);
+        _state.SetAttackStaggerResistLevel(0);
         _cooldownTimers[_attackIndex] = CurrentAttack.Cooldown;
         _attackIndex = -1;
         _isHitActive = false;
@@ -335,8 +334,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
     private void CacheComponent()
     {
-        _health = GetComponent<EnemyHealth>();
-        _reaction = GetComponent<EnemyReaction>();
+        _state = GetComponent<EnemyState>();
         _animation = GetComponent<EnemyAnimation>();
         _leap = GetComponent<EnemyLeap>();
     }
@@ -349,15 +347,15 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
     private void BindReactionEvent()
     {
-        _health.Died += OnInterrupted;
-        _reaction.Staggered += OnInterrupted;
-        _reaction.GroggyEntered += OnInterrupted;
+        _state.Died += OnInterrupted;
+        _state.Staggered += OnInterrupted;
+        _state.GroggyEntered += OnInterrupted;
     }
 
     private void UnbindReactionEvent()
     {
-        _health.Died -= OnInterrupted;
-        _reaction.Staggered -= OnInterrupted;
-        _reaction.GroggyEntered -= OnInterrupted;
+        _state.Died -= OnInterrupted;
+        _state.Staggered -= OnInterrupted;
+        _state.GroggyEntered -= OnInterrupted;
     }
 }

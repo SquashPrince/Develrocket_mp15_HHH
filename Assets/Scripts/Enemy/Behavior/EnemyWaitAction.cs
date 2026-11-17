@@ -18,7 +18,7 @@ public partial class EnemyWaitAction : Action
 
     protected override Status OnStart()
     {
-        _timer = GameObject.GetComponent<EnemyBehaviorSetting>().AttackInterval;
+        _timer = GameObject.GetComponent<EnemyController>().Data.AttackInterval;
 
         return OnUpdate();
     }

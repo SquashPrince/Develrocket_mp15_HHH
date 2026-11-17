@@ -247,7 +247,7 @@ public class PlayerAttackJudge : MonoBehaviour
         // 이 타격으로 처치된 적은 경직 · 콤보 스킬 대상이 아니다. 그로기 적이 강타로 처치되면 콤보 스킬보다 처치가 먼저다.
         if(!enemy.IsAlive) return;
 
-        // 경직 · 그로기 기능(EnemyReaction)이 없는 적은 경직 · 그로기 · 콤보 스킬 대상이 아니다.
+        // 경직 · 그로기 인터페이스가 없는 적은 경직 · 그로기 · 콤보 스킬 대상이 아니다.
         if(canReact && action.StaggerTime > 0f && enemy.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(action.StaggerTime, action.StaggerLevel);
 
         bool hasGroggy = enemy.transform.TryGetComponent(out IEnemyGroggyable groggyable);
