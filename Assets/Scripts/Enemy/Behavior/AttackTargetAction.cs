@@ -19,7 +19,7 @@ public partial class AttackTargetAction : Action
     [SerializeReference] public BlackboardVariable<Transform> Target;
 
     private EnemyMovement _movement;
-    private EnemyBehaviorSetting _setting;
+    private EnemyData _data;
     private EnemyAttacker _attacker;
     private bool _hasStartedAttack;
 
@@ -28,7 +28,7 @@ public partial class AttackTargetAction : Action
         if(Target.Value == null) return Status.Failure;
 
         _movement = GameObject.GetComponent<EnemyMovement>();
-        _setting = GameObject.GetComponent<EnemyBehaviorSetting>();
+        _data = GameObject.GetComponent<EnemyController>().Data;
         _attacker = GameObject.GetComponent<EnemyAttacker>();
         _hasStartedAttack = false;
 
@@ -49,9 +49,9 @@ public partial class AttackTargetAction : Action
         Vector3 toTarget = Target.Value.position - GameObject.transform.position;
         toTarget.y = 0f;
 
-        if(toTarget.sqrMagnitude > _setting.AttackRange * _setting.AttackRange)
+        if(toTarget.sqrMagnitude > _data.AttackRange * _data.AttackRange)
         {
-            _movement.MoveTo(Target.Value.position, _movement.MoveSpeed * _setting.RunSpeedRate);
+            _movement.MoveTo(Target.Value.position, _movement.MoveSpeed * _data.RunSpeedRate);
             return Status.Running;
         }
 

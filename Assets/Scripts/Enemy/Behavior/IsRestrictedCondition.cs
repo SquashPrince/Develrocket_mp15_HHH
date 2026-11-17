@@ -12,14 +12,12 @@ using Unity.Properties;
     id: "be2c42cd95884df4ae61a443c2141f04")]
 public partial class IsRestrictedCondition : Condition
 {
-    private EnemyHealth _health;
-    private EnemyReaction _reaction;
+    private EnemyState _state;
 
     public override void OnStart()
     {
-        _health = GameObject.GetComponent<EnemyHealth>();
-        _reaction = GameObject.GetComponent<EnemyReaction>();
+        _state = GameObject.GetComponent<EnemyState>();
     }
 
-    public override bool IsTrue() => !_health.IsAlive || _reaction.IsRestricted;
+    public override bool IsTrue() => !_state.IsAlive || _state.IsRestricted;
 }

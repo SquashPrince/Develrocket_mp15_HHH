@@ -18,14 +18,14 @@ public partial class ChaseTargetAction : Action
     [SerializeReference] public BlackboardVariable<Transform> Target;
 
     private EnemyMovement _movement;
-    private EnemyBehaviorSetting _setting;
+    private EnemyData _data;
 
     protected override Status OnStart()
     {
         if(Target.Value == null) return Status.Failure;
 
         _movement = GameObject.GetComponent<EnemyMovement>();
-        _setting = GameObject.GetComponent<EnemyBehaviorSetting>();
+        _data = GameObject.GetComponent<EnemyController>().Data;
 
         return OnUpdate();
     }
@@ -35,9 +35,9 @@ public partial class ChaseTargetAction : Action
         Vector3 toTarget = Target.Value.position - GameObject.transform.position;
         toTarget.y = 0f;
 
-        if(toTarget.sqrMagnitude <= _setting.KeepDistance * _setting.KeepDistance) return Status.Success;
+        if(toTarget.sqrMagnitude <= _data.KeepDistance * _data.KeepDistance) return Status.Success;
 
-        _movement.MoveTo(Target.Value.position, _movement.MoveSpeed * _setting.RunSpeedRate);
+        _movement.MoveTo(Target.Value.position, _movement.MoveSpeed * _data.RunSpeedRate);
         return Status.Running;
     }
 

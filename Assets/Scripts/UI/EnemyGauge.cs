@@ -14,7 +14,7 @@ using UnityEngine.UI;
 public class EnemyGauge : MonoBehaviour
 {
     [Tooltip("[선택] 보여줄 적. 비워 두면 부모에서 찾는다 (일반 적 머리 위 바)")]
-    [SerializeField] private EnemyHealth _target;
+    [SerializeField] private EnemyState _target;
     [Tooltip("처치되면 숨길 막대 묶음")]
     [SerializeField] private GameObject _root;
     [SerializeField] private Slider _healthSlider;
@@ -29,7 +29,6 @@ public class EnemyGauge : MonoBehaviour
     [Tooltip("그로기 중, 콤보 스킬 연계를 모두 썼거나 이어받을 대기 캐릭터가 없을 때 그로기 막대 채움 영역에 덮어 띄울 색")]
     [SerializeField] private Color _comboUsedFillColor = new Color(0.5f, 0.5f, 0.5f);
 
-    private EnemyReaction _reaction;
     // 그로기 막대 채움 영역의 이미지와 원래 색
     private Image _groggyFillImage;
     private Color _normalFillColor;
@@ -58,9 +57,9 @@ public class EnemyGauge : MonoBehaviour
     // 항상 두 자리(00 ~ 99)로 보여준다. 100 이 되면 그로기에 들어가 숫자가 숨겨진다.
     private void RefreshGroggyGauge()
     {
-        if(_reaction.IsGroggy) return;
+        if(_target.IsGroggy) return;
 
-        float ratio = _reaction.CurrentGroggy / _reaction.MaxGroggy;
+        float ratio = _target.CurrentGroggy / _target.MaxGroggy;
         _groggySlider.value = ratio;
 
         if(_groggyPercentText != null) _groggyPercentText.text = Mathf.FloorToInt(ratio * 100f).ToString("00");
@@ -69,17 +68,17 @@ public class EnemyGauge : MonoBehaviour
     // 그로기 중에만 남은 시간과 남은 연계 여부에 따른 막대 색을 그린다.
     private void RefreshGroggyTime()
     {
-        if(!_reaction.IsGroggy) return;
+        if(!_target.IsGroggy) return;
 
-        _groggySlider.value = _reaction.GroggyTimeRatio;
-        _groggyFillImage.color = _reaction.HasRemainingComboChain ? _comboReadyFillColor : _comboUsedFillColor;
+        _groggySlider.value = _target.GroggyTimeRatio;
+        _groggyFillImage.color = _target.HasRemainingComboChain ? _comboReadyFillColor : _comboUsedFillColor;
     }
 
     // 그로기에 들어가거나 풀릴 때 퍼센트 숫자를 켜고 끄고, 막대를 그 상태에 맞게 다시 그린다.
     private void RefreshGroggyState()
     {
-        if(_groggyPercentText != null) _groggyPercentText.gameObject.SetActive(!_reaction.IsGroggy);
-        if(!_reaction.IsGroggy) _groggyFillImage.color = _normalFillColor;
+        if(_groggyPercentText != null) _groggyPercentText.gameObject.SetActive(!_target.IsGroggy);
+        if(!_target.IsGroggy) _groggyFillImage.color = _normalFillColor;
 
         RefreshGroggyGauge();
         RefreshGroggyTime();
@@ -92,9 +91,9 @@ public class EnemyGauge : MonoBehaviour
     {
         _target.Damaged += OnDamaged;
         _target.Died += Hide;
-        _reaction.GroggyGaugeChanged += RefreshGroggyGauge;
-        _reaction.GroggyEntered += RefreshGroggyState;
-        _reaction.Recovered += RefreshGroggyState;
+        _target.GroggyGaugeChanged += RefreshGroggyGauge;
+        _target.GroggyEntered += RefreshGroggyState;
+        _target.Recovered += RefreshGroggyState;
         RefreshAll();
     }
 
@@ -109,16 +108,15 @@ public class EnemyGauge : MonoBehaviour
     {
         _target.Damaged -= OnDamaged;
         _target.Died -= Hide;
-        _reaction.GroggyGaugeChanged -= RefreshGroggyGauge;
-        _reaction.GroggyEntered -= RefreshGroggyState;
-        _reaction.Recovered -= RefreshGroggyState;
+        _target.GroggyGaugeChanged -= RefreshGroggyGauge;
+        _target.GroggyEntered -= RefreshGroggyState;
+        _target.Recovered -= RefreshGroggyState;
     }
 
     private void CacheComponent()
     {
-        if(_target == null) _target = GetComponentInParent<EnemyHealth>();
+        if(_target == null) _target = GetComponentInParent<EnemyState>();
 
-        _reaction = _target.GetComponent<EnemyReaction>();
         _groggyFillImage = _groggySlider.fillRect.GetComponent<Image>();
         _normalFillColor = _groggyFillImage.color;
     }

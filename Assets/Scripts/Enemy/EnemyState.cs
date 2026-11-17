@@ -19,6 +19,9 @@ using UnityEngine;
 //   멈춘 동안 남은 그로기 시간은 그대로이고, 다시 흐를 때 이어서 줄어든다.
 // 경직 · 그로기 · 시체 시간은 적 전용 시간으로 흘러 슬로모션 · 필살기 연출 동안 느려지거나 멈춘다.
 // 적의 공격 기능은 알림을 받아 진행 중인 공격을 끊고, 경직 · 그로기 동안에는 공격하지 않는다.
+// 실행 순서를 앞당기는 이유 : 적 체력 막대(EnemyGauge)는 켜질 때(OnEnable) 최대 체력 등을 읽는다.
+//   Unity 는 오브젝트마다 Awake · OnEnable 을 이어서 부르므로, 자식인 막대가 먼저 돌면 이 컴포넌트가 데이터를 읽기 전이라 오류가 난다.
+[DefaultExecutionOrder(-10)]
 [RequireComponent(typeof(EnemyController))]
 public class EnemyState : MonoBehaviour
 {

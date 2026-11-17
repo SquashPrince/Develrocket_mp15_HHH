@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65e1e9906d46e4f49b34491fe60ca842, type: 3}
+  m_Name: Black Knight
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  _grade: 2
+  _maxHealth: 10000
+  _canDie: 1
+  _corpseDuration: 3
+  _baseStaggerResistLevel: 2
+  _maxGroggy: 2500
+  _groggyTime: 12
+  _maxComboChain: 3
+  _moveSpeed: 4.5
+  _turnSpeed: 540
+  _repathDistance: 0.3
+  _runSpeedRate: 1.5
+  _keepDistance: 5
+  _keepDistanceTolerance: 1
+  _strafeSpeed: 1
+  _keepDistanceTimeMin: 2
+  _keepDistanceTimeMax: 3
+  _backStepChance: 0.3
+  _idleChance: 0.25
+  _backStepSpeedRate: 0.35
+  _attackRange: 5
+  _attackInterval: 0.5

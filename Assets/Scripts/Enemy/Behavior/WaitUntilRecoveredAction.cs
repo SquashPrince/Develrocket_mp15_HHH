@@ -15,16 +15,14 @@ using Action = Unity.Behavior.Action;
     id: "c284431997ec441e937a4ad9702b4dfb")]
 public partial class WaitUntilRecoveredAction : Action
 {
-    private EnemyHealth _health;
-    private EnemyReaction _reaction;
+    private EnemyState _state;
 
     protected override Status OnStart()
     {
-        _health = GameObject.GetComponent<EnemyHealth>();
-        _reaction = GameObject.GetComponent<EnemyReaction>();
+        _state = GameObject.GetComponent<EnemyState>();
 
         return OnUpdate();
     }
 
-    protected override Status OnUpdate() => !_health.IsAlive || _reaction.IsRestricted ? Status.Running : Status.Success;
+    protected override Status OnUpdate() => !_state.IsAlive || _state.IsRestricted ? Status.Running : Status.Success;
 }

@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65e1e9906d46e4f49b34491fe60ca842, type: 3}
+  m_Name: Earth Golem
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  _grade: 0
+  _maxHealth: 784
+  _canDie: 1
+  _corpseDuration: 2
+  _baseStaggerResistLevel: 0
+  _maxGroggy: 500
+  _groggyTime: 12
+  _maxComboChain: 1
+  _moveSpeed: 3
+  _turnSpeed: 540
+  _repathDistance: 0.3
+  _runSpeedRate: 1.5
+  _keepDistance: 2
+  _keepDistanceTolerance: 4
+  _strafeSpeed: 1.25
+  _keepDistanceTimeMin: 1.5
+  _keepDistanceTimeMax: 3
+  _backStepChance: 0.3
+  _idleChance: 0.5
+  _backStepSpeedRate: 0.75
+  _attackRange: 2
+  _attackInterval: 2
