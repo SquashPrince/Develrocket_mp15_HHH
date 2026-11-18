@@ -153,6 +153,7 @@ public class ComboSkillSelector : MonoBehaviour
         _party.SlowMotion.End();
         _groggyable.SetGroggyPaused(true);
         Time.timeScale = Common.ComboSelectTimeScale;
+        BattleFeedback.Raise(BattleFeedback.Moment.ComboSelectOpened);
     }
 
     // 고른 캐릭터가 콤보 스킬로 들어오고 연계 1회를 쓴다. 시전을 시작할 때마다(마지막 연계 포함) 그로기 정지 시간을 건다.
@@ -201,6 +202,7 @@ public class ComboSkillSelector : MonoBehaviour
         _closedFrame = Time.frameCount;
         Time.timeScale = 1f;
         _groggyable.SetGroggyPaused(false);
+        BattleFeedback.Raise(BattleFeedback.Moment.ComboSelectClosed);
     }
 
     private void EndChain()

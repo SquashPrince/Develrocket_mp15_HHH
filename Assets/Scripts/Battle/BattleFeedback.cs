@@ -28,7 +28,11 @@ public static class BattleFeedback
         // 조작 중인 캐릭터가 회피를 시작함 (방향 입력 없이 뒤로)
         Dodge,
         // 조작 중인 캐릭터의 발이 땅에 닿음. 걷기 · 달리기 클립의 이벤트가 알린다
-        Footstep
+        Footstep,
+        // 콤보 스킬 캐릭터 선택 화면이 열림 (연계마다)
+        ComboSelectOpened,
+        // 콤보 스킬 캐릭터 선택 화면이 닫힘 (고르기 · 취소 · 시간 초과 · 꺼짐)
+        ComboSelectClosed
     }
 
     // 순간과 그 순간의 충격 방향을 알린다. 구독하는 쪽은 꺼질 때 반드시 해제한다.
