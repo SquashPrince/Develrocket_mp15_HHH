@@ -9,7 +9,8 @@ using UnityEngine.Serialization;
 // 적 바 : 등장할 때 자기 적 바 Prefab 을 HUD 아래에 만들고 자신을 대상으로 넘겨준다. 등급으로 나누지 않고, 어떤 HUD 를 연결했는지에 따라 보이는 방식이 정해진다.
 //   보스는 화면 Canvas(보스 바), 일반 · 엘리트는 자기 몸에 붙인 월드 공간 Canvas(머리 위 바)를 HUD 로 연결한다.
 //   지금은 오브젝트가 켜지는 순간을 등장으로 본다. 다시 켜져도 이미 만든 바를 그대로 쓴다.
-//   화면 Canvas 는 씬 오브젝트라, 씬에 놓은 보스면 Inspector 에서 연결한다. 이후 웨이브 관리 기능이 보스를 만들 때는 그쪽이 넘겨준다.
+//   화면 Canvas 는 씬 오브젝트라, 씬에 놓은 보스면 Inspector 에서 연결한다. 실행 중 생성한 보스는 생성한 쪽이 SetHudRoot 로 넘겨준다.
+//   HUD 가 비어 있으면 켜질 때 바를 만들지 않고, HUD 를 넘겨받는 순간 만든다. Prefab 에는 씬의 Canvas 를 연결할 수 없기 때문이다.
 [RequireComponent(typeof(EnemyState))]
 public class EnemyController : MonoBehaviour, IEnemyTargetable, IEnemyDamageable, IEnemyStaggerable, IEnemyGroggyable
 {
@@ -53,10 +54,17 @@ public class EnemyController : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     public void HoldGroggy(float duration) => _state.HoldGroggy(duration);
     public void SetGroggyPaused(bool isPaused) => _state.SetGroggyPaused(isPaused);
 
-    // 등장할 때 적 바를 HUD 아래에 한 번 만들고 자신을 대상으로 넘겨준다.
+    // 실행 중 생성한 보스에 생성한 쪽이 화면 Canvas 를 넘겨준다. 넘겨받는 순간 적 바를 만든다.
+    public void SetHudRoot(Transform hudRoot)
+    {
+        _hudRoot = hudRoot;
+        ShowGauge();
+    }
+
+    // 등장할 때 적 바를 HUD 아래에 한 번 만들고 자신을 대상으로 넘겨준다. HUD 를 아직 받지 않았으면 만들지 않는다.
     private void ShowGauge()
     {
-        if(_gauge != null) return;
+        if(_gauge != null || _hudRoot == null) return;
 
         _gauge = Instantiate(_gaugePrefab, _hudRoot);
         _gauge.SetTarget(_state);

@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
     private PlayerHitState _hitState;
     private PlayerSwapInState _swapInState;
     private PlayerSwapOutState _swapOutState;
+    private PlayerDownedState _downedState;
     // 이 캐릭터가 속한 파티. 파티가 Awake 에서 알려 준다.
     private PlayerParty _party;
     private float _dashCooldownTimer;
@@ -104,8 +105,14 @@ public class PlayerController : MonoBehaviour
         else _isSwapOutReserved = true;
     }
 
-    // 예약된 퇴장을 지운다. 연속 패링 패턴 중 필드에 남아 있던 이 캐릭터를 다시 조작해 패링할 때 부른다.
-    public void CancelSwapOut() => _isSwapOutReserved = false;
+    // 예약된 퇴장을 지운다. 이미 퇴장 중이면 이동 상태로 되돌린다.
+    // 필드에 남아 있던 이 캐릭터를 다시 조작할 때(연속 패링 · 콤보 스킬 · 조작 캐릭터가 쓰러짐) 부른다.
+    public void CancelSwapOut()
+    {
+        _isSwapOutReserved = false;
+
+        if(_stateMachine.CurrentState == _swapOutState) EnterLocomotion(false);
+    }
 
     // 퇴장이 끝나면 캐릭터를 꺼 대기 상태로 만든다. 꺼진 캐릭터는 적에게 맞거나 대상으로 잡히지 않는다.
     public void Standby() => gameObject.SetActive(false);
@@ -210,6 +217,15 @@ public class PlayerController : MonoBehaviour
         _comboExpireTime = 0f;
         _hitState.Setup(attack, reaction, attacker);
         _stateMachine.ChangeState(_hitState);
+    }
+
+    // 체력이 0 이 되면 어떤 상태에서든 쓰러짐 상태로 넘어간다. 진행 중이던 차지 · 퇴장 예약은 지운다.
+    public void StartDowned()
+    {
+        _isCharging = false;
+        _comboExpireTime = 0f;
+        _isSwapOutReserved = false;
+        _stateMachine.ChangeState(_downedState);
     }
 
     // 공격 동작이 끝난 시점에 다음 단계와, 다음 단계로 이어갈 수 있는 마감 시각을 정한다. 마지막 단계 다음은 1단이다.
@@ -375,6 +391,7 @@ public class PlayerController : MonoBehaviour
         _hitState = new PlayerHitState(this);
         _swapInState = new PlayerSwapInState(this);
         _swapOutState = new PlayerSwapOutState(this);
+        _downedState = new PlayerDownedState(this);
         _dashStack = MAX_DASH_STACK;
 
         EnterLocomotion(false);

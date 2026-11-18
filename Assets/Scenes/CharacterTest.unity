@@ -2333,7 +2333,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlowMotionScreenEffect
   _party: {fileID: 1781024354}
   _fadeInTime: 0.1
-  _fadeOutTime: 0.3
+  _fadeOutTime: 0.25
 --- !u!1 &582530194
 GameObject:
   m_ObjectHideFlags: 0

@@ -56,7 +56,9 @@ public class EnemyMovement : MonoBehaviour
         if(!_isMoving) return;
 
         _isMoving = false;
-        _agent.ResetPath();
+
+        // 에디터 정지 · 씬 전환으로 적이 사라질 때 Agent 가 먼저 꺼진 뒤 행동 그래프가 끝나며 부를 수 있다. 꺼진 Agent 는 경로를 지울 수 없다.
+        if(_agent.isOnNavMesh) _agent.ResetPath();
 
         if(playsIdle) _animation.SetMoving(false);
     }

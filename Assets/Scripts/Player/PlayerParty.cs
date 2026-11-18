@@ -25,7 +25,12 @@ using UnityEngine;
 //                     선택 중에는 교체 키 · 캐릭터 입력을 막는다.
 // 대기 : 필드에 없는 캐릭터는 꺼 둔다. 꺼진 오브젝트는 적에게 맞거나 대상으로 잡히지 않는다.
 //        대기 캐릭터의 에너지는 파티가 초당 회복량 × 대기 회복 배율로 채운다.
-// 적의 공격 대상 : 시작할 때와 교체할 때 씬의 적 행동 그래프의 Target 을 조작 중인 캐릭터로 바꾼다.
+// 쓰러짐 : 체력이 0 이 된 캐릭터는 쓰러짐 모션이 끝나면 꺼지고, 교체 · 콤보 스킬 후보 · 대기 에너지 회복에서 빠진다.
+//          조작 중인 캐릭터가 쓰러지면 다음 순서의 살아 있는 대기 캐릭터가 그 자리로 교체 입장한다.
+//          대기 캐릭터가 없고 필드에 퇴장 중인 캐릭터만 살아 있으면 퇴장을 취소하고 그 캐릭터를 조작한다.
+//          살아 있는 캐릭터가 없으면 전멸을 알린다. 혼자 남으면 연속 패링 패턴 중에도 패링할 수 없다.
+// 적의 공격 대상 : 시작할 때와 교체할 때 등록된 적 행동 그래프의 Target 을 조작 중인 캐릭터로 바꾼다.
+//   씬에 미리 놓인 적은 파티가 깨어날 때 한 번 찾아 등록하고, 실행 중 생성되는 적은 생성한 쪽이 등록한다.
 //   적은 공격을 시작할 때 대상을 따로 저장하므로, 진행 중인 공격은 이전 캐릭터의 위치로 끝까지 시전하고 다음 공격부터 새 캐릭터를 노린다.
 [RequireComponent(typeof(BattleSlowMotion), typeof(PlayerLockOn), typeof(ParryTelegraphView))]
 [RequireComponent(typeof(ComboSkillSelector))]
@@ -47,6 +52,8 @@ public class PlayerParty : MonoBehaviour
     private readonly Dictionary<IEnemyParryable, bool> _parryableAtOpen = new Dictionary<IEnemyParryable, bool>();
     // 이번 패링 가능 시간에 이미 패링을 시작한 적. 예고 하나에 캐릭터 하나만 패링하게 한다. 패링 가능 시간이 닫히면 지운다.
     private readonly HashSet<IEnemyParryable> _claimedParryAttackers = new HashSet<IEnemyParryable>();
+    // 공격 대상을 받을 적 행동 그래프. 처치되어 꺼진 적도 남겨 둔다. 꺼진 그래프에 값을 넣어도 문제없다.
+    private readonly List<BehaviorGraphAgent> _enemyAgents = new List<BehaviorGraphAgent>();
     // 빠른 지원 : 넉백된 캐릭터와 그 캐릭터를 넉백시킨 적. 입력 시간이 지나거나 쓰면 비운다.
     private PlayerController _quickSupportSource;
     private Transform _quickSupportTarget;
@@ -56,6 +63,8 @@ public class PlayerParty : MonoBehaviour
     private float _lastSwapTime = float.NegativeInfinity;
     // 처음 조작하지 않는 캐릭터들을 껐는지
     private bool _isStandbyReady;
+    // 결과 화면이 떠 입력을 잠갔는지. 씬을 다시 불러오면 풀린다.
+    private bool _isInputLocked;
 
     public CommonCharacterSettings Common => _common;
     public Camera MainCamera => _mainCamera;
@@ -66,17 +75,20 @@ public class PlayerParty : MonoBehaviour
     public PlayerLockOn LockOn { get; private set; }
     // 교체할 수 있는 대기 캐릭터가 있는지. 없으면 지원 공격(교체 패링)을 할 수 없어 적의 패링 공격 예고가 패링 불가로 뜬다.
     public bool HasStandby => FindStandbyIndex(NEXT) >= 0;
-    // 콤보 스킬을 이어받을 파티원(조작 캐릭터 말고)이 있는지. 필드에 나와 있어도(연속 패링 · 퇴장 중) 이어받을 수 있다.
-    // 플레이어 캐릭터에는 아직 사망이 없어 조작 캐릭터를 뺀 모든 파티원이 해당한다. 사망이 생기면 살아 있는 파티원만 센다.
-    public bool HasComboMember => _members.Length > 1;
+    // 콤보 스킬을 이어받을 살아 있는 파티원(조작 캐릭터 말고)이 있는지. 필드에 나와 있어도(연속 패링 · 퇴장 중) 이어받을 수 있다.
+    public bool HasComboMember => CountAliveMembers() > 1;
     // 지금 교체 키로 패링할 수 있는지. 대기 캐릭터가 있거나, 적이 연속 패링 패턴 중이면(필드의 파티원이 다시 패링) true 다.
-    public bool CanParry => HasStandby || ParryWindow.IsChainActive;
+    // 살아 있는 캐릭터가 혼자면 연속 패링 패턴 중에도 패링할 수 없다.
+    public bool CanParry => HasStandby || ParryWindow.IsChainActive && CountAliveMembers() > 1;
     public ComboSkillSelector ComboSelector { get; private set; }
-    // 콤보 스킬 캐릭터 선택 중이라 플레이어 입력(교체 · 캐릭터 행동 · 록온)을 막는지
-    public bool IsInputBlocked => ComboSelector.IsBlockingInput;
+    // 플레이어 입력(교체 · 캐릭터 행동 · 록온)을 막는지. 콤보 스킬 캐릭터 선택 중이거나, 결과 화면이 떠 입력을 잠갔을 때다.
+    public bool IsInputBlocked => _isInputLocked || ComboSelector.IsBlockingInput;
 
     // 조작 중인 캐릭터가 바뀌면 알린다. 시작할 때도 첫 캐릭터로 한 번 알린다. 카메라가 따라갈 대상을 바꾸는 데 쓴다.
     public event Action<PlayerController> ControlledChanged;
+    // 마지막 살아 있는 캐릭터의 쓰러짐 모션이 끝나면 알린다. 게임 흐름이 실패를 처리하는 데 쓴다.
+    // Unity.Behavior 에도 Action 이 있어 System 을 붙여 구분한다.
+    public event System.Action Wiped;
 
     // 캐릭터 기능은 Start 부터 공통 설정을 읽는다. 그래서 캐릭터의 Start 보다 먼저 도는 Awake 에서 파티를 알려 준다.
     private void Awake()
@@ -137,6 +149,66 @@ public class PlayerParty : MonoBehaviour
         }
     }
 
+    // 결과 화면이 뜨면 게임 흐름이 부른다. 화면의 버튼을 누르는 클릭이 공격 입력으로 들어가지 않게 한다.
+    public void LockInput() => _isInputLocked = true;
+
+    // 모든 캐릭터를 point 위치 · 방향으로 옮긴다. 보스전 재도전으로 씬을 다시 불러왔을 때 시작하며 부른다.
+    // CharacterController 가 켜져 있으면 위치를 직접 바꿔도 덮어쓰므로 잠깐 끄고 옮긴다.
+    public void PlaceAt(Transform point)
+    {
+        for(int i = 0; i < _members.Length; i++)
+        {
+            CharacterController body = _members[i].Body;
+
+            body.enabled = false;
+            _members[i].transform.SetPositionAndRotation(point.position, point.rotation);
+            body.enabled = true;
+        }
+    }
+
+    // 실행 중 생성한 적을 등록하고 조작 중인 캐릭터를 공격 대상으로 준다. 이후 교체할 때마다 새 캐릭터로 바꿔 준다.
+    public void RegisterEnemy(BehaviorGraphAgent agent)
+    {
+        _enemyAgents.Add(agent);
+        agent.SetVariableValue(ENEMY_TARGET_VARIABLE, Controlled.transform);
+    }
+
+    // 캐릭터의 쓰러짐 모션이 끝나면 쓰러짐 상태가 부른다. 그 캐릭터를 끄고, 조작 중이던 캐릭터면 다음 살아 있는 캐릭터로 넘긴다.
+    // 퇴장 중에 쓰러진 이전 캐릭터는 끄기만 한다.
+    public void OnMemberDowned(PlayerController member)
+    {
+        member.Standby();
+
+        if(member != Controlled) return;
+
+        int standbyIndex = FindStandbyIndex(NEXT);
+
+        if(standbyIndex >= 0)
+        {
+            PlayerController next = _members[standbyIndex];
+
+            PlaceNext(member, next);
+            next.SwapIn();
+            SetControlled(standbyIndex);
+            return;
+        }
+
+        int fieldIndex = FindAliveIndex(NEXT);
+
+        if(fieldIndex >= 0)
+        {
+            _members[fieldIndex].CancelSwapOut();
+            SetControlled(fieldIndex);
+            return;
+        }
+
+#if UNITY_EDITOR
+        Debug.Log("[파티 전멸]");
+#endif
+
+        Wiped?.Invoke();
+    }
+
     private void JoinMembers()
     {
         for(int i = 0; i < _members.Length; i++)
@@ -169,7 +241,7 @@ public class PlayerParty : MonoBehaviour
         {
             PlayerController member = _members[i];
 
-            if(member.gameObject.activeSelf) continue;
+            if(member.gameObject.activeSelf || member.Status.IsDowned) continue;
 
             member.Status.AddEnergy(member.Character.EnergyRegenPerSecond * rate);
         }
@@ -227,21 +299,23 @@ public class PlayerParty : MonoBehaviour
         FinishSwap(previous, nextIndex);
     }
 
-    // 연속 패링 패턴 중 대기 캐릭터가 없을 때, 누른 방향 바로 옆의 파티원이 필드에 있어도(퇴장 중 포함) 다시 조작해 패링한다.
-    // 파티원이 한 명이면 조작 중인 캐릭터가 다시 패링한다. 패링을 시작하면 그 파티원의 퇴장 예약을 지운다.
+    // 연속 패링 패턴 중 대기 캐릭터가 없을 때, 누른 방향으로 가장 가까운 살아 있는 파티원이 필드에 있어도(퇴장 중 포함) 다시 조작해 패링한다.
+    // 살아 있는 캐릭터가 혼자면 패링하지 않는다. 패링을 시작하면 그 파티원의 퇴장 예약을 지운다.
     private void TryChainParry(int direction)
     {
         if(!ParryWindow.IsChainActive) return;
 
-        int nextIndex = (_controlledIndex + direction + _members.Length) % _members.Length;
+        int nextIndex = FindAliveIndex(direction);
+
+        if(nextIndex < 0) return;
+
         PlayerController previous = Controlled;
         PlayerController next = _members[nextIndex];
 
         if(!next.ActionTrigger.TryStartSupportParry()) return;
 
         next.CancelSwapOut();
-
-        if(next != previous) FinishSwap(previous, nextIndex);
+        FinishSwap(previous, nextIndex);
     }
 
     // 콤보 스킬 선택에서 고른 캐릭터를 콤보 스킬로 들여보낸다. 교체처럼 이전 캐릭터 자리에 꺼내 놓고 조작 캐릭터로 바꾼다.
@@ -265,7 +339,7 @@ public class PlayerParty : MonoBehaviour
         FinishSwap(previous, Array.IndexOf(_members, next));
     }
 
-    // 조작 중인 캐릭터에서 isNext 쪽으로 한 칸씩 가며, used 에 없는 캐릭터를 찾는다. 없으면 null 이다.
+    // 조작 중인 캐릭터에서 isNext 쪽으로 한 칸씩 가며, used 에 없는 살아 있는 캐릭터를 찾는다. 없으면 null 이다.
     // 콤보 스킬 선택이 이번 연계에서 아직 쓰지 않은 후보를 고를 때 쓴다. 필드에 나와 있는 파티원도 후보다. (HasComboMember 와 같은 기준)
     public PlayerController FindComboCandidate(bool isNext, HashSet<PlayerController> used)
     {
@@ -275,7 +349,7 @@ public class PlayerParty : MonoBehaviour
         {
             PlayerController member = _members[(_controlledIndex + direction * step + _members.Length) % _members.Length];
 
-            if(!used.Contains(member)) return member;
+            if(!used.Contains(member) && !member.Status.IsDowned) return member;
         }
 
         return null;
@@ -318,17 +392,43 @@ public class PlayerParty : MonoBehaviour
         next.SwapIn();
     }
 
-    // 조작 중인 캐릭터에서 direction 쪽으로 한 칸씩 가며 꺼져 있는(대기) 캐릭터를 찾는다. 없으면 -1 이다.
+    // 조작 중인 캐릭터에서 direction 쪽으로 한 칸씩 가며 꺼져 있는(대기) 살아 있는 캐릭터를 찾는다. 없으면 -1 이다.
+    // 쓰러진 캐릭터도 꺼져 있으므로 쓰러짐 여부를 함께 본다.
     private int FindStandbyIndex(int direction)
     {
         for(int step = 1; step < _members.Length; step++)
         {
             int index = (_controlledIndex + direction * step + _members.Length) % _members.Length;
 
-            if(!_members[index].gameObject.activeSelf) return index;
+            if(!_members[index].gameObject.activeSelf && !_members[index].Status.IsDowned) return index;
         }
 
         return -1;
+    }
+
+    // 조작 중인 캐릭터에서 direction 쪽으로 한 칸씩 가며 대기 · 필드와 상관없이 살아 있는 캐릭터를 찾는다. 없으면 -1 이다.
+    private int FindAliveIndex(int direction)
+    {
+        for(int step = 1; step < _members.Length; step++)
+        {
+            int index = (_controlledIndex + direction * step + _members.Length) % _members.Length;
+
+            if(!_members[index].Status.IsDowned) return index;
+        }
+
+        return -1;
+    }
+
+    private int CountAliveMembers()
+    {
+        int count = 0;
+
+        for(int i = 0; i < _members.Length; i++)
+        {
+            if(!_members[i].Status.IsDowned) count++;
+        }
+
+        return count;
     }
 
     // index 의 캐릭터만 입력에 반응하게 하고, 적의 공격 대상을 바꾼 뒤 바뀐 것을 알린다.
@@ -345,23 +445,22 @@ public class PlayerParty : MonoBehaviour
         ControlledChanged?.Invoke(Controlled);
     }
 
-    // 씬의 적 행동 그래프마다 공격 대상을 조작 중인 캐릭터로 바꾼다.
-    // 교체할 때만 찾으므로 비용이 작다. 웨이브로 생기는 적은 전투 흐름 작업에서 생성할 때 등록하는 방식으로 바꾼다.
+    // 등록된 적 행동 그래프마다 공격 대상을 조작 중인 캐릭터로 바꾼다.
     private void RetargetEnemies()
     {
-        BehaviorGraphAgent[] agents = FindObjectsByType<BehaviorGraphAgent>(FindObjectsSortMode.None);
-
-        for(int i = 0; i < agents.Length; i++)
+        for(int i = 0; i < _enemyAgents.Count; i++)
         {
-            agents[i].SetVariableValue(ENEMY_TARGET_VARIABLE, Controlled.transform);
+            _enemyAgents[i].SetVariableValue(ENEMY_TARGET_VARIABLE, Controlled.transform);
         }
     }
 
+    // 씬에 미리 놓인 적은 Awake 에서 찾는다. 생성기가 Start 에서 만든 적은 등록으로 들어오므로, 그보다 먼저 찾아야 두 번 들어가지 않는다.
     private void CacheComponent()
     {
         SlowMotion = GetComponent<BattleSlowMotion>();
         LockOn = GetComponent<PlayerLockOn>();
         ComboSelector = GetComponent<ComboSkillSelector>();
+        _enemyAgents.AddRange(FindObjectsByType<BehaviorGraphAgent>(FindObjectsSortMode.None));
     }
 
     private void Init()
