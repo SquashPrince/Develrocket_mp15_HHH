@@ -47,6 +47,8 @@ public class GameFlow : MonoBehaviour
     public bool IsBossPhase { get; private set; }
     public float TimeLimit => _timeLimit;
     public float TimeLeft => _timeLeft;
+    // 결과 화면이 떠 이번 판이 끝났는지. 끝난 뒤에는 일시정지할 수 없다.
+    public bool IsEnded => _isEnded;
 
     // 보스전이 시작되어 제한 시간을 재기 시작하면 알린다. 타이머 표시를 켜는 데 쓴다.
     public event System.Action BossPhaseStarted;
