@@ -15,13 +15,32 @@ MonoBehaviour:
   _waves:
   - _entries:
     - _prefab: {fileID: 7810074939736527391, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
-      _count: 5
+      _count: 7
+    _useTimeLimit: 0
+    _timeLimit: 180
+  - _entries:
+    - _prefab: {fileID: 7810074939736527391, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
+      _count: 2
+    - _prefab: {fileID: 6892805522329183486, guid: dea92aa731d0e4c43a19a75fe5194413, type: 3}
+      _count: 3
+    _useTimeLimit: 0
+    _timeLimit: 180
   - _entries:
     - _prefab: {fileID: 6892805522329183486, guid: dea92aa731d0e4c43a19a75fe5194413, type: 3}
       _count: 3
-  - _entries:
     - _prefab: {fileID: 6714013248425762633, guid: 93a8a783d0bf5514e9fb126bcde5f762, type: 3}
       _count: 1
-  _waveInterval: 2
+    _useTimeLimit: 0
+    _timeLimit: 180
+  - _entries:
+    - _prefab: {fileID: 7810074939736527391, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
+      _count: 3
+    - _prefab: {fileID: 6892805522329183486, guid: dea92aa731d0e4c43a19a75fe5194413, type: 3}
+      _count: 2
+    - _prefab: {fileID: 6714013248425762633, guid: 93a8a783d0bf5514e9fb126bcde5f762, type: 3}
+      _count: 1
+    _useTimeLimit: 1
+    _timeLimit: 180
+  _waveInterval: 3
   _minSpacing: 3
   _minPlayerDistance: 5

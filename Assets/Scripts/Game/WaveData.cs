@@ -18,20 +18,29 @@ public class WaveData : ScriptableObject
         public int Count => _count;
     }
 
+    // 웨이브 하나. 제한 시간을 쓰는 웨이브가 보스전이다. 스테이지의 마지막 웨이브 하나에만 켠다.
+    //   보스전은 웨이브가 나오는 순간 제한 시간을 재기 시작하고, 그 안에 보스 등급 적을 모두 처치해야 한다.
+    //   중간 보스처럼 제한 시간 없이 보스만 나오는 웨이브는 끈 채로 둔다.
     [Serializable]
     public class Wave
     {
-        [Tooltip("이 웨이브에 생성할 적 종류와 마리 수")]
+        [Tooltip("이 웨이브에 생성할 적 종류와 마리 수. 보스 등급 적은 보스 생성 위치에 나온다")]
         [SerializeField] private SpawnEntry[] _entries;
+        [Tooltip("보스전 웨이브인지. 켜면 이 웨이브가 나오는 순간부터 제한 시간을 잰다. 마지막 웨이브 하나에만 켠다")]
+        [SerializeField] private bool _useTimeLimit;
+        [Tooltip("보스 등급 적을 모두 처치해야 하는 제한 시간(초)")]
+        [SerializeField, Min(1f)] private float _timeLimit = 180f;
 
         public SpawnEntry[] Entries => _entries;
+        public bool UseTimeLimit => _useTimeLimit;
+        public float TimeLimit => _timeLimit;
     }
 
     [Tooltip("웨이브 목록. 위에서부터 차례로 진행한다")]
     [SerializeField] private Wave[] _waves;
 
     [Header("진행")]
-    [Tooltip("웨이브를 정리한 뒤 다음 웨이브(마지막이면 보스)가 나오기까지 기다리는 시간(초)")]
+    [Tooltip("웨이브를 정리한 뒤 다음 웨이브가 나오기까지 기다리는 시간(초)")]
     [SerializeField, Min(0f)] private float _waveInterval = 2f;
 
     [Header("생성 위치")]
