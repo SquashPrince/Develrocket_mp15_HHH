@@ -81,8 +81,8 @@ public class PlayerParty : MonoBehaviour
     // 살아 있는 캐릭터가 혼자면 연속 패링 패턴 중에도 패링할 수 없다.
     public bool CanParry => HasStandby || ParryWindow.IsChainActive && CountAliveMembers() > 1;
     public ComboSkillSelector ComboSelector { get; private set; }
-    // 플레이어 입력(교체 · 캐릭터 행동 · 록온)을 막는지. 콤보 스킬 캐릭터 선택 중이거나, 결과 화면이 떠 입력을 잠갔을 때다.
-    public bool IsInputBlocked => _isInputLocked || ComboSelector.IsBlockingInput;
+    // 플레이어 입력(교체 · 캐릭터 행동 · 록온)을 막는지. 콤보 스킬 캐릭터 선택 중이거나, 결과 화면이 떠 입력을 잠갔거나, 일시정지 중일 때다.
+    public bool IsInputBlocked => _isInputLocked || GamePause.IsPaused || ComboSelector.IsBlockingInput;
 
     // 조작 중인 캐릭터가 바뀌면 알린다. 시작할 때도 첫 캐릭터로 한 번 알린다. 카메라가 따라갈 대상을 바꾸는 데 쓴다.
     public event Action<PlayerController> ControlledChanged;
