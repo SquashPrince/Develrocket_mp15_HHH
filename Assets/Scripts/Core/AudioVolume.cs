@@ -5,7 +5,7 @@ using UnityEngine.Audio;
 // 볼륨(0 ~ 1)을 Mixer 가 쓰는 데시벨로 바꿔 넣는다. 사람이 듣는 크기는 로그에 가까워, 슬라이더를 고르게 움직이면 소리도 고르게 줄게 하기 위해서다.
 // 0 이면 들리지 않는 최저값으로 둔다.
 // Mixer 의 노출 변수는 Awake 에서 바꾸면 적용되지 않아 Start 에서 처음 반영한다.
-// 볼륨을 쓰는 씬(타이틀 · 게임)마다 하나씩 둔다.
+// 씬이 바뀌어도 유지되는 공용 UI 에 하나만 둔다.
 public class AudioVolume : MonoBehaviour
 {
     private const float MIN_DECIBEL = -80f;
