@@ -490,7 +490,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
         ParryWindow.Open(this);
         _isParryWindowOpen = true;
-
+        BattleFeedback.Raise(BattleFeedback.Moment.ParryCue);
     }
 
     private void CloseParryWindow()

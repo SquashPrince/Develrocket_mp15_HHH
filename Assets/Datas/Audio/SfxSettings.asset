@@ -77,7 +77,7 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 4fae115d22d7e4b7cb3e4a17de3ada4c, type: 3}
       - {fileID: 8300000, guid: 39e085cf9c17040b2869a7d4176d2fa9, type: 3}
       - {fileID: 8300000, guid: 0872a3ed81a4b44ad8d26ecdc198d219, type: 3}
-      _volume: 0.5
+      _volume: 1
     _extraLayers: []
   - _moment: 9
     _sound:
@@ -85,7 +85,7 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 4fae115d22d7e4b7cb3e4a17de3ada4c, type: 3}
       - {fileID: 8300000, guid: 39e085cf9c17040b2869a7d4176d2fa9, type: 3}
       - {fileID: 8300000, guid: 0872a3ed81a4b44ad8d26ecdc198d219, type: 3}
-      _volume: 0.5
+      _volume: 1
     _extraLayers: []
   - _moment: 10
     _sound:
@@ -109,6 +109,21 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 2617efad9f3d1e44cb36979d32faa18e, type: 3}
       _volume: 1
     _extraLayers: []
+  - _moment: 13
+    _sound:
+      _clips:
+      - {fileID: 8300000, guid: ca1b4101b55d3d843885571b28fe98b3, type: 3}
+      _volume: 1
+    _extraLayers:
+    - _clips:
+      - {fileID: 8300000, guid: 9caafea7542e4e7408c77c39a65cfca2, type: 3}
+      _volume: 0.5
+    - _clips:
+      - {fileID: 8300000, guid: 5fab6ae7f3d923c40b993c9dbe0e5829, type: 3}
+      _volume: 0.25
+    - _clips:
+      - {fileID: 8300000, guid: cda096cf3343aa042803242bd51bb89e, type: 3}
+      _volume: 0.075
   _buttonClick:
     _clips:
     - {fileID: 8300000, guid: 808f050eeb62b4a90baab9b9fcb910e9, type: 3}

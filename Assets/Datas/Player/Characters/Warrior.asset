@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   _displayName: 
   _portrait: {fileID: 21300000, guid: fc883bc814237f24eb6e3aeed8e0d4f1, type: 3}
-  _maxHealth: 2171
+  _maxHealth: 4342
   _maxEnergy: 120
   _energyRegenPerSecond: 0.6
   _maxUltimateGauge: 3000
