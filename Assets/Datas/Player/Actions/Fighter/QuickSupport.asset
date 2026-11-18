@@ -14,24 +14,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
   _actionType: 2
   _steps:
-  - _animationState: DashAttack
+  - _animationState: DodgeCounter
     _hitMode: 0
-    _windowTiming: 1
+    _windowTiming: 0
     _hitInterval: 0.035
-    _hitCount: 5
+    _hitCount: 7
     _reactOnFirstHitOnly: 0
     _hitLagTime: 0.035
     _hitShape: 2
-    _hitCenter: {x: 0, y: 1, z: 1.5}
-    _hitSize: {x: 0.5, y: 2, z: 2}
-    _hitRadius: 1
-    _hitLength: 4
+    _hitCenter: {x: 0, y: 1, z: 3.5}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 3
+    _hitLength: 10
     _hitAngle: 90
     _hitInnerRadius: 0
     _hitHeight: 2
-    _advanceDistance: 3.5
-    _advanceDuration: 0.15
-    _fadeTime: 0.2
+    _advanceDistance: 1.5
+    _advanceDuration: 0.4
+    _fadeTime: 0.1
     _interrupts: 14
     _swingSound:
       _clips:
@@ -43,17 +43,16 @@ MonoBehaviour:
       _volume: 0.5
   _energyGain: 0.143
   _ultimateGaugeGain: 2.08
-  _power: 10
+  _power: 25
   _staggerLevel: 1
   _staggerTime: 0.25
   _hitSound:
     _clips:
-    - {fileID: 8300000, guid: 9b1951864e55042419d36626fbf984c9, type: 3}
-    - {fileID: 8300000, guid: 31e024ce3ed0a4b8885a7cfadbcf4992, type: 3}
-    - {fileID: 8300000, guid: f3a27f675d71c448c937b8c1552fbf7f, type: 3}
-    - {fileID: 8300000, guid: 15db56fb478b54ba584e54368f943195, type: 3}
-    - {fileID: 8300000, guid: 9eaf9ecc10af54992a32818ffc712ce1, type: 3}
-    _volume: 0.5
+    - {fileID: 8300000, guid: a44cce8c584164d4d9b85f4aac1c97fb, type: 3}
+    - {fileID: 8300000, guid: 4f9a19fc9a4e42f469f81302b7d7f26a, type: 3}
+    - {fileID: 8300000, guid: edffb2d082bc6d64e981077bd9ea258a, type: 3}
+    - {fileID: 8300000, guid: 6e85af8a62ee1d24a89bb8e0a12bb485, type: 3}
+    _volume: 1
   _energyCost: 0
   _chargeTime: 0.6
   _inputBuffer: 0.1

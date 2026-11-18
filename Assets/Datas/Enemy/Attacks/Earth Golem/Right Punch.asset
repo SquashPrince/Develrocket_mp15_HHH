@@ -20,7 +20,7 @@ MonoBehaviour:
   _turnSpeed: 360
   _leapHeight: 0
   _overshootDistance: 0
-  _power: 10
+  _power: 76
   _staggerResistLevel: 1
   _resistUntilEvent: 0
   _canPerfectDodge: 1
@@ -35,7 +35,22 @@ MonoBehaviour:
   _steps:
   - _animationState: Attack 2
     _hitMode: 1
+    _windowTiming: 0
+    _hitInterval: 0.2
+    _hitCount: 3
+    _useFinalReaction: 0
+    _finalReaction: 2
+    _hitShape: 1
     _hitCenter: {x: 0, y: 1, z: 1.2}
+    _hitSize: {x: 2, y: 2, z: 2}
     _hitRadius: 1.5
+    _hitLength: 3
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
+    _followsTarget: 0
+    _followSpeedRate: 1
+    _facesTarget: 0
     _isParryable: 0
     _parryStaggerTime: 1.5
+    _continuesOnParry: 0

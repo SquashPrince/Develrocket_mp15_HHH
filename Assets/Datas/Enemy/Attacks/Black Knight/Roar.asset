@@ -20,7 +20,7 @@ MonoBehaviour:
   _turnSpeed: 120
   _leapHeight: 0
   _overshootDistance: 0
-  _power: 10
+  _power: 103
   _staggerResistLevel: 1
   _resistUntilEvent: 0
   _canPerfectDodge: 1

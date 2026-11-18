@@ -21,11 +21,11 @@ MonoBehaviour:
     _hitCount: 1
     _reactOnFirstHitOnly: 1
     _hitLagTime: 0.025
-    _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitShape: 2
+    _hitCenter: {x: 0, y: 1, z: 2.25}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
-    _hitRadius: 1.5
-    _hitLength: 3
+    _hitRadius: 2
+    _hitLength: 6
     _hitAngle: 90
     _hitInnerRadius: 0
     _hitHeight: 2
@@ -48,12 +48,11 @@ MonoBehaviour:
   _staggerTime: 0.35
   _hitSound:
     _clips:
-    - {fileID: 8300000, guid: 9b1951864e55042419d36626fbf984c9, type: 3}
-    - {fileID: 8300000, guid: 31e024ce3ed0a4b8885a7cfadbcf4992, type: 3}
-    - {fileID: 8300000, guid: f3a27f675d71c448c937b8c1552fbf7f, type: 3}
-    - {fileID: 8300000, guid: 15db56fb478b54ba584e54368f943195, type: 3}
-    - {fileID: 8300000, guid: 9eaf9ecc10af54992a32818ffc712ce1, type: 3}
-    _volume: 0.5
+    - {fileID: 8300000, guid: a44cce8c584164d4d9b85f4aac1c97fb, type: 3}
+    - {fileID: 8300000, guid: 4f9a19fc9a4e42f469f81302b7d7f26a, type: 3}
+    - {fileID: 8300000, guid: edffb2d082bc6d64e981077bd9ea258a, type: 3}
+    - {fileID: 8300000, guid: 6e85af8a62ee1d24a89bb8e0a12bb485, type: 3}
+    _volume: 1
   _energyCost: 0
   _chargeTime: 0.01
   _inputBuffer: 0.35

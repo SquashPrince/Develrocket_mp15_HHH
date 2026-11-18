@@ -20,10 +20,10 @@ MonoBehaviour:
     _hitInterval: 0.05
     _hitCount: 2
     _reactOnFirstHitOnly: 1
-    _hitLagTime: 0.1
+    _hitLagTime: 0.075
     _hitShape: 0
-    _hitCenter: {x: 0, y: 1, z: 1}
-    _hitSize: {x: 1, y: 2, z: 2}
+    _hitCenter: {x: 0, y: 1, z: 1.5}
+    _hitSize: {x: 3.5, y: 2, z: 3}
     _hitRadius: 1
     _hitLength: 4
     _hitAngle: 90
@@ -35,12 +35,10 @@ MonoBehaviour:
     _interrupts: 6
     _swingSound:
       _clips:
-      - {fileID: 8300000, guid: 75413883fc37e4ac4a79534562fe86d3, type: 3}
-      - {fileID: 8300000, guid: 083f2008ba6f84d249022b78a25083bf, type: 3}
-      - {fileID: 8300000, guid: 0fcfa9c875e4b4dba9eaf74fb519fbad, type: 3}
-      - {fileID: 8300000, guid: 0a2e846459a7140cda716d532a07c000, type: 3}
-      - {fileID: 8300000, guid: 7f7aaff14b17e48fb99e5fba09e6f650, type: 3}
-      _volume: 0.5
+      - {fileID: 8300000, guid: 69c906cb4718cfa479b6295c8603a99b, type: 3}
+      - {fileID: 8300000, guid: 6f74033cf212c8f46b5071809f0f598a, type: 3}
+      - {fileID: 8300000, guid: 151cb907cd994a348836f827b8810e0b, type: 3}
+      _volume: 1
   _energyGain: 0.6
   _ultimateGaugeGain: 18
   _power: 10
@@ -48,12 +46,11 @@ MonoBehaviour:
   _staggerTime: 0.25
   _hitSound:
     _clips:
-    - {fileID: 8300000, guid: 24cde6106ef0941d1a937189110b3f26, type: 3}
-    - {fileID: 8300000, guid: 4f577a01743b54c529b0be9b4dd395dd, type: 3}
-    - {fileID: 8300000, guid: a4e116bc4eac64af087e1047d3668ab6, type: 3}
-    - {fileID: 8300000, guid: adf7ae99e0c464820a6b51d17b2d70d3, type: 3}
-    - {fileID: 8300000, guid: a651ce7be338e4bddb7038c5a9f21505, type: 3}
-    _volume: 0.5
+    - {fileID: 8300000, guid: a44cce8c584164d4d9b85f4aac1c97fb, type: 3}
+    - {fileID: 8300000, guid: 4f9a19fc9a4e42f469f81302b7d7f26a, type: 3}
+    - {fileID: 8300000, guid: edffb2d082bc6d64e981077bd9ea258a, type: 3}
+    - {fileID: 8300000, guid: 6e85af8a62ee1d24a89bb8e0a12bb485, type: 3}
+    _volume: 1
   _energyCost: 0
   _chargeTime: 0.6
   _inputBuffer: 0.1
