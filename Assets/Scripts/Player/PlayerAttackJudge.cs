@@ -13,6 +13,9 @@ using UnityEngine;
 // 동작이 "첫 타격에만 반응"을 켜면, 구간(판정 시작 한 번)에서 처음 적중한 타격에만 경직 · 히트렉을 건다. 강타는 항상 건다.
 // 범위 찾기 : 동작의 모양(상자 · 구 · 캡슐)대로 캐릭터 기준 범위를 확인한다.
 // 맞은 적 처리 : 체력 감소 · 에너지 · 필살기 게이지 획득 · 경직 · 그로기 누적 · 콤보 스킬 발동과 연계.
+// 에너지 · 필살기 게이지 : 한 동작에서 처음 적중했을 때 한 번만 얻는다. 여러 적을 맞히거나 여러 번 타격해도 더 얻지 않는다.
+//   공격 상태는 동작을 시작할 때와 상태를 나갈 때 판정 끄기(EndHit)를 부르므로, 그때 기록을 지워 다음 동작에서 다시 얻게 한다.
+//   한 동작 안의 판정 시작 · 끝 · 강타 끝은 판정 구간만 닫고 기록은 남긴다.
 // 두 과정을 나눠 둔 이유는, 나중에 검기처럼 날아가며 판정하는 공격도 같은 맞은 적 처리를 쓰게 하기 위해서다.
 // 범위를 찾을 때 이벤트로 알려, 디버그 기능이 범위를 표시한다. 디버그 기능이 없어도 판정은 그대로다.
 [RequireComponent(typeof(PlayerStatus), typeof(PlayerActionTrigger))]
@@ -40,6 +43,8 @@ public class PlayerAttackJudge : MonoBehaviour
     private bool _windowEndsWithImpact;
     private int _nextTickIndex;
     private bool _hasReacted;
+    // 이번 동작에서 이미 에너지 · 필살기 게이지를 얻었는지. 동작이 바뀌거나 끝날 때(EndHit) 지운다.
+    private bool _hasGainedGauge;
 
     // 판정 범위를 찾을 때마다 알린다. 전달 값 : 범위를 찾은 동작
     public event Action<ActionStep> RangeChecked;
@@ -64,7 +69,7 @@ public class PlayerAttackJudge : MonoBehaviour
     // 판정 범위 · 방식은 동작(step), 위력 · 게이지 같은 타격 값은 액션(action)에서 읽는다.
     public void BeginHit(ActionData action, ActionStep step)
     {
-        EndHit();
+        CloseWindow();
 
         if(step.Mode == ActionStep.HitMode.Instant)
         {
@@ -94,15 +99,15 @@ public class PlayerAttackJudge : MonoBehaviour
     {
         if(IsWindowOpen) HitDueTicks(GetWindowEndTime());
 
-        EndHit();
+        CloseWindow();
     }
 
     // 판정을 바로 끈다. 상태가 바뀌거나 다음 동작으로 넘어갈 때 부른다. 남은 타격은 하지 않는다.
+    // 동작이 바뀌는 때라 이번 동작의 에너지 · 필살기 게이지 획득 기록도 지운다.
     public void EndHit()
     {
-        IsWindowOpen = false;
-        _windowStep = null;
-        _windowAction = null;
+        CloseWindow();
+        _hasGainedGauge = false;
     }
 
     // 강타 끝 이벤트. 구간 끝 전의 타격을 마치고, 이 순간 범위 안의 적에게 강타 판정을 한 번 한 뒤 판정을 끈다.
@@ -112,8 +117,16 @@ public class PlayerAttackJudge : MonoBehaviour
     {
         if(IsWindowOpen) HitDueTicks(GetWindowEndTime());
 
-        EndHit();
+        CloseWindow();
         HitInRange(action, step, true, true);
+    }
+
+    // 판정 구간만 닫는다. 같은 동작 안의 판정 시작 · 끝 · 강타 끝에서 쓰며, 에너지 · 필살기 게이지 획득 기록은 남긴다.
+    private void CloseWindow()
+    {
+        IsWindowOpen = false;
+        _windowStep = null;
+        _windowAction = null;
     }
 
     // 구간 판정이 켜져 있으면 지금까지 지난 타격 시점의 타격을 한다.
@@ -202,14 +215,14 @@ public class PlayerAttackJudge : MonoBehaviour
         // 여러 적을 맞혀도 연출이 겹쳐 커지지 않게 판정마다 한 번만 알린다.
         if(hasHit && isImpact) BattleFeedback.Raise(BattleFeedback.Moment.ImpactHit);
 
-        // 판정을 모두 마친 뒤 콤보 스킬 선택을 열어, 같은 판정의 다른 적도 에너지 · 게이지 · 경직을 받게 한다.
+        // 판정을 모두 마친 뒤 콤보 스킬 선택을 열어, 같은 판정의 다른 적도 체력 감소 · 경직 · 그로기를 받게 한다.
         // 고를 대기 캐릭터가 없으면 열리지 않고 적의 발동 기회도 남는다.
         if(comboSkillTarget != null) ComboSelector.TryBeginChain(comboSkillTarget, comboSkillGroggyable);
 
         return hasHit;
     }
 
-    // 맞은 적 하나에 결과를 적용한다. 체력은 액션의 위력만큼 줄고, 에너지와 필살기 게이지를 얻는다.
+    // 맞은 적 하나에 결과를 적용한다. 체력은 액션의 위력만큼 줄고, 이번 동작에서 처음 적중했으면 에너지와 필살기 게이지를 얻는다.
     // canReact 이고 액션의 경직 시간이 0보다 크면, 경직 저항 레벨이 액션의 경직 레벨 이하인 적을 경직시킨다.
     // 그로기 게이지는 반응 여부와 상관없이 모든 적중마다 액션의 그로기 값만큼 쌓는다.
     // 강타가 그로기 적에게 맞으면 콤보 스킬 대상으로 고른다. 한 번의 판정에서 콤보 스킬은 하나의 적에게만 발동한다.
@@ -218,8 +231,13 @@ public class PlayerAttackJudge : MonoBehaviour
     private void ApplyHit(IEnemyDamageable enemy, ActionData action, bool isImpact, bool canReact, ref IEnemyTargetable comboSkillTarget, ref IEnemyGroggyable comboSkillGroggyable)
     {
         enemy.TakeDamage(action.Power, isImpact);
-        _status.AddEnergy(action.EnergyGain);
-        _status.AddUltimateGauge(action.UltimateGaugeGain);
+
+        if(!_hasGainedGauge)
+        {
+            _status.AddEnergy(action.EnergyGain);
+            _status.AddUltimateGauge(action.UltimateGaugeGain);
+            _hasGainedGauge = true;
+        }
 
         // 이 타격으로 처치된 적은 경직 · 콤보 스킬 대상이 아니다. 그로기 적이 강타로 처치되면 콤보 스킬보다 처치가 먼저다.
         if(!enemy.IsAlive) return;
