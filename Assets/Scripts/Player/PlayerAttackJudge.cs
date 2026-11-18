@@ -212,8 +212,8 @@ public class PlayerAttackJudge : MonoBehaviour
 
         if(hasHit && canReact) _status.BeginHitLag(step.HitLagTime);
 
-        // 여러 적을 맞혀도 연출이 겹쳐 커지지 않게 판정마다 한 번만 알린다.
-        if(hasHit && isImpact) BattleFeedback.Raise(BattleFeedback.Moment.ImpactHit);
+        // 여러 적을 맞혀도 연출 · 효과음이 겹쳐 커지지 않게 판정마다 한 번만 알린다.
+        if(hasHit) BattleFeedback.Raise(isImpact ? BattleFeedback.Moment.ImpactHit : BattleFeedback.Moment.NormalHit);
 
         // 판정을 모두 마친 뒤 콤보 스킬 선택을 열어, 같은 판정의 다른 적도 체력 감소 · 경직 · 그로기를 받게 한다.
         // 고를 대기 캐릭터가 없으면 열리지 않고 적의 발동 기회도 남는다.
