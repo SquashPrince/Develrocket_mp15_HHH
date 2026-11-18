@@ -19,7 +19,7 @@ using UnityEngine;
 //   다음 동작도 자기 클립의 Telegraph 이벤트로 패링 가능 시간을 다시 열고, 플레이어는 다시 패링해야 막을 수 있다.
 // 공격 시작부터 그 공격의 경직 저항 레벨을 적용하고, 첫 HitStart 이벤트(또는 설정에 따라 ResistEnd 이벤트)에서 푼다.
 // 경직 · 그로기 · 처치되면 진행 중인 공격을 끊는다. 끊긴 공격도 쓴 것으로 보고 쿨타임을 시작한다.
-// 공격 선택 : 쿨타임 중이거나 대상이 사용 최소 거리보다 가까운 공격은 빼고, 가중치(기본 가중치 + 증가량 × 마지막으로 쓴 뒤 다른 공격이 선택된 횟수)에 비례해 무작위로 고른다.
+// 공격 선택 : 쿨타임 중이거나 대상이 사용 최소 거리보다 가까운 공격, 다른 적이 연속 패링 패턴 중일 때의 연속 패링 패턴은 빼고, 가중치(기본 가중치 + 증가량 × 마지막으로 쓴 뒤 다른 공격이 선택된 횟수)에 비례해 무작위로 고른다.
 //   사거리 밖 공격만 요청받으면(대상이 공격 사거리 밖) 사거리 밖에서 쓸 수 있는 공격 중에서만 고른다.
 // 모션은 루트 모션 없이 제자리에서 재생한다. 도약 · 돌진 공격은 LeapStart · LeapLock · LeapEnd 이벤트를 도약 기능(EnemyLeap)에 넘겨 목표 지점으로 옮긴다.
 [RequireComponent(typeof(EnemyState), typeof(EnemyAnimation), typeof(EnemyMovement))]
@@ -419,11 +419,14 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     }
 
     // 쿨타임이 끝났고, 대상이 사용 최소 거리 이상 떨어져 있으면 쓸 수 있다. 사거리 밖 공격만 고를 때는 사거리 밖에서 쓸 수 있는 공격이어야 한다.
+    // 연속 패링 패턴은 다른 적이 이미 연속 패링 패턴 중이면 쓰지 않는다.
+    //   여러 적이 동시에 하면 패링 대상 고르기와 순간 이동 · 카메라가 적 사이를 오가며 어지럽게 바뀌기 때문이다.
     private bool IsUsable(int index, float distance, bool rangedOnly)
     {
         EnemyAttackData attack = _attacks[index];
 
         if(_cooldownTimers[index] > 0f || distance < attack.MinUseDistance) return false;
+        if(attack.HasParryChain && ParryWindow.IsChainActive) return false;
 
         return !rangedOnly || attack.CanUseOutOfRange;
     }

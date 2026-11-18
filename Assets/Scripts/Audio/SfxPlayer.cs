@@ -29,7 +29,17 @@ public class SfxPlayer : MonoBehaviour
 
     private void OnMoment(BattleFeedback.Moment moment, Vector3 direction)
     {
-        if(_settings.TryGetSound(moment, out SoundGroup sound)) Play(sound);
+        if(!_settings.TryGetSound(moment, out SfxSettings.MomentSound sound)) return;
+
+        // 기본 소리와 추가 겹을 동시에 낸다. 비어 있는 겹은 Play 가 건너뛴다.
+        Play(sound.Sound);
+
+        if(sound.ExtraLayers == null) return;
+
+        foreach(SoundGroup layer in sound.ExtraLayers)
+        {
+            Play(layer);
+        }
     }
 
     private void PlayButtonClick() => Play(_settings.ButtonClick);
