@@ -3,8 +3,10 @@ using UnityEngine;
 
 // 전투 연출이 반응할 순간을 알린다. 플레이어 쪽은 순간이 일어났다는 것만 알리고, 카메라 · 화면 등 반응하는 쪽이 각자 구독한다.
 // 반응하는 쪽(카메라 등)은 씬 오브젝트이고 알리는 쪽은 캐릭터마다 있어, 서로 몰라도 되는 공용 알림으로 둔다.
+// 순간에 반응하는 쪽 : 카메라 연출 · 히트스톱 · 효과음. 순간마다 반응할지는 반응하는 쪽이 정한다.
 public static class BattleFeedback
 {
+    // 새 순간은 맨 뒤에 더한다. 효과음 설정 에셋 등이 순간을 번호로 저장하므로, 중간에 끼우면 저장된 값이 다른 순간을 가리킨다.
     public enum Moment
     {
         // 강타가 적에게 맞음. 한 번의 판정에서 여러 적을 맞혀도 한 번만 알린다.
@@ -14,19 +16,38 @@ public static class BattleFeedback
         ParrySuccess,
         PerfectDodge,
         // 조작 중인 캐릭터가 넉백됨
-        Knockback
+        Knockback,
+        // 강타가 아닌 공격이 적에게 맞음. 강타와 같이 한 번의 판정에 한 번만 알린다.
+        NormalHit,
+        // 조작 중인 캐릭터가 넉백이 아닌 피격(피격 · 큰 피격)을 당함
+        Hurt,
+        // 적이 처치됨
+        EnemyKilled,
+        // 조작 중인 캐릭터가 대시를 시작함 (방향 입력 있음)
+        Dash,
+        // 조작 중인 캐릭터가 회피를 시작함 (방향 입력 없이 뒤로)
+        Dodge,
+        // 조작 중인 캐릭터의 발이 땅에 닿음. 걷기 · 달리기 클립의 이벤트가 알린다
+        Footstep
     }
 
     // 순간과 그 순간의 충격 방향을 알린다. 구독하는 쪽은 꺼질 때 반드시 해제한다.
     // 충격 방향 : 조작 캐릭터가 밀리는 월드 방향(적 → 캐릭터). 방향이 없는 순간은 Vector3.zero 다.
     public static event Action<Moment, Vector3> Occurred;
 
+    // 플레이어 공격이 적에게 대미지를 줄 때마다 알린다. 대미지 숫자 표시가 쓴다.
+    // 맞은 적 · 대미지 · 강타 여부. 한 번의 판정에서 여러 적을 맞히면 적마다 알린다.
+    public static event Action<Transform, float, bool> DamageDealt;
+
     public static void Raise(Moment moment) => Raise(moment, Vector3.zero);
+
+    public static void RaiseDamage(Transform target, float amount, bool isImpact) => DamageDealt?.Invoke(target, amount, isImpact);
 
     public static void Raise(Moment moment, Vector3 direction)
     {
 #if UNITY_EDITOR
-        Debug.Log($"[전투 연출] {moment}");
+        // 발자국은 아주 자주 와서 로그를 남기지 않는다.
+        if(moment != Moment.Footstep) Debug.Log($"[전투 연출] {moment}");
 #endif
 
         Occurred?.Invoke(moment, direction);
@@ -37,5 +58,6 @@ public static class BattleFeedback
     private static void Reset()
     {
         Occurred = null;
+        DamageDealt = null;
     }
 }

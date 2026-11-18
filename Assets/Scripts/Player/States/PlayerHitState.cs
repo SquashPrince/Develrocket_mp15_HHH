@@ -60,6 +60,10 @@ public class PlayerHitState : PlayerState
         {
             _phase = Phase.Stun;
             Controller.Animation.Play(_reaction == EnemyAttackData.HitReaction.HeavyHit ? HEAVY_HIT_ANIMATION : HIT_ANIMATION);
+
+            // 넉백과 같이 화면의 주인공(조작 캐릭터)이 맞을 때만 알린다.
+            if(Controller.Party.Controlled == Controller) BattleFeedback.Raise(BattleFeedback.Moment.Hurt);
+
             return;
         }
 

@@ -41,6 +41,10 @@ public class ActionData : ScriptableObject
     [Tooltip("맞은 적을 경직시키는 시간(초, 적 전용 시간). 0이면 경직시키지 않는다. 경직하면 적이 진행 중이던 공격이 끊긴다")]
     [SerializeField, Min(0f)] private float _staggerTime;
 
+    [Header("소리")]
+    [Tooltip("이 액션이 적에게 대미지를 줄 때 내는 소리. 한 번의 판정에서 여러 적을 맞혀도 한 번만 낸다. 비워 두면 소리가 없다")]
+    [SerializeField] private SoundGroup _hitSound;
+
     [Header("비용")]
     [Tooltip("이 액션을 쓸 때 드는 에너지. 지금은 특수스킬만 쓴다. 스킬 입력 시 에너지가 이보다 적으면 일반 스킬이 나간다")]
     [SerializeField, Min(0f)] private float _energyCost;
@@ -70,6 +74,7 @@ public class ActionData : ScriptableObject
     public float EnergyGain => _energyGain;
     public float UltimateGaugeGain => _ultimateGaugeGain;
     public float Power => _power;
+    public SoundGroup HitSound => _hitSound;
     public int StaggerLevel => _staggerLevel;
     public float StaggerTime => _staggerTime;
     public float EnergyCost => _energyCost;

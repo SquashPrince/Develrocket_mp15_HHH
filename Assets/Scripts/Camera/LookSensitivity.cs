@@ -35,12 +35,6 @@ public class LookSensitivity : MonoBehaviour
     }
 #endif
 
-    public void SetMouseSensitivity(Vector2 sensitivity)
-    {
-        _mouseSensitivity = sensitivity;
-        ApplySensitivity();
-    }
-
     public void SetStickSensitivity(Vector2 sensitivity)
     {
         _stickSensitivity = sensitivity;

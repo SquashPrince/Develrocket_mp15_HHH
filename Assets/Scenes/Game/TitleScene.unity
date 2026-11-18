@@ -264,14 +264,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 539733cb10f97f44b974c768d39ad6f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BestRecordView
-  _recordGroup: {fileID: 504811598}
-  _noRecordObject: {fileID: 0}
   _scoreText: {fileID: 677305916}
   _gradeText: {fileID: 1825128783}
   _totalTimeText: {fileID: 1088907624}
   _bossTimeText: {fileID: 1719832532}
   _retryText: {fileID: 1441847204}
---- !u!1 &662575467
+--- !u!1 &549275757
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -279,38 +277,35 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 662575469}
-  - component: {fileID: 662575468}
+  - component: {fileID: 549275759}
+  - component: {fileID: 549275758}
   m_Layer: 0
-  m_Name: AudioVolume
+  m_Name: BgmCue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &662575468
+--- !u!114 &549275758
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 662575467}
+  m_GameObject: {fileID: 549275757}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92d67bce86f2fd0419a3903f25fd1fae, type: 3}
+  m_Script: {fileID: 11500000, guid: 9b6943a380ee5e540ad3843565aa03f1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AudioVolume
-  _mixer: {fileID: 24100000, guid: 2d284800c3895404a897d8695bb0549a, type: 2}
-  _masterParameter: MasterVolume
-  _bgmParameter: BgmVolume
-  _sfxParameter: SfxVolume
---- !u!4 &662575469
+  m_EditorClassIdentifier: Assembly-CSharp::BgmCue
+  _track: 0
+--- !u!4 &549275759
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 662575467}
+  m_GameObject: {fileID: 549275757}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -1898,4 +1893,4 @@ SceneRoots:
   - {fileID: 1865245458}
   - {fileID: 1772703487}
   - {fileID: 1845914918}
-  - {fileID: 662575469}
+  - {fileID: 549275759}

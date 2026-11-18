@@ -175,6 +175,7 @@ public class EnemyState : MonoBehaviour
 #endif
 
         Died?.Invoke();
+        BattleFeedback.Raise(BattleFeedback.Moment.EnemyKilled);
     }
 
     // 시체가 남아 있는 시간이 지나면 적 오브젝트를 비활성화한다.

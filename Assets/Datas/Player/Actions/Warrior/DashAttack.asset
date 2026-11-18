@@ -33,11 +33,27 @@ MonoBehaviour:
     _advanceDuration: 0.5
     _fadeTime: 0.2
     _interrupts: 6
+    _swingSound:
+      _clips:
+      - {fileID: 8300000, guid: 75413883fc37e4ac4a79534562fe86d3, type: 3}
+      - {fileID: 8300000, guid: 083f2008ba6f84d249022b78a25083bf, type: 3}
+      - {fileID: 8300000, guid: 0fcfa9c875e4b4dba9eaf74fb519fbad, type: 3}
+      - {fileID: 8300000, guid: 0a2e846459a7140cda716d532a07c000, type: 3}
+      - {fileID: 8300000, guid: 7f7aaff14b17e48fb99e5fba09e6f650, type: 3}
+      _volume: 0.5
   _energyGain: 0.6
   _ultimateGaugeGain: 18
   _power: 10
   _staggerLevel: 1
   _staggerTime: 0.25
+  _hitSound:
+    _clips:
+    - {fileID: 8300000, guid: 24cde6106ef0941d1a937189110b3f26, type: 3}
+    - {fileID: 8300000, guid: 4f577a01743b54c529b0be9b4dd395dd, type: 3}
+    - {fileID: 8300000, guid: a4e116bc4eac64af087e1047d3668ab6, type: 3}
+    - {fileID: 8300000, guid: adf7ae99e0c464820a6b51d17b2d70d3, type: 3}
+    - {fileID: 8300000, guid: a651ce7be338e4bddb7038c5a9f21505, type: 3}
+    _volume: 0.5
   _energyCost: 0
   _chargeTime: 0.6
   _inputBuffer: 0.1

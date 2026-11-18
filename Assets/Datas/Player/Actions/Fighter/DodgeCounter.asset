@@ -26,15 +26,34 @@ MonoBehaviour:
     _hitSize: {x: 1.5, y: 1.5, z: 2}
     _hitRadius: 1.5
     _hitLength: 3
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
     _advanceDistance: 1.5
     _advanceDuration: 0.4
     _fadeTime: 0.1
     _interrupts: -1
+    _swingSound:
+      _clips:
+      - {fileID: 8300000, guid: ab38c8f953789430691b634dd685119b, type: 3}
+      - {fileID: 8300000, guid: 7cbfafc671f0e4426a71d276a8bb71ec, type: 3}
+      - {fileID: 8300000, guid: e945ae282c1c548c3bb168b0606333ba, type: 3}
+      - {fileID: 8300000, guid: abf4caad1f5a24e49a317937ebf12163, type: 3}
+      - {fileID: 8300000, guid: d637bacd075454147bb398300d59dc3e, type: 3}
+      _volume: 0.5
   _energyGain: 0.255
   _ultimateGaugeGain: 4.64
   _power: 10
   _staggerLevel: 1
   _staggerTime: 0.25
+  _hitSound:
+    _clips:
+    - {fileID: 8300000, guid: 9b1951864e55042419d36626fbf984c9, type: 3}
+    - {fileID: 8300000, guid: 31e024ce3ed0a4b8885a7cfadbcf4992, type: 3}
+    - {fileID: 8300000, guid: f3a27f675d71c448c937b8c1552fbf7f, type: 3}
+    - {fileID: 8300000, guid: 15db56fb478b54ba584e54368f943195, type: 3}
+    - {fileID: 8300000, guid: 9eaf9ecc10af54992a32818ffc712ce1, type: 3}
+    _volume: 0.5
   _energyCost: 0
   _chargeTime: 0.6
   _inputBuffer: 0.1
