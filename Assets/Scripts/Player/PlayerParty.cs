@@ -29,7 +29,8 @@ using UnityEngine;
 //          조작 중인 캐릭터가 쓰러지면 다음 순서의 살아 있는 대기 캐릭터가 그 자리로 교체 입장한다.
 //          대기 캐릭터가 없고 필드에 퇴장 중인 캐릭터만 살아 있으면 퇴장을 취소하고 그 캐릭터를 조작한다.
 //          살아 있는 캐릭터가 없으면 전멸을 알린다. 혼자 남으면 연속 패링 패턴 중에도 패링할 수 없다.
-// 적의 공격 대상 : 시작할 때와 교체할 때 씬의 적 행동 그래프의 Target 을 조작 중인 캐릭터로 바꾼다.
+// 적의 공격 대상 : 시작할 때와 교체할 때 등록된 적 행동 그래프의 Target 을 조작 중인 캐릭터로 바꾼다.
+//   씬에 미리 놓인 적은 파티가 깨어날 때 한 번 찾아 등록하고, 실행 중 생성되는 적은 생성한 쪽이 등록한다.
 //   적은 공격을 시작할 때 대상을 따로 저장하므로, 진행 중인 공격은 이전 캐릭터의 위치로 끝까지 시전하고 다음 공격부터 새 캐릭터를 노린다.
 [RequireComponent(typeof(BattleSlowMotion), typeof(PlayerLockOn), typeof(ParryTelegraphView))]
 [RequireComponent(typeof(ComboSkillSelector))]
@@ -51,6 +52,8 @@ public class PlayerParty : MonoBehaviour
     private readonly Dictionary<IEnemyParryable, bool> _parryableAtOpen = new Dictionary<IEnemyParryable, bool>();
     // 이번 패링 가능 시간에 이미 패링을 시작한 적. 예고 하나에 캐릭터 하나만 패링하게 한다. 패링 가능 시간이 닫히면 지운다.
     private readonly HashSet<IEnemyParryable> _claimedParryAttackers = new HashSet<IEnemyParryable>();
+    // 공격 대상을 받을 적 행동 그래프. 처치되어 꺼진 적도 남겨 둔다. 꺼진 그래프에 값을 넣어도 문제없다.
+    private readonly List<BehaviorGraphAgent> _enemyAgents = new List<BehaviorGraphAgent>();
     // 빠른 지원 : 넉백된 캐릭터와 그 캐릭터를 넉백시킨 적. 입력 시간이 지나거나 쓰면 비운다.
     private PlayerController _quickSupportSource;
     private Transform _quickSupportTarget;
@@ -142,6 +145,13 @@ public class PlayerParty : MonoBehaviour
         {
             if(_members[i] != caster) _members[i].Status.SetFrozen(isFrozen);
         }
+    }
+
+    // 실행 중 생성한 적을 등록하고 조작 중인 캐릭터를 공격 대상으로 준다. 이후 교체할 때마다 새 캐릭터로 바꿔 준다.
+    public void RegisterEnemy(BehaviorGraphAgent agent)
+    {
+        _enemyAgents.Add(agent);
+        agent.SetVariableValue(ENEMY_TARGET_VARIABLE, Controlled.transform);
     }
 
     // 캐릭터의 쓰러짐 모션이 끝나면 쓰러짐 상태가 부른다. 그 캐릭터를 끄고, 조작 중이던 캐릭터면 다음 살아 있는 캐릭터로 넘긴다.
@@ -416,23 +426,22 @@ public class PlayerParty : MonoBehaviour
         ControlledChanged?.Invoke(Controlled);
     }
 
-    // 씬의 적 행동 그래프마다 공격 대상을 조작 중인 캐릭터로 바꾼다.
-    // 교체할 때만 찾으므로 비용이 작다. 웨이브로 생기는 적은 전투 흐름 작업에서 생성할 때 등록하는 방식으로 바꾼다.
+    // 등록된 적 행동 그래프마다 공격 대상을 조작 중인 캐릭터로 바꾼다.
     private void RetargetEnemies()
     {
-        BehaviorGraphAgent[] agents = FindObjectsByType<BehaviorGraphAgent>(FindObjectsSortMode.None);
-
-        for(int i = 0; i < agents.Length; i++)
+        for(int i = 0; i < _enemyAgents.Count; i++)
         {
-            agents[i].SetVariableValue(ENEMY_TARGET_VARIABLE, Controlled.transform);
+            _enemyAgents[i].SetVariableValue(ENEMY_TARGET_VARIABLE, Controlled.transform);
         }
     }
 
+    // 씬에 미리 놓인 적은 Awake 에서 찾는다. 생성기가 Start 에서 만든 적은 등록으로 들어오므로, 그보다 먼저 찾아야 두 번 들어가지 않는다.
     private void CacheComponent()
     {
         SlowMotion = GetComponent<BattleSlowMotion>();
         LockOn = GetComponent<PlayerLockOn>();
         ComboSelector = GetComponent<ComboSkillSelector>();
+        _enemyAgents.AddRange(FindObjectsByType<BehaviorGraphAgent>(FindObjectsSortMode.None));
     }
 
     private void Init()
