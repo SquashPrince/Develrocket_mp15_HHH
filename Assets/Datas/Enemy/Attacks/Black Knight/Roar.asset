@@ -34,14 +34,14 @@ MonoBehaviour:
   _canDashCancel: 0
   _steps:
   - _animationState: HeavyAttack
-    _hitMode: 1
+    _hitMode: 0
     _windowTiming: 0
     _hitInterval: 0.2
     _hitCount: 3
     _useFinalReaction: 0
     _finalReaction: 2
     _hitShape: 3
-    _hitCenter: {x: 0, y: 3.5, z: 0}
+    _hitCenter: {x: 0, y: 0, z: 0}
     _hitSize: {x: 2, y: 2, z: 2}
     _hitRadius: 10
     _hitLength: 3

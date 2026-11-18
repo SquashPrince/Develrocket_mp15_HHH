@@ -78,6 +78,16 @@ public class PlayerAnimation : MonoBehaviour
         _animator.CrossFadeInFixedTime(stateHash, fadeTime);
     }
 
+    // 기본 레이어에서 지금 재생 중인 상태가 stateHash 이고 끝까지 재생되었으면 true 다. 다른 상태와 섞이는 중이면 false 다.
+    public bool IsStateFinished(int stateHash)
+    {
+        if(_animator.IsInTransition(0)) return false;
+
+        AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+
+        return stateInfo.shortNameHash == stateHash && stateInfo.normalizedTime >= 1f;
+    }
+
     // 실제 수평 이동 속도를 넘겨 Blend Tree 가 걷기 · 달리기를 섞게 한다.
     public void SetMoveSpeed(float speed)
     {

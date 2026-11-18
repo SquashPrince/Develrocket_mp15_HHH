@@ -7,7 +7,7 @@ using UnityEngine;
 // 에너지는 시간이 지나거나 공격이 적중하면 쌓이고, 특수스킬을 쓰면 줄어든다.
 // 필살기 게이지는 에너지와 별개로 공격 적중 · 패링 성공 · 완벽 회피로 쌓이고, 필살기를 쓸 때 전부 소모한다. 그 외에는 줄어들지 않는다.
 // 최대 체력 · 최대 에너지 · 초당 에너지 회복량 · 최대 게이지 · 패링 성공과 완벽 회피의 게이지 획득량은 캐릭터 데이터에서, 공격 적중 획득량은 액션 데이터에서 읽는다.
-// 체력이 0이 되었을 때의 쓰러짐 · 실패는 게임 흐름 단계에서 만든다. 지금은 0에서 멈추고 로그만 남긴다.
+// 쓰러짐 : 체력이 0 이 되면 피격 대신 쓰러짐 상태로 넘긴다. 쓰러진 캐릭터는 더 맞지 않고, 다시 일어나지 않는다.
 // 현재 체력 · 에너지 · 게이지는 실행 중 Inspector 에서 바로 볼 수 있다. 확인용이라 실행 전에 넣은 값은 쓰지 않는다(시작할 때 다시 정한다).
 // 캐릭터 시간 : 캐릭터마다 시간 배율을 가진다. 플레이어 쪽 기능 · 상태는 Unity 시간 대신 이 캐릭터 시간으로 타이머 · 이동을 계산한다.
 //   히트렉처럼 공격한 캐릭터만 멈추게 하기 위해서다. 슬로모션처럼 적에게 거는 전투 효과는 실제 시간을 그대로 쓴다.
@@ -63,6 +63,8 @@ public class PlayerStatus : MonoBehaviour
             UltimateGaugeChanged?.Invoke();
         }
     }
+    // 체력이 0 이 되어 쓰러졌는지. 쓰러진 캐릭터는 교체 · 콤보 스킬 후보에서 빠진다.
+    public bool IsDowned => _currentHealth <= 0f;
     public bool IsUltimateGaugeFull => _currentUltimateGauge >= _controller.Character.MaxUltimateGauge;
     // 시간으로 거는 무적(대시 · 넉백)이나 시전 중 무적 공격의 무적 중인지
     public bool IsInvincible => _invincibleTimer > 0f || _isAttackInvincible;
@@ -138,13 +140,16 @@ public class PlayerStatus : MonoBehaviour
 
     // 적의 타격 한 번에 맞았을 때 부른다. 맞았으면 true 를 돌려준다. 완벽 회피 · 패링했거나 무적이면 무시하고 false 를 돌려준다.
     // 연타 공격은 타격마다 부르므로, 한 공격 안에서도 타격마다 완벽 회피 · 패링 · 피격을 따로 판정한다.
-    // 판정 순서 : 완벽 회피 → 패링 → 무적(슬로모션 중 포함) → 피격
+    // 판정 순서 : 쓰러짐 → 완벽 회피 → 패링 → 무적(슬로모션 중 포함) → 피격
+    //   쓰러진 캐릭터는 쓰러짐 모션 동안 공격을 모두 무시한다.
+    //   이 타격으로 체력이 0 이 되면 피격 대신 쓰러짐 상태로 넘긴다.
     //   슬로모션 중에는 무적이라 맞지 않는다. 그 사이 다시 대시 · 회피해 완벽 회피 판정 시간에 타격이 닿으면 완벽 회피가 다시 발동한다.
     // step : 판정한 동작. 패링 가능 여부 · 패링 경직 시간은 동작마다 다르다.
     // reaction : 이 타격의 반응. 막타면 동작의 막타 반응이다.
     // attacker : 패링 성공을 알리고, 넉백 방향을 정할 때 위치를 쓰는 공격한 적
     public bool TakeHit(EnemyAttackData attack, EnemyAttackStep step, EnemyAttackData.HitReaction reaction, IEnemyParryable attacker)
     {
+        if(IsDowned) return false;
         if(TryPerfectDodge(attack)) return false;
         if(_actionTrigger.TryParry(attack, step, attacker)) return false;
 
@@ -158,7 +163,9 @@ public class PlayerStatus : MonoBehaviour
 
         CurrentHealth = _currentHealth - attack.Power;
 
-        _controller.StartHit(attack, reaction, attacker.transform);
+        if(IsDowned) _controller.StartDowned();
+        else _controller.StartHit(attack, reaction, attacker.transform);
+
         return true;
     }
 
