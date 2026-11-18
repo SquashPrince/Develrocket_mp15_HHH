@@ -35,7 +35,13 @@ public static class BattleFeedback
     // 충격 방향 : 조작 캐릭터가 밀리는 월드 방향(적 → 캐릭터). 방향이 없는 순간은 Vector3.zero 다.
     public static event Action<Moment, Vector3> Occurred;
 
+    // 플레이어 공격이 적에게 대미지를 줄 때마다 알린다. 대미지 숫자 표시가 쓴다.
+    // 맞은 적 · 대미지 · 강타 여부. 한 번의 판정에서 여러 적을 맞히면 적마다 알린다.
+    public static event Action<Transform, float, bool> DamageDealt;
+
     public static void Raise(Moment moment) => Raise(moment, Vector3.zero);
+
+    public static void RaiseDamage(Transform target, float amount, bool isImpact) => DamageDealt?.Invoke(target, amount, isImpact);
 
     public static void Raise(Moment moment, Vector3 direction)
     {
@@ -52,5 +58,6 @@ public static class BattleFeedback
     private static void Reset()
     {
         Occurred = null;
+        DamageDealt = null;
     }
 }

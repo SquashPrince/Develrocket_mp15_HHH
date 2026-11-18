@@ -251,6 +251,7 @@ public class PlayerAttackJudge : MonoBehaviour
     private void ApplyHit(IEnemyDamageable enemy, ActionData action, bool isImpact, bool canReact, ref IEnemyTargetable comboSkillTarget, ref IEnemyGroggyable comboSkillGroggyable)
     {
         enemy.TakeDamage(action.Power, isImpact);
+        BattleFeedback.RaiseDamage(enemy.transform, action.Power, isImpact);
 
         if(!_hasGainedGauge)
         {

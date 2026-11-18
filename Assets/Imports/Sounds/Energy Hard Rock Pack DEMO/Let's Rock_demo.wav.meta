@@ -1,11 +1,18 @@
 fileFormatVersion: 2
 guid: d28de280d51aaa746b2a21099e617bfe
+AssetOrigin:
+  serializedVersion: 1
+  productId: 54012
+  packageName: DEMO Energy Rock Pack
+  packageVersion: 1.1
+  assetPath: Assets/Energy Hard Rock Pack DEMO/Let's Rock_demo.wav
+  uploadId: 162297
 AudioImporter:
   externalObjects: {}
   serializedVersion: 8
   defaultSettings:
     serializedVersion: 2
-    loadType: 1
+    loadType: 2
     sampleRateSetting: 0
     sampleRateOverride: 0
     compressionFormat: 0
@@ -21,10 +28,3 @@ AudioImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 54012
-  packageName: DEMO Energy Rock Pack
-  packageVersion: 1.1
-  assetPath: Assets/Energy Hard Rock Pack DEMO/Let's Rock_demo.wav
-  uploadId: 162297
