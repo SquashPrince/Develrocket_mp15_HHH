@@ -63,6 +63,14 @@ public static class ParryWindow
     // 적의 연속 패링 패턴 공격이 끝나거나 끊길 때 알린다.
     public static void EndChain(IEnemyParryable attacker) => _chainAttackers.Remove(attacker);
 
+    // 씬을 바꾸기 전에 목록을 비운다. 사라질 적이 목록에 남아 다음 씬에서 파괴된 적을 찾지 않게 한다.
+    // 구독은 각 오브젝트가 꺼질 때 스스로 해제하므로 건드리지 않는다.
+    public static void ClearAttackers()
+    {
+        _openAttackers.Clear();
+        _chainAttackers.Clear();
+    }
+
     // 도메인 리로드를 끈 채 플레이를 다시 시작해도 이전 플레이의 목록 · 구독이 남지 않게 한다.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Reset()

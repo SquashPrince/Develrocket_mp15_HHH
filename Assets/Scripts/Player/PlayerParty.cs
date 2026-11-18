@@ -63,6 +63,8 @@ public class PlayerParty : MonoBehaviour
     private float _lastSwapTime = float.NegativeInfinity;
     // 처음 조작하지 않는 캐릭터들을 껐는지
     private bool _isStandbyReady;
+    // 결과 화면이 떠 입력을 잠갔는지. 씬을 다시 불러오면 풀린다.
+    private bool _isInputLocked;
 
     public CommonCharacterSettings Common => _common;
     public Camera MainCamera => _mainCamera;
@@ -79,8 +81,8 @@ public class PlayerParty : MonoBehaviour
     // 살아 있는 캐릭터가 혼자면 연속 패링 패턴 중에도 패링할 수 없다.
     public bool CanParry => HasStandby || ParryWindow.IsChainActive && CountAliveMembers() > 1;
     public ComboSkillSelector ComboSelector { get; private set; }
-    // 콤보 스킬 캐릭터 선택 중이라 플레이어 입력(교체 · 캐릭터 행동 · 록온)을 막는지
-    public bool IsInputBlocked => ComboSelector.IsBlockingInput;
+    // 플레이어 입력(교체 · 캐릭터 행동 · 록온)을 막는지. 콤보 스킬 캐릭터 선택 중이거나, 결과 화면이 떠 입력을 잠갔을 때다.
+    public bool IsInputBlocked => _isInputLocked || ComboSelector.IsBlockingInput;
 
     // 조작 중인 캐릭터가 바뀌면 알린다. 시작할 때도 첫 캐릭터로 한 번 알린다. 카메라가 따라갈 대상을 바꾸는 데 쓴다.
     public event Action<PlayerController> ControlledChanged;
@@ -144,6 +146,23 @@ public class PlayerParty : MonoBehaviour
         for(int i = 0; i < _members.Length; i++)
         {
             if(_members[i] != caster) _members[i].Status.SetFrozen(isFrozen);
+        }
+    }
+
+    // 결과 화면이 뜨면 게임 흐름이 부른다. 화면의 버튼을 누르는 클릭이 공격 입력으로 들어가지 않게 한다.
+    public void LockInput() => _isInputLocked = true;
+
+    // 모든 캐릭터를 point 위치 · 방향으로 옮긴다. 보스전 재도전으로 씬을 다시 불러왔을 때 시작하며 부른다.
+    // CharacterController 가 켜져 있으면 위치를 직접 바꿔도 덮어쓰므로 잠깐 끄고 옮긴다.
+    public void PlaceAt(Transform point)
+    {
+        for(int i = 0; i < _members.Length; i++)
+        {
+            CharacterController body = _members[i].Body;
+
+            body.enabled = false;
+            _members[i].transform.SetPositionAndRotation(point.position, point.rotation);
+            body.enabled = true;
         }
     }
 

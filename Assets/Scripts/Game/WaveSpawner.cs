@@ -83,6 +83,22 @@ public class WaveSpawner : MonoBehaviour
 #endif
     }
 
+    // 이번 웨이브의 보스 등급 적이 잃은 체력의 비율(0 ~ 1). 보스가 여러 마리면 최대 체력 합 기준이다. 보스가 없으면 0 이다.
+    // 웨이브의 적이 모두 처치되면 목록을 비우므로, 보스전이 끝나는 순간에 읽는다.
+    public float GetBossDamageRatio()
+    {
+        float maxHealth = 0f;
+        float lostHealth = 0f;
+
+        foreach(EnemyState boss in _waveBosses)
+        {
+            maxHealth += boss.MaxHealth;
+            lostHealth += boss.MaxHealth - boss.CurrentHealth;
+        }
+
+        return maxHealth > 0f ? lostHealth / maxHealth : 0f;
+    }
+
     private static bool IsBoss(EnemyController prefab) => prefab.Data.Grade == EnemyGrade.Boss;
 
     // 보스 등급 적을 보스 생성 위치에 만들고 화면 Canvas 에 보스 바를 띄운다.
