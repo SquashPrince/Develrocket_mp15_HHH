@@ -63,6 +63,9 @@ public partial class KeepDistanceAction : Action
 
     protected override Status OnUpdate()
     {
+        // 실행 중 대상이 사라지면(씬 전환 등) 실패한다.
+        if(Target.Value == null) return Status.Failure;
+
         switch(_mode)
         {
             case Mode.BackStep: return UpdateBackStep();

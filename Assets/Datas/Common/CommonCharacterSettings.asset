@@ -25,7 +25,7 @@ MonoBehaviour:
   _lockOnMarkerPrefab: {fileID: 6668375599957286743, guid: 86d476e8f4ecd2443bf6651d8d833efc, type: 3}
   _teleportBlockLayers:
     serializedVersion: 2
-    m_Bits: 3072
+    m_Bits: 3328
   _teleportGroundLayers:
     serializedVersion: 2
     m_Bits: 1024
@@ -33,7 +33,6 @@ MonoBehaviour:
   _groundSearchDepth: 2
   _slowMotionDuration: 1
   _slowMotionEnemyTimeScale: 0.25
-  _slowMotionMarkerPrefab: {fileID: 4365308044123951882, guid: ab2927bfddf64e34c8a41ba60305abf6, type: 3}
   _parryReadyTime: 1
   _parryReactDistance: 3
   _parryReactTime: 1

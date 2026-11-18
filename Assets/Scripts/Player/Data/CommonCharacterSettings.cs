@@ -34,7 +34,7 @@ public class CommonCharacterSettings : ScriptableObject
     [SerializeField] private GameObject _lockOnMarkerPrefab;
 
     [Header("순간 이동")]
-    [Tooltip("순간 이동할 자리가 막혀 있는지 검사할 Layer. Player · Enemy 는 빼고 벽 · 지형만 넣는다")]
+    [Tooltip("순간 이동할 자리가 막혀 있는지 검사할 Layer. 벽 · 지형과 Enemy 를 넣는다(다른 적 몸 안에 서지 않게). Player 는 빼야 자기 몸 · 퇴장 중인 파티원에 막히지 않는다")]
     [SerializeField] private LayerMask _teleportBlockLayers = 1;
     [Tooltip("도착 지점의 바닥을 찾을 Layer. 바닥 · 지형 Layer 를 넣는다")]
     [SerializeField] private LayerMask _teleportGroundLayers = 1;
