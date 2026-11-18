@@ -33,6 +33,9 @@ MonoBehaviour:
     _advanceDuration: 0.15
     _fadeTime: 0.1
     _interrupts: 8
+    _swingSound:
+      _clips: []
+      _volume: 1
   - _animationState: ParryReact
     _hitMode: 0
     _windowTiming: 0
@@ -52,11 +55,17 @@ MonoBehaviour:
     _advanceDuration: 0.15
     _fadeTime: 0.1
     _interrupts: 8
+    _swingSound:
+      _clips: []
+      _volume: 1
   _energyGain: 0
   _ultimateGaugeGain: 0
   _power: 0
   _staggerLevel: 2
   _staggerTime: 2
+  _hitSound:
+    _clips: []
+    _volume: 1
   _energyCost: 0
   _chargeTime: 0.6
   _inputBuffer: 0.4

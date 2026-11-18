@@ -1,27 +1,13 @@
 using System;
 using UnityEngine;
 
-// 효과음 설정. 전투 순간마다 소리 목록과 볼륨을 두고, 재생할 때 목록에서 무작위로 하나 고른다.
-// 같은 순간이 반복될 때 소리가 섞여 나오게 해 반복감을 줄이기 위해서다.
-// 목록에 없는 순간은 소리를 내지 않는다. 순간을 늘리면 항목만 더한다.
+// 공통 효과음 설정. 캐릭터 · 액션과 상관없는 소리(패링 · 완벽 회피 · 피격 · 적 처치 · 대시 · 회피 · 발자국 등)를 전투 순간마다 둔다.
+// 목록에 없거나 소리가 비어 있는 순간은 소리를 내지 않는다. 순간을 늘리면 항목만 더한다.
+// 공격의 휘두름 · 적중 소리는 캐릭터 · 액션마다 다르므로 액션 데이터에 둔다. 그래서 일반 · 강타 적중 순간은 보통 비워 둔다.
 // 버튼 클릭음도 여기서 정한다.
 [CreateAssetMenu(fileName = "NewSfxSettings", menuName = "HHH/Sfx Settings")]
 public class SfxSettings : ScriptableObject
 {
-    // 소리 묶음 하나. 목록에서 무작위로 골라 정한 볼륨으로 재생한다.
-    [Serializable]
-    public class SoundGroup
-    {
-        [SerializeField] private AudioClip[] _clips;
-        [Tooltip("이 묶음의 볼륨(0 ~ 1). 효과음 · 전체 볼륨 설정과 곱해진다")]
-        [SerializeField, Range(0f, 1f)] private float _volume = 1f;
-
-        public float Volume => _volume;
-        public bool HasClip => _clips != null && _clips.Length > 0;
-
-        public AudioClip PickClip() => _clips[UnityEngine.Random.Range(0, _clips.Length)];
-    }
-
     // 전투 순간 하나에 낼 소리
     [Serializable]
     public class MomentSound

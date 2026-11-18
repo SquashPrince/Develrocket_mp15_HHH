@@ -25,6 +25,13 @@ public class PlayerAnimationEventRelay : MonoBehaviour
     private void AttackMotionEnd(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.AttackMotionEnd, animationEvent);
     private void RecoveryEnd(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.RecoveryEnd, animationEvent);
 
+    // 걷기 · 달리기 클립의 발이 땅에 닿는 프레임에 찍는다. 상태 처리와 상관없는 소리 순간이라 상태로 넘기지 않고 바로 알린다.
+    // 조작 중인 캐릭터의 발자국만 알린다. 퇴장 중인 이전 캐릭터가 달려 나갈 때는 소리를 내지 않는다.
+    private void Footstep()
+    {
+        if(_playerController.Party.Controlled == _playerController) BattleFeedback.Raise(BattleFeedback.Moment.Footstep);
+    }
+
     private void Relay(PlayerAnimationEventType type, AnimationEvent animationEvent)
     {
         _playerController.HandleAnimationEvent(type, animationEvent.animatorStateInfo.shortNameHash);

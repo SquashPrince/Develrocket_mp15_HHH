@@ -22,7 +22,13 @@ public static class BattleFeedback
         // 조작 중인 캐릭터가 넉백이 아닌 피격(피격 · 큰 피격)을 당함
         Hurt,
         // 적이 처치됨
-        EnemyKilled
+        EnemyKilled,
+        // 조작 중인 캐릭터가 대시를 시작함 (방향 입력 있음)
+        Dash,
+        // 조작 중인 캐릭터가 회피를 시작함 (방향 입력 없이 뒤로)
+        Dodge,
+        // 조작 중인 캐릭터의 발이 땅에 닿음. 걷기 · 달리기 클립의 이벤트가 알린다
+        Footstep
     }
 
     // 순간과 그 순간의 충격 방향을 알린다. 구독하는 쪽은 꺼질 때 반드시 해제한다.
@@ -34,7 +40,8 @@ public static class BattleFeedback
     public static void Raise(Moment moment, Vector3 direction)
     {
 #if UNITY_EDITOR
-        Debug.Log($"[전투 연출] {moment}");
+        // 발자국은 아주 자주 와서 로그를 남기지 않는다.
+        if(moment != Moment.Footstep) Debug.Log($"[전투 연출] {moment}");
 #endif
 
         Occurred?.Invoke(moment, direction);

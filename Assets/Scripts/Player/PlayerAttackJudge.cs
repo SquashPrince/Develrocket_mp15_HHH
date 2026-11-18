@@ -14,6 +14,7 @@ using UnityEngine;
 // 범위 찾기 : 동작의 모양(상자 · 구 · 캡슐)대로 캐릭터 기준 범위를 확인한다.
 // 맞은 적 처리 : 체력 감소 · 에너지 · 필살기 게이지 획득 · 경직 · 그로기 누적 · 콤보 스킬 발동과 연계.
 // 에너지 · 필살기 게이지 : 한 동작에서 처음 적중했을 때 한 번만 얻는다. 여러 적을 맞히거나 여러 번 타격해도 더 얻지 않는다.
+// 소리 : 동작의 휘두름 소리는 동작에서 처음 판정할 때 한 번, 액션의 적중 소리는 적을 맞힌 판정마다 한 번 요청한다.
 //   공격 상태는 동작을 시작할 때와 상태를 나갈 때 판정 끄기(EndHit)를 부르므로, 그때 기록을 지워 다음 동작에서 다시 얻게 한다.
 //   한 동작 안의 판정 시작 · 끝 · 강타 끝은 판정 구간만 닫고 기록은 남긴다.
 // 두 과정을 나눠 둔 이유는, 나중에 검기처럼 날아가며 판정하는 공격도 같은 맞은 적 처리를 쓰게 하기 위해서다.
@@ -45,6 +46,8 @@ public class PlayerAttackJudge : MonoBehaviour
     private bool _hasReacted;
     // 이번 동작에서 이미 에너지 · 필살기 게이지를 얻었는지. 동작이 바뀌거나 끝날 때(EndHit) 지운다.
     private bool _hasGainedGauge;
+    // 이번 동작에서 휘두름 소리를 냈는지. 동작이 바뀌거나 끝날 때(EndHit) 지운다.
+    private bool _hasPlayedSwing;
 
     // 판정 범위를 찾을 때마다 알린다. 전달 값 : 범위를 찾은 동작
     public event Action<ActionStep> RangeChecked;
@@ -70,6 +73,7 @@ public class PlayerAttackJudge : MonoBehaviour
     public void BeginHit(ActionData action, ActionStep step)
     {
         CloseWindow();
+        PlaySwingSoundOnce(step);
 
         if(step.Mode == ActionStep.HitMode.Instant)
         {
@@ -103,11 +107,12 @@ public class PlayerAttackJudge : MonoBehaviour
     }
 
     // 판정을 바로 끈다. 상태가 바뀌거나 다음 동작으로 넘어갈 때 부른다. 남은 타격은 하지 않는다.
-    // 동작이 바뀌는 때라 이번 동작의 에너지 · 필살기 게이지 획득 기록도 지운다.
+    // 동작이 바뀌는 때라 이번 동작의 에너지 · 필살기 게이지 획득 · 휘두름 소리 기록도 지운다.
     public void EndHit()
     {
         CloseWindow();
         _hasGainedGauge = false;
+        _hasPlayedSwing = false;
     }
 
     // 강타 끝 이벤트. 구간 끝 전의 타격을 마치고, 이 순간 범위 안의 적에게 강타 판정을 한 번 한 뒤 판정을 끈다.
@@ -118,7 +123,18 @@ public class PlayerAttackJudge : MonoBehaviour
         if(IsWindowOpen) HitDueTicks(GetWindowEndTime());
 
         CloseWindow();
+        PlaySwingSoundOnce(step);
         HitInRange(action, step, true, true);
+    }
+
+    // 동작의 휘두름 소리를 이 동작에서 처음 판정할 때 한 번만 낸다. 판정 시작이 없이 강타 끝만 있는 동작은 강타 끝에서 낸다.
+    // 적이 없어도 낸다. 휘두름은 맞았는지와 상관없는 시전 소리이기 때문이다.
+    private void PlaySwingSoundOnce(ActionStep step)
+    {
+        if(_hasPlayedSwing) return;
+
+        _hasPlayedSwing = true;
+        SfxRequest.Play(step.SwingSound);
     }
 
     // 판정 구간만 닫는다. 같은 동작 안의 판정 시작 · 끝 · 강타 끝에서 쓰며, 에너지 · 필살기 게이지 획득 기록은 남긴다.
@@ -213,7 +229,11 @@ public class PlayerAttackJudge : MonoBehaviour
         if(hasHit && canReact) _status.BeginHitLag(step.HitLagTime);
 
         // 여러 적을 맞혀도 연출 · 효과음이 겹쳐 커지지 않게 판정마다 한 번만 알린다.
-        if(hasHit) BattleFeedback.Raise(isImpact ? BattleFeedback.Moment.ImpactHit : BattleFeedback.Moment.NormalHit);
+        if(hasHit)
+        {
+            BattleFeedback.Raise(isImpact ? BattleFeedback.Moment.ImpactHit : BattleFeedback.Moment.NormalHit);
+            SfxRequest.Play(action.HitSound);
+        }
 
         // 판정을 모두 마친 뒤 콤보 스킬 선택을 열어, 같은 판정의 다른 적도 체력 감소 · 경직 · 그로기를 받게 한다.
         // 고를 대기 캐릭터가 없으면 열리지 않고 적의 발동 기회도 남는다.

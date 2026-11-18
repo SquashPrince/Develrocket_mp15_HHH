@@ -45,6 +45,9 @@ public class PlayerDashState : PlayerState
         Controller.Status.BeginDodgeInvincible(Controller.DashInvincibleTime);
         Controller.HorizontalVelocity = _direction * GetSpeed();
         Controller.Animation.Play(IsDodge ? DODGE_ANIMATION : DASH_ANIMATION);
+
+        // 조작 중인 캐릭터일 때만 알린다. 대시 · 회피는 조작 캐릭터만 하지만, 다른 연출 순간과 같은 기준으로 둔다.
+        if(Controller.Party.Controlled == Controller) BattleFeedback.Raise(IsDodge ? BattleFeedback.Moment.Dodge : BattleFeedback.Moment.Dash);
     }
 
     public override void Tick()

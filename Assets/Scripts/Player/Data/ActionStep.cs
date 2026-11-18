@@ -87,6 +87,10 @@ public class ActionStep
     [Tooltip("이 동작 중 허용할 행동. 체크한 것만 허용한다.\n대시 : 휘두르는 중 대시 · 회피로 끊기 (후딜은 항상 끊을 수 있다)\n필살기 : 게이지가 가득 차 있으면 필살기로 끊기 (공격 액션만 사용)\n교체 : 교체 키로 다른 캐릭터와 교체. 막힌 동작 중 누른 교체 키는 무시한다\n패링 교체 : 적이 패링 가능 시간을 열었을 때만 교체(지원 패링)를 허용한다. 교체를 켜면 이 항목은 필요 없다 (예 : 패링 반응 중 연속 패링)")]
     [SerializeField] private Interrupt _interrupts = Interrupt.Dash | Interrupt.Ultimate | Interrupt.Swap;
 
+    [Header("소리")]
+    [Tooltip("이 동작을 휘두를(시전할) 때 내는 소리. 적이 없어도 판정 시작(판정 시작이 없으면 강타 끝) 순간에 동작마다 한 번 낸다. 비워 두면 소리가 없다")]
+    [SerializeField] private SoundGroup _swingSound;
+
     public string AnimationState => _animationState;
     // 재생 · 이벤트 구분에 쓰는 상태 해시. 상태 이름으로 매번 계산한다.
     public int AnimationHash => Animator.StringToHash(_animationState);
@@ -101,6 +105,7 @@ public class ActionStep
     public float AdvanceDistance => _advanceDistance;
     public float AdvanceDuration => _advanceDuration;
     public float FadeTime => _fadeTime;
+    public SoundGroup SwingSound => _swingSound;
 
     // 이 동작 중 interrupt 행동을 허용하는지
     public bool Allows(Interrupt interrupt) => (_interrupts & interrupt) != 0;
