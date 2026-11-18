@@ -1261,8 +1261,6 @@ GameObject:
   - component: {fileID: 253891555}
   - component: {fileID: 253891561}
   - component: {fileID: 253891564}
-  - component: {fileID: 253891562}
-  - component: {fileID: 253891563}
   - component: {fileID: 253891565}
   m_Layer: 0
   m_Name: FreeLook Camera
@@ -1312,15 +1310,15 @@ MonoBehaviour:
         DecelTime: 0.2
     - Name: Orbit Scale
       Owner: {fileID: 253891558}
-      Enabled: 0
+      Enabled: 1
       Input:
-        InputAction: {fileID: 0}
-        Gain: -1
+        InputAction: {fileID: -6257851254053319103, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+        Gain: -2
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
-        AccelTime: 0
-        DecelTime: 0
+        AccelTime: 0.1
+        DecelTime: 0.1
   PlayerIndex: -1
   AutoEnableInputs: 1
 --- !u!114 &253891556
@@ -1362,7 +1360,7 @@ MonoBehaviour:
       Size: {x: 0.8, y: 0.8}
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
-  TargetOffset: {x: 0, y: 1.25, z: 0}
+  TargetOffset: {x: 0, y: 1, z: 0}
   Damping: {x: 0, y: 0}
   Lookahead:
     Enabled: 0
@@ -1423,9 +1421,9 @@ MonoBehaviour:
       Time: 1
     Restrictions: 0
   RadialAxis:
-    Value: 1
-    Center: 1
-    Range: {x: 1, y: 1}
+    Value: 0.6
+    Center: 0.6
+    Range: {x: 0.2, y: 1.2}
     Wrap: 0
     Recentering:
       Enabled: 0
@@ -1483,8 +1481,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 253891554}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.123657785, y: -0.000000027985779, z: 0.0000000034874574, w: 0.99232495}
-  m_LocalPosition: {x: 0, y: 2.105867, z: -3.3807404}
+  m_LocalRotation: {x: 0.17476761, y: -0.00000009341321, z: 0.000000016580788, w: 0.9846097}
+  m_LocalPosition: {x: 0, y: 1.7435201, z: -2.0284443}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1529,35 +1527,6 @@ MonoBehaviour:
     NearLimit: 5
     FarLimit: 30
     MaxQualityBoost: 0.2
---- !u!114 &253891562
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 253891554}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff470b1a15b6bc644ad3b6c13ff106cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraRecenterBlocker
-  _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _orbitalFollow: {fileID: 253891558}
---- !u!114 &253891563
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 253891554}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffbe040b562210845b0cc7c8630e664e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LookSensitivity
-  _lookAction: {fileID: -5630151704836100654, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
-  _mouseSensitivity: {x: 5, y: 5}
-  _stickSensitivity: {x: 10, y: -10}
 --- !u!114 &253891564
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2980,6 +2949,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 552218299}
+  - component: {fileID: 552218301}
+  - component: {fileID: 552218300}
+  - component: {fileID: 552218303}
+  - component: {fileID: 552218302}
   m_Layer: 0
   m_Name: CameraSettings
   m_TagString: Untagged
@@ -3005,6 +2978,71 @@ Transform:
   - {fileID: 2145229456}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &552218300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552218298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffbe040b562210845b0cc7c8630e664e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LookSensitivity
+  _lookAction: {fileID: -5630151704836100654, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _mouseSensitivity: {x: 5, y: 5}
+  _stickSensitivity: {x: 10, y: -10}
+--- !u!114 &552218301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552218298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff470b1a15b6bc644ad3b6c13ff106cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraRecenterBlocker
+  _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _orbitalFollow: {fileID: 253891558}
+--- !u!114 &552218302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552218298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24bbc790ef4cadb42a5a173078784de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraTargetSwitcher
+  _party: {fileID: 1781024354}
+  _cameras:
+  - {fileID: 253891559}
+  - {fileID: 1942779149}
+  _targetGroup: {fileID: 2145229457}
+--- !u!114 &552218303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552218298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ff55638ad2a490449d826b70ab07b8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LockOnCamera
+  _party: {fileID: 1781024354}
+  _lockOnCamera: {fileID: 1942779149}
+  _orbitalFollow: {fileID: 1942779153}
+  _targetGroup: {fileID: 2145229457}
+  _turnTime: 0.2
+  _targetRadius: 1
+  _blockedBlendTime: 0.5
 --- !u!1 &565605710
 GameObject:
   m_ObjectHideFlags: 0
@@ -8455,9 +8493,7 @@ GameObject:
   - component: {fileID: 1942779153}
   - component: {fileID: 1942779152}
   - component: {fileID: 1942779151}
-  - component: {fileID: 1942779154}
   - component: {fileID: 1942779156}
-  - component: {fileID: 1942779155}
   - component: {fileID: 1942779157}
   m_Layer: 0
   m_Name: LockOn Camera
@@ -8518,7 +8554,7 @@ Transform:
   m_GameObject: {fileID: 1942779148}
   serializedVersion: 2
   m_LocalRotation: {x: 0.0000000054052514, y: 0.99232495, z: -0.12365775, w: 0.0000000433759}
-  m_LocalPosition: {x: -0.00000029555372, y: 2.105867, z: 3.3807406}
+  m_LocalPosition: {x: -0, y: 2.105867, z: 3.3807406}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8655,42 +8691,6 @@ MonoBehaviour:
       Wait: 1
       Time: 2
     Restrictions: 0
---- !u!114 &1942779154
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1942779148}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ff55638ad2a490449d826b70ab07b8a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LockOnCamera
-  _party: {fileID: 1781024354}
-  _lockOnCamera: {fileID: 1942779149}
-  _orbitalFollow: {fileID: 1942779153}
-  _targetGroup: {fileID: 2145229457}
-  _turnTime: 0.2
-  _targetRadius: 1
-  _blockedBlendTime: 0.5
---- !u!114 &1942779155
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1942779148}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24bbc790ef4cadb42a5a173078784de5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraTargetSwitcher
-  _party: {fileID: 1781024354}
-  _cameras:
-  - {fileID: 253891559}
-  - {fileID: 1942779149}
-  _targetGroup: {fileID: 2145229457}
 --- !u!114 &1942779156
 MonoBehaviour:
   m_ObjectHideFlags: 0
