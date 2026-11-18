@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1294f4bfd0b0ac4191a63fba382f00e, type: 3}
+  m_Name: ScoreSettings
+  m_EditorClassIdentifier: Assembly-CSharp::ScoreSettings
+  _totalTimeMaxScore: 40000
+  _fullScoreTime: 300
+  _zeroScoreTime: 600
+  _retryMaxScore: 10000
+  _freeRetryCount: 2
+  _retryPenalty: 1250
+  _bossMaxScore: 50000
+  _wipedBossScoreRate: 0.25
+  _grades:
+  - _name: F
+    _minScore: 0
+  - _name: D
+    _minScore: 30000
+  - _name: C
+    _minScore: 45000
+  - _name: B
+    _minScore: 60000
+  - _name: A
+    _minScore: 85000
+  - _name: S
+    _minScore: 100000
