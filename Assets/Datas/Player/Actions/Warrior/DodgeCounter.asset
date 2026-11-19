@@ -62,3 +62,4 @@ MonoBehaviour:
   _groggyGain: 9.2
   _teleport: {fileID: 0}
   _cameraShot: 0
+  _hitEffect: {fileID: 8471836630667197198, guid: b0523a7c89225cb43a6dd77437f9d4c4, type: 3}

@@ -22,7 +22,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 3072
   _sightHeight: 1.2
-  _lockOnMarkerPrefab: {fileID: 6668375599957286743, guid: 86d476e8f4ecd2443bf6651d8d833efc, type: 3}
+  _lockOnMarkerPrefab: {fileID: 6269551623542804000, guid: cd6569d016c63fe409b55165c901081b, type: 3}
   _teleportBlockLayers:
     serializedVersion: 2
     m_Bits: 3328
@@ -50,6 +50,7 @@ MonoBehaviour:
   _comboSelectTimeScale: 0.15
   _groggyHoldTime: 3
   _ultimateTargetSearchRange: 15
+  _ultimateGaugeShareRatio: 0.3
   _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _dashAction: {fileID: 504704208043311331, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _attackAction: {fileID: -2737370060291335809, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}

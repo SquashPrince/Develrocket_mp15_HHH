@@ -13,6 +13,7 @@ using UnityEngine;
 // 동작이 "첫 타격에만 반응"을 켜면, 구간(판정 시작 한 번)에서 처음 적중한 타격에만 경직 · 히트렉을 건다. 강타는 항상 건다.
 // 범위 찾기 : 동작의 모양(상자 · 구 · 캡슐)대로 캐릭터 기준 범위를 확인한다.
 // 맞은 적 처리 : 체력 감소(캐릭터의 대미지 흔들림 · 크리티컬 적용) · 경직 · 그로기 누적 · 콤보 스킬 발동과 연계.
+// 적중 이펙트 : 맞은 적마다 액션의 적중 이펙트를 띄운다 (다단 히트는 타격마다).
 // 에너지 · 필살기 게이지 : 적을 맞힌 판정마다 한 번 얻는다. 한 번의 판정에서 여러 적을 맞혀도 한 번이고, 다단 히트는 타격마다 얻는다.
 // 소리 : 동작의 휘두름 소리는 동작에서 처음 판정할 때 한 번, 액션의 적중 소리는 적을 맞힌 판정마다 한 번 요청한다.
 //   공격 상태는 동작을 시작할 때와 상태를 나갈 때 판정 끄기(EndHit)를 부르므로, 그때 휘두름 소리 기록을 지워 다음 동작에서 다시 내게 한다.
@@ -221,6 +222,7 @@ public class PlayerAttackJudge : MonoBehaviour
             if(enemy == null || !enemy.IsAlive || !_hitTargets.Add(enemy)) continue;
 
             ApplyHit(enemy, action, step, isImpact, canReact, ref comboSkillTarget, ref comboSkillGroggyable);
+            PlayHitEffect(action, _hitColliders[i]);
             hasHit = true;
         }
 
@@ -292,6 +294,25 @@ public class PlayerAttackJudge : MonoBehaviour
 
         enemy.transform.TryGetComponent(out comboSkillTarget);
         comboSkillGroggyable = groggyable;
+    }
+
+    // 맞은 적의 콜라이더에 액션의 적중 이펙트를 띄운다. 처치된 적도 마지막 타격이라 띄운다.
+    // 위치 : 콜라이더 중심 높이에서 캐릭터 쪽으로 가장 가까운 표면. 방향 : 캐릭터 → 적(수평).
+    // 콜라이더가 여러 개인 적은 이번 찾기에서 처음 찾은 콜라이더를 쓴다.
+    private void PlayHitEffect(ActionData action, Collider hitCollider)
+    {
+        if(action.HitEffect == null) return;
+
+        Vector3 center = hitCollider.bounds.center;
+        Vector3 attackerPoint = new Vector3(transform.position.x, center.y, transform.position.z);
+        Vector3 direction = center - attackerPoint;
+
+        direction.y = 0f;
+
+        // 캐릭터와 적의 중심이 겹치면 방향을 알 수 없으므로 캐릭터 정면을 쓴다.
+        if(direction == Vector3.zero) direction = transform.forward;
+
+        BattleEffect.Play(action.HitEffect, hitCollider.ClosestPoint(attackerPoint), Quaternion.LookRotation(direction));
     }
 
     private void CacheComponent()

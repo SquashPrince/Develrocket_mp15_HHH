@@ -90,6 +90,8 @@ public class ActionData : ScriptableObject
     [Header("연출")]
     [Tooltip("이 액션을 쓰는 동안의 카메라 구도. 패링은 패링 액션과 추격 액션에 같은 구도를 고르면 패링 시작부터 추격이 끝날 때까지 이어진다")]
     [SerializeField] private CameraShot _cameraShot = CameraShot.None;
+    [Tooltip("적을 맞힐 때 맞은 적마다 띄우는 이펙트. 몸 중심 높이에서 공격한 캐릭터 쪽 표면에, 캐릭터 → 적 방향으로 띄운다. 비워 두면 띄우지 않는다")]
+    [SerializeField] private GameObject _hitEffect;
 
     public ActionType Type => _actionType;
     public int StepCount => _steps.Length;
@@ -108,6 +110,7 @@ public class ActionData : ScriptableObject
     public float GroggyGain => _groggyGain;
     public TeleportOption Teleport => _teleport;
     public CameraShot Shot => _cameraShot;
+    public GameObject HitEffect => _hitEffect;
 
     // index : 동작 번호(0부터)
     public ActionStep GetStep(int index) => _steps[index];
