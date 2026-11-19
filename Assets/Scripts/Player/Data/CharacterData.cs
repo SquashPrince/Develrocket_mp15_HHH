@@ -25,6 +25,14 @@ public class CharacterData : ScriptableObject
     [Tooltip("완벽 회피 한 번에 얻는 필살기 게이지")]
     [SerializeField, Min(0f)] private float _perfectDodgeGaugeGain = 300f;
 
+    [Header("대미지")]
+    [Tooltip("대미지 흔들림 비율. 0.1 이면 액션 위력의 90% ~ 110% 사이에서 무작위로 정한다. 0 이면 항상 위력 그대로")]
+    [SerializeField, Range(0f, 1f)] private float _damageVariance = 0.1f;
+    [Tooltip("크리티컬 확률. 0.1 이면 10%")]
+    [SerializeField, Range(0f, 1f)] private float _criticalChance = 0.1f;
+    [Tooltip("크리티컬일 때 대미지 배율. 흔들림을 적용한 대미지에 곱한다")]
+    [SerializeField, Min(1f)] private float _criticalMultiplier = 1.5f;
+
     [Header("이동")]
     [SerializeField, Min(0f)] private float _walkSpeed = 4f;
     [SerializeField, Min(0f)] private float _runSpeed = 7f;
@@ -117,4 +125,14 @@ public class CharacterData : ScriptableObject
 
     // step : 콤보 단계(0부터)
     public ActionData GetComboStep(int step) => _comboSteps[step];
+
+    // 액션 위력에 이 캐릭터의 대미지 흔들림과 크리티컬을 적용한 대미지를 뽑는다. 부를 때마다 새로 뽑는다.
+    public float RollDamage(float power, out bool isCritical)
+    {
+        float damage = power * Random.Range(1f - _damageVariance, 1f + _damageVariance);
+
+        isCritical = Random.value < _criticalChance;
+
+        return isCritical ? damage * _criticalMultiplier : damage;
+    }
 }

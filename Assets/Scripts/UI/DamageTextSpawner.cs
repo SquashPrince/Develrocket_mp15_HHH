@@ -24,12 +24,12 @@ public class DamageTextSpawner : MonoBehaviour
     private void OnEnable() => BindFeedbackEvent();
     private void OnDisable() => UnbindFeedbackEvent();
 
-    private void OnDamageDealt(Transform target, float amount, bool isImpact)
+    private void OnDamageDealt(Transform target, float amount, bool isImpact, bool isCritical)
     {
         Vector2 offset = Random.insideUnitCircle * _randomOffset;
         Vector3 position = GetAnchorPosition(target) + new Vector3(offset.x, 0f, offset.y);
 
-        GetText().Show(_camera, position, amount, isImpact);
+        GetText().Show(_camera, position, amount, isImpact, isCritical);
     }
 
     private Vector3 GetAnchorPosition(Transform target)

@@ -30,9 +30,9 @@ public class ActionData : ScriptableObject
     [SerializeField] private ActionStep[] _steps = { new ActionStep() };
 
     [Header("타격 값")]
-    [Tooltip("적중한 적 하나마다 얻는 에너지")]
+    [Tooltip("적을 맞힌 판정마다 얻는 에너지. 한 번의 판정에서 여러 적을 맞혀도 한 번만 얻는다")]
     [SerializeField, Min(0f)] private float _energyGain = 5f;
-    [Tooltip("적중한 적 하나마다 얻는 필살기 게이지")]
+    [Tooltip("적을 맞힌 판정마다 얻는 필살기 게이지. 한 번의 판정에서 여러 적을 맞혀도 한 번만 얻는다")]
     [SerializeField, Min(0f)] private float _ultimateGaugeGain = 50f;
     [Tooltip("적중 시 위력. 맞은 적의 체력을 이만큼 깎는다")]
     [SerializeField, Min(0f)] private float _power = 10f;

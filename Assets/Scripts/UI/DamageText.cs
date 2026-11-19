@@ -5,7 +5,8 @@ using UnityEngine;
 // 화면 공간 Canvas 위에 있고, 매 프레임 월드 위치를 화면 좌표로 바꿔 따라간다. 거리와 상관없이 같은 크기로 읽히게 하기 위해서다.
 // 위치는 맞은 순간의 값을 쓴다. 적이 움직여도 숫자는 맞은 자리에서 떠오른다.
 // 카메라 뒤쪽 위치는 화면에 그리지 않는다.
-// 강타는 크기 · 색을 다르게 한다. 게임 시간으로 움직여 일시정지 중에는 멈춘다.
+// 강타는 크기 · 색을 다르게 한다. 크리티컬은 크리티컬 색을 쓰고 크기를 더 키운다(강타 크리티컬은 두 배율을 곱한다).
+// 게임 시간으로 움직여 일시정지 중에는 멈춘다.
 [RequireComponent(typeof(TMP_Text))]
 public class DamageText : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class DamageText : MonoBehaviour
     [SerializeField] private Color _impactColor = new Color(1f, 0.8f, 0.2f);
     [Tooltip("강타 숫자의 크기 배율")]
     [SerializeField, Min(1f)] private float _impactScale = 1.4f;
+    [SerializeField] private Color _criticalColor = new Color(1f, 0.3f, 0.2f);
+    [Tooltip("크리티컬 숫자의 크기 배율")]
+    [SerializeField, Min(1f)] private float _criticalScale = 1.3f;
 
     private TMP_Text _text;
     private Camera _camera;
@@ -30,16 +34,16 @@ public class DamageText : MonoBehaviour
 
     // worldPosition 에서 amount 를 띄운다. 숫자는 반올림한 정수로 보여준다.
     // 먼저 켜서, 꺼진 채 만들어져 아직 준비(Awake)되지 않은 숫자도 바로 쓸 수 있게 한다.
-    public void Show(Camera camera, Vector3 worldPosition, float amount, bool isImpact)
+    public void Show(Camera camera, Vector3 worldPosition, float amount, bool isImpact, bool isCritical)
     {
         gameObject.SetActive(true);
         _camera = camera;
         _worldPosition = worldPosition;
         _timer = 0f;
-        _color = isImpact ? _impactColor : _normalColor;
+        _color = isCritical ? _criticalColor : isImpact ? _impactColor : _normalColor;
         _text.text = Mathf.RoundToInt(amount).ToString();
         _text.color = _color;
-        transform.localScale = _baseScale * (isImpact ? _impactScale : 1f);
+        transform.localScale = _baseScale * (isImpact ? _impactScale : 1f) * (isCritical ? _criticalScale : 1f);
         UpdatePosition(0f);
     }
 
