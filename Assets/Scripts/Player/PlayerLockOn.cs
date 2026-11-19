@@ -2,7 +2,9 @@ using UnityEngine;
 
 // 플레이어의 록온 상태. 록온은 캐릭터가 아니라 플레이어가 고른 대상이라 파티에 하나만 둔다.
 //   교체해도 같은 대상을 계속 록온하고, 록온 표시 · 록온 카메라도 하나만 본다.
-// 록온 입력마다 록온과 해제를 번갈아 하고, 대상이 처치되거나 록온 사거리 밖으로 나가면 자동으로 해제한다.
+// 록온 입력마다 록온과 해제를 번갈아 하고, 대상이 록온 사거리 밖으로 나가면 자동으로 해제한다.
+// 대상이 처치되면 록온 입력과 같은 규칙으로 다음 대상을 찾아 옮기고, 없으면 해제한다.
+// 패링을 시작하면 패링 대상으로 록온을 옮긴다(LockOnTo). 패링에 실패해도 록온은 남는다.
 // 록온할 대상 찾기 · 거리 · 가림 확인은 조작 중인 캐릭터를 기준으로 한다. 대상 찾기 규칙은 캐릭터의 타겟팅 기능을 그대로 쓴다.
 // 록온 사거리 · 록온 표시 Prefab 과 록온 입력은 파티의 공통 설정에서 읽는다. 록온 표시는 시작할 때 Prefab 으로 만든다.
 public class PlayerLockOn : MonoBehaviour
@@ -39,10 +41,18 @@ public class PlayerLockOn : MonoBehaviour
 
         if(_lockTarget == null) return;
 
-        // 록온 대상이 처치되었거나 조작 중인 캐릭터에서 록온 사거리 밖으로 나가면 록온을 푼다.
+        // 록온 대상이 처치되면 다음 대상으로 옮긴다. 다음 대상이 없으면 풀린다.
+        if(!_lockTarget.IsAlive)
+        {
+            SetLockTarget(Targeting.FindTarget(Common.LockOnRange, true));
+
+            if(_lockTarget == null) return;
+        }
+
+        // 조작 중인 캐릭터에서 록온 사거리 밖으로 나가면 록온을 푼다.
         Vector3 toTarget = _lockTarget.transform.position - _party.Controlled.transform.position;
 
-        if(!_lockTarget.IsAlive || toTarget.sqrMagnitude > Common.LockOnRange * Common.LockOnRange)
+        if(toTarget.sqrMagnitude > Common.LockOnRange * Common.LockOnRange)
         {
             SetLockTarget(null);
             return;
@@ -54,6 +64,14 @@ public class PlayerLockOn : MonoBehaviour
         // 대상이 알려주는 록온 표시 위치(머리 · 가슴 등)가 있으면 그 위치를 따라가고, 없으면 기본 높이에 띄운다.
         Transform lockOnPoint = _lockTarget.LockOnPoint;
         _lockOnMarker.position = lockOnPoint != null ? lockOnPoint.position : _lockTarget.transform.position + Vector3.up * _markerHeight;
+    }
+
+    // 록온 입력 없이 정한 대상으로 록온한다. 이미 다른 대상을 록온 중이면 이 대상으로 옮긴다.
+    public void LockOnTo(IEnemyTargetable target)
+    {
+        if(target == _lockTarget) return;
+
+        SetLockTarget(target);
     }
 
     private void SetLockTarget(IEnemyTargetable target)

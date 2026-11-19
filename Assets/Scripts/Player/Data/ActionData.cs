@@ -5,7 +5,8 @@ using UnityEngine;
 // 액션은 동작 목록을 가진다. 1개면 한 동작만, 여러 개면 순서대로 이어 재생한다. (예: 필살기 난무 2동작)
 // 동작마다 재생할 상태 · 판정 범위 · 전진이 다르고, 위력 · 경직 · 게이지 · 캔슬 · 무적 같은 타격 값은 액션 공통이다.
 // 일부 액션에만 붙는 기능은 추가 옵션(옵션 에셋 참조)으로 붙인다. 비워 두면 그 기능을 쓰지 않는다. (예: 순간 이동)
-// 카메라 워크 · Timeline 같은 연출 참조와 시네마틱 이동(경로 이동)은 연출 작업 때 이 에셋에 추가한다.
+// 카메라 구도는 구도 종류만 고르고, 실제 카메라는 씬의 구도 카메라 기능(CameraShotDirector)이 정한다. 에셋은 씬의 카메라를 직접 가리킬 수 없기 때문이다.
+// Timeline 같은 연출 참조와 시네마틱 이동(경로 이동)은 연출 작업 때 이 에셋에 추가한다.
 [CreateAssetMenu(fileName = "NewActionData", menuName = "HHH/Action Data")]
 public class ActionData : ScriptableObject
 {
@@ -23,6 +24,23 @@ public class ActionData : ScriptableObject
         ComboSkill
     }
 
+    // 이 액션을 쓰는 동안 화면을 맡을 공용 구도. Inspector 에 저장된 값은 순서 번호이므로, 새 구도는 항상 맨 뒤에 추가한다.
+    public enum CameraShot
+    {
+        // 구도 없음. 조작 카메라(일반 · 록온)를 그대로 쓴다
+        None,
+        // 아래에서 올려다보는 구도
+        LowAngle,
+        // 옆에서 보는 구도
+        Side,
+        // 앞에서 가깝게 보는 구도
+        FrontClose,
+        // 위에서 내려다보는 구도
+        HighAngle,
+        // 패링 성공후 추격 공격시
+        ParryChase
+    }
+
     [Tooltip("[예정] 액션 종류. 공격 종류에 따라 대미지를 다르게 계산할 때 쓴다. 지금은 동작에 쓰지 않는다")]
     [SerializeField] private ActionType _actionType = ActionType.Basic;
 
@@ -30,9 +48,9 @@ public class ActionData : ScriptableObject
     [SerializeField] private ActionStep[] _steps = { new ActionStep() };
 
     [Header("타격 값")]
-    [Tooltip("적중한 적 하나마다 얻는 에너지")]
+    [Tooltip("적을 맞힌 판정마다 얻는 에너지. 한 번의 판정에서 여러 적을 맞혀도 한 번만 얻는다")]
     [SerializeField, Min(0f)] private float _energyGain = 5f;
-    [Tooltip("적중한 적 하나마다 얻는 필살기 게이지")]
+    [Tooltip("적을 맞힌 판정마다 얻는 필살기 게이지. 한 번의 판정에서 여러 적을 맞혀도 한 번만 얻는다")]
     [SerializeField, Min(0f)] private float _ultimateGaugeGain = 50f;
     [Tooltip("적중 시 위력. 맞은 적의 체력을 이만큼 깎는다")]
     [SerializeField, Min(0f)] private float _power = 10f;
@@ -69,6 +87,10 @@ public class ActionData : ScriptableObject
     [Tooltip("액션을 시작할 때 대상 앞으로 순간 이동하는 옵션. 비워 두면 순간 이동하지 않는다")]
     [SerializeField] private TeleportOption _teleport;
 
+    [Header("연출")]
+    [Tooltip("이 액션을 쓰는 동안의 카메라 구도. 패링은 패링 액션과 추격 액션에 같은 구도를 고르면 패링 시작부터 추격이 끝날 때까지 이어진다")]
+    [SerializeField] private CameraShot _cameraShot = CameraShot.None;
+
     public ActionType Type => _actionType;
     public int StepCount => _steps.Length;
     public float EnergyGain => _energyGain;
@@ -85,6 +107,7 @@ public class ActionData : ScriptableObject
     public bool IsInvincibleOnSwing => _isInvincibleOnSwing;
     public float GroggyGain => _groggyGain;
     public TeleportOption Teleport => _teleport;
+    public CameraShot Shot => _cameraShot;
 
     // index : 동작 번호(0부터)
     public ActionStep GetStep(int index) => _steps[index];

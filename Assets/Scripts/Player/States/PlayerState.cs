@@ -18,6 +18,9 @@ public abstract class PlayerState
     // 액션을 쓰는 상태(공격 · 패링 · 필살기 · 콤보 스킬)는 지금 동작의 끼어들기 허용을 따른다.
     public virtual bool CanSwap => true;
 
+    // 이 상태가 지금 쓰고 있는 액션. 액션을 쓰지 않는 상태(이동 · 피격 등)는 null 이다. 카메라 구도가 읽는다.
+    public virtual ActionData CurrentAction => null;
+
     public virtual void Enter()
     {
     }

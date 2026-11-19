@@ -20,6 +20,9 @@ MonoBehaviour:
   _maxUltimateGauge: 3000
   _parryGaugeGain: 225
   _perfectDodgeGaugeGain: 25
+  _damageVariance: 0.1
+  _criticalChance: 0.15
+  _criticalMultiplier: 1.5
   _walkSpeed: 5
   _runSpeed: 10
   _turnTime: 0.1

@@ -76,6 +76,8 @@ public class PlayerController : MonoBehaviour
     public bool CanUseUltimate => _stateMachine.CurrentState.CanUseUltimate;
     // 현재 상태에서 교체할 수 있는지. 상태마다 스스로 정한다.
     public bool CanSwap => _stateMachine.CurrentState.CanSwap;
+    // 현재 상태가 쓰고 있는 액션. 액션을 쓰지 않는 상태면 null 이다.
+    public ActionData CurrentAction => _stateMachine.CurrentState.CurrentAction;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();

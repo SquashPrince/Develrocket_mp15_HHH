@@ -150,8 +150,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31bef0e692fc24d4d808636f095b40bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageText
-  _lifetime: 0.4
-  _riseHeight: 0.5
+  _lifetime: 0.25
+  _riseHeight: 0.35
   _normalColor: {r: 1, g: 1, b: 1, a: 1}
   _impactColor: {r: 1, g: 0.8, b: 0.2, a: 1}
   _impactScale: 2
+  _criticalColor: {r: 1, g: 0.3, b: 0.2, a: 1}
+  _criticalScale: 2.5

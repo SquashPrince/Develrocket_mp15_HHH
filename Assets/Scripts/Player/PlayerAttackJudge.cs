@@ -12,10 +12,10 @@ using UnityEngine;
 // 적중하면 동작의 히트렉 시간 동안 공격한 캐릭터만 멈추도록 상태 기능에 요청한다.
 // 동작이 "첫 타격에만 반응"을 켜면, 구간(판정 시작 한 번)에서 처음 적중한 타격에만 경직 · 히트렉을 건다. 강타는 항상 건다.
 // 범위 찾기 : 동작의 모양(상자 · 구 · 캡슐)대로 캐릭터 기준 범위를 확인한다.
-// 맞은 적 처리 : 체력 감소 · 에너지 · 필살기 게이지 획득 · 경직 · 그로기 누적 · 콤보 스킬 발동과 연계.
-// 에너지 · 필살기 게이지 : 한 동작에서 처음 적중했을 때 한 번만 얻는다. 여러 적을 맞히거나 여러 번 타격해도 더 얻지 않는다.
+// 맞은 적 처리 : 체력 감소(캐릭터의 대미지 흔들림 · 크리티컬 적용) · 경직 · 그로기 누적 · 콤보 스킬 발동과 연계.
+// 에너지 · 필살기 게이지 : 적을 맞힌 판정마다 한 번 얻는다. 한 번의 판정에서 여러 적을 맞혀도 한 번이고, 다단 히트는 타격마다 얻는다.
 // 소리 : 동작의 휘두름 소리는 동작에서 처음 판정할 때 한 번, 액션의 적중 소리는 적을 맞힌 판정마다 한 번 요청한다.
-//   공격 상태는 동작을 시작할 때와 상태를 나갈 때 판정 끄기(EndHit)를 부르므로, 그때 기록을 지워 다음 동작에서 다시 얻게 한다.
+//   공격 상태는 동작을 시작할 때와 상태를 나갈 때 판정 끄기(EndHit)를 부르므로, 그때 휘두름 소리 기록을 지워 다음 동작에서 다시 내게 한다.
 //   한 동작 안의 판정 시작 · 끝 · 강타 끝은 판정 구간만 닫고 기록은 남긴다.
 // 두 과정을 나눠 둔 이유는, 나중에 검기처럼 날아가며 판정하는 공격도 같은 맞은 적 처리를 쓰게 하기 위해서다.
 // 범위를 찾을 때 이벤트로 알려, 디버그 기능이 범위를 표시한다. 디버그 기능이 없어도 판정은 그대로다.
@@ -44,8 +44,6 @@ public class PlayerAttackJudge : MonoBehaviour
     private bool _windowEndsWithImpact;
     private int _nextTickIndex;
     private bool _hasReacted;
-    // 이번 동작에서 이미 에너지 · 필살기 게이지를 얻었는지. 동작이 바뀌거나 끝날 때(EndHit) 지운다.
-    private bool _hasGainedGauge;
     // 이번 동작에서 휘두름 소리를 냈는지. 동작이 바뀌거나 끝날 때(EndHit) 지운다.
     private bool _hasPlayedSwing;
 
@@ -107,11 +105,10 @@ public class PlayerAttackJudge : MonoBehaviour
     }
 
     // 판정을 바로 끈다. 상태가 바뀌거나 다음 동작으로 넘어갈 때 부른다. 남은 타격은 하지 않는다.
-    // 동작이 바뀌는 때라 이번 동작의 에너지 · 필살기 게이지 획득 · 휘두름 소리 기록도 지운다.
+    // 동작이 바뀌는 때라 이번 동작의 휘두름 소리 기록도 지운다.
     public void EndHit()
     {
         CloseWindow();
-        _hasGainedGauge = false;
         _hasPlayedSwing = false;
     }
 
@@ -137,7 +134,7 @@ public class PlayerAttackJudge : MonoBehaviour
         SfxRequest.Play(step.SwingSound);
     }
 
-    // 판정 구간만 닫는다. 같은 동작 안의 판정 시작 · 끝 · 강타 끝에서 쓰며, 에너지 · 필살기 게이지 획득 기록은 남긴다.
+    // 판정 구간만 닫는다. 같은 동작 안의 판정 시작 · 끝 · 강타 끝에서 쓰며, 휘두름 소리 기록은 남긴다.
     private void CloseWindow()
     {
         IsWindowOpen = false;
@@ -228,9 +225,11 @@ public class PlayerAttackJudge : MonoBehaviour
 
         if(hasHit && canReact) _status.BeginHitLag(step.HitLagTime);
 
-        // 여러 적을 맞혀도 연출 · 효과음이 겹쳐 커지지 않게 판정마다 한 번만 알린다.
+        // 여러 적을 맞혀도 게이지 · 연출 · 효과음이 겹쳐 커지지 않게 판정마다 한 번만 얻고 알린다.
         if(hasHit)
         {
+            _status.AddEnergy(action.EnergyGain);
+            _status.AddUltimateGauge(action.UltimateGaugeGain);
             BattleFeedback.Raise(isImpact ? BattleFeedback.Moment.ImpactHit : BattleFeedback.Moment.NormalHit);
             SfxRequest.Play(action.HitSound);
         }
@@ -242,7 +241,7 @@ public class PlayerAttackJudge : MonoBehaviour
         return hasHit;
     }
 
-    // 맞은 적 하나에 결과를 적용한다. 체력은 액션의 위력만큼 줄고, 이번 동작에서 처음 적중했으면 에너지와 필살기 게이지를 얻는다.
+    // 맞은 적 하나에 결과를 적용한다. 대미지는 액션의 위력에 캐릭터의 대미지 흔들림 · 크리티컬을 적용한 값이며, 적마다 따로 뽑는다.
     // canReact 이고 액션의 경직 시간이 0보다 크면, 경직 저항 레벨이 액션의 경직 레벨 이하인 적을 경직시킨다.
     // 그로기 게이지는 반응 여부와 상관없이 모든 적중마다 액션의 그로기 값만큼 쌓는다.
     // 강타가 그로기 적에게 맞으면 콤보 스킬 대상으로 고른다. 한 번의 판정에서 콤보 스킬은 하나의 적에게만 발동한다.
@@ -250,15 +249,10 @@ public class PlayerAttackJudge : MonoBehaviour
     // 이 적중으로 그로기에 들어갔으면 콤보 스킬 선택에 알려 그로기 정지 시간을 걸게 한다.
     private void ApplyHit(IEnemyDamageable enemy, ActionData action, bool isImpact, bool canReact, ref IEnemyTargetable comboSkillTarget, ref IEnemyGroggyable comboSkillGroggyable)
     {
-        enemy.TakeDamage(action.Power, isImpact);
-        BattleFeedback.RaiseDamage(enemy.transform, action.Power, isImpact);
+        float damage = _controller.Character.RollDamage(action.Power, out bool isCritical);
 
-        if(!_hasGainedGauge)
-        {
-            _status.AddEnergy(action.EnergyGain);
-            _status.AddUltimateGauge(action.UltimateGaugeGain);
-            _hasGainedGauge = true;
-        }
+        enemy.TakeDamage(damage, isImpact);
+        BattleFeedback.RaiseDamage(enemy.transform, damage, isImpact, isCritical);
 
         // 이 타격으로 처치된 적은 경직 · 콤보 스킬 대상이 아니다. 그로기 적이 강타로 처치되면 콤보 스킬보다 처치가 먼저다.
         if(!enemy.IsAlive) return;
