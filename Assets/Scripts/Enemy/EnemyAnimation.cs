@@ -5,7 +5,7 @@ using UnityEngine;
 // 경직되면 Hit, 그로기 중 맞으면 Hit 만 재생하고 그로기를 유지, 그로기가 되면 Groggy, 회복하면 Idle, 처치되면 Die 를 재생한다.
 // 공격 중 맞았지만 경직 저항으로 경직되지 않았으면 공격 모션이 끊기지 않도록 Hit 을 재생하지 않는다.
 // Hit 이 끝난 뒤 Groggy · Idle 중 어디로 돌아갈지는 Animator 의 IsGroggy 파라미터와 전이선이 정한다.
-// 완벽 회피 슬로모션 · 필살기 연출 동안 함께 느려지거나 멈추도록 Animator 재생 속도를 적 전용 시간 배율에 맞춘다.
+// 완벽 회피 슬로모션 · 필살기 연출 · 맞은 적 히트스톱 동안 함께 느려지거나 멈추도록 Animator 재생 속도를 이 적의 시간 배율에 맞춘다.
 [RequireComponent(typeof(EnemyState))]
 public class EnemyAnimation : MonoBehaviour
 {
@@ -32,7 +32,7 @@ public class EnemyAnimation : MonoBehaviour
     private void Awake() => CacheComponent();
     private void OnEnable() => BindReactionEvent();
     private void OnDisable() => UnbindReactionEvent();
-    private void Update() => _animator.speed = EnemyTime.Scale;
+    private void Update() => _animator.speed = _state.Clock.Scale;
 
     // 이동 기능이 이동을 시작하면 Run 또는 Move, 멈추면 Idle 을 재생한다.
     // isDirectional : 대상을 바라본 채 움직이는 이동(거리 유지)이면 true. 방향 값(MoveX · MoveZ)으로 앞 · 뒤 · 좌 · 우 · 제자리 모션을 섞는 Move 를 재생한다.
@@ -49,8 +49,8 @@ public class EnemyAnimation : MonoBehaviour
     // 적이 바라보는 방향 기준의 이동 방향을 넘긴다. x 는 오른쪽(+) · 왼쪽(-), z 는 앞(+) · 뒤(-), 멈춰 있으면 (0, 0) 이다.
     public void SetMoveDirection(Vector3 localDirection)
     {
-        _animator.SetFloat(MOVE_X_PARAMETER, localDirection.x, MOVE_DIRECTION_DAMP_TIME, EnemyTime.DeltaTime);
-        _animator.SetFloat(MOVE_Z_PARAMETER, localDirection.z, MOVE_DIRECTION_DAMP_TIME, EnemyTime.DeltaTime);
+        _animator.SetFloat(MOVE_X_PARAMETER, localDirection.x, MOVE_DIRECTION_DAMP_TIME, _state.Clock.DeltaTime);
+        _animator.SetFloat(MOVE_Z_PARAMETER, localDirection.z, MOVE_DIRECTION_DAMP_TIME, _state.Clock.DeltaTime);
     }
 
     // 공격 단계처럼 다른 기능이 정한 상태를 재생한다.

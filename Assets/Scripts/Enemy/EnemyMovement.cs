@@ -72,7 +72,7 @@ public class EnemyMovement : MonoBehaviour
         Vector3 toCorner = _agent.steeringTarget - transform.position;
         toCorner.y = 0f;
 
-        float step = Mathf.Min(_speed * EnemyTime.DeltaTime, toCorner.magnitude);
+        float step = Mathf.Min(_speed * _state.Clock.DeltaTime, toCorner.magnitude);
         Vector3 moveDirection = toCorner.normalized;
 
         // Agent 의 위치를 먼저 옮기면 NavMesh 위로 맞춰지므로, 맞춰진 위치를 실제 위치로 쓴다.
@@ -94,7 +94,7 @@ public class EnemyMovement : MonoBehaviour
         if(direction == Vector3.zero) return;
 
         Quaternion targetRotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _data.TurnSpeed * EnemyTime.DeltaTime);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _data.TurnSpeed * _state.Clock.DeltaTime);
     }
 
     private void CacheComponent()

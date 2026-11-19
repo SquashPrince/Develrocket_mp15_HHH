@@ -13,4 +13,7 @@ public interface IEnemyDamageable
     // power : 공격 위력. 체력에서 뺀다.
     // isImpact : 강타인지. 체력이 0 인 적은 강타에 맞아야만 처치된다.
     void TakeDamage(float power, bool isImpact);
+
+    // duration(초) 동안 이 적 하나만 멈춘다(히트스톱). 다른 적과 플레이어는 그대로 움직인다.
+    void BeginHitStop(float duration);
 }

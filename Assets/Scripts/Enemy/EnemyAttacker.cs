@@ -189,7 +189,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     {
         for(int i = 0; i < _cooldownTimers.Length; i++)
         {
-            if(_cooldownTimers[i] > 0f) _cooldownTimers[i] -= EnemyTime.DeltaTime;
+            if(_cooldownTimers[i] > 0f) _cooldownTimers[i] -= _state.Clock.DeltaTime;
         }
     }
 
@@ -296,7 +296,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     {
         if(!_isHitActive) return;
 
-        _windowElapsed += EnemyTime.DeltaTime;
+        _windowElapsed += _state.Clock.DeltaTime;
         HitDueTicks(_windowElapsed);
     }
 
@@ -468,7 +468,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
         if(toTarget == Vector3.zero) return;
 
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(toTarget), CurrentAttack.TurnSpeed * EnemyTime.DeltaTime);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(toTarget), CurrentAttack.TurnSpeed * _state.Clock.DeltaTime);
     }
 
     private void StartLeap(AnimationEvent animationEvent)

@@ -42,6 +42,7 @@ public partial class KeepDistanceAction : Action
     private EnemyMovement _movement;
     private EnemyAnimation _animation;
     private EnemyData _data;
+    private EnemyClock _clock;
     private float _timer;
     // 1 이면 위에서 볼 때 시계 방향, -1 이면 반시계 방향으로 돈다.
     private float _strafeSign;
@@ -54,6 +55,7 @@ public partial class KeepDistanceAction : Action
         _movement = GameObject.GetComponent<EnemyMovement>();
         _animation = GameObject.GetComponent<EnemyAnimation>();
         _data = GameObject.GetComponent<EnemyController>().Data;
+        _clock = GameObject.GetComponent<EnemyState>().Clock;
         _timer = _data.PickKeepDistanceTime();
         _strafeSign = Random.value < 0.5f ? 1f : -1f;
         _mode = PickMode();
@@ -95,7 +97,7 @@ public partial class KeepDistanceAction : Action
     // 속도 0 으로 지금 위치를 목적지로 넘겨, 움직이지 않고 대상 쪽으로 몸만 돌린다. 방향 모션은 (0, 0) 이라 제자리 모션이 나온다.
     private Status UpdateIdle()
     {
-        _timer -= EnemyTime.DeltaTime;
+        _timer -= _clock.DeltaTime;
 
         if(_timer <= 0f) return Status.Success;
 
@@ -117,7 +119,7 @@ public partial class KeepDistanceAction : Action
 
     private Status UpdateStrafe()
     {
-        _timer -= EnemyTime.DeltaTime;
+        _timer -= _clock.DeltaTime;
 
         if(_timer <= 0f) return Status.Success;
 
