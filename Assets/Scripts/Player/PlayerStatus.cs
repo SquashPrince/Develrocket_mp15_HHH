@@ -166,7 +166,12 @@ public class PlayerStatus : MonoBehaviour
 
         CurrentHealth = _currentHealth - attack.Power;
 
-        if(IsDowned) _controller.StartDowned();
+        // 쓰러지면 에너지도 모두 잃는다.
+        if(IsDowned)
+        {
+            CurrentEnergy = 0f;
+            _controller.StartDowned();
+        }
         else _controller.StartHit(attack, reaction, attacker.transform);
 
         return true;
@@ -183,7 +188,18 @@ public class PlayerStatus : MonoBehaviour
         return true;
     }
 
+    // 공격 적중 · 패링 · 완벽 회피로 얻는 필살기 게이지. 조작 중인 캐릭터가 얻으면 다른 파티원도 공통 설정의 비율만큼 함께 얻는다.
     public void AddUltimateGauge(float amount)
+    {
+        if(amount <= 0f) return;
+
+        CurrentUltimateGauge += amount;
+
+        if(_controller.Party.Controlled == _controller) _controller.Party.ShareUltimateGauge(_controller, amount);
+    }
+
+    // 다른 파티원이 나눠 준 필살기 게이지. 받은 게이지는 다시 나눠 주지 않는다.
+    public void ReceiveSharedUltimateGauge(float amount)
     {
         if(amount <= 0f) return;
 
@@ -230,7 +246,13 @@ public class PlayerStatus : MonoBehaviour
         if(_perfectDodgeTimer > 0f) _perfectDodgeTimer -= DeltaTime;
     }
 
-    private void RegenerateEnergy() => CurrentEnergy += _controller.Character.EnergyRegenPerSecond * DeltaTime;
+    // 쓰러진 캐릭터는 에너지가 다시 차지 않는다.
+    private void RegenerateEnergy()
+    {
+        if(IsDowned) return;
+
+        CurrentEnergy += _controller.Character.EnergyRegenPerSecond * DeltaTime;
+    }
 
     private void CacheComponent()
     {

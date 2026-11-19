@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 // 캐릭터 칸 하나. 초상화 · 체력 · 에너지 막대와 [선택] 필살기 게이지 숫자를 보여준다. 조작 캐릭터 칸과 대기 캐릭터 칸이 함께 쓴다.
 // 체력 · 필살기 게이지는 상태 기능의 알림이 올 때만 다시 그리고, 에너지는 시간이 지나며 계속 차므로 매 프레임 읽는다.
+// 쓰러진 캐릭터는 초상화를 회색으로 어둡게 보여준다. 체력이 바뀔 때 함께 정하므로, 교체로 칸의 캐릭터가 바뀌어도 맞게 보인다.
 // 맡은 캐릭터가 바뀌면 이전 캐릭터의 알림을 해제하고 새 캐릭터의 알림을 구독한다. 해제하지 않으면 다른 캐릭터의 값으로 그려지기 때문이다.
 // 막대는 Slider(0 ~ 1)로 그린다. 채움 영역의 크기가 줄어드는 방식이라 막대 끝 장식(9-slice)이 줄어들어도 유지된다.
 // 체력 막대 뒤의 잔상 막대는 맞아서 줄어든 체력만 잔상으로 남긴다. 맡은 캐릭터가 바뀌거나 처음 그릴 때는 잔상 없이 바로 맞춘다.
@@ -29,6 +30,8 @@ public class CharacterGauge : MonoBehaviour
     }
 
     [SerializeField] private Image _portraitImage;
+    [Tooltip("쓰러진 캐릭터의 초상화에 곱할 색. 회색으로 어둡게 보인다")]
+    [SerializeField] private Color _downedPortraitColor = new Color(0.35f, 0.35f, 0.35f);
     [SerializeField] private Slider _healthSlider;
     [Tooltip("체력 막대 뒤에 겹친 잔상 막대")]
     [SerializeField] private GaugeTrail _healthTrail;
@@ -52,6 +55,8 @@ public class CharacterGauge : MonoBehaviour
 
     private PlayerController _character;
     private PlayerStatus _status;
+    // 초상화의 원래 색. 쓰러지지 않은 캐릭터에 쓴다.
+    private Color _portraitBaseColor;
     // 에너지 막대 채움 영역의 이미지와 원래 색
     private Image _energyFillImage;
     private Color _energyBaseFillColor;
@@ -96,6 +101,7 @@ public class CharacterGauge : MonoBehaviour
     {
         float ratio = _status.CurrentHealth / _status.MaxHealth;
         _healthSlider.value = ratio;
+        _portraitImage.color = _status.IsDowned ? _downedPortraitColor : _portraitBaseColor;
 
         if(isSnap) _healthTrail.Snap(ratio);
         else _healthTrail.SetValue(ratio);
@@ -201,6 +207,7 @@ public class CharacterGauge : MonoBehaviour
 
     private void CacheComponent()
     {
+        _portraitBaseColor = _portraitImage.color;
         _energyFillImage = _energySlider.fillRect.GetComponent<Image>();
         _energyBaseFillColor = _energyFillImage.color;
 

@@ -149,6 +149,18 @@ public class PlayerParty : MonoBehaviour
         }
     }
 
+    // 조작 중인 캐릭터가 얻은 필살기 게이지의 일정 비율을 나머지 파티원(대기 · 퇴장 중 포함)에게 나눠 준다.
+    // 대기 캐릭터도 싸움에 참여한 몫을 받아, 교체해 들어왔을 때 필살기를 쓸 수 있게 하기 위해서다.
+    public void ShareUltimateGauge(PlayerController giver, float amount)
+    {
+        float shared = amount * Common.UltimateGaugeShareRatio;
+
+        for(int i = 0; i < _members.Length; i++)
+        {
+            if(_members[i] != giver) _members[i].Status.ReceiveSharedUltimateGauge(shared);
+        }
+    }
+
     // 필드에 나와 있는 모든 캐릭터를 duration 동안 무적으로 만든다. 패링 성공 때 불러, 막은 순간 다른 적의 공격에 파티가 맞지 않게 한다.
     // 대기 중(꺼진) 캐릭터는 시간이 흐르지 않아 나중에 나올 때 무적이 남으므로 넣지 않는다.
     public void BeginFieldInvincible(float duration)

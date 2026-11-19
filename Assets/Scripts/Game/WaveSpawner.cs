@@ -39,6 +39,8 @@ public class WaveSpawner : MonoBehaviour
     private int _remainingBossCount;
 
     public WaveData Data => _waveData;
+    // 이번 웨이브의 첫 보스. 보스가 없으면 null 이다. 웨이브의 적이 모두 처치되면 목록을 비우므로, 보스전이 끝나는 순간에 읽는다.
+    public Transform FirstBoss => _waveBosses.Count > 0 ? _waveBosses[0].transform : null;
 
     // 이번 웨이브의 적이 모두 처치되면 알린다.
     public event System.Action WaveCleared;

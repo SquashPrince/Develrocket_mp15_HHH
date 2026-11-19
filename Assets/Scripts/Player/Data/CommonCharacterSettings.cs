@@ -90,6 +90,8 @@ public class CommonCharacterSettings : ScriptableObject
     [Header("필살기")]
     [Tooltip("발동할 때 이 거리 안의 대상(록온 대상 우선, 없으면 자동 조준 대상)을 찾는다. 필살기 액션에 순간 이동 옵션이 있으면 그 대상 앞으로 순간 이동한다")]
     [SerializeField, Min(0f)] private float _ultimateTargetSearchRange = 10f;
+    [Tooltip("조작 중인 캐릭터가 필살기 게이지를 얻을 때, 다른 파티원이 함께 얻는 비율. 0.3 이면 얻은 양의 30%")]
+    [SerializeField, Range(0f, 1f)] private float _ultimateGaugeShareRatio = 0.3f;
 
     [Header("입력 : 이동 · 행동")]
     [SerializeField] private InputActionReference _moveAction;
@@ -141,6 +143,7 @@ public class CommonCharacterSettings : ScriptableObject
     public float ComboSelectTimeScale => _comboSelectTimeScale;
     public float GroggyHoldTime => _groggyHoldTime;
     public float UltimateTargetSearchRange => _ultimateTargetSearchRange;
+    public float UltimateGaugeShareRatio => _ultimateGaugeShareRatio;
     public InputActionReference MoveAction => _moveAction;
     public InputActionReference DashAction => _dashAction;
     public InputActionReference AttackAction => _attackAction;

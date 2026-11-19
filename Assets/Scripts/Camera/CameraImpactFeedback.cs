@@ -54,8 +54,8 @@ public class CameraImpactFeedback : MonoBehaviour
     [SerializeField] private FovPulse _parrySuccessFov = new FovPulse(-6f, 0.3f, new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.15f, 1f), new Keyframe(1f, 0f)));
     [Tooltip("웨이브 마지막 적 처치 : 느려지는 동안 줌 인했다가 돌아온다. 길이는 마지막 일격 기능의 슬로우 시간에 맞춘다")]
     [SerializeField] private FovPulse _waveFinishFov = new FovPulse(-8f, 1f, new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.15f, 1f), new Keyframe(0.7f, 1f), new Keyframe(1f, 0f)));
-    [Tooltip("보스 처치 : 멈춘 동안 줌 인했다가 돌아온다. 길이는 마지막 일격 기능의 정지 시간에 맞춘다")]
-    [SerializeField] private FovPulse _bossFinishFov = new FovPulse(-12f, 1f, new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.1f, 1f), new Keyframe(0.8f, 1f), new Keyframe(1f, 0f)));
+    [Tooltip("보스 처치 : 멈춘 동안 줌 인했다가 돌아온다. 길이는 마지막 일격 기능의 결과 화면까지의 시간에 맞춘다")]
+    [SerializeField] private FovPulse _bossFinishFov = new FovPulse(-12f, 5f, new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.05f, 1f), new Keyframe(0.9f, 1f), new Keyframe(1f, 0f)));
 
     [Header("상황 유지 줌")]
     [Tooltip("콤보 선택 화면이 열려 있는 동안의 FOV 변화량(도). 음수면 줌 인")]
