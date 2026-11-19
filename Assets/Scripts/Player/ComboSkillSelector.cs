@@ -9,7 +9,9 @@ using UnityEngine.InputSystem;
 //        남은 연계 수는 적이 센다. 적의 바가 남은 연계 여부를 보여줄 수 있게, 이 기능은 횟수를 따로 세지 않고 적에게 쓰고 묻는다.
 //        첫 강타(조작 캐릭터)와 콤보 스킬 중 대상에게 맞은 강타가 선택 단계를 연다.
 //        캔슬했거나 콤보 스킬이 강타 없이 끝났는데 연계가 남았으면, 조작 캐릭터가 같은 적에게 강타를 맞혀 다시 선택 단계를 연다.
-//        이번 연계에서 아직 콤보 스킬을 쓰지 않은 대기 캐릭터만 고를 수 있다. 그로기가 끝나거나 대상이 처치되면 남은 연계는 사라진다.
+//        이번 이어받기에서 아직 콤보 스킬을 쓰지 않은 대기 캐릭터만 고를 수 있다. 그로기가 끝나거나 대상이 처치되면 남은 연계는 사라진다.
+//        캔슬 · 강타 대기 뒤 강타로 다시 열면 새 이어받기로 보고 쓴 캐릭터 기록을 비운다. 앞에서 콤보를 쓴 캐릭터도 다시 고를 수 있다.
+//        연계가 남았어도 이어받을 캐릭터가 더 없으면(쓰러진 파티원 등) 적의 남은 연계를 없애 적의 바가 연계 없음으로 보이게 한다.
 // 선택 단계 : 게임 전체 시간 배율을 낮춰 적 · 캐릭터 · 타격 간격 · 카메라가 함께 느려진다. 고르는 시간은 실제 시간으로 줄어든다.
 //            이전(교체 이전 · 공격 · 필살기) · 다음(교체 다음 · 대시 · 스킬) 입력으로 고르고, 캔슬 입력이나 시간 초과는 캔슬이다.
 //            이 동안 다른 플레이어 입력은 막는다.
@@ -86,15 +88,20 @@ public class ComboSkillSelector : MonoBehaviour
     // 조작 캐릭터의 강타가 그로기 적에게 맞았을 때 판정 기능이 부른다. 선택 단계를 열었으면 true 를 돌려준다.
     // 새 연계는 적의 콤보 스킬 기회를 쓰고 시작한다. 강타 대기 중인 연계는 같은 적일 때 이어서 연다.
     // 고를 대기 캐릭터가 없으면(1인 포함) 열지 않고, 새 연계라면 적의 기회도 남긴다.
+    // 강타 대기 중인 연계를 다시 열 때는 쓴 캐릭터 기록을 먼저 비우고 후보를 찾는다. 강타가 새 이어받기의 시작이기 때문이다.
     public bool TryBeginChain(IEnemyTargetable target, IEnemyGroggyable groggyable)
     {
-        if(!HasCandidate()) return false;
-
         if(IsAwaitingStrikeOn(groggyable))
         {
+            _usedCharacters.Clear();
+
+            if(!HasCandidate()) return false;
+
             OpenSelection();
             return true;
         }
+
+        if(!HasCandidate()) return false;
 
         if(_state != ChainState.None || !groggyable.TryConsumeComboSkillChance()) return false;
 
@@ -176,7 +183,18 @@ public class ComboSkillSelector : MonoBehaviour
         _groggyable.HoldGroggy(Common.GroggyHoldTime);
         _party.EnterComboSkill(candidate, _target);
 
-        if(IsLastChainUsed) EndChain();
+        if(IsLastChainUsed)
+        {
+            EndChain();
+            return;
+        }
+
+        // 연계가 남았어도 이어받을 캐릭터가 더 없으면(쓰러진 파티원 등) 적의 남은 연계를 없애, 적의 바가 연계 없음으로 보이게 한다.
+        if(!HasCandidate())
+        {
+            _groggyable.ClearComboChain();
+            EndChain();
+        }
     }
 
     // 캔슬 입력 · 시간 초과. 콤보 스킬 없이 연계 1회를 쓴다.

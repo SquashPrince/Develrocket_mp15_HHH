@@ -143,7 +143,8 @@ public class PlayerStatus : MonoBehaviour
 
     // 적의 타격 한 번에 맞았을 때 부른다. 맞았으면 true 를 돌려준다. 완벽 회피 · 패링했거나 무적이면 무시하고 false 를 돌려준다.
     // 연타 공격은 타격마다 부르므로, 한 공격 안에서도 타격마다 완벽 회피 · 패링 · 피격을 따로 판정한다.
-    // 판정 순서 : 쓰러짐 → 완벽 회피 → 패링 → 무적(슬로모션 중 포함) → 피격
+    // 판정 순서 : 판 종료 → 쓰러짐 → 완벽 회피 → 패링 → 무적(슬로모션 중 포함) → 피격
+    //   판이 끝난 뒤(보스 처치 · 시간 초과 · 전멸)에는 적의 공격을 모두 무시한다.
     //   쓰러진 캐릭터는 쓰러짐 모션 동안 공격을 모두 무시한다.
     //   이 타격으로 체력이 0 이 되면 피격 대신 쓰러짐 상태로 넘긴다.
     //   슬로모션 중에는 무적이라 맞지 않는다. 그 사이 다시 대시 · 회피해 완벽 회피 판정 시간에 타격이 닿으면 완벽 회피가 다시 발동한다.
@@ -152,7 +153,7 @@ public class PlayerStatus : MonoBehaviour
     // attacker : 패링 성공을 알리고, 넉백 방향을 정할 때 위치를 쓰는 공격한 적
     public bool TakeHit(EnemyAttackData attack, EnemyAttackStep step, EnemyAttackData.HitReaction reaction, IEnemyParryable attacker)
     {
-        if(IsDowned) return false;
+        if(_controller.Party.IsBattleEnded || IsDowned) return false;
         if(TryPerfectDodge(attack)) return false;
         if(_actionTrigger.TryParry(attack, step, attacker)) return false;
 

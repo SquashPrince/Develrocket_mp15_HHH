@@ -10,7 +10,8 @@ using Random = UnityEngine.Random;
 //   각 Cinemachine 카메라의 Impulse Listener 가 받으며, Listener 의 Use Camera Space 가 켜져 있어야 방향이 화면 기준이 된다.
 // FOV : 순간 줌과 유지 줌을 더한 값을 만든다. 각 Cinemachine 카메라의 CameraFovOffset 이 이 값을 최종 렌즈에 더한다.
 //   순간 줌 : 패링 시작 · 패링 성공 · 웨이브 마지막 적 처치 · 보스 처치 때 곡선대로 바뀐다. 새 효과가 오면 진행 중인 효과를 끝내고 새로 시작한다.
-//   유지 줌 : 콤보 선택 화면이 열려 있는 동안 · 완벽 회피 슬로모션 동안 서서히 줌 인하고, 끝나면 서서히 돌아온다. 둘이 겹치면 더 많이 당기는 쪽을 쓴다.
+//   유지 줌 : 콤보 선택 화면이 열려 있는 동안 · 완벽 회피 슬로모션 동안 서서히 줌 인하고, 끝나면 서서히 돌아온다. 겹치면 가장 많이 당기는 쪽을 쓴다.
+//     판 실패(전멸 · 시간 초과) 뒤에는 씬이 바뀔 때까지 줌 인을 유지한다.
 //   둘 다 히트스톱 · 슬로모션 · 콤보 선택 감속과 상관없이 실제 시간으로 흐른다.
 public class CameraImpactFeedback : MonoBehaviour
 {
@@ -62,6 +63,8 @@ public class CameraImpactFeedback : MonoBehaviour
     [SerializeField] private float _comboSelectFov = -6f;
     [Tooltip("완벽 회피 슬로모션 동안의 FOV 변화량(도). 음수면 줌 인")]
     [SerializeField] private float _slowMotionFov = -6f;
+    [Tooltip("판 실패(전멸 · 시간 초과) 뒤 유지할 FOV 변화량(도). 음수면 줌 인. 씬이 바뀔 때까지 유지한다")]
+    [SerializeField] private float _runFailedFov = -6f;
     [Tooltip("유지 줌이 들어가고 돌아오는 속도(도 / 실제 시간 초)")]
     [SerializeField, Min(0.01f)] private float _holdFovSpeed = 30f;
 
@@ -70,6 +73,7 @@ public class CameraImpactFeedback : MonoBehaviour
     private float _pulseOffset;
     private float _holdOffset;
     private bool _isComboSelectOpen;
+    private bool _isRunFailed;
 
     // 지금 더할 FOV 변화량(도). 순간 줌과 유지 줌을 더한 값이며, 효과가 없으면 0 이다.
     public float FovOffset => _pulseOffset + _holdOffset;
@@ -89,6 +93,7 @@ public class CameraImpactFeedback : MonoBehaviour
         UnbindFeedbackEvent();
         StopFov();
         _isComboSelectOpen = false;
+        _isRunFailed = false;
         _holdOffset = 0f;
     }
 
@@ -102,14 +107,16 @@ public class CameraImpactFeedback : MonoBehaviour
 
         if(moment == BattleFeedback.Moment.ComboSelectOpened) _isComboSelectOpen = true;
         else if(moment == BattleFeedback.Moment.ComboSelectClosed) _isComboSelectOpen = false;
+        else if(moment == BattleFeedback.Moment.RunFailed) _isRunFailed = true;
     }
 
-    // 지금 상황의 유지 줌 목표로 서서히 옮긴다. 두 상황이 겹치면 더 많이 당기는(더 작은) 값을 목표로 한다.
+    // 지금 상황의 유지 줌 목표로 서서히 옮긴다. 상황이 겹치면 가장 많이 당기는(가장 작은) 값을 목표로 한다.
     private void UpdateHoldFov()
     {
         float comboTarget = _isComboSelectOpen ? _comboSelectFov : 0f;
         float slowMotionTarget = _slowMotion.IsActive ? _slowMotionFov : 0f;
-        float target = Mathf.Min(comboTarget, slowMotionTarget);
+        float runFailedTarget = _isRunFailed ? _runFailedFov : 0f;
+        float target = Mathf.Min(comboTarget, Mathf.Min(slowMotionTarget, runFailedTarget));
 
         _holdOffset = Mathf.MoveTowards(_holdOffset, target, _holdFovSpeed * Time.unscaledDeltaTime);
     }

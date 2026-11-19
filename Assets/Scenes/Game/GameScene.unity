@@ -171,6 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterGauge
   _portraitImage: {fileID: 1796199773}
+  _downedPortraitColor: {r: 0.35, g: 0.35, b: 0.35, a: 1}
   _healthSlider: {fileID: 938592440}
   _healthTrail: {fileID: 266308655}
   _energySlider: {fileID: 938592438}
@@ -2250,6 +2251,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterGauge
   _portraitImage: {fileID: 682032136}
+  _downedPortraitColor: {r: 0.35, g: 0.35, b: 0.35, a: 1}
   _healthSlider: {fileID: 1647339995}
   _healthTrail: {fileID: 467992891}
   _energySlider: {fileID: 1647339994}
@@ -3107,6 +3109,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterGauge
   _portraitImage: {fileID: 1332524721}
+  _downedPortraitColor: {r: 0.35, g: 0.35, b: 0.35, a: 1}
   _healthSlider: {fileID: 1213688930}
   _healthTrail: {fileID: 1498848711}
   _energySlider: {fileID: 1213688929}

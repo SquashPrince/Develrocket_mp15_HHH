@@ -254,8 +254,10 @@ public class PlayerAttackJudge : MonoBehaviour
     {
         float damage = _controller.Character.RollDamage(action.Power, out bool isCritical);
 
-        enemy.TakeDamage(damage, isImpact);
-        BattleFeedback.RaiseDamage(enemy.transform, damage, isImpact, isCritical);
+        // 그로기 배율은 적이 적용하므로, 숫자는 적이 실제로 받은 대미지로 보여준다.
+        float dealt = enemy.TakeDamage(damage, isImpact);
+
+        BattleFeedback.RaiseDamage(enemy.transform, dealt, isImpact, isCritical);
 
         // 이 타격으로 처치된 적은 경직 · 콤보 스킬 대상이 아니다. 그로기 적이 강타로 처치되면 콤보 스킬보다 처치가 먼저다.
         if(!enemy.IsAlive) return;

@@ -47,6 +47,8 @@ public class EnemyState : MonoBehaviour
     private float _reactionTimer;
     // 그로기 시간이 줄지 않는 남은 시간. 플레이어 쪽이 콤보 스킬 흐름에 맞춰 건다.
     private float _groggyHoldTimer;
+    // 그로기 막대가 가득 찬 것으로 보일 남은 시간. 실제 그로기 시간과 상관없이 막대 표시에만 쓴다.
+    private float _groggyRatioBase;
     // 진행 중인 공격의 경직 저항 레벨. 공격 기능이 공격을 시작할 때 정하고, 공격이 끝나거나 끊기면 0 으로 돌린다.
     private int _attackStaggerResistLevel;
     // 이번 그로기에서 남은 연계 수. 그로기가 될 때마다 최대 연계 수로 채우고, 콤보 스킬 시전 · 캔슬마다 1 씩 준다.
@@ -70,7 +72,9 @@ public class EnemyState : MonoBehaviour
     public float CurrentGroggy => _currentGroggy;
     public float MaxGroggy => _data.MaxGroggy;
     // 그로기 중 남은 그로기 시간의 비율(1 → 0). 정지 중에는 줄지 않는다. 그로기가 아니면 0 이다.
-    public float GroggyTimeRatio => IsGroggy && _data.GroggyTime > 0f ? Mathf.Clamp01(_reactionTimer / _data.GroggyTime) : 0f;
+    // 기준은 그로기 진입 때 그로기 시간이고, 콤보 스킬 선택이 열릴 때마다 그 순간의 남은 시간으로 바뀐다.
+    //   선택이 열리면 막대가 다시 가득 찬 상태에서 시작하고, 실제 남은 시간은 그대로라 남은 시간만큼에 걸쳐 줄어든다.
+    public float GroggyTimeRatio => IsGroggy && _groggyRatioBase > 0f ? Mathf.Clamp01(_reactionTimer / _groggyRatioBase) : 0f;
 
     // 맞을 때마다 강타 여부와 함께 알린다. 처치되는 타격도 먼저 맞은 것으로 알린 뒤 처치를 알린다.
     public event Action<bool> Damaged;
@@ -99,16 +103,22 @@ public class EnemyState : MonoBehaviour
         UpdateReactionTimer();
     }
 
-    public void TakeDamage(float power, bool isImpact)
+    // 대미지를 받고, 실제로 받은 대미지를 돌려준다. 그로기 중이면 적 데이터의 그로기 대미지 배율만큼 커진다.
+    // 처치된 적은 받지 않고 0 을 돌려준다. 돌려준 값은 대미지 숫자 표시에 쓴다.
+    public float TakeDamage(float power, bool isImpact)
     {
-        if(_isDead) return;
+        if(_isDead) return 0f;
 
-        _currentHealth = Mathf.Max(0f, _currentHealth - power);
+        float damage = IsGroggy ? power * _data.GroggyDamageMultiplier : power;
+
+        _currentHealth = Mathf.Max(0f, _currentHealth - damage);
 
         Damaged?.Invoke(isImpact);
 
         // 이 타격으로 체력이 0 이 된 경우도 강타라면 바로 처치한다.
         if(_data.CanDie && isImpact && _currentHealth <= 0f) Die();
+
+        return damage;
     }
 
     // 경직한다. 경직 중 다시 걸면 경직 시간을 처음부터 센다.
@@ -148,7 +158,13 @@ public class EnemyState : MonoBehaviour
         if(IsGroggy) _groggyHoldTimer = duration;
     }
 
-    public void SetGroggyPaused(bool isPaused) => _isGroggyPaused = isPaused;
+    // 멈출 때(콤보 스킬 선택이 열릴 때) 그로기 막대의 기준을 지금 남은 시간으로 바꿔, 막대가 가득 찬 상태에서 다시 줄어들게 한다.
+    public void SetGroggyPaused(bool isPaused)
+    {
+        _isGroggyPaused = isPaused;
+
+        if(isPaused && IsGroggy) _groggyRatioBase = _reactionTimer;
+    }
 
     public bool TryConsumeComboSkillChance()
     {
@@ -198,6 +214,7 @@ public class EnemyState : MonoBehaviour
     private void EnterGroggy()
     {
         _reactionTimer = _data.GroggyTime;
+        _groggyRatioBase = _data.GroggyTime;
         _reaction = Reaction.Groggy;
         _hasComboSkillChance = true;
         _remainingComboChain = _data.MaxComboChain;

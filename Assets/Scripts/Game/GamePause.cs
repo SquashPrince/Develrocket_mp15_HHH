@@ -11,6 +11,7 @@ using UnityEngine.InputSystem;
 //   씬을 떠날 때(재시작 · 타이틀) 풀어 둔다. 타이틀은 커서가 보여야 하고, 다시 불러온 게임 씬은 시작할 때 다시 잠근다.
 // 카메라 : 멈춘 동안 카메라 입력 컨트롤러(Cinemachine Input Axis Controller)를 끈다. Cinemachine 이 게임 시간 배율을 무시하게 설정되어 있어, 멈춘 동안에도 마우스로 카메라가 움직이기 때문이다.
 //   입력 동작만 끄면 컨트롤러가 스스로 다시 켤 수 있어(Auto Enable Inputs) 컨트롤러를 끈다.
+//   판이 끝나면(보스 처치 · 시간 초과 · 전멸) 같은 컨트롤러를 꺼 카메라를 돌릴 수 없게 한다.
 // 플레이어 입력(이동 · 공격 · 교체 · 록온)은 파티가 멈춤 여부를 보고 막는다.
 public class GamePause : MonoBehaviour
 {
@@ -26,6 +27,8 @@ public class GamePause : MonoBehaviour
     public event System.Action<bool> PausedChanged;
 
     private void Start() => Init();
+    private void OnEnable() => BindGameFlowEvent();
+    private void OnDisable() => UnbindGameFlowEvent();
     private void Update() => ReadPauseInput();
     // 씬을 떠날 때 멈춤 상태와 커서를 처음으로 돌린다. 시간 배율은 게임 흐름이 씬을 바꾸기 전에 돌린다.
     private void OnDestroy()
@@ -80,6 +83,19 @@ public class GamePause : MonoBehaviour
     {
         Cursor.lockState = isLocked ? CursorLockMode.Locked : CursorLockMode.None;
         Cursor.visible = !isLocked;
+    }
+
+    // 판이 끝나면 카메라 입력을 끈다. 끝난 뒤에는 일시정지할 수 없어 다시 켜지지 않는다.
+    private void OnRunEnded() => SetCameraInputEnabled(false);
+
+    private void BindGameFlowEvent()
+    {
+        _gameFlow.RunEnded += OnRunEnded;
+    }
+
+    private void UnbindGameFlowEvent()
+    {
+        _gameFlow.RunEnded -= OnRunEnded;
     }
 
     private void Init()

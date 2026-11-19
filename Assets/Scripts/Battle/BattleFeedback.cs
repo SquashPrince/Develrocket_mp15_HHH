@@ -37,8 +37,10 @@ public static class BattleFeedback
         ParryCue,
         // 웨이브의 마지막 적이 처치됨 (게임 전체가 잠깐 느려짐)
         WaveFinish,
-        // 보스전의 보스가 처치됨 (게임 전체가 잠깐 멈춘 뒤 클리어)
-        BossFinish
+        // 보스전의 보스가 처치됨 (게임 전체가 멈춘 뒤 클리어)
+        BossFinish,
+        // 판이 실패로 끝남 (파티 전멸 · 보스전 시간 초과)
+        RunFailed
     }
 
     // 순간과 그 순간의 충격 방향을 알린다. 구독하는 쪽은 꺼질 때 반드시 해제한다.

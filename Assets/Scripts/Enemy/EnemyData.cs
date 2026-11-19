@@ -25,6 +25,8 @@ public class EnemyData : ScriptableObject
     [SerializeField, Min(1f)] private float _maxGroggy = 100f;
     [Tooltip("그로기가 유지되는 시간(초, 적 전용 시간)")]
     [SerializeField, Min(0f)] private float _groggyTime = 12f;
+    [Tooltip("그로기 중에 받는 대미지 배율. 1.5 면 그로기 동안 1.5 배 대미지를 받는다")]
+    [SerializeField, Min(0f)] private float _groggyDamageMultiplier = 1.5f;
     [Tooltip("이 적에게 콤보 스킬이 이어지는 최대 연계 수. 일반 1, 엘리트 2")]
     [SerializeField, Min(1)] private int _maxComboChain = 1;
 
@@ -74,6 +76,7 @@ public class EnemyData : ScriptableObject
     public int BaseStaggerResistLevel => _baseStaggerResistLevel;
     public float MaxGroggy => _maxGroggy;
     public float GroggyTime => _groggyTime;
+    public float GroggyDamageMultiplier => _groggyDamageMultiplier;
     public int MaxComboChain => _maxComboChain;
     public float MoveSpeed => _moveSpeed;
     public float TurnSpeed => _turnSpeed;
