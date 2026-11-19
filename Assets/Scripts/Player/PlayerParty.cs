@@ -83,6 +83,8 @@ public class PlayerParty : MonoBehaviour
     public ComboSkillSelector ComboSelector { get; private set; }
     // 플레이어 입력(교체 · 캐릭터 행동 · 록온)을 막는지. 콤보 스킬 캐릭터 선택 중이거나, 결과 화면이 떠 입력을 잠갔거나, 일시정지 중일 때다.
     public bool IsInputBlocked => _isInputLocked || GamePause.IsPaused || ComboSelector.IsBlockingInput;
+    // 판이 끝났는지. 끝난 뒤에는 파티가 적의 공격에 맞지 않는다.
+    public bool IsBattleEnded { get; private set; }
 
     // 조작 중인 캐릭터가 바뀌면 알린다. 시작할 때도 첫 캐릭터로 한 번 알린다. 카메라가 따라갈 대상을 바꾸는 데 쓴다.
     public event Action<PlayerController> ControlledChanged;
@@ -149,8 +151,35 @@ public class PlayerParty : MonoBehaviour
         }
     }
 
-    // 결과 화면이 뜨면 게임 흐름이 부른다. 화면의 버튼을 누르는 클릭이 공격 입력으로 들어가지 않게 한다.
-    public void LockInput() => _isInputLocked = true;
+    // 조작 중인 캐릭터가 얻은 필살기 게이지의 일정 비율을 나머지 파티원(대기 · 퇴장 중 포함)에게 나눠 준다.
+    // 대기 캐릭터도 싸움에 참여한 몫을 받아, 교체해 들어왔을 때 필살기를 쓸 수 있게 하기 위해서다.
+    public void ShareUltimateGauge(PlayerController giver, float amount)
+    {
+        float shared = amount * Common.UltimateGaugeShareRatio;
+
+        for(int i = 0; i < _members.Length; i++)
+        {
+            if(_members[i] != giver) _members[i].Status.ReceiveSharedUltimateGauge(shared);
+        }
+    }
+
+    // 필드에 나와 있는 모든 캐릭터를 duration 동안 무적으로 만든다. 패링 성공 때 불러, 막은 순간 다른 적의 공격에 파티가 맞지 않게 한다.
+    // 대기 중(꺼진) 캐릭터는 시간이 흐르지 않아 나중에 나올 때 무적이 남으므로 넣지 않는다.
+    public void BeginFieldInvincible(float duration)
+    {
+        for(int i = 0; i < _members.Length; i++)
+        {
+            if(_members[i].gameObject.activeSelf) _members[i].Status.BeginInvincible(duration);
+        }
+    }
+
+    // 판이 끝나면(보스 처치 · 시간 초과 · 전멸) 게임 흐름이 부른다.
+    // 입력을 막아 결과 화면의 버튼을 누르는 클릭이 공격 입력으로 들어가지 않게 하고, 이후 적의 공격에 맞지 않게 한다.
+    public void EndBattle()
+    {
+        _isInputLocked = true;
+        IsBattleEnded = true;
+    }
 
     // 모든 캐릭터를 point 위치 · 방향으로 옮긴다. 보스전 재도전으로 씬을 다시 불러왔을 때 시작하며 부른다.
     // CharacterController 가 켜져 있으면 위치를 직접 바꿔도 덮어쓰므로 잠깐 끄고 옮긴다.
@@ -175,11 +204,14 @@ public class PlayerParty : MonoBehaviour
 
     // 캐릭터의 쓰러짐 모션이 끝나면 쓰러짐 상태가 부른다. 그 캐릭터를 끄고, 조작 중이던 캐릭터면 다음 살아 있는 캐릭터로 넘긴다.
     // 퇴장 중에 쓰러진 이전 캐릭터는 끄기만 한다.
+    // 넘길 캐릭터가 없는 마지막 캐릭터는 끄지 않고 쓰러진 모습 그대로 두고 전멸을 알린다.
     public void OnMemberDowned(PlayerController member)
     {
-        member.Standby();
-
-        if(member != Controlled) return;
+        if(member != Controlled)
+        {
+            member.Standby();
+            return;
+        }
 
         int standbyIndex = FindStandbyIndex(NEXT);
 
@@ -187,6 +219,7 @@ public class PlayerParty : MonoBehaviour
         {
             PlayerController next = _members[standbyIndex];
 
+            member.Standby();
             PlaceNext(member, next);
             next.SwapIn();
             SetControlled(standbyIndex);
@@ -197,6 +230,7 @@ public class PlayerParty : MonoBehaviour
 
         if(fieldIndex >= 0)
         {
+            member.Standby();
             _members[fieldIndex].CancelSwapOut();
             SetControlled(fieldIndex);
             return;

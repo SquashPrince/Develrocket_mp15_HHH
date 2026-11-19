@@ -217,9 +217,10 @@ public class PlayerAttackJudge : MonoBehaviour
         {
             IEnemyDamageable enemy = _hitColliders[i].GetComponentInParent<IEnemyDamageable>();
 
-            if(enemy == null || !_hitTargets.Add(enemy)) continue;
+            // 이미 처치된 적(시체)은 맞지 않는다. 대미지 숫자 · 게이지 · 히트렉 · 적중 소리도 나오지 않는다.
+            if(enemy == null || !enemy.IsAlive || !_hitTargets.Add(enemy)) continue;
 
-            ApplyHit(enemy, action, isImpact, canReact, ref comboSkillTarget, ref comboSkillGroggyable);
+            ApplyHit(enemy, action, step, isImpact, canReact, ref comboSkillTarget, ref comboSkillGroggyable);
             hasHit = true;
         }
 
@@ -243,22 +244,29 @@ public class PlayerAttackJudge : MonoBehaviour
 
     // 맞은 적 하나에 결과를 적용한다. 대미지는 액션의 위력에 캐릭터의 대미지 흔들림 · 크리티컬을 적용한 값이며, 적마다 따로 뽑는다.
     // canReact 이고 액션의 경직 시간이 0보다 크면, 경직 저항 레벨이 액션의 경직 레벨 이하인 적을 경직시킨다.
+    // canReact 이면 맞은 적을 동작의 히트렉 시간만큼 멈춘다(히트스톱). 플레이어 히트렉과 같은 시간이라 둘이 함께 멈췄다 함께 풀린다.
+    //   경직 저항으로 경직되지 않는 적도 멈추고, 이 타격으로 처치된 적은 멈추지 않는다.
     // 그로기 게이지는 반응 여부와 상관없이 모든 적중마다 액션의 그로기 값만큼 쌓는다.
     // 강타가 그로기 적에게 맞으면 콤보 스킬 대상으로 고른다. 한 번의 판정에서 콤보 스킬은 하나의 적에게만 발동한다.
     // 그로기를 쌓은 뒤 콤보 스킬을 확인하므로, 게이지를 채운 강타가 바로 콤보 스킬 선택을 연다.
     // 이 적중으로 그로기에 들어갔으면 콤보 스킬 선택에 알려 그로기 정지 시간을 걸게 한다.
-    private void ApplyHit(IEnemyDamageable enemy, ActionData action, bool isImpact, bool canReact, ref IEnemyTargetable comboSkillTarget, ref IEnemyGroggyable comboSkillGroggyable)
+    private void ApplyHit(IEnemyDamageable enemy, ActionData action, ActionStep step, bool isImpact, bool canReact, ref IEnemyTargetable comboSkillTarget, ref IEnemyGroggyable comboSkillGroggyable)
     {
         float damage = _controller.Character.RollDamage(action.Power, out bool isCritical);
 
-        enemy.TakeDamage(damage, isImpact);
-        BattleFeedback.RaiseDamage(enemy.transform, damage, isImpact, isCritical);
+        // 그로기 배율은 적이 적용하므로, 숫자는 적이 실제로 받은 대미지로 보여준다.
+        float dealt = enemy.TakeDamage(damage, isImpact);
+
+        BattleFeedback.RaiseDamage(enemy.transform, dealt, isImpact, isCritical);
 
         // 이 타격으로 처치된 적은 경직 · 콤보 스킬 대상이 아니다. 그로기 적이 강타로 처치되면 콤보 스킬보다 처치가 먼저다.
         if(!enemy.IsAlive) return;
 
         // 경직 · 그로기 인터페이스가 없는 적은 경직 · 그로기 · 콤보 스킬 대상이 아니다.
         if(canReact && action.StaggerTime > 0f && enemy.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(action.StaggerTime, action.StaggerLevel);
+
+        // 경직을 건 뒤 멈춰, 맞는 모션의 첫 자세에서 멈췄다가 이어지게 한다.
+        if(canReact) enemy.BeginHitStop(step.HitLagTime);
 
         bool hasGroggy = enemy.transform.TryGetComponent(out IEnemyGroggyable groggyable);
 

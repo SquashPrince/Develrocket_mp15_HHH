@@ -6,6 +6,12 @@ using UnityEngine.SceneManagement;
 //   보스 등급 적도 웨이브에 들어 있다. 제한 시간을 쓰지 않는 웨이브의 보스(중간 보스)는 일반 적처럼 웨이브 정리에만 센다.
 // 보스전 : 제한 시간을 쓰는 웨이브(마지막 웨이브)가 나오는 순간부터 제한 시간을 잰다.
 //   제한 시간 안에 그 웨이브의 보스 등급 적을 모두 처치하면 처치, 남은 시간이 0 이 되면 시간 초과, 파티가 모두 쓰러지면 전멸이다. 남은 일반 적은 상관없다.
+// 마지막 일격 : 웨이브가 정리되면(보스까지 모두 처치) 마지막 일격 기능이 게임 전체를 잠깐 느리게 한다.
+//   보스전 처치는 기록과 입력 잠금을 처치 순간에 하고, 마지막 일격 기능이 게임 전체를 멈춘 뒤 끝났다고 알리면 그때 처치 결과를 알린다.
+//   결과 화면이 떠도 게임은 멈춘 채로 두고, 남은 적도 그대로 둔다. 결과 화면의 버튼은 씬을 바꾸기 전에 게임 시간을 되돌린다.
+//   보스 처치와 웨이브 정리가 함께 오면 보스 처치가 먼저 와 판이 끝나므로, 웨이브 슬로우는 걸지 않는다.
+// 판 실패(전멸 · 시간 초과) : 판 실패 순간을 알려 카메라가 조금 줌 인한 채 유지한다. 마지막 캐릭터는 쓰러진 채 남고, 시간 초과는 쓰러뜨리지 않는다.
+// 판이 끝나면 파티의 입력을 막고 적 공격에 맞지 않게 하며, 판 종료를 알려 카메라 입력도 막게 한다.
 // 웨이브 중 전멸 : 전멸 화면을 띄운다. 보스전 전이라 재시도로 세지 않는다.
 // 끝난 뒤 : 결과 화면이 뜨면 플레이어 입력을 잠그고, 이후 처치 · 시간 초과 · 전멸 알림은 무시한다.
 //   전투는 멈추지 않는다. 히트스톱이 끝나며 게임 시간을 되돌리므로, 게임 시간을 멈추는 일시정지는 Esc 메뉴 작업에서 함께 만든다.
@@ -25,6 +31,8 @@ public class GameFlow : MonoBehaviour
 
     [SerializeField] private WaveSpawner _waveSpawner;
     [SerializeField] private PlayerParty _party;
+    [Tooltip("웨이브 마지막 적 · 보스 처치 연출")]
+    [SerializeField] private BattleFinisher _finisher;
     [Tooltip("보스전 재도전 때 파티가 시작할 위치 · 방향")]
     [SerializeField] private Transform _bossCheckpoint;
     [Tooltip("타이틀로 갈 때 불러올 씬. 빌드 씬 목록에 등록되어 있어야 한다")]
@@ -56,17 +64,21 @@ public class GameFlow : MonoBehaviour
     public event System.Action WaveWiped;
     // 보스전이 끝나면 끝난 방식과 함께 알린다. 기록은 RunRecord 에 남긴 뒤 알린다.
     public event System.Action<BossOutcome> BossPhaseEnded;
+    // 판이 끝나는 순간(보스 처치 · 시간 초과 · 전멸) 알린다. 결과 화면보다 먼저 온다. 카메라 입력을 막는 데 쓴다.
+    public event System.Action RunEnded;
 
     private void Start() => Init();
     private void OnEnable()
     {
         BindSpawnerEvent();
         BindPartyEvent();
+        BindFinisherEvent();
     }
     private void OnDisable()
     {
         UnbindSpawnerEvent();
         UnbindPartyEvent();
+        UnbindFinisherEvent();
     }
     private void Update()
     {
@@ -105,6 +117,8 @@ public class GameFlow : MonoBehaviour
     {
         if(_isEnded) return;
 
+        _finisher.PlayWaveFinish();
+
         if(_waveIndex + 1 >= _waveSpawner.Data.WaveCount)
         {
 #if UNITY_EDITOR
@@ -128,6 +142,8 @@ public class GameFlow : MonoBehaviour
     private void OnPartyWiped()
     {
         if(_isEnded) return;
+
+        BattleFeedback.Raise(BattleFeedback.Moment.RunFailed);
 
         if(IsBossPhase)
         {
@@ -196,10 +212,12 @@ public class GameFlow : MonoBehaviour
 
         if(_timeLeft > 0f) return;
 
+        BattleFeedback.Raise(BattleFeedback.Moment.RunFailed);
         EndBossPhase(BossOutcome.TimeOut);
     }
 
     // 보스 시간 · 깎은 체력 비율을 기록하고 끝난 방식을 알린다. 시간 초과면 보스 시간은 제한 시간 그대로다.
+    // 처치면 기록은 처치 순간에 하고, 마지막 일격 정지가 끝난 뒤에 알린다.
     private void EndBossPhase(BossOutcome outcome)
     {
         EndRun();
@@ -210,8 +228,16 @@ public class GameFlow : MonoBehaviour
         Debug.Log($"[게임 흐름] 보스전 종료 : {outcome} · 보스 시간 {RunRecord.BossTime:0.0}초 · 깎은 체력 {RunRecord.BossDamageRatio:P0}");
 #endif
 
+        if(outcome == BossOutcome.Cleared)
+        {
+            _finisher.PlayBossFinish(_waveSpawner.FirstBoss);
+            return;
+        }
+
         BossPhaseEnded?.Invoke(outcome);
     }
+
+    private void OnBossFinishEnded() => BossPhaseEnded?.Invoke(BossOutcome.Cleared);
 
     // 이번 판을 끝낸다. 타이머 · 전체 시간을 멈추고 플레이어 입력을 잠근다.
     private void EndRun()
@@ -219,7 +245,8 @@ public class GameFlow : MonoBehaviour
         _isEnded = true;
         _isTimerRunning = false;
         _isWaitingNextWave = false;
-        _party.LockInput();
+        _party.EndBattle();
+        RunEnded?.Invoke();
     }
 
     private void ReloadScene()
@@ -279,5 +306,15 @@ public class GameFlow : MonoBehaviour
     private void UnbindPartyEvent()
     {
         _party.Wiped -= OnPartyWiped;
+    }
+
+    private void BindFinisherEvent()
+    {
+        _finisher.BossFinishEnded += OnBossFinishEnded;
+    }
+
+    private void UnbindFinisherEvent()
+    {
+        _finisher.BossFinishEnded -= OnBossFinishEnded;
     }
 }

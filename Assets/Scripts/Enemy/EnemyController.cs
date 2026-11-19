@@ -45,7 +45,8 @@ public class EnemyController : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     // 몸 반지름은 콜라이더 경계가 잡힌 뒤에 재도록 Start 에서 잰다.
     private void Start() => Init();
 
-    public void TakeDamage(float power, bool isImpact) => _state.TakeDamage(power, isImpact);
+    public float TakeDamage(float power, bool isImpact) => _state.TakeDamage(power, isImpact);
+    public void BeginHitStop(float duration) => _state.Clock.BeginHitStop(duration);
     public void Stagger(float duration, int staggerLevel) => _state.Stagger(duration, staggerLevel);
     public bool AddGroggy(float amount) => _state.AddGroggy(amount);
     public bool TryConsumeComboSkillChance() => _state.TryConsumeComboSkillChance();

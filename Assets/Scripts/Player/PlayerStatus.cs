@@ -138,9 +138,13 @@ public class PlayerStatus : MonoBehaviour
         _timeScale = 1f;
     }
 
+    // 이 캐릭터가 지금 이 동작을 패링할 수 있는지. 적의 타격이 패링하는 캐릭터를 먼저 판정하는 데 쓴다. 쓰러진 캐릭터는 패링하지 않는다.
+    public bool CanParry(EnemyAttackStep step) => !IsDowned && _actionTrigger.CanParry(step);
+
     // 적의 타격 한 번에 맞았을 때 부른다. 맞았으면 true 를 돌려준다. 완벽 회피 · 패링했거나 무적이면 무시하고 false 를 돌려준다.
     // 연타 공격은 타격마다 부르므로, 한 공격 안에서도 타격마다 완벽 회피 · 패링 · 피격을 따로 판정한다.
-    // 판정 순서 : 쓰러짐 → 완벽 회피 → 패링 → 무적(슬로모션 중 포함) → 피격
+    // 판정 순서 : 판 종료 → 쓰러짐 → 완벽 회피 → 패링 → 무적(슬로모션 중 포함) → 피격
+    //   판이 끝난 뒤(보스 처치 · 시간 초과 · 전멸)에는 적의 공격을 모두 무시한다.
     //   쓰러진 캐릭터는 쓰러짐 모션 동안 공격을 모두 무시한다.
     //   이 타격으로 체력이 0 이 되면 피격 대신 쓰러짐 상태로 넘긴다.
     //   슬로모션 중에는 무적이라 맞지 않는다. 그 사이 다시 대시 · 회피해 완벽 회피 판정 시간에 타격이 닿으면 완벽 회피가 다시 발동한다.
@@ -149,7 +153,7 @@ public class PlayerStatus : MonoBehaviour
     // attacker : 패링 성공을 알리고, 넉백 방향을 정할 때 위치를 쓰는 공격한 적
     public bool TakeHit(EnemyAttackData attack, EnemyAttackStep step, EnemyAttackData.HitReaction reaction, IEnemyParryable attacker)
     {
-        if(IsDowned) return false;
+        if(_controller.Party.IsBattleEnded || IsDowned) return false;
         if(TryPerfectDodge(attack)) return false;
         if(_actionTrigger.TryParry(attack, step, attacker)) return false;
 
@@ -163,7 +167,12 @@ public class PlayerStatus : MonoBehaviour
 
         CurrentHealth = _currentHealth - attack.Power;
 
-        if(IsDowned) _controller.StartDowned();
+        // 쓰러지면 에너지도 모두 잃는다.
+        if(IsDowned)
+        {
+            CurrentEnergy = 0f;
+            _controller.StartDowned();
+        }
         else _controller.StartHit(attack, reaction, attacker.transform);
 
         return true;
@@ -180,7 +189,18 @@ public class PlayerStatus : MonoBehaviour
         return true;
     }
 
+    // 공격 적중 · 패링 · 완벽 회피로 얻는 필살기 게이지. 조작 중인 캐릭터가 얻으면 다른 파티원도 공통 설정의 비율만큼 함께 얻는다.
     public void AddUltimateGauge(float amount)
+    {
+        if(amount <= 0f) return;
+
+        CurrentUltimateGauge += amount;
+
+        if(_controller.Party.Controlled == _controller) _controller.Party.ShareUltimateGauge(_controller, amount);
+    }
+
+    // 다른 파티원이 나눠 준 필살기 게이지. 받은 게이지는 다시 나눠 주지 않는다.
+    public void ReceiveSharedUltimateGauge(float amount)
     {
         if(amount <= 0f) return;
 
@@ -227,7 +247,13 @@ public class PlayerStatus : MonoBehaviour
         if(_perfectDodgeTimer > 0f) _perfectDodgeTimer -= DeltaTime;
     }
 
-    private void RegenerateEnergy() => CurrentEnergy += _controller.Character.EnergyRegenPerSecond * DeltaTime;
+    // 쓰러진 캐릭터는 에너지가 다시 차지 않는다.
+    private void RegenerateEnergy()
+    {
+        if(IsDowned) return;
+
+        CurrentEnergy += _controller.Character.EnergyRegenPerSecond * DeltaTime;
+    }
 
     private void CacheComponent()
     {

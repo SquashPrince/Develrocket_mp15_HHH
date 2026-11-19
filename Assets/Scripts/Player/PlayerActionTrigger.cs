@@ -45,12 +45,15 @@ public class PlayerActionTrigger : MonoBehaviour
     // 패링은 현재 캐릭터가 직접 하지 않는다. 파티 전투에서 교체 키로 나온 캐릭터가 패링한다(지원 공격).
     private void Update() => TryStartUltimate();
 
+    // 지금 이 동작이 닿으면 패링이 되는지. 패링 준비 중이고 노란 동작(패링할 수 있는 동작)이면 true 다.
+    public bool CanParry(EnemyAttackStep step) => _parryState.IsActive && step.IsParryable;
+
     // 패링 준비 · 반응 중 노란 동작(패링할 수 있는 동작)이 닿으면 패링 성공으로 처리하고 true 를 돌려준다. 상태 기능이 맞았을 때 부른다.
     // 적에게는 패링당했다고 알리기만 한다. 경직할지 다음 동작으로 이어갈지는 적이 지금 동작 설정으로 정한다.
     // 그로기 · 필살기 게이지 · 패링 추격은 패링할 때마다 얻는다. 이어가는 공격이면 추격할지 다음 패링을 할지 플레이어가 고른다.
     public bool TryParry(EnemyAttackData attack, EnemyAttackStep step, IEnemyParryable attacker)
     {
-        if(!_parryState.IsActive || !step.IsParryable) return false;
+        if(!CanParry(step)) return false;
 
 #if UNITY_EDITOR
         Debug.Log($"[패링 성공] {attack.name}");

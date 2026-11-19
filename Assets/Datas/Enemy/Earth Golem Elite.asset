@@ -20,6 +20,7 @@ MonoBehaviour:
   _baseStaggerResistLevel: 1
   _maxGroggy: 662
   _groggyTime: 12
+  _groggyDamageMultiplier: 1.75
   _maxComboChain: 2
   _moveSpeed: 3
   _turnSpeed: 540
