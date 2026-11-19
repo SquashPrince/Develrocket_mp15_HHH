@@ -573,6 +573,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraImpactFeedback
   _mainCamera: {fileID: 330585545}
+  _slowMotion: {fileID: 1781024355}
   _impactHitShake: {fileID: 1871799910}
   _parrySuccessShake: {fileID: 2038312266}
   _knockbackShake: {fileID: 1828446719}
@@ -648,42 +649,9 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  _perfectDodgeFov:
-    _amount: -10
-    _duration: 0.5
-    _curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 0.15
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
+  _comboSelectFov: -25
+  _slowMotionFov: -15
+  _holdFovSpeed: 200
 --- !u!4 &97138653
 Transform:
   m_ObjectHideFlags: 0
@@ -1298,6 +1266,7 @@ GameObject:
   - component: {fileID: 253891561}
   - component: {fileID: 253891564}
   - component: {fileID: 253891565}
+  - component: {fileID: 253891566}
   m_Layer: 0
   m_Name: FreeLook Camera
   m_TagString: Untagged
@@ -1600,6 +1569,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFovOffset
   _feedback: {fileID: 97138651}
+--- !u!114 &253891566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 253891554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca7de3aefa901374ba29464584a3109a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineDecollider
+  CameraRadius: 0.1
+  Decollision:
+    Enabled: 0
+    ObstacleLayers:
+      serializedVersion: 2
+      m_Bits: 1
+    UseFollowTarget:
+      Enabled: 0
+      YOffset: 0
+    Damping: 0.5
+    SmoothingTime: 0
+  TerrainResolution:
+    Enabled: 1
+    TerrainLayers:
+      serializedVersion: 2
+      m_Bits: 1024
+    MaximumRaycast: 10
+    Damping: 0.5
 --- !u!1 &263541221
 GameObject:
   m_ObjectHideFlags: 0
@@ -2241,7 +2240,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 64.49285
+  field of view: 60.000004
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -2267,8 +2266,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.16010976, y: -0.0137057165, z: -0.0022233182, w: 0.9870016}
-  m_LocalPosition: {x: 0.5, y: 0.75, z: -0.85}
+  m_LocalRotation: {x: 0.000000005405252, y: 0.99232495, z: -0.12365775, w: 0.000000043375902}
+  m_LocalPosition: {x: -0.00000029555372, y: 2.105867, z: 3.3807406}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3440,7 +3439,8 @@ GameObject:
   - component: {fileID: 552218303}
   - component: {fileID: 552218302}
   - component: {fileID: 552218304}
-  m_Layer: 0
+  - component: {fileID: 552218305}
+  m_Layer: 8
   m_Name: CameraSettings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3515,6 +3515,7 @@ MonoBehaviour:
   - {fileID: 1085364820}
   - {fileID: 486967397}
   - {fileID: 1343133950}
+  - {fileID: 1391436720}
   _targetGroup: {fileID: 2145229457}
 --- !u!114 &552218303
 MonoBehaviour:
@@ -3559,6 +3560,30 @@ MonoBehaviour:
     _camera: {fileID: 1236494789}
   - _shot: 5
     _camera: {fileID: 1391436720}
+--- !u!114 &552218305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552218298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a726de1cfcc78b94fb0cd6dfbcec6dbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatDistance
+  _party: {fileID: 1781024354}
+  _orbitalFollows:
+  - {fileID: 253891558}
+  - {fileID: 1942779153}
+  _enemyLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  _checkRange: 15
+  _crowdCount: 3
+  _crowdDistance: 1
+  _bossDistance: 2.5
+  _changeSpeed: 1.51
 --- !u!1 &582530194
 GameObject:
   m_ObjectHideFlags: 0
@@ -9998,6 +10023,7 @@ GameObject:
   - component: {fileID: 1942779151}
   - component: {fileID: 1942779156}
   - component: {fileID: 1942779157}
+  - component: {fileID: 1942779158}
   m_Layer: 0
   m_Name: LockOn Camera
   m_TagString: Untagged
@@ -10231,6 +10257,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFovOffset
   _feedback: {fileID: 97138651}
+--- !u!114 &1942779158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942779148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca7de3aefa901374ba29464584a3109a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineDecollider
+  CameraRadius: 0.1
+  Decollision:
+    Enabled: 0
+    ObstacleLayers:
+      serializedVersion: 2
+      m_Bits: 1
+    UseFollowTarget:
+      Enabled: 0
+      YOffset: 0
+    Damping: 0.5
+    SmoothingTime: 0
+  TerrainResolution:
+    Enabled: 1
+    TerrainLayers:
+      serializedVersion: 2
+      m_Bits: 1024
+    MaximumRaycast: 10
+    Damping: 0.5
 --- !u!1001 &1990156745
 PrefabInstance:
   m_ObjectHideFlags: 0

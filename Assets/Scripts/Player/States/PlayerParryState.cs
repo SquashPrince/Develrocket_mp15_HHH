@@ -46,6 +46,9 @@ public class PlayerParryState : PlayerState
 
         // 패링 액션의 순간 이동 옵션대로 고른 적 앞에 순간 이동한다. 도착 지점이 막혀 있으면 제자리에서 패링한다.
         TeleportManager.TryTeleportTo(Controller, _trigger.SelectedParryAttacker.transform, _trigger.ParryAction.Teleport);
+
+        // 패링할 적으로 록온을 옮긴다. 패링에 실패해도 록온은 남는다.
+        if(_trigger.SelectedParryAttacker.transform.TryGetComponent(out IEnemyTargetable parryTarget)) Controller.Party.LockOn.LockOnTo(parryTarget);
         Controller.HorizontalVelocity = Vector3.zero;
         PlayStep(READY_STEP);
         BattleFeedback.Raise(BattleFeedback.Moment.ParryStart);
