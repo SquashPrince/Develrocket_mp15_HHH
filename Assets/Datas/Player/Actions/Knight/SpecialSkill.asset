@@ -61,3 +61,4 @@ MonoBehaviour:
   _isInvincibleOnSwing: 1
   _groggyGain: 5.85
   _teleport: {fileID: 0}
+  _cameraShot: 2
