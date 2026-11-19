@@ -9,7 +9,7 @@ using Random = UnityEngine.Random;
 //   충격 방향이 있는 순간(패링) : 그 방향으로 밀리는 반동 / 없는 순간 : 화면 기준 상하좌우 무작위
 //   각 Cinemachine 카메라의 Impulse Listener 가 받으며, Listener 의 Use Camera Space 가 켜져 있어야 방향이 화면 기준이 된다.
 // FOV : 순간 줌과 유지 줌을 더한 값을 만든다. 각 Cinemachine 카메라의 CameraFovOffset 이 이 값을 최종 렌즈에 더한다.
-//   순간 줌 : 패링 시작 · 패링 성공 때 곡선대로 바뀐다. 새 효과가 오면 진행 중인 효과를 끝내고 새로 시작한다.
+//   순간 줌 : 패링 시작 · 패링 성공 · 웨이브 마지막 적 처치 · 보스 처치 때 곡선대로 바뀐다. 새 효과가 오면 진행 중인 효과를 끝내고 새로 시작한다.
 //   유지 줌 : 콤보 선택 화면이 열려 있는 동안 · 완벽 회피 슬로모션 동안 서서히 줌 인하고, 끝나면 서서히 돌아온다. 둘이 겹치면 더 많이 당기는 쪽을 쓴다.
 //   둘 다 히트스톱 · 슬로모션 · 콤보 선택 감속과 상관없이 실제 시간으로 흐른다.
 public class CameraImpactFeedback : MonoBehaviour
@@ -52,6 +52,10 @@ public class CameraImpactFeedback : MonoBehaviour
     [SerializeField] private FovPulse _parryStartFov = new FovPulse(-4f, 0.25f, new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.2f, 1f), new Keyframe(1f, 0f)));
     [Tooltip("패링 성공 : 짧게 줌 인했다가 돌아온다")]
     [SerializeField] private FovPulse _parrySuccessFov = new FovPulse(-6f, 0.3f, new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.15f, 1f), new Keyframe(1f, 0f)));
+    [Tooltip("웨이브 마지막 적 처치 : 느려지는 동안 줌 인했다가 돌아온다. 길이는 마지막 일격 기능의 슬로우 시간에 맞춘다")]
+    [SerializeField] private FovPulse _waveFinishFov = new FovPulse(-8f, 1f, new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.15f, 1f), new Keyframe(0.7f, 1f), new Keyframe(1f, 0f)));
+    [Tooltip("보스 처치 : 멈춘 동안 줌 인했다가 돌아온다. 길이는 마지막 일격 기능의 정지 시간에 맞춘다")]
+    [SerializeField] private FovPulse _bossFinishFov = new FovPulse(-12f, 1f, new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.1f, 1f), new Keyframe(0.8f, 1f), new Keyframe(1f, 0f)));
 
     [Header("상황 유지 줌")]
     [Tooltip("콤보 선택 화면이 열려 있는 동안의 FOV 변화량(도). 음수면 줌 인")]
@@ -179,6 +183,8 @@ public class CameraImpactFeedback : MonoBehaviour
         {
             case BattleFeedback.Moment.ParryStart: return _parryStartFov;
             case BattleFeedback.Moment.ParrySuccess: return _parrySuccessFov;
+            case BattleFeedback.Moment.WaveFinish: return _waveFinishFov;
+            case BattleFeedback.Moment.BossFinish: return _bossFinishFov;
             default: return null;
         }
     }

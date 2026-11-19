@@ -58,11 +58,12 @@ public class PlayerParryState : PlayerState
 
     // 공격한 적 쪽을 보고, 그 반대 방향으로 밀려나기 시작한다. 이후 닿는 노란 공격은 이 패링으로 막지 않는다.
     // 밀려나는 동안(반응 시간)은 무적이라, 성공 → 추격 사이에 어떤 공격에도 맞지 않는다. 반응 중 온 노란 공격도 흘려보낸다.
+    // 같은 시간 동안 필드의 다른 파티원(퇴장 중인 이전 캐릭터 등)도 무적이 된다. 막은 순간 다른 적의 공격에 파티가 맞지 않게 하기 위해서다.
     // 패링한 적을 기억해, 록온 중이 아니면 추격 공격이 그 적에게 나가게 한다.
     public void OnParrySuccess(IEnemyTargetable parriedTarget)
     {
         IsActive = false;
-        Controller.Status.BeginInvincible(_trigger.ParryReactTime);
+        Controller.Party.BeginFieldInvincible(_trigger.ParryReactTime);
         _parriedTarget = parriedTarget;
         _awayDirection = Controller.transform.position - parriedTarget.transform.position;
         _awayDirection.y = 0f;

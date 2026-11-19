@@ -34,7 +34,11 @@ public static class BattleFeedback
         // 콤보 스킬 캐릭터 선택 화면이 닫힘 (고르기 · 취소 · 시간 초과 · 꺼짐)
         ComboSelectClosed,
         // 적의 패링할 수 있는 동작이 예고됨 (동작마다 패링 가능 시간이 열릴 때. 연속 패링 중에도 동작마다)
-        ParryCue
+        ParryCue,
+        // 웨이브의 마지막 적이 처치됨 (게임 전체가 잠깐 느려짐)
+        WaveFinish,
+        // 보스전의 보스가 처치됨 (게임 전체가 잠깐 멈춘 뒤 클리어)
+        BossFinish
     }
 
     // 순간과 그 순간의 충격 방향을 알린다. 구독하는 쪽은 꺼질 때 반드시 해제한다.

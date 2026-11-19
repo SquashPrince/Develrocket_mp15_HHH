@@ -149,6 +149,16 @@ public class PlayerParty : MonoBehaviour
         }
     }
 
+    // 필드에 나와 있는 모든 캐릭터를 duration 동안 무적으로 만든다. 패링 성공 때 불러, 막은 순간 다른 적의 공격에 파티가 맞지 않게 한다.
+    // 대기 중(꺼진) 캐릭터는 시간이 흐르지 않아 나중에 나올 때 무적이 남으므로 넣지 않는다.
+    public void BeginFieldInvincible(float duration)
+    {
+        for(int i = 0; i < _members.Length; i++)
+        {
+            if(_members[i].gameObject.activeSelf) _members[i].Status.BeginInvincible(duration);
+        }
+    }
+
     // 결과 화면이 뜨면 게임 흐름이 부른다. 화면의 버튼을 누르는 클릭이 공격 입력으로 들어가지 않게 한다.
     public void LockInput() => _isInputLocked = true;
 

@@ -138,6 +138,9 @@ public class PlayerStatus : MonoBehaviour
         _timeScale = 1f;
     }
 
+    // 이 캐릭터가 지금 이 동작을 패링할 수 있는지. 적의 타격이 패링하는 캐릭터를 먼저 판정하는 데 쓴다. 쓰러진 캐릭터는 패링하지 않는다.
+    public bool CanParry(EnemyAttackStep step) => !IsDowned && _actionTrigger.CanParry(step);
+
     // 적의 타격 한 번에 맞았을 때 부른다. 맞았으면 true 를 돌려준다. 완벽 회피 · 패링했거나 무적이면 무시하고 false 를 돌려준다.
     // 연타 공격은 타격마다 부르므로, 한 공격 안에서도 타격마다 완벽 회피 · 패링 · 피격을 따로 판정한다.
     // 판정 순서 : 쓰러짐 → 완벽 회피 → 패링 → 무적(슬로모션 중 포함) → 피격

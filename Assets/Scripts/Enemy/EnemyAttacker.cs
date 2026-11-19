@@ -438,11 +438,14 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     //   지원 공격처럼 무적인 이전 캐릭터와 패링 중인 새 캐릭터가 함께 있어도, 새 캐릭터가 따로 판정을 받는다.
     // reaction : 이 타격으로 맞은 캐릭터의 반응. 막타면 동작의 막타 반응이다.
     // 패링당해 공격이 끊기거나 이 동작이 막히면, 남은 캐릭터는 이 타격으로 맞히지 않는다.
+    // 범위 안에 패링할 수 있는 캐릭터가 있으면 그 캐릭터를 먼저 판정한다. 패링이 성립하면 이 타격은 범위 안의 누구에게도 대미지를 주지 않는다.
+    //   콜라이더 순서대로만 판정하면, 퇴장하는 이전 캐릭터가 먼저 맞은 뒤에 패링이 성립할 수 있기 때문이다.
     private void HitTargets(EnemyAttackData.HitReaction reaction)
     {
         EnemyAttackData attack = CurrentAttack;
         EnemyAttackStep step = CurrentStep;
         int count = step.Range.Overlap(transform, _hitColliders, _targetLayers);
+        PlayerStatus parrier = null;
 
         _landedTargets.Clear();
 
@@ -453,7 +456,22 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
             if(status == null || _landedTargets.Contains(status)) continue;
 
             _landedTargets.Add(status);
-            status.TakeHit(attack, step, reaction, this);
+
+            if(parrier == null && status.CanParry(step)) parrier = status;
+        }
+
+        if(parrier != null)
+        {
+            parrier.TakeHit(attack, step, reaction, this);
+
+            if(!IsAttacking || _isStepParried) return;
+        }
+
+        for(int i = 0; i < _landedTargets.Count; i++)
+        {
+            if(_landedTargets[i] == parrier) continue;
+
+            _landedTargets[i].TakeHit(attack, step, reaction, this);
 
             if(!IsAttacking || _isStepParried) return;
         }
