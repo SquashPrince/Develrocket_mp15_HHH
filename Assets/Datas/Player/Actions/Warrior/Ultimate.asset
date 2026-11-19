@@ -69,7 +69,7 @@ MonoBehaviour:
       _volume: 1
   _energyGain: 0
   _ultimateGaugeGain: 0
-  _power: 100
+  _power: 25000
   _staggerLevel: 3
   _staggerTime: 1.5
   _hitSound:

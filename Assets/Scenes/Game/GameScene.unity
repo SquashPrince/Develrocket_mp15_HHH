@@ -1365,7 +1365,7 @@ MonoBehaviour:
       Size: {x: 0.8, y: 0.8}
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
-  TargetOffset: {x: 0, y: 1, z: 0}
+  TargetOffset: {x: 0, y: 1.25, z: 0}
   Damping: {x: 0, y: 0}
   Lookahead:
     Enabled: 0
@@ -1384,7 +1384,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b5d7c088409d9a40b7b09aa707777f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineOrbitalFollow
-  TargetOffset: {x: 0, y: 1.2, z: 0}
+  TargetOffset: {x: 0, y: 1.25, z: 0}
   TrackerSettings:
     BindingMode: 4
     PositionDamping: {x: 0.2, y: 0.2, z: 0.2}
@@ -1486,8 +1486,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 253891554}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.17476761, y: -0.00000009341321, z: 0.000000016580788, w: 0.9846097}
-  m_LocalPosition: {x: 0, y: 1.7435201, z: -2.0284443}
+  m_LocalRotation: {x: 0.1305262, y: 0.000000016879564, z: -0.0000000022222366, w: 0.9914449}
+  m_LocalPosition: {x: 0, y: 1.7935201, z: -2.0284443}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2240,7 +2240,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60.000004
+  field of view: 64.49285
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -2266,8 +2266,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000000005405252, y: 0.99232495, z: -0.12365775, w: 0.000000043375902}
-  m_LocalPosition: {x: -0.00000029555372, y: 2.105867, z: 3.3807406}
+  m_LocalRotation: {x: 0.014262182, y: -0.24250945, z: 0.0035655457, w: 0.97003764}
+  m_LocalPosition: {x: 2.25, y: 1.45, z: -1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3293,8 +3293,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
   Priority:
-    Enabled: 0
-    m_Value: 0
+    Enabled: 1
+    m_Value: 20
   OutputChannel: 1
   StandbyUpdate: 2
   m_StreamingVersion: 20241001
@@ -3533,7 +3533,7 @@ MonoBehaviour:
   _lockOnCamera: {fileID: 1942779149}
   _orbitalFollow: {fileID: 1942779153}
   _targetGroup: {fileID: 2145229457}
-  _turnTime: 0.2
+  _turnTime: 0.35
   _targetRadius: 1
   _blockedBlendTime: 0.5
 --- !u!114 &552218304
@@ -5910,8 +5910,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
   Priority:
-    Enabled: 0
-    m_Value: 0
+    Enabled: 1
+    m_Value: 20
   OutputChannel: 1
   StandbyUpdate: 2
   m_StreamingVersion: 20241001
@@ -6730,8 +6730,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
   Priority:
-    Enabled: 0
-    m_Value: 0
+    Enabled: 1
+    m_Value: 20
   OutputChannel: 1
   StandbyUpdate: 2
   m_StreamingVersion: 20241001
@@ -7058,8 +7058,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
   Priority:
-    Enabled: 0
-    m_Value: 0
+    Enabled: 1
+    m_Value: 20
   OutputChannel: 1
   StandbyUpdate: 2
   m_StreamingVersion: 20241001
@@ -7275,8 +7275,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
   Priority:
-    Enabled: 0
-    m_Value: 0
+    Enabled: 1
+    m_Value: 20
   OutputChannel: 1
   StandbyUpdate: 2
   m_StreamingVersion: 20241001
@@ -7805,8 +7805,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GamePause
   _pauseAction: {fileID: 3607086430963573367, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _cameraInputControllers:
-  - {fileID: 253891559}
-  - {fileID: 1942779149}
+  - {fileID: 253891555}
   _gameFlow: {fileID: 1521699988}
 --- !u!114 &1521699991
 MonoBehaviour:
@@ -10044,8 +10043,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
   Priority:
-    Enabled: 0
-    m_Value: 0
+    Enabled: 1
+    m_Value: 10
   OutputChannel: 1
   StandbyUpdate: 2
   m_StreamingVersion: 20241001
@@ -10082,8 +10081,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1942779148}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.0000000054052514, y: 0.99232495, z: -0.12365775, w: 0.0000000433759}
-  m_LocalPosition: {x: -0, y: 2.105867, z: 3.3807406}
+  m_LocalRotation: {x: 0.000000005705481, y: 0.9914449, z: -0.13052617, w: 0.00000004333743}
+  m_LocalPosition: {x: -0.00000029555372, y: 2.1558666, z: 3.3807406}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10151,7 +10150,7 @@ MonoBehaviour:
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
   TargetOffset: {x: 0, y: 1.25, z: 0}
-  Damping: {x: 0, y: 0}
+  Damping: {x: 0.3, y: 0.3}
   Lookahead:
     Enabled: 0
     Time: 0
@@ -10169,10 +10168,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b5d7c088409d9a40b7b09aa707777f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineOrbitalFollow
-  TargetOffset: {x: 0, y: 1.2, z: 0}
+  TargetOffset: {x: 0, y: 1.25, z: 0}
   TrackerSettings:
     BindingMode: 4
-    PositionDamping: {x: 0.2, y: 0.2, z: 0.2}
+    PositionDamping: {x: 0.4, y: 0.4, z: 0.4}
     AngularDampingMode: 0
     RotationDamping: {x: 1, y: 1, z: 1}
     QuaternionDamping: 1
@@ -10427,7 +10426,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineImpulseSource
   ImpulseDefinition:
     ImpulseChannel: 1
-    ImpulseShape: 1
+    ImpulseShape: 3
     CustomImpulseShape:
       serializedVersion: 2
       m_Curve: []
@@ -10465,7 +10464,7 @@ MonoBehaviour:
     DissipationMode: 2
     DissipationDistance: 100
     PropagationSpeed: 343
-  DefaultVelocity: {x: 0, y: -0.6, z: 0}
+  DefaultVelocity: {x: 0, y: -1.5, z: 0}
 --- !u!4 &2038312267
 Transform:
   m_ObjectHideFlags: 0

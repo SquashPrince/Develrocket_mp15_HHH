@@ -43,7 +43,7 @@ MonoBehaviour:
       _volume: 0.5
   _energyGain: 0.143
   _ultimateGaugeGain: 2.08
-  _power: 25
+  _power: 2500
   _staggerLevel: 1
   _staggerTime: 0.25
   _hitSound:
@@ -61,3 +61,4 @@ MonoBehaviour:
   _isInvincibleOnSwing: 1
   _groggyGain: 1.6125
   _teleport: {fileID: 11400000, guid: 7263e82ed97087141b501f4c8dba8526, type: 2}
+  _cameraShot: 0

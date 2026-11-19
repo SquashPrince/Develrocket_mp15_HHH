@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   _grade: 0
   _portrait: {fileID: 0}
-  _maxHealth: 2352
+  _maxHealth: 235200
   _canDie: 1
   _corpseDuration: 2
   _baseStaggerResistLevel: 0
