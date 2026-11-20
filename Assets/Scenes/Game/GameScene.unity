@@ -22551,80 +22551,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6912827535344444191, guid: 803dad7ad50e6d84c9ac40e9188e9a61, type: 3}
   m_PrefabInstance: {fileID: 165315260}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &166097694
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 7183380445868500484}
-    m_Modifications:
-    - target: {fileID: 1965817736021702754, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_Name
-      value: Fighter Dust
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.75
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.75
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.75
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.6532815
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0.27059805
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.27059805
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0.6532815
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 45
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 90
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
---- !u!4 &166097695 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9191233009820616710, guid: f845cbc3d50f40e42bc4edae6b269fb7, type: 3}
-  m_PrefabInstance: {fileID: 166097694}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &166153296
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -69939,7 +69865,7 @@ MonoBehaviour:
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
   TargetOffset: {x: 0.75, y: 1.3, z: 1}
-  Damping: {x: 0.1, y: 0.1}
+  Damping: {x: 0.05, y: 0.05}
   Lookahead:
     Enabled: 0
     Time: 0
@@ -69959,9 +69885,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineFollow
   TrackerSettings:
     BindingMode: 1
-    PositionDamping: {x: 0.1, y: 0.1, z: 0.1}
+    PositionDamping: {x: 0.05, y: 0.05, z: 0.05}
     AngularDampingMode: 0
-    RotationDamping: {x: 1, y: 1, z: 1}
+    RotationDamping: {x: 0.05, y: 0.05, z: 0.05}
     QuaternionDamping: 1
   FollowOffset: {x: 2, y: 1.5, z: -1}
 --- !u!114 &486967397
@@ -161659,7 +161585,7 @@ MonoBehaviour:
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
   TargetOffset: {x: 1.05, y: 0.7, z: -0.25}
-  Damping: {x: 0.1, y: 0.1}
+  Damping: {x: 0.05, y: 0.05}
   Lookahead:
     Enabled: 0
     Time: 0
@@ -161679,9 +161605,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineFollow
   TrackerSettings:
     BindingMode: 1
-    PositionDamping: {x: 0.1, y: 0.1, z: 0.1}
+    PositionDamping: {x: 0.05, y: 0.05, z: 0.05}
     AngularDampingMode: 0
-    RotationDamping: {x: 1, y: 1, z: 1}
+    RotationDamping: {x: 0.05, y: 0.05, z: 0.05}
     QuaternionDamping: 1
   FollowOffset: {x: 1.55, y: 0.55, z: -1}
 --- !u!114 &1085364820
@@ -183176,7 +183102,7 @@ MonoBehaviour:
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
   TargetOffset: {x: 0, y: 1.25, z: 3}
-  Damping: {x: 0.1, y: 0.1}
+  Damping: {x: 0.05, y: 0.05}
   Lookahead:
     Enabled: 0
     Time: 0
@@ -183196,9 +183122,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineFollow
   TrackerSettings:
     BindingMode: 1
-    PositionDamping: {x: 0.1, y: 0.1, z: 0.1}
+    PositionDamping: {x: 0.05, y: 0.05, z: 0.05}
     AngularDampingMode: 0
-    RotationDamping: {x: 1, y: 1, z: 1}
+    RotationDamping: {x: 0.05, y: 0.05, z: 0.05}
     QuaternionDamping: 1
   FollowOffset: {x: -1.75, y: 2, z: -2.5}
 --- !u!114 &1236494789
@@ -196495,7 +196421,7 @@ MonoBehaviour:
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
   TargetOffset: {x: 0.45, y: 1.35, z: 0.95}
-  Damping: {x: 0.1, y: 0.1}
+  Damping: {x: 0.05, y: 0.05}
   Lookahead:
     Enabled: 0
     Time: 0
@@ -196515,9 +196441,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineFollow
   TrackerSettings:
     BindingMode: 1
-    PositionDamping: {x: 0.1, y: 0.1, z: 0.1}
+    PositionDamping: {x: 0.05, y: 0.05, z: 0.05}
     AngularDampingMode: 0
-    RotationDamping: {x: 1, y: 1, z: 1}
+    RotationDamping: {x: 0.05, y: 0.05, z: 0.05}
     QuaternionDamping: 1
   FollowOffset: {x: 0.5, y: 0.75, z: -0.85}
 --- !u!114 &1343133950
@@ -203433,7 +203359,7 @@ MonoBehaviour:
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
   TargetOffset: {x: 0.65, y: 1.35, z: 1.5}
-  Damping: {x: 0.1, y: 0.1}
+  Damping: {x: 0.05, y: 0.05}
   Lookahead:
     Enabled: 0
     Time: 0
@@ -203453,9 +203379,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineFollow
   TrackerSettings:
     BindingMode: 1
-    PositionDamping: {x: 0.1, y: 0.1, z: 0.1}
+    PositionDamping: {x: 0.05, y: 0.05, z: 0.05}
     AngularDampingMode: 0
-    RotationDamping: {x: 1, y: 1, z: 1}
+    RotationDamping: {x: 0.05, y: 0.05, z: 0.05}
     QuaternionDamping: 1
   FollowOffset: {x: 2.25, y: 1.45, z: -1.5}
 --- !u!114 &1391436720
@@ -298089,7 +298015,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ImpulseDuration: 0.2
+    ImpulseDuration: 0.1
     ImpulseType: 0
     DissipationRate: 0.25
     RawSignal: {fileID: 0}
@@ -298120,7 +298046,7 @@ MonoBehaviour:
     DissipationMode: 2
     DissipationDistance: 100
     PropagationSpeed: 343
-  DefaultVelocity: {x: 0, y: -1.5, z: 0}
+  DefaultVelocity: {x: 0, y: -0.5, z: 0}
 --- !u!4 &2038312267
 Transform:
   m_ObjectHideFlags: 0
@@ -315502,10 +315428,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 5519931953987422134, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 166097695}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7505186ea7efed44baa68ca34ff963d2, type: 3}
 --- !u!1001 &4104542682595170454

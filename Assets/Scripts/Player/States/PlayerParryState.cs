@@ -79,6 +79,7 @@ public class PlayerParryState : PlayerState
         _timer = 0f;
         _hasChaseInput = false;
         PlayStep(REACT_STEP);
+        PlayParryEffect(parriedTarget.transform.position);
         BattleFeedback.Raise(BattleFeedback.Moment.ParrySuccess, _awayDirection);
     }
 
@@ -122,6 +123,16 @@ public class PlayerParryState : PlayerState
         float t = _timer / _trigger.ParryReactTime;
 
         return Mathf.Lerp(startSpeed, 0f, t);
+    }
+
+    // 캐릭터와 패링한 적의 중간, 공통 설정의 높이에 캐릭터에서 적을 바라보는 방향으로 패링 이펙트를 띄운다.
+    // 밀려나는 방향(_awayDirection)은 적에서 캐릭터 쪽이므로, 그 반대가 캐릭터에서 적 쪽이다.
+    private void PlayParryEffect(Vector3 targetPosition)
+    {
+        Vector3 position = (Controller.transform.position + targetPosition) * 0.5f;
+
+        position.y = Controller.transform.position.y + Controller.Common.ParryEffectHeight;
+        BattleEffect.Play(Controller.Common.ParryEffectPrefab, position, Quaternion.LookRotation(-_awayDirection));
     }
 
     // 패링 액션의 index 번째 동작 모션을 그 동작의 섞는 시간으로 재생한다.

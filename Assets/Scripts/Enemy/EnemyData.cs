@@ -30,6 +30,14 @@ public class EnemyData : ScriptableObject
     [Tooltip("이 적에게 콤보 스킬이 이어지는 최대 연계 수. 일반 1, 엘리트 2")]
     [SerializeField, Min(1)] private int _maxComboChain = 1;
 
+    [Header("처치 연출")]
+    [Tooltip("시체가 사라질 때 녹아 없어지게 바꿔 끼울 Material (DissolveShader). 적 Prefab 의 EnemyDissolve 에 연결한 Renderer 에 쓴다. 비워 두면 녹지 않고 그냥 사라진다")]
+    [SerializeField] private Material _dissolveMaterial;
+    [Tooltip("녹아 없어지는 데 걸리는 시간(초, 적 전용 시간). 시체 시간이 끝나기 이 시간만큼 전에 시작한다. 시체 시간보다 길면 처치되자마자 시작해 시체 시간 안에 끝낸다")]
+    [SerializeField, Min(0.01f)] private float _dissolveDuration = 1f;
+    [Tooltip("녹기 시작할 때 적 위치(발밑 기준)에 적이 바라보는 방향으로 띄우는 이펙트 (날리는 흔적 등). 적에 붙이지 않아 적이 사라진 뒤에도 끝날 때까지 남는다. 비워 두면 띄우지 않는다")]
+    [SerializeField] private GameObject _deathEffectPrefab;
+
     [Header("이동")]
     [Tooltip("추적할 때의 이동 속도(초당 거리)")]
     [SerializeField, Min(0f)] private float _moveSpeed = 3f;
@@ -73,6 +81,9 @@ public class EnemyData : ScriptableObject
     public float MaxHealth => _maxHealth;
     public bool CanDie => _canDie;
     public float CorpseDuration => _corpseDuration;
+    public Material DissolveMaterial => _dissolveMaterial;
+    public float DissolveDuration => _dissolveDuration;
+    public GameObject DeathEffectPrefab => _deathEffectPrefab;
     public int BaseStaggerResistLevel => _baseStaggerResistLevel;
     public float MaxGroggy => _maxGroggy;
     public float GroggyTime => _groggyTime;

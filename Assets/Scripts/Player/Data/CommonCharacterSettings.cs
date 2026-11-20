@@ -60,6 +60,10 @@ public class CommonCharacterSettings : ScriptableObject
     [SerializeField] private GameObject _parryTelegraphPrefab;
     [Tooltip("[임시 표시] 적이 패링 공격 예고를 시작할 때, 교체할 대기 캐릭터가 없으면(패링 불가) 띄우는 Prefab")]
     [SerializeField] private GameObject _unparryableTelegraphPrefab;
+    [Tooltip("패링에 성공할 때마다 캐릭터와 적의 중간에 띄우는 이펙트. 캐릭터에서 적을 바라보는 방향으로 띄운다. 비워 두면 띄우지 않는다")]
+    [SerializeField] private GameObject _parryEffectPrefab;
+    [Tooltip("패링 이펙트를 띄우는 높이 (캐릭터 발 기준)")]
+    [SerializeField] private float _parryEffectHeight = 1f;
 
     [Header("파티 교체")]
     [Tooltip("일반 교체의 최소 간격(초, 실제 시간). 마지막 교체(패링 · 빠른 지원 포함)부터 이 시간이 지나야 일반 교체를 할 수 있다. 빠른 지원 · 패링이 되는 교체는 막지 않는다")]
@@ -131,6 +135,8 @@ public class CommonCharacterSettings : ScriptableObject
     public float ParryReactTime => _parryReactTime;
     public GameObject ParryTelegraphPrefab => _parryTelegraphPrefab;
     public GameObject UnparryableTelegraphPrefab => _unparryableTelegraphPrefab;
+    public GameObject ParryEffectPrefab => _parryEffectPrefab;
+    public float ParryEffectHeight => _parryEffectHeight;
     public float SwapInTime => _swapInTime;
     public float SwapCooldown => _swapCooldown;
     public float SwapInAdvanceDistance => _swapInAdvanceDistance;
