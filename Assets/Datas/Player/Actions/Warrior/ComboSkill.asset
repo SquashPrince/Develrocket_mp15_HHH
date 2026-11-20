@@ -40,6 +40,14 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 1cd720f285a4336428e3dbf834fdf558, type: 3}
       - {fileID: 8300000, guid: 8ba1e1ff351e8f5439d2126fab265552, type: 3}
       _volume: 1
+    _hitEffects:
+    - _prefab: {fileID: 8471836630667197198, guid: b0523a7c89225cb43a6dd77437f9d4c4, type: 3}
+      _rollAngle: 0
+      _rollRandom: 15
+    - _prefab: {fileID: 8471836630667197198, guid: b0523a7c89225cb43a6dd77437f9d4c4, type: 3}
+      _rollAngle: 0
+      _rollRandom: 15
+    _motionEffects: []
   - _animationState: ComboSkill 2
     _hitMode: 0
     _windowTiming: 1
@@ -67,6 +75,11 @@ MonoBehaviour:
       - {fileID: 8300000, guid: d9e8d8a344c3d4843b63c5390c64cf83, type: 3}
       - {fileID: 8300000, guid: 3bbec08078d52a3418a1519fbac546c6, type: 3}
       _volume: 1
+    _hitEffects:
+    - _prefab: {fileID: 8471836630667197198, guid: b0523a7c89225cb43a6dd77437f9d4c4, type: 3}
+      _rollAngle: -100
+      _rollRandom: 15
+    _motionEffects: []
   _energyGain: 2.25
   _ultimateGaugeGain: 90
   _power: 10000

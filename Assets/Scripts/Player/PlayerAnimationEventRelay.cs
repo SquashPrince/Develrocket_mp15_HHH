@@ -15,13 +15,25 @@ public class PlayerAnimationEventRelay : MonoBehaviour
     // 상태가 바뀌며 이전 클립과 섞이는 동안에는 이전 클립의 이벤트도 발생하므로,
     // 어느 Animator 상태에서 온 이벤트인지 함께 넘겨 현재 상태의 이벤트만 처리하게 한다.
     private void ComboInputOpen(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.ComboInputOpen, animationEvent);
+    // 판정 시작 · 강타 끝 이벤트의 Int 값은 이번 휘두르기의 적중 이펙트 번호다. 상태가 판정을 부르기 전에 판정 기능에 미리 알린다.
     private void HitStart(AnimationEvent animationEvent)
     {
         PrepareHitWindow(animationEvent);
+        _playerController.AttackJudge.PrepareHitEffect(animationEvent.intParameter);
         Relay(PlayerAnimationEventType.HitStart, animationEvent);
     }
-    private void HitEnd(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.HitEnd, animationEvent);
-    private void ImpactEnd(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.ImpactEnd, animationEvent);
+    // 판정 끝 · 강타 끝은 반복 중인 동작 이펙트(펀치 러시의 먼지 등)도 멈춘다.
+    private void HitEnd(AnimationEvent animationEvent)
+    {
+        _playerController.StopLoopingMotionEffects(animationEvent.animatorStateInfo.shortNameHash);
+        Relay(PlayerAnimationEventType.HitEnd, animationEvent);
+    }
+    private void ImpactEnd(AnimationEvent animationEvent)
+    {
+        _playerController.AttackJudge.PrepareHitEffect(animationEvent.intParameter);
+        _playerController.StopLoopingMotionEffects(animationEvent.animatorStateInfo.shortNameHash);
+        Relay(PlayerAnimationEventType.ImpactEnd, animationEvent);
+    }
     private void AttackMotionEnd(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.AttackMotionEnd, animationEvent);
     private void RecoveryEnd(AnimationEvent animationEvent) => Relay(PlayerAnimationEventType.RecoveryEnd, animationEvent);
 

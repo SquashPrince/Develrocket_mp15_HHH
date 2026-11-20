@@ -21,6 +21,7 @@ MonoBehaviour:
     _hitCount: 7
     _reactOnFirstHitOnly: 0
     _hitLagTime: 0.035
+    _hitLagOnFirstHitOnly: 0
     _hitShape: 2
     _hitCenter: {x: 0, y: 1, z: 0}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
@@ -41,6 +42,8 @@ MonoBehaviour:
       - {fileID: 8300000, guid: abf4caad1f5a24e49a317937ebf12163, type: 3}
       - {fileID: 8300000, guid: d637bacd075454147bb398300d59dc3e, type: 3}
       _volume: 0.5
+    _hitEffects: []
+    _motionEffects: []
   _energyGain: 0.345
   _ultimateGaugeGain: 1.86
   _power: 3500
@@ -62,4 +65,3 @@ MonoBehaviour:
   _groggyGain: 3.45075
   _teleport: {fileID: 0}
   _cameraShot: 0
-  _hitEffect: {fileID: 1341028232701450620, guid: 914eaee70a5d59843bf488615be2da69, type: 3}

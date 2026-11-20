@@ -36,6 +36,8 @@ MonoBehaviour:
     _swingSound:
       _clips: []
       _volume: 1
+    _hitEffects: []
+    _motionEffects: []
   - _animationState: ParryReact
     _hitMode: 0
     _windowTiming: 0
@@ -58,6 +60,8 @@ MonoBehaviour:
     _swingSound:
       _clips: []
       _volume: 1
+    _hitEffects: []
+    _motionEffects: []
   _energyGain: 0
   _ultimateGaugeGain: 0
   _power: 0
@@ -75,3 +79,4 @@ MonoBehaviour:
   _groggyGain: 175
   _teleport: {fileID: 11400000, guid: ed6427ef9bfe3d64ba9b3799f8fe8333, type: 2}
   _cameraShot: 1
+  _hitEffect: {fileID: 0}

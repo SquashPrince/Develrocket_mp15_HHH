@@ -18,7 +18,7 @@ MonoBehaviour:
     _hitMode: 0
     _windowTiming: 1
     _hitInterval: 0.05
-    _hitCount: 1
+    _hitCount: 2
     _reactOnFirstHitOnly: 1
     _hitLagTime: 0.035
     _hitShape: 3
@@ -41,9 +41,14 @@ MonoBehaviour:
       - {fileID: 8300000, guid: abf4caad1f5a24e49a317937ebf12163, type: 3}
       - {fileID: 8300000, guid: d637bacd075454147bb398300d59dc3e, type: 3}
       _volume: 0.5
-  _energyGain: 0.998
-  _ultimateGaugeGain: 6.5
-  _power: 6500
+    _hitEffects:
+    - _prefab: {fileID: 1341028232701450620, guid: 914eaee70a5d59843bf488615be2da69, type: 3}
+      _rollAngle: 0
+      _rollRandom: 90
+    _motionEffects: []
+  _energyGain: 0.499
+  _ultimateGaugeGain: 3.25
+  _power: 3250
   _staggerLevel: 1
   _staggerTime: 0.25
   _hitSound:
@@ -59,7 +64,7 @@ MonoBehaviour:
   _useLegRun: 0
   _alwaysLegRun: 0
   _isInvincibleOnSwing: 0
-  _groggyGain: 6.71875
+  _groggyGain: 3.359375
   _teleport: {fileID: 0}
   _cameraShot: 0
-  _hitEffect: {fileID: 1341028232701450620, guid: 914eaee70a5d59843bf488615be2da69, type: 3}
+  _hitEffect: {fileID: 0}

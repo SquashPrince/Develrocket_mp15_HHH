@@ -6,6 +6,8 @@ using UnityEngine.Rendering;
 // 콤보 선택 중에는 게임 시간이 느려지므로 전환은 실제 시간으로 잰다.
 // 색 번짐 : Volume 의 Weight 를 비율로 바꾼다. 효과의 종류 · 세기는 Volume Profile 에서 정한다.
 // 왜곡 : 왜곡 세기(_Distorsion)를 비율 × 최대 왜곡 세기로 넣는다. MaterialPropertyBlock 으로 넣어 Material 에셋은 바꾸지 않는다.
+//   켜져 있는 동안 왜곡 Renderer 를 연계 대상 적의 패링 예고 위치(없으면 적 위치)로 옮긴다. 회전은 부모(카메라)를 따른다.
+//   선택이 닫히며 대상이 비워져도, 사라지는 동안은 마지막 위치에 남는다.
 //   비율이 0 이면 Renderer 를 꺼, 효과가 없는 동안 화면을 한 번 더 그리지 않게 한다.
 //   왜곡 셰이더는 화면 색을 읽으므로 URP 설정의 Opaque Texture 가 켜져 있어야 한다.
 [RequireComponent(typeof(Volume))]
@@ -13,8 +15,10 @@ public class ComboSelectScreenEffect : MonoBehaviour
 {
     private static readonly int DISTORTION_ID = Shader.PropertyToID("_Distorsion");
 
-    [Tooltip("카메라 앞에 놓은 화면 왜곡 Renderer (Distorsion 프리팹)")]
+    [Tooltip("화면 왜곡 Renderer (Distorsion 프리팹). 카메라의 자식으로 두면 카메라를 향한 채 연계 대상 위치로 옮겨진다")]
     [SerializeField] private Renderer _distortionRenderer;
+    [Tooltip("연계 대상을 읽을 콤보 스킬 선택 (파티 오브젝트)")]
+    [SerializeField] private ComboSkillSelector _selector;
     [Tooltip("효과가 다 켜졌을 때의 왜곡 세기")]
     [SerializeField, Min(0f)] private float _maxDistortion = 0.14f;
     [Tooltip("효과가 켜지는 시간(초, 실제 시간)")]
@@ -46,12 +50,28 @@ public class ComboSelectScreenEffect : MonoBehaviour
 
     private void UpdateEffect()
     {
-        if(_rate == _target) return;
+        if(_rate != _target)
+        {
+            float speed = 1f / (_target > _rate ? _fadeInTime : _fadeOutTime);
 
-        float speed = 1f / (_target > _rate ? _fadeInTime : _fadeOutTime);
+            _rate = Mathf.MoveTowards(_rate, _target, speed * Time.unscaledDeltaTime);
+            ApplyRate();
+        }
 
-        _rate = Mathf.MoveTowards(_rate, _target, speed * Time.unscaledDeltaTime);
-        ApplyRate();
+        if(_rate > 0f) FollowTarget();
+    }
+
+    // 왜곡을 연계 대상의 패링 예고 위치로 옮긴다. 예고 위치가 없는 적은 적 위치에 둔다.
+    // 대상이 없거나 처치되었으면 마지막 위치에 둔다.
+    private void FollowTarget()
+    {
+        IEnemyTargetable target = _selector.Target;
+
+        if(target == null || !target.IsAlive) return;
+
+        Transform point = target.transform.TryGetComponent(out IEnemyParryable parryable) ? parryable.TelegraphPoint : null;
+
+        _distortionRenderer.transform.position = point != null ? point.position : target.transform.position;
     }
 
     private void ApplyRate()

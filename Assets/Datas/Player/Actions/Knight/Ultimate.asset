@@ -41,6 +41,20 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 3ffd5bac966874fe6bfdad5ece325d8d, type: 3}
       - {fileID: 8300000, guid: a951e5d6c72414423b1f59c46b7854b4, type: 3}
       _volume: 1
+    _hitEffects:
+    - _prefab: {fileID: 3303146159454808010, guid: f5b7920747c252e46bf251a7a8957241, type: 3}
+      _rollAngle: 135
+      _rollRandom: 0
+    - _prefab: {fileID: 0}
+      _rollAngle: 0
+      _rollRandom: 0
+    - _prefab: {fileID: 3303146159454808010, guid: f5b7920747c252e46bf251a7a8957241, type: 3}
+      _rollAngle: 15
+      _rollRandom: 0
+    - _prefab: {fileID: 3303146159454808010, guid: f5b7920747c252e46bf251a7a8957241, type: 3}
+      _rollAngle: -15
+      _rollRandom: 0
+    _motionEffects: []
   - _animationState: Ultimate 2
     _hitMode: 0
     _windowTiming: 1
@@ -68,6 +82,23 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 4efeb35994dd14a1780ee01a6c7595eb, type: 3}
       - {fileID: 8300000, guid: e8ee5f242c7b04789a9fb37d55dde855, type: 3}
       _volume: 1
+    _hitEffects:
+    - _prefab: {fileID: 3303146159454808010, guid: 9ebfdf6e13d621c43ad5e0720d3640bd, type: 3}
+      _rollAngle: 165
+      _rollRandom: 0
+    - _prefab: {fileID: 3303146159454808010, guid: 9ebfdf6e13d621c43ad5e0720d3640bd, type: 3}
+      _rollAngle: 135
+      _rollRandom: 0
+    - _prefab: {fileID: 3303146159454808010, guid: 9ebfdf6e13d621c43ad5e0720d3640bd, type: 3}
+      _rollAngle: 225
+      _rollRandom: 0
+    - _prefab: {fileID: 0}
+      _rollAngle: 0
+      _rollRandom: 0
+    - _prefab: {fileID: 3303146159454808010, guid: 9ebfdf6e13d621c43ad5e0720d3640bd, type: 3}
+      _rollAngle: -70
+      _rollRandom: 0
+    _motionEffects: []
   _energyGain: 0
   _ultimateGaugeGain: 0
   _power: 5000
@@ -90,4 +121,4 @@ MonoBehaviour:
   _groggyGain: 64.77
   _teleport: {fileID: 11400000, guid: c555635f73488104bba4f75bacd32a01, type: 2}
   _cameraShot: 0
-  _hitEffect: {fileID: 3303146159454808010, guid: f5b7920747c252e46bf251a7a8957241, type: 3}
+  _hitEffect: {fileID: 0}

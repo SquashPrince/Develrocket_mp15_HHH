@@ -11,9 +11,10 @@ using UnityEngine;
 //   시점은 캐릭터 시간으로 재므로, 히트렉으로 멈춘 동안은 다음 시점이 오지 않는다.
 // 적중하면 동작의 히트렉 시간 동안 공격한 캐릭터만 멈추도록 상태 기능에 요청한다.
 // 동작이 "첫 타격에만 반응"을 켜면, 구간(판정 시작 한 번)에서 처음 적중한 타격에만 경직 · 히트렉을 건다. 강타는 항상 건다.
+// 동작이 "첫 타격에만 히트렉"을 켜면, 경직은 타격마다 걸고 히트렉(공격한 캐릭터 · 맞은 적 멈춤)만 처음 적중한 타격에 건다.
 // 범위 찾기 : 동작의 모양(상자 · 구 · 캡슐)대로 캐릭터 기준 범위를 확인한다.
 // 맞은 적 처리 : 체력 감소(캐릭터의 대미지 흔들림 · 크리티컬 적용) · 경직 · 그로기 누적 · 콤보 스킬 발동과 연계.
-// 적중 이펙트 : 맞은 적마다 액션의 적중 이펙트를 띄운다 (다단 히트는 타격마다).
+// 적중 이펙트 : 맞은 적마다 동작의 적중 이펙트 목록에서 고른 이펙트를 띄운다 (다단 히트는 타격마다).
 // 에너지 · 필살기 게이지 : 적을 맞힌 판정마다 한 번 얻는다. 한 번의 판정에서 여러 적을 맞혀도 한 번이고, 다단 히트는 타격마다 얻는다.
 // 소리 : 동작의 휘두름 소리는 동작에서 처음 판정할 때 한 번, 액션의 적중 소리는 적을 맞힌 판정마다 한 번 요청한다.
 //   공격 상태는 동작을 시작할 때와 상태를 나갈 때 판정 끄기(EndHit)를 부르므로, 그때 휘두름 소리 기록을 지워 다음 동작에서 다시 내게 한다.
@@ -38,6 +39,9 @@ public class PlayerAttackJudge : MonoBehaviour
     private ActionStep _windowStep;
     // 다음 판정 시작에 쓸 구간 길이와 강타로 끝나는지. 이벤트 전달 기능이 판정 시작 직전에 알려 준다.
     private float _preparedLength = -1f;
+    // 다음 판정 시작 · 강타 끝에 쓸 적중 이펙트 번호와, 지금 판정이 쓰는 번호
+    private int _preparedHitEffectIndex;
+    private int _hitEffectIndex;
     private bool _preparedEndsWithImpact;
     // 지금 구간의 시작 시각(캐릭터 시계), 길이(모르면 -1), 강타로 끝나는지, 다음 타격 번호, 이미 경직 · 히트렉을 걸었는지
     private float _windowStartTime;
@@ -67,16 +71,23 @@ public class PlayerAttackJudge : MonoBehaviour
         _preparedEndsWithImpact = endsWithImpact;
     }
 
+    // 다음 판정 시작 · 강타 끝에서 쓸 적중 이펙트 번호(동작의 적중 이펙트 목록 번호)를 미리 받아 둔다. 이벤트 전달 기능이 두 이벤트 직전에 부른다.
+    public void PrepareHitEffect(int index)
+    {
+        _preparedHitEffectIndex = index;
+    }
+
     // 판정 시작 이벤트. 구간 판정 동작이면 판정을 켜고 시작 시점의 타격을 바로 한다. 한 순간 판정 동작이면 이 순간 한 번만 판정한다.
     // 판정 범위 · 방식은 동작(step), 위력 · 게이지 같은 타격 값은 액션(action)에서 읽는다.
     public void BeginHit(ActionData action, ActionStep step)
     {
         CloseWindow();
         PlaySwingSoundOnce(step);
+        UsePreparedHitEffect();
 
         if(step.Mode == ActionStep.HitMode.Instant)
         {
-            HitInRange(action, step, false, true);
+            HitInRange(action, step, false, true, true);
             return;
         }
 
@@ -116,13 +127,23 @@ public class PlayerAttackJudge : MonoBehaviour
     // 강타 끝 이벤트. 구간 끝 전의 타격을 마치고, 이 순간 범위 안의 적에게 강타 판정을 한 번 한 뒤 판정을 끈다.
     // 강타는 범위 안의 적마다 한 번씩 맞고 항상 경직 · 히트렉을 건다.
     // 그로기 적에게 맞으면 판정을 모두 마친 뒤 콤보 스킬을 발동한다. 콤보 스킬 중이면 새로 발동하지 않고, 콤보 스킬 대상에게 맞았을 때 다음 연계를 잇게 한다.
+    // 구간의 남은 타격은 구간을 연 판정 시작의 적중 이펙트 번호로, 강타는 강타 끝 이벤트의 번호로 띄운다.
     public void PerformImpact(ActionData action, ActionStep step)
     {
         if(IsWindowOpen) HitDueTicks(GetWindowEndTime());
 
         CloseWindow();
         PlaySwingSoundOnce(step);
-        HitInRange(action, step, true, true);
+        UsePreparedHitEffect();
+        HitInRange(action, step, true, true, true);
+    }
+
+    // 미리 받아 둔 적중 이펙트 번호를 이번 판정에 쓰고, 받아 둔 값은 0 으로 돌린다.
+    // 번호를 넣지 않은 이벤트(Int 0)는 목록의 첫 이펙트를 쓴다.
+    private void UsePreparedHitEffect()
+    {
+        _hitEffectIndex = _preparedHitEffectIndex;
+        _preparedHitEffectIndex = 0;
     }
 
     // 동작의 휘두름 소리를 이 동작에서 처음 판정할 때 한 번만 낸다. 판정 시작이 없이 강타 끝만 있는 동작은 강타 끝에서 낸다.
@@ -159,9 +180,11 @@ public class PlayerAttackJudge : MonoBehaviour
             _nextTickIndex++;
 
             // 첫 타격에만 반응하는 동작이면, 이 구간에서 이미 경직 · 히트렉을 걸었을 때 이번 타격은 반응 없이 맞힌다.
+            // 첫 타격에만 히트렉을 거는 동작이면, 이미 반응한 구간에서는 경직만 걸고 멈추지 않는다.
             bool canReact = !_windowStep.ReactOnFirstHitOnly || !_hasReacted;
+            bool canHitLag = canReact && (!_windowStep.HitLagOnFirstHitOnly || !_hasReacted);
 
-            if(HitInRange(_windowAction, _windowStep, false, canReact) && canReact) _hasReacted = true;
+            if(HitInRange(_windowAction, _windowStep, false, canReact, canHitLag) && canReact) _hasReacted = true;
         }
     }
 
@@ -201,8 +224,8 @@ public class PlayerAttackJudge : MonoBehaviour
     private float GetWindowEndTime() => _windowLength >= 0f ? _windowLength : _status.LocalTime - _windowStartTime;
 
     // 범위 안의 적을 찾아 맞히고, 한 명이라도 맞았으면 true 를 돌려준다.
-    // canReact 이면 맞은 적을 경직시키고, 한 번의 찾기에서 여러 적을 맞혀도 히트렉은 한 번만 건다.
-    private bool HitInRange(ActionData action, ActionStep step, bool isImpact, bool canReact)
+    // canReact 이면 맞은 적을 경직시킨다. canHitLag 이면 히트렉을 걸고, 한 번의 찾기에서 여러 적을 맞혀도 한 번만 건다.
+    private bool HitInRange(ActionData action, ActionStep step, bool isImpact, bool canReact, bool canHitLag)
     {
         int count = step.Range.Overlap(transform, _hitColliders, Physics.AllLayers);
         IEnemyTargetable comboSkillTarget = null;
@@ -221,12 +244,12 @@ public class PlayerAttackJudge : MonoBehaviour
             // 이미 처치된 적(시체)은 맞지 않는다. 대미지 숫자 · 게이지 · 히트렉 · 적중 소리도 나오지 않는다.
             if(enemy == null || !enemy.IsAlive || !_hitTargets.Add(enemy)) continue;
 
-            ApplyHit(enemy, action, step, isImpact, canReact, ref comboSkillTarget, ref comboSkillGroggyable);
-            PlayHitEffect(action, _hitColliders[i]);
+            ApplyHit(enemy, action, step, isImpact, canReact, canHitLag, ref comboSkillTarget, ref comboSkillGroggyable);
+            PlayHitEffect(step, _hitColliders[i]);
             hasHit = true;
         }
 
-        if(hasHit && canReact) _status.BeginHitLag(step.HitLagTime);
+        if(hasHit && canHitLag) _status.BeginHitLag(step.HitLagTime);
 
         // 여러 적을 맞혀도 게이지 · 연출 · 효과음이 겹쳐 커지지 않게 판정마다 한 번만 얻고 알린다.
         if(hasHit)
@@ -246,13 +269,13 @@ public class PlayerAttackJudge : MonoBehaviour
 
     // 맞은 적 하나에 결과를 적용한다. 대미지는 액션의 위력에 캐릭터의 대미지 흔들림 · 크리티컬을 적용한 값이며, 적마다 따로 뽑는다.
     // canReact 이고 액션의 경직 시간이 0보다 크면, 경직 저항 레벨이 액션의 경직 레벨 이하인 적을 경직시킨다.
-    // canReact 이면 맞은 적을 동작의 히트렉 시간만큼 멈춘다(히트스톱). 플레이어 히트렉과 같은 시간이라 둘이 함께 멈췄다 함께 풀린다.
+    // canHitLag 이면 맞은 적을 동작의 히트렉 시간만큼 멈춘다(히트스톱). 플레이어 히트렉과 같은 시간이라 둘이 함께 멈췄다 함께 풀린다.
     //   경직 저항으로 경직되지 않는 적도 멈추고, 이 타격으로 처치된 적은 멈추지 않는다.
     // 그로기 게이지는 반응 여부와 상관없이 모든 적중마다 액션의 그로기 값만큼 쌓는다.
     // 강타가 그로기 적에게 맞으면 콤보 스킬 대상으로 고른다. 한 번의 판정에서 콤보 스킬은 하나의 적에게만 발동한다.
     // 그로기를 쌓은 뒤 콤보 스킬을 확인하므로, 게이지를 채운 강타가 바로 콤보 스킬 선택을 연다.
     // 이 적중으로 그로기에 들어갔으면 콤보 스킬 선택에 알려 그로기 정지 시간을 걸게 한다.
-    private void ApplyHit(IEnemyDamageable enemy, ActionData action, ActionStep step, bool isImpact, bool canReact, ref IEnemyTargetable comboSkillTarget, ref IEnemyGroggyable comboSkillGroggyable)
+    private void ApplyHit(IEnemyDamageable enemy, ActionData action, ActionStep step, bool isImpact, bool canReact, bool canHitLag, ref IEnemyTargetable comboSkillTarget, ref IEnemyGroggyable comboSkillGroggyable)
     {
         float damage = _controller.Character.RollDamage(action.Power, out bool isCritical);
 
@@ -268,7 +291,7 @@ public class PlayerAttackJudge : MonoBehaviour
         if(canReact && action.StaggerTime > 0f && enemy.transform.TryGetComponent(out IEnemyStaggerable staggerable)) staggerable.Stagger(action.StaggerTime, action.StaggerLevel);
 
         // 경직을 건 뒤 멈춰, 맞는 모션의 첫 자세에서 멈췄다가 이어지게 한다.
-        if(canReact) enemy.BeginHitStop(step.HitLagTime);
+        if(canHitLag) enemy.BeginHitStop(step.HitLagTime);
 
         bool hasGroggy = enemy.transform.TryGetComponent(out IEnemyGroggyable groggyable);
 
@@ -296,23 +319,48 @@ public class PlayerAttackJudge : MonoBehaviour
         comboSkillGroggyable = groggyable;
     }
 
-    // 맞은 적의 콜라이더에 액션의 적중 이펙트를 띄운다. 처치된 적도 마지막 타격이라 띄운다.
-    // 위치 : 콜라이더 중심 높이에서 캐릭터 쪽으로 가장 가까운 표면. 방향 : 캐릭터 → 적(수평).
+    // 맞은 적의 콜라이더에 적중 이펙트를 띄운다. 처치된 적도 마지막 타격이라 띄운다.
+    // 고르기 : 동작의 적중 이펙트 목록에서 이번 판정의 번호(판정 시작 · 강타 끝 이벤트의 Int 값)로 고르고, 그 기울기로 돌린다.
+    //   목록이 비어 있으면 띄우지 않는다. 목록에 없는 번호는 클립과 데이터가 어긋난 것이라 경고하고 띄우지 않는다.
+    // 높이 : 동작의 판정 범위 중심 높이(실제로 휘두르는 높이)를 쓰고, 콜라이더의 위아래 끝 안으로 맞춘다.
+    //   콜라이더 중심 높이를 쓰면 큰 적(보스)은 캐릭터가 아래에서 때려도 이펙트가 공중에 뜨기 때문이다.
+    // 위치 : 그 높이에서 캐릭터 쪽으로 가장 가까운 표면. 방향 : 캐릭터 → 적(수평).
+    // 흩어짐 : 공통 설정의 범위 안에서 좌우 · 위아래로 무작위로 비켜, 다단히트가 한 점에 겹치지 않게 한다. 앞뒤로는 비키지 않는다.
     // 콜라이더가 여러 개인 적은 이번 찾기에서 처음 찾은 콜라이더를 쓴다.
-    private void PlayHitEffect(ActionData action, Collider hitCollider)
+    private void PlayHitEffect(ActionStep step, Collider hitCollider)
     {
-        if(action.HitEffect == null) return;
+        if(!step.HasHitEffects) return;
 
-        Vector3 center = hitCollider.bounds.center;
-        Vector3 attackerPoint = new Vector3(transform.position.x, center.y, transform.position.z);
-        Vector3 direction = center - attackerPoint;
+        HitEffectSetting setting = step.GetHitEffect(_hitEffectIndex);
+
+        if(setting == null)
+        {
+#if UNITY_EDITOR
+            Debug.LogWarning($"[적중 이펙트] 동작 '{step.AnimationState}' 에 {_hitEffectIndex} 번 적중 이펙트가 없습니다. 판정 시작 · 강타 끝 이벤트의 Int 값과 동작의 적중 이펙트 목록을 확인하세요.", this);
+#endif
+            return;
+        }
+
+        GameObject prefab = setting.Prefab;
+
+        if(prefab == null) return;
+
+        Bounds bounds = hitCollider.bounds;
+        float height = Mathf.Clamp(transform.TransformPoint(step.Range.Center).y, bounds.min.y, bounds.max.y);
+        Vector3 attackerPoint = new Vector3(transform.position.x, height, transform.position.z);
+        Vector3 direction = new Vector3(bounds.center.x, height, bounds.center.z) - attackerPoint;
 
         direction.y = 0f;
 
         // 캐릭터와 적의 중심이 겹치면 방향을 알 수 없으므로 캐릭터 정면을 쓴다.
         if(direction == Vector3.zero) direction = transform.forward;
 
-        BattleEffect.Play(action.HitEffect, hitCollider.ClosestPoint(attackerPoint), Quaternion.LookRotation(direction));
+        Quaternion rotation = Quaternion.LookRotation(direction);
+        Vector2 spread = _controller.Common.HitEffectSpread;
+        Vector3 offset = rotation * new Vector3(UnityEngine.Random.Range(-spread.x, spread.x), UnityEngine.Random.Range(-spread.y, spread.y), 0f);
+
+        // 기울기는 공격 방향(이펙트의 앞쪽 축)을 축으로 돌린다.
+        BattleEffect.Play(prefab, hitCollider.ClosestPoint(attackerPoint) + offset, rotation * Quaternion.Euler(0f, 0f, setting.PickRollAngle()));
     }
 
     private void CacheComponent()

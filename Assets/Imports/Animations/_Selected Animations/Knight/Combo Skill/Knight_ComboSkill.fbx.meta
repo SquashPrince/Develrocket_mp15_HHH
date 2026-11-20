@@ -171,10 +171,17 @@ ModelImporter:
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
-        intParameter: 0
+        intParameter: 1
         messageOptions: 0
       - time: 0.41859925
         functionName: HitEnd
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 1
+        messageOptions: 0
+      - time: 0.85898674
+        functionName: MotionEffect
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -185,14 +192,14 @@ ModelImporter:
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
-        intParameter: 0
+        intParameter: 2
         messageOptions: 0
       - time: 0.9013204
         functionName: ImpactEnd
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
-        intParameter: 0
+        intParameter: 2
         messageOptions: 0
       - time: 1
         functionName: AttackMotionEnd

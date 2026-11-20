@@ -57,11 +57,11 @@ Transform:
   m_GameObject: {fileID: 5364471435072078890}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.5, z: 1.85}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8274059916941491464}
+  m_Father: {fileID: 2241258730357759650}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7608253765501798388
 GameObject:
@@ -88,11 +88,11 @@ Transform:
   m_GameObject: {fileID: 7608253765501798388}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.25, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8274059916941491464}
+  m_Father: {fileID: 2241258730357759708}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8592957830441349726
 GameObject:
@@ -133,8 +133,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 680516721575052309}
-  - {fileID: 6288933616598289340}
-  - {fileID: 954866986054530240}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &7070953523484102684
@@ -261,173 +259,7 @@ MonoBehaviour:
   _targetLayers:
     serializedVersion: 2
     m_Bits: 128
-  _turnSpeed: 360
   _telegraphPoint: {fileID: 6288933616598289340}
-  _attacks:
-  - _name: Swing Axe
-    _animationStates:
-    - Attack 1
-    _cooldown: 3.5
-    _baseWeight: 25
-    _weightGrowth: 10
-    _minUseDistance: 0
-    _canUseOutOfRange: 0
-    _leapHeight: 0
-    _overshootDistance: 0
-    _isParryable: 0
-    _parryStaggerTime: 1.5
-    _staggerResistLevel: 1
-    _resistUntilEvent: 0
-    _isContinuousHit: 0
-    _canPerfectDodge: 1
-    _hitCenter: {x: 0, y: 2, z: 3}
-    _hitRadius: 3
-    _power: 10
-    _reaction: 1
-    _hitStunTime: 0.5
-    _hitPushDistance: 1
-    _hitPushDuration: 0.2
-    _knockbackDistance: 3
-    _knockbackDuration: 0.5
-    _getUpTime: 1
-    _canDashCancel: 1
-  - _name: Pound Axe
-    _animationStates:
-    - Attack 2
-    _cooldown: 2
-    _baseWeight: 25
-    _weightGrowth: 10
-    _minUseDistance: 0
-    _canUseOutOfRange: 0
-    _leapHeight: 0
-    _overshootDistance: 0
-    _isParryable: 0
-    _parryStaggerTime: 1.5
-    _staggerResistLevel: 1
-    _resistUntilEvent: 0
-    _isContinuousHit: 0
-    _canPerfectDodge: 1
-    _hitCenter: {x: 0, y: 2, z: 3}
-    _hitRadius: 3
-    _power: 10
-    _reaction: 1
-    _hitStunTime: 0.75
-    _hitPushDistance: 1.25
-    _hitPushDuration: 0.3
-    _knockbackDistance: 3
-    _knockbackDuration: 0.5
-    _getUpTime: 1
-    _canDashCancel: 1
-  - _name: Roar
-    _animationStates:
-    - HeavyAttack
-    _cooldown: 5
-    _baseWeight: 30
-    _weightGrowth: 10
-    _minUseDistance: 0
-    _canUseOutOfRange: 0
-    _leapHeight: 0
-    _overshootDistance: 0
-    _isParryable: 0
-    _parryStaggerTime: 1.5
-    _staggerResistLevel: 1
-    _resistUntilEvent: 0
-    _isContinuousHit: 0
-    _canPerfectDodge: 1
-    _hitCenter: {x: 0, y: 3.5, z: 1.65}
-    _hitRadius: 5
-    _power: 10
-    _reaction: 2
-    _hitStunTime: 0.8
-    _hitPushDistance: 2
-    _hitPushDuration: 0.2
-    _knockbackDistance: 5
-    _knockbackDuration: 0.5
-    _getUpTime: 1
-    _canDashCancel: 0
-  - _name: Pierce
-    _animationStates:
-    - ParryAttackReady
-    - ParryAttackAction
-    - ParryAttackEnd
-    _cooldown: 10
-    _baseWeight: 20
-    _weightGrowth: 5
-    _minUseDistance: 0
-    _canUseOutOfRange: 0
-    _leapHeight: 0
-    _overshootDistance: 0
-    _isParryable: 1
-    _parryStaggerTime: 2
-    _staggerResistLevel: 2
-    _resistUntilEvent: 1
-    _isContinuousHit: 1
-    _canPerfectDodge: 1
-    _hitCenter: {x: 0, y: 2, z: 5}
-    _hitRadius: 5
-    _power: 10
-    _reaction: 2
-    _hitStunTime: 0.4
-    _hitPushDistance: 0
-    _hitPushDuration: 0.2
-    _knockbackDistance: 7.5
-    _knockbackDuration: 0.725
-    _getUpTime: 1
-    _canDashCancel: 0
-  - _name: Leap
-    _animationStates:
-    - LeapAttack
-    _cooldown: 10
-    _baseWeight: 20
-    _weightGrowth: 5
-    _minUseDistance: 10
-    _canUseOutOfRange: 1
-    _leapHeight: 15
-    _overshootDistance: 0
-    _isParryable: 0
-    _parryStaggerTime: 2
-    _staggerResistLevel: 2
-    _resistUntilEvent: 1
-    _isContinuousHit: 1
-    _canPerfectDodge: 1
-    _hitCenter: {x: 0, y: 0, z: 0}
-    _hitRadius: 10
-    _power: 10
-    _reaction: 2
-    _hitStunTime: 0.4
-    _hitPushDistance: 0
-    _hitPushDuration: 0.2
-    _knockbackDistance: 7.5
-    _knockbackDuration: 0.725
-    _getUpTime: 1
-    _canDashCancel: 0
-  - _name: Assult
-    _animationStates:
-    - AssultAttack
-    _cooldown: 10
-    _baseWeight: 20
-    _weightGrowth: 5
-    _minUseDistance: 7.5
-    _canUseOutOfRange: 1
-    _leapHeight: 0
-    _overshootDistance: 2.5
-    _isParryable: 0
-    _parryStaggerTime: 2
-    _staggerResistLevel: 2
-    _resistUntilEvent: 1
-    _isContinuousHit: 1
-    _canPerfectDodge: 1
-    _hitCenter: {x: 0, y: 1.5, z: 2}
-    _hitRadius: 5
-    _power: 10
-    _reaction: 2
-    _hitStunTime: 0.4
-    _hitPushDistance: 0
-    _hitPushDuration: 0.2
-    _knockbackDistance: 7.5
-    _knockbackDuration: 0.725
-    _getUpTime: 1
-    _canDashCancel: 0
 --- !u!114 &2111374454688834338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -470,7 +302,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   _data: {fileID: 11400000, guid: bc8ad3210a9bcbb419a2158d3eeb1793, type: 2}
   _lockOnPoint: {fileID: 954866986054530240}
-  _bossGaugePrefab: {fileID: 3142188097247535159, guid: 99b55f27fb5c55f46a76bbac83dc1bd5, type: 3}
+  _gaugePrefab: {fileID: 3142188097247535159, guid: 99b55f27fb5c55f46a76bbac83dc1bd5, type: 3}
   _hudRoot: {fileID: 0}
 --- !u!1001 &2241258730357359616
 PrefabInstance:
@@ -558,7 +390,13 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 6dde8a74ee2c4433b62a4c9b27a167f1, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 400092, guid: 6a83db130c2a41eab61ba170c28926b0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6288933616598289340}
+    - targetCorrespondingSourceObject: {fileID: 400034, guid: 6a83db130c2a41eab61ba170c28926b0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 954866986054530240}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 100004, guid: 6a83db130c2a41eab61ba170c28926b0, type: 3}
       insertIndex: -1
@@ -590,5 +428,15 @@ MonoBehaviour:
 --- !u!4 &2241258730357759620 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: 6a83db130c2a41eab61ba170c28926b0, type: 3}
+  m_PrefabInstance: {fileID: 2241258730357359616}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2241258730357759650 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400034, guid: 6a83db130c2a41eab61ba170c28926b0, type: 3}
+  m_PrefabInstance: {fileID: 2241258730357359616}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2241258730357759708 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400092, guid: 6a83db130c2a41eab61ba170c28926b0, type: 3}
   m_PrefabInstance: {fileID: 2241258730357359616}
   m_PrefabAsset: {fileID: 0}

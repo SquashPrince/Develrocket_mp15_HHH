@@ -17,6 +17,10 @@ public class CommonCharacterSettings : ScriptableObject
     [Tooltip("회피(백스텝)를 시작한 뒤 제자리에 있다가 전진을 시작하기까지의 시간(초). 회피 시간 안에 포함되므로 회피 시간보다 짧게 둔다")]
     [SerializeField, Min(0f)] private float _dodgeStartDelay;
 
+    [Header("적중 이펙트")]
+    [Tooltip("적중 이펙트를 맞은 자리에서 무작위로 비켜 띄우는 최대 거리 (x : 좌우, y : 위아래). 0 이면 비키지 않는다. 앞뒤로는 비키지 않아 적 표면에 붙어 있다")]
+    [SerializeField] private Vector2 _hitEffectSpread = new Vector2(0.3f, 0.3f);
+
     [Header("공격 간격")]
     [Tooltip("공격할 때 대상 앞에서 멈추거나 순간 이동할 때, 대상 몸 표면과 플레이어 몸 표면 사이를 이 간격만큼 띄운다. 중심 사이 거리는 대상 반지름 + 플레이어 반지름 + 간격이다")]
     [SerializeField, Min(0f)] private float _attackableDistance = 1.5f;
@@ -139,6 +143,7 @@ public class CommonCharacterSettings : ScriptableObject
     public LayerMask ObstacleLayers => _obstacleLayers;
     public float SightHeight => _sightHeight;
     public GameObject LockOnMarkerPrefab => _lockOnMarkerPrefab;
+    public Vector2 HitEffectSpread => _hitEffectSpread;
     public float AttackableDistance => _attackableDistance;
     public LayerMask TeleportBlockLayers => _teleportBlockLayers;
     public LayerMask TeleportGroundLayers => _teleportGroundLayers;

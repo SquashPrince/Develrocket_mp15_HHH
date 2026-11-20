@@ -1182,15 +1182,8 @@ ModelImporter:
           postInfinity: 3
           rotationOrder: 4
       events:
-      - time: 0.92385787
-        functionName: AttackMotionEnd
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 1
-        functionName: RecoveryEnd
+      - time: 0.06926407
+        functionName: MotionEffect
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -1210,12 +1203,26 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
+      - time: 0.21158008
+        functionName: MotionEffect
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 1
+        messageOptions: 0
       - time: 0.21473804
         functionName: HitStart
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
+        messageOptions: 0
+      - time: 0.21961638
+        functionName: MotionEffect
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 2
         messageOptions: 0
       - time: 0.67472655
         functionName: HitEnd
@@ -1230,6 +1237,20 @@ ModelImporter:
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
+        messageOptions: 0
+      - time: 0.7535982
+        functionName: MotionEffect
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 3
+        messageOptions: 0
+      - time: 0.7708422
+        functionName: MotionEffect
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 4
         messageOptions: 0
       - time: 0.7760507
         functionName: ImpactEnd
@@ -1252,8 +1273,15 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.22340426
-        functionName: MotionEffect
+      - time: 0.92385787
+        functionName: AttackMotionEnd
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 1
+        functionName: RecoveryEnd
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

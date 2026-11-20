@@ -36,6 +36,8 @@ MonoBehaviour:
     _swingSound:
       _clips: []
       _volume: 1
+    _hitEffects: []
+    _motionEffects: []
   - _animationState: ParryReact
     _hitMode: 0
     _windowTiming: 0
@@ -58,6 +60,8 @@ MonoBehaviour:
     _swingSound:
       _clips: []
       _volume: 1
+    _hitEffects: []
+    _motionEffects: []
   _energyGain: 0
   _ultimateGaugeGain: 0
   _power: 0

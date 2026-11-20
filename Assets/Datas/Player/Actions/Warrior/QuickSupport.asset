@@ -39,6 +39,8 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 6f74033cf212c8f46b5071809f0f598a, type: 3}
       - {fileID: 8300000, guid: 151cb907cd994a348836f827b8810e0b, type: 3}
       _volume: 1
+    _hitEffects: []
+    _motionEffects: []
   _energyGain: 0.6
   _ultimateGaugeGain: 18
   _power: 1000
@@ -60,4 +62,4 @@ MonoBehaviour:
   _groggyGain: 5.75
   _teleport: {fileID: 11400000, guid: 7263e82ed97087141b501f4c8dba8526, type: 2}
   _cameraShot: 0
-  _hitEffect: {fileID: 8471836630667197198, guid: b0523a7c89225cb43a6dd77437f9d4c4, type: 3}
+  _hitEffect: {fileID: 0}

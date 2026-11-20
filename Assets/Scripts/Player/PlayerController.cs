@@ -41,6 +41,8 @@ public class PlayerController : MonoBehaviour
     private bool _isCharging;
     // 교체로 나가야 하지만 하던 동작이 남아 있어 퇴장을 미뤄 둔 상태인지
     private bool _isSwapOutReserved;
+    // 마지막으로 동작 이펙트를 띄운 동작. 이 동작이 끝나면 반복 중인 동작 이펙트를 멈춘다.
+    private ActionStep _motionEffectStep;
 
     // 상태가 이번 프레임에 정한 수평 속도. 매 프레임 상태 실행 뒤 중력과 함께 반영한다.
     public Vector3 HorizontalVelocity { get; set; }
@@ -85,6 +87,7 @@ public class PlayerController : MonoBehaviour
     {
         RechargeDashStack();
         _stateMachine.Tick();
+        StopMotionEffectsOnStepChange();
 
         // 퇴장이 끝나 이번 프레임에 캐릭터가 꺼졌으면 꺼진 CharacterController 를 움직이지 않는다.
         if(!gameObject.activeSelf) return;
@@ -330,6 +333,31 @@ public class PlayerController : MonoBehaviour
         }
 
         BattleEffect.PlayAttached(effect.Prefab, transform, effect.Position, effect.Rotation, effect.Scale);
+        _motionEffectStep = step;
+    }
+
+    // 판정 끝 · 강타 끝 이벤트에서 이 캐릭터에 붙어 반복 중인 동작 이펙트(펀치 러시의 먼지 등)를 멈춘다.
+    // 이전 클립과 섞이는 동안 온 이전 클립의 이벤트는 지금 동작의 이펙트를 멈추지 않게 거른다.
+    public void StopLoopingMotionEffects(int stateHash)
+    {
+        ActionStep step = _stateMachine.CurrentState.CurrentStep;
+
+        if(step == null || step.AnimationHash != stateHash) return;
+
+        StopLoopingMotionEffects();
+    }
+
+    private void StopLoopingMotionEffects()
+    {
+        BattleEffect.StopLoop(transform);
+        _motionEffectStep = null;
+    }
+
+    // 동작 이펙트를 띄운 동작이 끝나면(다음 동작 · 다른 상태로 넘어가면) 판정 끝 이벤트가 오지 않았어도 반복을 멈춘다.
+    // 피격 · 회피로 동작이 끊겨도 먼지가 계속 남지 않게 하기 위해서다.
+    private void StopMotionEffectsOnStepChange()
+    {
+        if(_motionEffectStep != null && _stateMachine.CurrentState.CurrentStep != _motionEffectStep) StopLoopingMotionEffects();
     }
 
     // 이동 상태로 돌아가면 진행 중이던 차지는 끊는다. 퇴장이 예약되어 있으면 이동 상태 대신 퇴장한다.
