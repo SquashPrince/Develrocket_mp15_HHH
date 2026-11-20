@@ -72,9 +72,9 @@ public class CommonCharacterSettings : ScriptableObject
     [SerializeField, Min(0f)] private float _parryReactDistance = 2f;
     [Tooltip("패링 성공 후 반응 시간(초). 이 시간에 걸쳐 점점 느려지며 밀려나고, 이 동안 닿은 노란 공격은 자동으로 패링된다. 이 동안 공격 키를 누르면 끝난 뒤 추격 공격이 나간다")]
     [SerializeField, Min(0.01f)] private float _parryReactTime = 1f;
-    [Tooltip("[임시 표시] 적이 패링 공격 예고를 시작할 때, 교체할 대기 캐릭터가 있으면(패링 가능) 띄우는 Prefab. 적의 예고 위치에 붙인다")]
+    [Tooltip("적이 패링 공격 예고를 시작할 때, 교체할 대기 캐릭터가 있으면(패링 가능) 띄우는 Prefab. 적의 예고 위치에 붙인다")]
     [SerializeField] private GameObject _parryTelegraphPrefab;
-    [Tooltip("[임시 표시] 적이 패링 공격 예고를 시작할 때, 교체할 대기 캐릭터가 없으면(패링 불가) 띄우는 Prefab")]
+    [Tooltip("적이 패링 공격 예고를 시작할 때, 교체할 대기 캐릭터가 없으면(패링 불가) 띄우는 Prefab")]
     [SerializeField] private GameObject _unparryableTelegraphPrefab;
     [Tooltip("패링에 성공할 때마다 캐릭터와 적의 중간에 띄우는 이펙트. 캐릭터에서 적을 바라보는 방향으로 띄운다. 비워 두면 띄우지 않는다")]
     [SerializeField] private GameObject _parryEffectPrefab;

@@ -34,7 +34,6 @@ MonoBehaviour:
   _slowMotionDuration: 1
   _slowMotionEnemyTimeScale: 0.25
   _afterimageMaterial: {fileID: 2100000, guid: 8b7e9b0e4e44fb34da56f95f5fab9be1, type: 2}
-  _afterimageFadeMode: 0
   _afterimageFadeProperty: _Color
   _afterimageStartValue: 1
   _afterimageEndValue: 0
@@ -44,8 +43,8 @@ MonoBehaviour:
   _parryReadyTime: 1
   _parryReactDistance: 3
   _parryReactTime: 1
-  _parryTelegraphPrefab: {fileID: 362406810184043471, guid: df2ca08c06889d340b79104967a64347, type: 3}
-  _unparryableTelegraphPrefab: {fileID: 362406810184043471, guid: 6d03919f2fbae284db26337abab6114e, type: 3}
+  _parryTelegraphPrefab: {fileID: 5199311003786235912, guid: 93398cfb6f2be5c45881b959efd0a405, type: 3}
+  _unparryableTelegraphPrefab: {fileID: 5199311003786235912, guid: 5718eb03ced533e44bf6ae33a114ce4d, type: 3}
   _parryEffectPrefab: {fileID: 1610259402245616, guid: c37b4de6b48998e4993bf5c06d679825, type: 3}
   _parryEffectHeight: 1.25
   _swapCooldown: 0.1
