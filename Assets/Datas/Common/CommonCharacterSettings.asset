@@ -33,6 +33,14 @@ MonoBehaviour:
   _groundSearchDepth: 2
   _slowMotionDuration: 1
   _slowMotionEnemyTimeScale: 0.25
+  _afterimageMaterial: {fileID: 2100000, guid: 8b7e9b0e4e44fb34da56f95f5fab9be1, type: 2}
+  _afterimageFadeMode: 0
+  _afterimageFadeProperty: _Color
+  _afterimageStartValue: 1
+  _afterimageEndValue: 0
+  _afterimageEmitTime: 0.35
+  _afterimageInterval: 0.05
+  _afterimageFadeTime: 0.35
   _parryReadyTime: 1
   _parryReactDistance: 3
   _parryReactTime: 1

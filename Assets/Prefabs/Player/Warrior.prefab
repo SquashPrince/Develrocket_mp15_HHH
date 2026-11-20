@@ -2812,6 +2812,7 @@ GameObject:
   - component: {fileID: 2209540083353082972}
   - component: {fileID: 7013964450345776751}
   - component: {fileID: 4340611844739287583}
+  - component: {fileID: 5503104381494857023}
   m_Layer: 7
   m_Name: Warrior
   m_TagString: Untagged
@@ -2965,6 +2966,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDebugger
   _rangeDisplayTime: 0.1
+--- !u!114 &5503104381494857023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752887230483005231}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57d57318340c5fb468b1d55491c04a4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PerfectDodgeAfterimage
+  _renderers:
+  - {fileID: 434420339582336599}
+  - {fileID: 1091671864178445583}
+  - {fileID: 2782508714701177028}
+  - {fileID: 489253123208265896}
+  - {fileID: 7427441389697102856}
+  - {fileID: 7868512743569864748}
+  - {fileID: 2593789138936839580}
+  - {fileID: 8457559342021814281}
 --- !u!1 &764204873506006043
 GameObject:
   m_ObjectHideFlags: 0
@@ -25430,7 +25452,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e48b212da23e60f49adb3521f2778457, type: 2}
+  - {fileID: 2100000, guid: a76bed222203cbd40bae5e61655555e9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -27363,7 +27385,7 @@ SkinnedMeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 449956f351df07e4bb8cd4ad9eac8dde, type: 2}
-  - {fileID: 2100000, guid: 744cfbb07ac6b8c4f831386b6c8d620c, type: 2}
+  - {fileID: 2100000, guid: bbc0bc1770b7d734da47c9bc6c381493, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -41896,5 +41918,10 @@ PrefabInstance:
 --- !u!4 &8457559342019390185 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 0466dd790c0cfd34db4afe171eadd2a6, type: 3}
+  m_PrefabInstance: {fileID: 8457559342019522665}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &8457559342021814281 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2300000, guid: 0466dd790c0cfd34db4afe171eadd2a6, type: 3}
   m_PrefabInstance: {fileID: 8457559342019522665}
   m_PrefabAsset: {fileID: 0}

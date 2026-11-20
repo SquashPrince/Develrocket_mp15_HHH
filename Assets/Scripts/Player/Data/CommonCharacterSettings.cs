@@ -49,6 +49,22 @@ public class CommonCharacterSettings : ScriptableObject
     [Tooltip("슬로모션 동안 적의 시간 배율")]
     [SerializeField, Range(0.05f, 1f)] private float _slowMotionEnemyTimeScale = 0.5f;
 
+    [Header("완벽 회피 잔상")]
+    [Tooltip("잔상에 씌울 Material (투명 모드). 비워 두면 잔상을 남기지 않는다")]
+    [SerializeField] private Material _afterimageMaterial;
+    [Tooltip("알파를 바꿔 흐려지게 할 Material 의 색 프로퍼티 이름 (예 : _Color, _BaseColor)")]
+    [SerializeField] private string _afterimageFadeProperty = "_Color";
+    [Tooltip("잔상이 생길 때의 알파. 잔상이 사라지는 동안 이 값에서 끝 알파로 바뀐다")]
+    [SerializeField, Range(0f, 1f)] private float _afterimageStartValue = 1f;
+    [Tooltip("잔상이 다 사라졌을 때의 알파")]
+    [SerializeField, Range(0f, 1f)] private float _afterimageEndValue;
+    [Tooltip("완벽 회피 후 잔상을 계속 남기는 시간(초, 실제 시간)")]
+    [SerializeField, Min(0f)] private float _afterimageEmitTime = 0.4f;
+    [Tooltip("잔상을 하나씩 남기는 간격(초, 실제 시간)")]
+    [SerializeField, Min(0.01f)] private float _afterimageInterval = 0.05f;
+    [Tooltip("잔상 하나가 사라지는 데 걸리는 시간(초, 실제 시간)")]
+    [SerializeField, Min(0.01f)] private float _afterimageFadeTime = 0.3f;
+
     [Header("패링")]
     [Tooltip("패링 준비 자세를 유지하는 시간(초). 적 공격이 끊겨도 끝까지 유지한다")]
     [SerializeField, Min(0.01f)] private float _parryReadyTime = 1f;
@@ -130,6 +146,13 @@ public class CommonCharacterSettings : ScriptableObject
     public float GroundSearchDepth => _groundSearchDepth;
     public float SlowMotionDuration => _slowMotionDuration;
     public float SlowMotionEnemyTimeScale => _slowMotionEnemyTimeScale;
+    public Material AfterimageMaterial => _afterimageMaterial;
+    public string AfterimageFadeProperty => _afterimageFadeProperty;
+    public float AfterimageStartValue => _afterimageStartValue;
+    public float AfterimageEndValue => _afterimageEndValue;
+    public float AfterimageEmitTime => _afterimageEmitTime;
+    public float AfterimageInterval => _afterimageInterval;
+    public float AfterimageFadeTime => _afterimageFadeTime;
     public float ParryReadyTime => _parryReadyTime;
     public float ParryReactDistance => _parryReactDistance;
     public float ParryReactTime => _parryReactTime;
