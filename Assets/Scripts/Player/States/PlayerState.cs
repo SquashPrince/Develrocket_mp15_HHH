@@ -21,6 +21,9 @@ public abstract class PlayerState
     // 이 상태가 지금 쓰고 있는 액션. 액션을 쓰지 않는 상태(이동 · 피격 등)는 null 이다. 카메라 구도가 읽는다.
     public virtual ActionData CurrentAction => null;
 
+    // 이 상태가 지금 재생 중인 액션의 동작. 동작을 재생하지 않는 상태 · 구간은 null 이다. 동작 이펙트가 읽는다.
+    public virtual ActionStep CurrentStep => null;
+
     public virtual void Enter()
     {
     }

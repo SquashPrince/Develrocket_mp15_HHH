@@ -8,6 +8,8 @@ public static class BattleEffect
 {
     // 띄울 이펙트 Prefab · 월드 위치 · 월드 회전을 알린다. 구독하는 쪽은 꺼질 때 반드시 해제한다.
     public static event Action<GameObject, Vector3, Quaternion> Requested;
+    // 띄울 이펙트 Prefab · 붙일 부모 · 부모 기준 위치 · 회전 · 크기 배수를 알린다. 이펙트는 부모를 따라 움직인다.
+    public static event Action<GameObject, Transform, Vector3, Quaternion, Vector3> AttachedRequested;
 
     // 비워 둔(null) 이펙트는 알리지 않는다.
     public static void Play(GameObject prefab, Vector3 position, Quaternion rotation)
@@ -17,10 +19,19 @@ public static class BattleEffect
         Requested?.Invoke(prefab, position, rotation);
     }
 
+    // 부모에 붙여 띄운다. 베기처럼 캐릭터를 따라가야 하는 이펙트에 쓴다. 비워 둔(null) 이펙트는 알리지 않는다.
+    public static void PlayAttached(GameObject prefab, Transform parent, Vector3 localPosition, Quaternion localRotation, Vector3 localScale)
+    {
+        if(prefab == null) return;
+
+        AttachedRequested?.Invoke(prefab, parent, localPosition, localRotation, localScale);
+    }
+
     // 도메인 리로드를 끈 채 플레이를 다시 시작해도 이전 플레이의 구독이 남지 않게 한다.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetOnLoad()
     {
         Requested = null;
+        AttachedRequested = null;
     }
 }

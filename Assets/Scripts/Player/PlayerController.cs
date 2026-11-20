@@ -310,6 +310,28 @@ public class PlayerController : MonoBehaviour
         _stateMachine.CurrentState.OnAnimationEvent(type, stateHash);
     }
 
+    // 지금 동작의 index 번 이펙트를 이 캐릭터에 붙여 띄운다.
+    // 상태가 바뀌며 이전 클립과 섞이는 동안 이전 클립의 이벤트도 발생하므로, 지금 동작의 클립에서 온 이벤트만 처리한다.
+    // 목록에 없는 번호는 클립과 액션 데이터가 어긋난 것이라 경고하고 넘어간다.
+    public void PlayMotionEffect(int index, int stateHash)
+    {
+        ActionStep step = _stateMachine.CurrentState.CurrentStep;
+
+        if(step == null || step.AnimationHash != stateHash) return;
+
+        MotionEffectSetting effect = step.GetMotionEffect(index);
+
+        if(effect == null)
+        {
+#if UNITY_EDITOR
+            Debug.LogWarning($"[{name}] 동작 '{step.AnimationState}' 에 {index} 번 동작 이펙트가 없습니다. 클립 이벤트의 Int 값과 액션 데이터의 이펙트 목록을 확인하세요.", this);
+#endif
+            return;
+        }
+
+        BattleEffect.PlayAttached(effect.Prefab, transform, effect.Position, effect.Rotation, effect.Scale);
+    }
+
     // 이동 상태로 돌아가면 진행 중이던 차지는 끊는다. 퇴장이 예약되어 있으면 이동 상태 대신 퇴장한다.
     public void EnterLocomotion(bool startRunning)
     {

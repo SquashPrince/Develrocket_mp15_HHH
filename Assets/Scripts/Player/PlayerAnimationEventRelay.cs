@@ -32,6 +32,13 @@ public class PlayerAnimationEventRelay : MonoBehaviour
         if(_playerController.Party.Controlled == _playerController) BattleFeedback.Raise(BattleFeedback.Moment.Footstep);
     }
 
+    // 동작 이펙트를 띄우는 순간에 찍고, Int 칸에 지금 동작의 이펙트 목록 번호를 넣는다.
+    // 상태의 진행과 상관없는 연출이라 상태로 넘기지 않고, 컨트롤러가 지금 동작을 확인해 바로 띄운다.
+    private void MotionEffect(AnimationEvent animationEvent)
+    {
+        _playerController.PlayMotionEffect(animationEvent.intParameter, animationEvent.animatorStateInfo.shortNameHash);
+    }
+
     private void Relay(PlayerAnimationEventType type, AnimationEvent animationEvent)
     {
         _playerController.HandleAnimationEvent(type, animationEvent.animatorStateInfo.shortNameHash);

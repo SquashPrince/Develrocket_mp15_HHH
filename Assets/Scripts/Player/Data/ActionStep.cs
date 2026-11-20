@@ -91,6 +91,10 @@ public class ActionStep
     [Tooltip("이 동작을 휘두를(시전할) 때 내는 소리. 적이 없어도 판정 시작(판정 시작이 없으면 강타 끝) 순간에 동작마다 한 번 낸다. 비워 두면 소리가 없다")]
     [SerializeField] private SoundGroup _swingSound;
 
+    [Header("이펙트")]
+    [Tooltip("이 동작 중 띄울 이펙트 목록. 클립에 동작 이펙트(MotionEffect) 이벤트를 찍고 Int 칸에 목록 번호(0 부터)를 넣으면 그 순간 그 번호의 이펙트를 캐릭터에 붙여 띄운다")]
+    [SerializeField] private MotionEffectSetting[] _motionEffects = new MotionEffectSetting[0];
+
     public string AnimationState => _animationState;
     // 재생 · 이벤트 구분에 쓰는 상태 해시. 상태 이름으로 매번 계산한다.
     public int AnimationHash => Animator.StringToHash(_animationState);
@@ -109,4 +113,12 @@ public class ActionStep
 
     // 이 동작 중 interrupt 행동을 허용하는지
     public bool Allows(Interrupt interrupt) => (_interrupts & interrupt) != 0;
+
+    // index 번 동작 이펙트. 목록에 없는 번호면 null 이다.
+    public MotionEffectSetting GetMotionEffect(int index)
+    {
+        if(index < 0 || index >= _motionEffects.Length) return null;
+
+        return _motionEffects[index];
+    }
 }

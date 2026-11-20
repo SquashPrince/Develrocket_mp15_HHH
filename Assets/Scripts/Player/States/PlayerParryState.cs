@@ -37,6 +37,7 @@ public class PlayerParryState : PlayerState
     // 준비 중에는 패링 액션의 준비 동작, 성공 반응 중에는 반응 동작의 끼어들기 허용을 따른다.
     public override bool CanSwap => _trigger.AllowsSwap(_trigger.ParryAction.GetStep(_phase == Phase.Ready ? READY_STEP : REACT_STEP));
     public override ActionData CurrentAction => _trigger.ParryAction;
+    public override ActionStep CurrentStep => _trigger.ParryAction.GetStep(_phase == Phase.Ready ? READY_STEP : REACT_STEP);
 
     public override void Enter()
     {

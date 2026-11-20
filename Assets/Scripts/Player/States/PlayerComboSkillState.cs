@@ -28,6 +28,8 @@ public class PlayerComboSkillState : PlayerState
     // 지금 동작의 끼어들기 허용을 따른다. 첫 동작을 시작하기 전(-1)에는 교체하지 않는다.
     public override bool CanSwap => _step >= 0 && _trigger.AllowsSwap(_trigger.ComboSkillAction.GetStep(_step));
     public override ActionData CurrentAction => _trigger.ComboSkillAction;
+    // 첫 동작을 시작하기 전(-1)에는 동작이 없다.
+    public override ActionStep CurrentStep => _step >= 0 ? _trigger.ComboSkillAction.GetStep(_step) : null;
 
     // target : 콤보 스킬 대상인 그로기 적. 순간 이동과 단계별 접근의 대상이 된다.
     public void Setup(IEnemyTargetable target) => _target = target;
