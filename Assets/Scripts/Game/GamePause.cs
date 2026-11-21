@@ -60,7 +60,8 @@ public class GamePause : MonoBehaviour
         else Pause();
     }
 
-    private bool CanPause() => Time.timeScale == 1f && !_gameFlow.IsEnded;
+    // 씬 이동(로딩) 중에는 열지 않는다. 로딩 화면 뒤에서 메뉴가 열려 있으면 화면이 보였을 때 멈춰 있기 때문이다.
+    private bool CanPause() => Time.timeScale == 1f && !_gameFlow.IsEnded && !CommonUI.Instance.SceneLoader.IsLoading;
 
     private void SetPaused(bool isPaused)
     {

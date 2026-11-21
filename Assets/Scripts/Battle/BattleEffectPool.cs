@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,8 +32,18 @@ public class BattleEffectPool : MonoBehaviour
         public bool IsLooping;
     }
 
+    // 로딩 중에 미리 만들어 둘 이펙트 하나와 개수
+    [Serializable]
+    private struct PrewarmEntry
+    {
+        public GameObject Prefab;
+        [Min(1)] public int Count;
+    }
+
     [Tooltip("이펙트 하나가 켜져 있을 수 있는 최대 시간(초, 실제 시간). 파티클이 끝나지 않거나 파티클이 없는 이펙트도 이 시간이 지나면 회수한다. 반복 중인 이펙트는 멈춘 때부터 잰다")]
     [SerializeField, Min(0.1f)] private float _maxLifetime = 5f;
+    [Tooltip("로딩 중에 미리 만들어 둘 이펙트와 개수. 전투 중 한꺼번에 많이 나오는 이펙트(타격 · 베기)는 동시에 나오는 최대 수만큼 둔다")]
+    [SerializeField] private PrewarmEntry[] _prewarm;
 
     // Prefab 별로 만든 이펙트 목록 · 지금 재생 중인 이펙트
     private readonly Dictionary<GameObject, List<PooledEffect>> _pools = new Dictionary<GameObject, List<PooledEffect>>();
@@ -169,14 +180,56 @@ public class BattleEffectPool : MonoBehaviour
         }
     }
 
-    // 꺼져 있는 이펙트를 꺼내고, 없으면 하나 더 만든다.
-    private PooledEffect GetEffect(GameObject prefab)
+    // 미리 만들 목록의 이펙트를 개수만큼 만들고, 모두 position 에 한 번씩 켜서 재생한다.
+    // 로딩 화면이 덮고 있는 동안 처음 그리는 끊김(셰이더 · 파티클 준비)을 미리 겪게 하기 위해서다. 끝나면 RecallAll 로 거둔다.
+    public void Prewarm(Vector3 position)
+    {
+        foreach(PrewarmEntry entry in _prewarm)
+        {
+            List<PooledEffect> pool = GetPool(entry.Prefab);
+
+            while(pool.Count < entry.Count)
+            {
+                pool.Add(CreateEffect(entry.Prefab));
+            }
+
+            foreach(PooledEffect effect in pool)
+            {
+                if(effect.Root.activeSelf) continue;
+
+                effect.Root.transform.position = position;
+                StartEffect(effect, false);
+            }
+        }
+    }
+
+    // 재생 중인 이펙트를 모두 바로 거둔다.
+    public void RecallAll()
+    {
+        foreach(PooledEffect effect in _playing)
+        {
+            if(effect.Root != null) Recall(effect);
+            else RemoveDestroyed(effect);
+        }
+
+        _playing.Clear();
+    }
+
+    private List<PooledEffect> GetPool(GameObject prefab)
     {
         if(!_pools.TryGetValue(prefab, out List<PooledEffect> pool))
         {
             pool = new List<PooledEffect>();
             _pools.Add(prefab, pool);
         }
+
+        return pool;
+    }
+
+    // 꺼져 있는 이펙트를 꺼내고, 없으면 하나 더 만든다.
+    private PooledEffect GetEffect(GameObject prefab)
+    {
+        List<PooledEffect> pool = GetPool(prefab);
 
         // 부모와 함께 파괴된 이펙트는 다음 갱신에서 목록에서 지우므로 건너뛴다.
         foreach(PooledEffect effect in pool)

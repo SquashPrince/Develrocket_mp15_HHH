@@ -24,6 +24,8 @@ public class BgmPlayer : MonoBehaviour
     [SerializeField] private AudioClip _bossClip;
     [Tooltip("비워 두면 결과 화면에서 배경음을 끈다")]
     [SerializeField] private AudioClip _resultClip;
+    [Tooltip("로딩 화면 곡. 비워 두면 로딩 중에는 소리를 끈다")]
+    [SerializeField] private AudioClip _loadingClip;
 
     [Header("재생")]
     [Tooltip("곡의 기본 볼륨(0 ~ 1). 배경음 · 전체 볼륨 설정과 곱해진다")]
@@ -137,7 +139,9 @@ public class BgmPlayer : MonoBehaviour
             case BgmTrack.Title: return _titleClip;
             case BgmTrack.Wave: return _waveClip;
             case BgmTrack.Boss: return _bossClip;
-            default: return _resultClip;
+            case BgmTrack.Result: return _resultClip;
+            case BgmTrack.Loading: return _loadingClip;
+            default: return null;
         }
     }
 

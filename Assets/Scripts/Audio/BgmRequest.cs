@@ -3,12 +3,15 @@ using UnityEngine;
 
 // 배경음 곡 종류. 곡 파일은 배경음 재생 기능에서 종류마다 정한다.
 // Inspector 에 저장된 값은 순서 번호이므로, 새 종류는 항상 맨 뒤에 추가한다.
+// None : 곡 없음. 씬을 옮기는 동안 배경음을 끌 때 쓴다. Loading : 로딩 화면 곡.
 public enum BgmTrack
 {
     Title,
     Wave,
     Boss,
-    Result
+    Result,
+    None,
+    Loading
 }
 
 // 배경음 곡 변경 요청. 화면마다 곡을 정하는 쪽(타이틀 · 게임 흐름)이 "이 곡으로 바꿔 줘" 라고 알리면, 공용 UI 의 배경음 재생 기능이 받아서 바꾼다.
