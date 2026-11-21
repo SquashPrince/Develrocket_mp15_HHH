@@ -21,6 +21,7 @@ MonoBehaviour:
     _hitCount: 5
     _reactOnFirstHitOnly: 0
     _hitLagTime: 0.05
+    _hitLagOnFirstHitOnly: 0
     _hitShape: 1
     _hitCenter: {x: 0, y: 1, z: 0}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
@@ -47,7 +48,11 @@ MonoBehaviour:
     - _prefab: {fileID: 8471836630667197198, guid: b0523a7c89225cb43a6dd77437f9d4c4, type: 3}
       _rollAngle: 0
       _rollRandom: 15
-    _motionEffects: []
+    _motionEffects:
+    - _prefab: {fileID: 3846456909460671692, guid: 7d026676ed0d10446927c73b35a93113, type: 3}
+      _position: {x: 0, y: 0, z: 0}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
   - _animationState: ComboSkill 2
     _hitMode: 0
     _windowTiming: 1
@@ -55,6 +60,7 @@ MonoBehaviour:
     _hitCount: 5
     _reactOnFirstHitOnly: 1
     _hitLagTime: 0.35
+    _hitLagOnFirstHitOnly: 0
     _hitShape: 3
     _hitCenter: {x: 0, y: 1, z: 0.5}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
@@ -79,7 +85,11 @@ MonoBehaviour:
     - _prefab: {fileID: 8471836630667197198, guid: b0523a7c89225cb43a6dd77437f9d4c4, type: 3}
       _rollAngle: -100
       _rollRandom: 15
-    _motionEffects: []
+    _motionEffects:
+    - _prefab: {fileID: 8395981408713305604, guid: 20084e1a6c79c8a479da7c6e632c89d0, type: 3}
+      _position: {x: 0, y: 0, z: 0}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
   _energyGain: 2.25
   _ultimateGaugeGain: 90
   _power: 10000
@@ -102,4 +112,3 @@ MonoBehaviour:
   _groggyGain: 0
   _teleport: {fileID: 11400000, guid: 7263e82ed97087141b501f4c8dba8526, type: 2}
   _cameraShot: 4
-  _hitEffect: {fileID: 8471836630667197198, guid: b0523a7c89225cb43a6dd77437f9d4c4, type: 3}

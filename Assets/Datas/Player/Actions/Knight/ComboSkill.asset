@@ -50,7 +50,19 @@ MonoBehaviour:
       _rollRandom: 10
     _motionEffects:
     - _prefab: {fileID: 8036930937933121221, guid: 726db78ad8e42ff4eace84718f3cb1a7, type: 3}
-      _position: {x: 0, y: 0, z: 0}
+      _position: {x: 0, y: 1, z: 0}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 4552895719542225792, guid: f65f8b33c43c38144af5839ec8a283bb, type: 3}
+      _position: {x: 0, y: 1, z: 0}
+      _rotation: {x: 0, y: 0, z: 45}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 4552895719542225792, guid: f65f8b33c43c38144af5839ec8a283bb, type: 3}
+      _position: {x: 0, y: 1, z: 0}
+      _rotation: {x: 0, y: 0, z: -45}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 7987803441382348541, guid: 8e4355468c87f9b40bbbe4454add792c, type: 3}
+      _position: {x: 0, y: 0.5, z: 0.25}
       _rotation: {x: 0, y: 0, z: 0}
       _scale: {x: 1, y: 1, z: 1}
   _energyGain: 1.07

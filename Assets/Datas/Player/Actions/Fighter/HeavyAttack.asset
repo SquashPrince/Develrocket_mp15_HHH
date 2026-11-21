@@ -43,7 +43,11 @@ MonoBehaviour:
       - {fileID: 8300000, guid: d637bacd075454147bb398300d59dc3e, type: 3}
       _volume: 0.5
     _hitEffects: []
-    _motionEffects: []
+    _motionEffects:
+    - _prefab: {fileID: 3130843824445296154, guid: e95fab74f600df043a0a710c7c875afa, type: 3}
+      _position: {x: 0, y: 0, z: 0}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
   _energyGain: 0.345
   _ultimateGaugeGain: 1.86
   _power: 3500
