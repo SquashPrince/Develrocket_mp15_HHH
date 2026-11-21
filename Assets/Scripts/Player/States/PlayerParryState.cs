@@ -66,8 +66,7 @@ public class PlayerParryState : PlayerState
         IsActive = false;
         Controller.Party.BeginFieldInvincible(_trigger.ParryReactTime);
         _parriedTarget = parriedTarget;
-        _awayDirection = Controller.transform.position - parriedTarget.transform.position;
-        _awayDirection.y = 0f;
+        _awayDirection = HorizontalVector.Between(parriedTarget.transform.position, Controller.transform.position);
 
         // 적과 위치가 겹치면 방향을 알 수 없으므로 뒤로 밀려난다.
         if(_awayDirection == Vector3.zero) _awayDirection = -Controller.transform.forward;

@@ -108,8 +108,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     // rangedOnly : true 면 사거리 밖에서 쓸 수 있는 공격 중에서만 고른다. 대상이 공격 사거리 밖일 때 다가가기 전에 쓴다.
     public bool TryStartAttack(Transform target, bool rangedOnly = false)
     {
-        Vector3 toTarget = target.position - transform.position;
-        toTarget.y = 0f;
+        Vector3 toTarget = HorizontalVector.Between(transform.position, target.position);
 
         int index = PickAttack(toTarget.magnitude, rangedOnly);
 
@@ -355,8 +354,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     {
         if(_target == null) return false;
 
-        Vector3 toTarget = _target.position - transform.position;
-        toTarget.y = 0f;
+        Vector3 toTarget = HorizontalVector.Between(transform.position, _target.position);
 
         if(toTarget.magnitude <= _controller.Radius + BodyRadius.GetHorizontal(_target))
         {
@@ -481,8 +479,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     {
         if(_target == null) return;
 
-        Vector3 toTarget = _target.position - transform.position;
-        toTarget.y = 0f;
+        Vector3 toTarget = HorizontalVector.Between(transform.position, _target.position);
 
         if(toTarget == Vector3.zero) return;
 

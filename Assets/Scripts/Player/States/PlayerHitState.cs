@@ -40,8 +40,7 @@ public class PlayerHitState : PlayerState
         _attack = attack;
         _reaction = reaction;
         _attacker = attacker;
-        _awayDirection = Controller.transform.position - attacker.position;
-        _awayDirection.y = 0f;
+        _awayDirection = HorizontalVector.Between(attacker.position, Controller.transform.position);
 
         // 적과 위치가 겹치면 방향을 알 수 없으므로 뒤로 밀려난다.
         if(_awayDirection == Vector3.zero) _awayDirection = -Controller.transform.forward;

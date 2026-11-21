@@ -49,8 +49,7 @@ public partial class AttackTargetAction : Action
         // 다가가는 도중 대상이 사라지면(씬 전환 등) 실패한다. 시작한 공격은 공격 기능이 저장한 대상으로 끝까지 진행한다.
         if(Target.Value == null) return Status.Failure;
 
-        Vector3 toTarget = Target.Value.position - GameObject.transform.position;
-        toTarget.y = 0f;
+        Vector3 toTarget = HorizontalVector.Between(GameObject.transform.position, Target.Value.position);
 
         if(toTarget.sqrMagnitude > _data.AttackRange * _data.AttackRange)
         {

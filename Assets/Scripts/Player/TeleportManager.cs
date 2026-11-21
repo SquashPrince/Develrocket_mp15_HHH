@@ -36,8 +36,7 @@ public static class TeleportManager
         CommonCharacterSettings common = character.Common;
         CharacterController body = character.Body;
         Vector3 targetPosition = target.position;
-        Vector3 direction = side == TeleportOption.Side.TargetFront ? target.forward : character.transform.position - targetPosition;
-        direction.y = 0f;
+        Vector3 direction = HorizontalVector.Flatten(side == TeleportOption.Side.TargetFront ? target.forward : character.transform.position - targetPosition);
         direction = (Quaternion.Euler(0f, sideAngle, 0f) * direction).normalized;
 
         float distance = BodyRadius.GetHorizontal(target) + body.radius + common.AttackableDistance;
@@ -56,9 +55,7 @@ public static class TeleportManager
         character.transform.position = destination;
         body.enabled = true;
 
-        Vector3 toTarget = targetPosition - destination;
-        toTarget.y = 0f;
-        character.FaceImmediately(toTarget);
+        character.FaceImmediately(HorizontalVector.Between(destination, targetPosition));
 
         return true;
     }

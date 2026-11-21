@@ -124,8 +124,7 @@ public partial class KeepDistanceAction : Action
         if(_timer <= 0f) return Status.Success;
 
         Vector3 targetPosition = Target.Value.position;
-        Vector3 fromTarget = GameObject.transform.position - targetPosition;
-        fromTarget.y = 0f;
+        Vector3 fromTarget = HorizontalVector.Between(targetPosition, GameObject.transform.position);
 
         Vector3 circleDirection = Quaternion.Euler(0f, STRAFE_LEAD_ANGLE * _strafeSign, 0f) * GetDirectionFromTarget();
         Vector3 destination = targetPosition + circleDirection * _data.KeepDistance;
@@ -139,8 +138,7 @@ public partial class KeepDistanceAction : Action
     // 대상에서 이 적 쪽으로 향하는 수평 방향. 대상과 위치가 겹치면 방향을 정할 수 없으므로 대상 앞쪽을 기준으로 삼는다.
     private Vector3 GetDirectionFromTarget()
     {
-        Vector3 fromTarget = GameObject.transform.position - Target.Value.position;
-        fromTarget.y = 0f;
+        Vector3 fromTarget = HorizontalVector.Between(Target.Value.position, GameObject.transform.position);
 
         return fromTarget == Vector3.zero ? Target.Value.forward : fromTarget.normalized;
     }

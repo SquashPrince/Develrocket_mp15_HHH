@@ -29,8 +29,7 @@ public partial class RangedAttackAction : Action
         _attacker = GameObject.GetComponent<EnemyAttacker>();
         EnemyData data = GameObject.GetComponent<EnemyController>().Data;
 
-        Vector3 toTarget = Target.Value.position - GameObject.transform.position;
-        toTarget.y = 0f;
+        Vector3 toTarget = HorizontalVector.Between(GameObject.transform.position, Target.Value.position);
 
         if(toTarget.sqrMagnitude <= data.AttackRange * data.AttackRange) return Status.Failure;
         if(!_attacker.TryStartAttack(Target.Value, true)) return Status.Failure;
