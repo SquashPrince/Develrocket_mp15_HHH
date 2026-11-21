@@ -348,9 +348,7 @@ public class PlayerAttackJudge : MonoBehaviour
         Bounds bounds = hitCollider.bounds;
         float height = Mathf.Clamp(transform.TransformPoint(step.Range.Center).y, bounds.min.y, bounds.max.y);
         Vector3 attackerPoint = new Vector3(transform.position.x, height, transform.position.z);
-        Vector3 direction = new Vector3(bounds.center.x, height, bounds.center.z) - attackerPoint;
-
-        direction.y = 0f;
+        Vector3 direction = HorizontalVector.Between(attackerPoint, bounds.center);
 
         // 캐릭터와 적의 중심이 겹치면 방향을 알 수 없으므로 캐릭터 정면을 쓴다.
         if(direction == Vector3.zero) direction = transform.forward;

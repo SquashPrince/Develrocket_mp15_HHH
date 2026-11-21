@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// 게임 흐름. 웨이브 → 보스전 → 결과 순서로 진행한다.
-// 웨이브 : 시작하면 첫 웨이브를 만들고, 웨이브가 정리되면 대기 시간 뒤 다음 웨이브를 만든다.
+// 게임 흐름. 맵 이동 → 전투 구역(웨이브) → … → 보스 구역(보스전) → 결과 순서로 진행한다.
+// 전투 구역 : 구역 목록의 순서대로 진행한다. 다음 구역에 조작 중인 캐릭터가 들어오면 구역의 벽을 켜고 첫 웨이브를 만든다.
+//   웨이브가 정리되면 대기 시간 뒤 다음 웨이브를 만들고, 구역의 마지막 웨이브까지 정리하면 벽을 끄고 정리한 구역 수를 기록한다.
+//   이미 정리한 구역이나 순서가 아닌 구역에 들어오는 것은 무시한다. 구역 밖에서는 전투가 없다.
 //   보스 등급 적도 웨이브에 들어 있다. 제한 시간을 쓰지 않는 웨이브의 보스(중간 보스)는 일반 적처럼 웨이브 정리에만 센다.
-// 보스전 : 제한 시간을 쓰는 웨이브(마지막 웨이브)가 나오는 순간부터 제한 시간을 잰다.
+// 보스전 : 제한 시간을 쓰는 웨이브(보스 구역의 마지막 웨이브)가 나오는 순간부터 제한 시간을 잰다.
 //   제한 시간 안에 그 웨이브의 보스 등급 적을 모두 처치하면 처치, 남은 시간이 0 이 되면 시간 초과, 파티가 모두 쓰러지면 전멸이다. 남은 일반 적은 상관없다.
 // 마지막 일격 : 웨이브가 정리되면(보스까지 모두 처치) 마지막 일격 기능이 게임 전체를 잠깐 느리게 한다.
 //   보스전 처치는 기록과 입력 잠금을 처치 순간에 하고, 마지막 일격 기능이 게임 전체를 멈춘 뒤 끝났다고 알리면 그때 처치 결과를 알린다.
@@ -12,11 +14,12 @@ using UnityEngine.SceneManagement;
 //   보스 처치와 웨이브 정리가 함께 오면 보스 처치가 먼저 와 판이 끝나므로, 웨이브 슬로우는 걸지 않는다.
 // 판 실패(전멸 · 시간 초과) : 판 실패 순간을 알려 카메라가 조금 줌 인한 채 유지한다. 마지막 캐릭터는 쓰러진 채 남고, 시간 초과는 쓰러뜨리지 않는다.
 // 판이 끝나면 파티의 입력을 막고 적 공격에 맞지 않게 하며, 판 종료를 알려 카메라 입력도 막게 한다.
-// 웨이브 중 전멸 : 전멸 화면을 띄운다. 보스전 전이라 재시도로 세지 않는다.
+// 구역 전투 중 전멸 : 전멸 화면을 띄운다. 재시작하면 보스전 재도전과 같이 재시도로 센다.
 // 끝난 뒤 : 결과 화면이 뜨면 플레이어 입력을 잠그고, 이후 처치 · 시간 초과 · 전멸 알림은 무시한다.
 //   전투는 멈추지 않는다. 히트스톱이 끝나며 게임 시간을 되돌리므로, 게임 시간을 멈추는 일시정지는 Esc 메뉴 작업에서 함께 만든다.
 // 다시 하기 : 재시작 · 재도전 · 타이틀 이동은 씬을 불러오는 것으로 처리한다. 이어 갈 기록은 RunRecord 에 남긴다.
-//   보스전 재도전으로 다시 불러온 씬은 파티를 보스전 앞 스폰 포인트로 옮기고 보스전 웨이브부터 시작한다.
+//   다시 불러온 씬은 기록된 정리한 구역 수만큼의 구역을 열어 두고, 파티를 마지막으로 정리한 구역의 다시 시작 지점에 놓는다.
+//   구역 전투 전멸 · 보스전 실패 뒤 다시 하기는 이 방식으로 실패한 구역 앞에서 시작한다. 처음부터 재시작은 기록을 지우고 처음 시작 지점에서 시작한다.
 //   씬이 바뀌어도 남는 정적 값(게임 시간 배율 · 적 시간 배율 · 패링 가능 목록)은 씬을 바꾸기 전에 처음 값으로 돌린다.
 // 대기 시간 · 제한 시간 · 전체 시간은 게임 시간으로 잰다. 히트스톱 · 콤보 선택 슬로모션 동안에는 느리게 흐른다.
 public class GameFlow : MonoBehaviour
@@ -33,13 +36,15 @@ public class GameFlow : MonoBehaviour
     [SerializeField] private PlayerParty _party;
     [Tooltip("웨이브 마지막 적 · 보스 처치 연출")]
     [SerializeField] private BattleFinisher _finisher;
-    [Tooltip("보스전 재도전 때 파티가 시작할 위치 · 방향")]
-    [SerializeField] private Transform _bossCheckpoint;
+    [Tooltip("전투 구역 목록. 위에서부터 차례로 진행하고, 마지막 구역이 보스 구역이다")]
+    [SerializeField] private BattleZone[] _zones;
     [Tooltip("타이틀로 갈 때 불러올 씬. 빌드 씬 목록에 등록되어 있어야 한다")]
     [SerializeField] private SceneReference _titleScene;
 
-    // 지금 진행 중인 웨이브 번호
+    // 다음에 진행할(전투 중이면 지금) 구역 번호와 그 구역에서 진행 중인 웨이브 번호
+    private int _zoneIndex;
     private int _waveIndex = -1;
+    private bool _isZoneActive;
     // 다음 웨이브까지 남은 시간
     private float _nextWaveTimer;
     private float _timeLimit;
@@ -58,9 +63,12 @@ public class GameFlow : MonoBehaviour
     // 결과 화면이 떠 이번 판이 끝났는지. 끝난 뒤에는 일시정지할 수 없다.
     public bool IsEnded => _isEnded;
 
+    // 지금 전투 중인 구역. 전투 중에만 읽는다.
+    private BattleZone CurrentZone => _zones[_zoneIndex];
+
     // 보스전이 시작되어 제한 시간을 재기 시작하면 알린다. 타이머 표시를 켜는 데 쓴다.
     public event System.Action BossPhaseStarted;
-    // 웨이브 중 파티가 전멸하면 알린다.
+    // 구역 전투 중(보스전 전) 파티가 전멸하면 알린다.
     public event System.Action WaveWiped;
     // 보스전이 끝나면 끝난 방식과 함께 알린다. 기록은 RunRecord 에 남긴 뒤 알린다.
     public event System.Action<BossOutcome> BossPhaseEnded;
@@ -73,12 +81,14 @@ public class GameFlow : MonoBehaviour
         BindSpawnerEvent();
         BindPartyEvent();
         BindFinisherEvent();
+        BindZoneEvent();
     }
     private void OnDisable()
     {
         UnbindSpawnerEvent();
         UnbindPartyEvent();
         UnbindFinisherEvent();
+        UnbindZoneEvent();
     }
     private void Update()
     {
@@ -87,20 +97,27 @@ public class GameFlow : MonoBehaviour
         UpdateTimeLimit();
     }
 
-    // 웨이브 전멸 화면의 재시작. 기록을 지우고 처음부터 다시 한다.
+    // 처음부터 재시작(Esc 메뉴). 기록을 지우고 처음 시작 지점부터 다시 한다.
     public void RestartRun()
     {
         RunRecord.ResetRun();
         ReloadScene();
     }
 
-    // 보스전 결과 화면의 재도전. 보스전 앞부터 다시 한다.
+    // 구역 전투 전멸 화면의 재시작. 마지막으로 정리한 구역 뒤에서 다시 한다. 재시도 횟수를 올리고 전체 시간을 이어서 센다.
+    public void RetryZone()
+    {
+        RunRecord.Retry();
+        ReloadScene();
+    }
+
+    // 보스전 결과 화면(Esc 메뉴)의 재도전. 보스 구역 앞(직전 구역 뒤)부터 다시 한다.
     // 실패 후 : 재시도 횟수를 올리고 전체 시간을 이어서 센다.
     // 처치 후 : 재시도 횟수는 그대로, 전체 시간은 이번 보스전이 시작된 순간의 값으로 되돌린다.
     public void RetryBoss()
     {
         if(_isBossCleared) RunRecord.RetryBossAfterClear();
-        else RunRecord.RetryBoss();
+        else RunRecord.Retry();
 
         ReloadScene();
     }
@@ -113,22 +130,55 @@ public class GameFlow : MonoBehaviour
         SceneManager.LoadScene(_titleScene.SceneName);
     }
 
+    // 진행할 순서의 구역에 조작 중인 캐릭터가 들어오면 그 구역의 전투를 시작한다.
+    private void OnZoneEntered(BattleZone zone, PlayerController member)
+    {
+        if(_isEnded || _isZoneActive || member != _party.Controlled) return;
+        if(_zoneIndex >= _zones.Length || zone != _zones[_zoneIndex]) return;
+
+        StartZone();
+    }
+
+    private void StartZone()
+    {
+        _isZoneActive = true;
+        _waveIndex = -1;
+        CurrentZone.SetWalls(true);
+
+#if UNITY_EDITOR
+        Debug.Log($"[게임 흐름] 구역 {_zoneIndex + 1} '{CurrentZone.name}' 전투 시작");
+#endif
+
+        SpawnNextWave();
+    }
+
     private void OnWaveCleared()
     {
         if(_isEnded) return;
 
         _finisher.PlayWaveFinish();
 
-        if(_waveIndex + 1 >= _waveSpawner.Data.WaveCount)
+        if(_waveIndex + 1 >= CurrentZone.Waves.WaveCount)
         {
-#if UNITY_EDITOR
-            Debug.Log("[게임 흐름] 모든 웨이브 정리");
-#endif
+            ClearZone();
             return;
         }
 
-        _nextWaveTimer = _waveSpawner.Data.WaveInterval;
+        _nextWaveTimer = CurrentZone.Waves.WaveInterval;
         _isWaitingNextWave = true;
+    }
+
+    // 구역의 웨이브를 모두 정리했다. 벽을 끄고, 정리한 구역 수를 기록해 이후 다시 하기는 이 구역 뒤에서 시작하게 한다.
+    private void ClearZone()
+    {
+        CurrentZone.SetWalls(false);
+        _isZoneActive = false;
+        _zoneIndex++;
+        RunRecord.ClearZone(_zoneIndex);
+
+#if UNITY_EDITOR
+        Debug.Log($"[게임 흐름] 구역 {_zoneIndex} 정리 · 남은 구역 {_zones.Length - _zoneIndex}개");
+#endif
     }
 
     // 보스전의 보스를 모두 처치하면 처치로 끝난다. 제한 시간이 없는 웨이브의 보스(중간 보스)는 무시한다.
@@ -154,7 +204,7 @@ public class GameFlow : MonoBehaviour
         EndRun();
 
 #if UNITY_EDITOR
-        Debug.Log("[게임 흐름] 웨이브 중 전멸");
+        Debug.Log($"[게임 흐름] 구역 {_zoneIndex + 1} 전투 중 전멸");
 #endif
 
         WaveWiped?.Invoke();
@@ -182,9 +232,9 @@ public class GameFlow : MonoBehaviour
     private void SpawnNextWave()
     {
         _waveIndex++;
-        _waveSpawner.SpawnWave(_waveIndex);
+        _waveSpawner.SpawnWave(CurrentZone, _waveIndex);
 
-        WaveData.Wave wave = _waveSpawner.Data.GetWave(_waveIndex);
+        WaveData.Wave wave = CurrentZone.Waves.GetWave(_waveIndex);
 
         if(wave.UseTimeLimit) StartBossPhase(wave.TimeLimit);
     }
@@ -263,27 +313,13 @@ public class GameFlow : MonoBehaviour
         ParryWindow.ClearAttackers();
     }
 
-    // 보스전 웨이브(제한 시간을 쓰는 웨이브) 번호. 없으면 첫 웨이브다.
-    private int FindBossWaveIndex()
-    {
-        for(int i = 0; i < _waveSpawner.Data.WaveCount; i++)
-        {
-            if(_waveSpawner.Data.GetWave(i).UseTimeLimit) return i;
-        }
-
-        return 0;
-    }
-
-    // 보스전 재도전이면 파티를 보스전 앞 스폰 포인트로 옮기고 보스전 웨이브부터, 아니면 첫 웨이브부터 시작한다.
+    // 기록된 정리한 구역 수만큼 구역을 열어 두고, 정리한 구역이 있으면 파티를 마지막으로 정리한 구역의 다시 시작 지점에 놓는다.
+    // 정리한 구역이 없으면 파티는 씬에 놓인 처음 시작 지점에 그대로 있다. 전투는 다음 구역에 들어갈 때 시작한다.
     private void Init()
     {
-        if(RunRecord.StartFrom == RunRecord.StartPoint.BossPhase)
-        {
-            _party.PlaceAt(_bossCheckpoint);
-            _waveIndex = FindBossWaveIndex() - 1;
-        }
+        _zoneIndex = Mathf.Min(RunRecord.ClearedZoneCount, _zones.Length);
 
-        SpawnNextWave();
+        if(_zoneIndex > 0) _party.PlaceAt(_zones[_zoneIndex - 1].RestartPoint);
     }
 
     private void BindSpawnerEvent()
@@ -316,5 +352,21 @@ public class GameFlow : MonoBehaviour
     private void UnbindFinisherEvent()
     {
         _finisher.BossFinishEnded -= OnBossFinishEnded;
+    }
+
+    private void BindZoneEvent()
+    {
+        foreach(BattleZone zone in _zones)
+        {
+            zone.Entered += OnZoneEntered;
+        }
+    }
+
+    private void UnbindZoneEvent()
+    {
+        foreach(BattleZone zone in _zones)
+        {
+            zone.Entered -= OnZoneEntered;
+        }
     }
 }

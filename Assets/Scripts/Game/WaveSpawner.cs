@@ -3,7 +3,8 @@ using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
 
-// 웨이브 적 생성. 웨이브 데이터의 웨이브 하나를 만들고, 웨이브의 적 · 보스가 모두 처치되면 알린다.
+// 웨이브 적 생성. 전투 구역의 웨이브 데이터에서 웨이브 하나를 만들고, 웨이브의 적 · 보스가 모두 처치되면 알린다.
+// 웨이브 구성 · 생성 영역 · 보스 생성 위치는 구역마다 다르므로, 웨이브를 만들 때 구역에서 받는다.
 // 보스 : 적 데이터의 등급이 보스인 적은 보스 생성 위치에 만들고, 보스 바를 띄울 화면 Canvas 를 넘겨준다.
 //   한 웨이브에 보스는 한 마리로 가정한다. 여러 마리면 같은 위치에 겹친다.
 // 일반 · 엘리트 : 생성 영역(수평 원) 안에 겹치지 않게 만든다.
@@ -19,18 +20,12 @@ public class WaveSpawner : MonoBehaviour
     // 뽑은 자리에서 NavMesh 를 찾는 최대 거리(m)
     private const float NAVMESH_SEARCH_DISTANCE = 2f;
 
-    [SerializeField] private WaveData _waveData;
     [SerializeField] private PlayerParty _party;
-    [Tooltip("생성 영역의 중심. 이 위치를 중심으로 한 수평 원 안에 일반 · 엘리트 적을 만든다")]
-    [SerializeField] private Transform _spawnCenter;
-    [Tooltip("생성 영역 반지름(m)")]
-    [SerializeField, Min(1f)] private float _spawnRadius = 10f;
-
-    [Header("보스")]
-    [Tooltip("보스 등급 적이 나올 위치")]
-    [SerializeField] private Transform _bossSpawnPoint;
     [Tooltip("보스 바를 띄울 화면 Canvas")]
     [SerializeField] private Transform _bossHudRoot;
+
+    // 지금 웨이브를 만드는 구역
+    private BattleZone _zone;
 
     // 이번 웨이브에서 생성해 처치 알림을 구독한 적 · 보스
     private readonly List<EnemyState> _waveEnemies = new List<EnemyState>();
@@ -38,7 +33,6 @@ public class WaveSpawner : MonoBehaviour
     private int _remainingCount;
     private int _remainingBossCount;
 
-    public WaveData Data => _waveData;
     // 이번 웨이브의 첫 보스. 보스가 없으면 null 이다. 웨이브의 적이 모두 처치되면 목록을 비우므로, 보스전이 끝나는 순간에 읽는다.
     public Transform FirstBoss => _waveBosses.Count > 0 ? _waveBosses[0].transform : null;
 
@@ -49,10 +43,12 @@ public class WaveSpawner : MonoBehaviour
 
     private void OnDisable() => UnbindEnemyEvent();
 
-    // index 번째 웨이브의 적을 만든다.
-    public void SpawnWave(int index)
+    // zone 의 index 번째 웨이브의 적을 만든다.
+    public void SpawnWave(BattleZone zone, int index)
     {
-        WaveData.Wave wave = _waveData.GetWave(index);
+        _zone = zone;
+
+        WaveData.Wave wave = zone.Waves.GetWave(index);
         List<Vector3> occupied = new List<Vector3>();
         int normalCount = 0;
 
@@ -61,7 +57,7 @@ public class WaveSpawner : MonoBehaviour
             if(IsBoss(entry.Prefab))
             {
                 SpawnBosses(entry);
-                occupied.Add(_bossSpawnPoint.position);
+                occupied.Add(_zone.BossSpawnPosition);
             }
             else normalCount += entry.Count;
         }
@@ -81,7 +77,7 @@ public class WaveSpawner : MonoBehaviour
         }
 
 #if UNITY_EDITOR
-        Debug.Log($"[웨이브 {index + 1}] 일반 {positions.Count}마리 · 보스 {_remainingBossCount}마리 생성");
+        Debug.Log($"[{zone.name} 웨이브 {index + 1}] 일반 {positions.Count}마리 · 보스 {_remainingBossCount}마리 생성");
 #endif
     }
 
@@ -108,7 +104,7 @@ public class WaveSpawner : MonoBehaviour
     {
         for(int i = 0; i < entry.Count; i++)
         {
-            EnemyController boss = Spawn(entry.Prefab, _bossSpawnPoint.position);
+            EnemyController boss = Spawn(entry.Prefab, _zone.BossSpawnPosition);
 
             boss.SetHudRoot(_bossHudRoot);
             boss.State.Died += OnBossDied;
@@ -121,8 +117,7 @@ public class WaveSpawner : MonoBehaviour
     // 조작 중인 캐릭터를 바라보게 만들고 파티에 등록한다.
     private EnemyController Spawn(EnemyController prefab, Vector3 position)
     {
-        Vector3 toPlayer = _party.Controlled.transform.position - position;
-        toPlayer.y = 0f;
+        Vector3 toPlayer = HorizontalVector.Between(position, _party.Controlled.transform.position);
 
         Quaternion rotation = toPlayer == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(toPlayer);
         EnemyController enemy = Instantiate(prefab, position, rotation);
@@ -165,7 +160,7 @@ public class WaveSpawner : MonoBehaviour
 
         if(count == 0) return positions;
 
-        List<Vector2> candidates = PoissonDiskSampler.SampleCircle(_spawnRadius, _waveData.MinSpacing);
+        List<Vector2> candidates = PoissonDiskSampler.SampleCircle(_zone.SpawnRadius, _zone.Waves.MinSpacing);
 
         Shuffle(candidates);
 
@@ -173,7 +168,7 @@ public class WaveSpawner : MonoBehaviour
         {
             if(positions.Count >= count) break;
 
-            Vector3 point = _spawnCenter.position + new Vector3(candidate.x, 0f, candidate.y);
+            Vector3 point = _zone.SpawnCenter + new Vector3(candidate.x, 0f, candidate.y);
 
             if(!NavMesh.SamplePosition(point, out NavMeshHit hit, NAVMESH_SEARCH_DISTANCE, NavMesh.AllAreas)) continue;
             if(!IsFarEnough(hit.position, positions) || !IsFarEnough(hit.position, occupied)) continue;
@@ -191,8 +186,8 @@ public class WaveSpawner : MonoBehaviour
     // 조작 중인 캐릭터와 최소 거리, placed 의 모든 위치와 최소 간격 이상 떨어져 있는지
     private bool IsFarEnough(Vector3 position, List<Vector3> placed)
     {
-        float sqrSpacing = _waveData.MinSpacing * _waveData.MinSpacing;
-        float sqrPlayerDistance = _waveData.MinPlayerDistance * _waveData.MinPlayerDistance;
+        float sqrSpacing = _zone.Waves.MinSpacing * _zone.Waves.MinSpacing;
+        float sqrPlayerDistance = _zone.Waves.MinPlayerDistance * _zone.Waves.MinPlayerDistance;
 
         if(GetSqrHorizontalDistance(position, _party.Controlled.transform.position) < sqrPlayerDistance) return false;
 
@@ -204,13 +199,7 @@ public class WaveSpawner : MonoBehaviour
         return true;
     }
 
-    private static float GetSqrHorizontalDistance(Vector3 a, Vector3 b)
-    {
-        Vector3 offset = a - b;
-        offset.y = 0f;
-
-        return offset.sqrMagnitude;
-    }
+    private static float GetSqrHorizontalDistance(Vector3 a, Vector3 b) => HorizontalVector.Between(b, a).sqrMagnitude;
 
     // 피셔-예이츠 섞기. 어느 자리든 고를 확률이 같다.
     private static void Shuffle(List<Vector2> list)
@@ -239,15 +228,4 @@ public class WaveSpawner : MonoBehaviour
         _remainingCount = 0;
         _remainingBossCount = 0;
     }
-
-#if UNITY_EDITOR
-    // 선택했을 때 생성 영역을 Scene 뷰에 그린다.
-    private void OnDrawGizmosSelected()
-    {
-        if(_spawnCenter == null) return;
-
-        UnityEditor.Handles.color = Color.yellow;
-        UnityEditor.Handles.DrawWireDisc(_spawnCenter.position, Vector3.up, _spawnRadius);
-    }
-#endif
 }

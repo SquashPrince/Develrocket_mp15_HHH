@@ -168,8 +168,7 @@ public class EnemyLeap : MonoBehaviour
     {
         if(_target == null) return;
 
-        Vector3 toTarget = _target.position - _startPosition;
-        toTarget.y = 0f;
+        Vector3 toTarget = HorizontalVector.Between(_startPosition, _target.position);
 
         Vector3 direction = toTarget == Vector3.zero ? transform.forward : toTarget.normalized;
         Vector3 destination = _target.position + direction * _overshootDistance;

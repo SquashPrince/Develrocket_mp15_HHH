@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65e1e9906d46e4f49b34491fe60ca842, type: 3}
+  m_Name: Black Knight Elite
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  _grade: 1
+  _portrait: {fileID: 21300000, guid: fad1a9824d12a4cfe95e33198d5bdc12, type: 3}
+  _maxHealth: 5000000
+  _canDie: 1
+  _corpseDuration: 3
+  _baseStaggerResistLevel: 2
+  _maxGroggy: 1823
+  _groggyTime: 12
+  _groggyDamageMultiplier: 2
+  _maxComboChain: 3
+  _dissolveMaterial: {fileID: 0}
+  _dissolveDuration: 1
+  _deathEffectPrefab: {fileID: 0}
+  _moveSpeed: 4.5
+  _turnSpeed: 540
+  _repathDistance: 0.3
+  _runSpeedRate: 1.5
+  _keepDistance: 5
+  _keepDistanceTolerance: 1
+  _strafeSpeed: 1
+  _keepDistanceTimeMin: 2
+  _keepDistanceTimeMax: 3
+  _backStepChance: 0.3
+  _idleChance: 0.25
+  _backStepSpeedRate: 0.35
+  _attackRange: 5
+  _attackInterval: 0.5
+  _attacks:
+  - {fileID: 11400000, guid: 0a558762325205a40a1bfa790a933784, type: 2}
+  - {fileID: 11400000, guid: 7ac771ad86ae0e84aa1eba11d1924d3a, type: 2}
+  - {fileID: 11400000, guid: e982e038895e64548922cfb4dbd7d272, type: 2}
+  - {fileID: 11400000, guid: d5d0c1ad13088314d9c0edd350c532fe, type: 2}
+  - {fileID: 11400000, guid: 4fbc3257e92d03c41a421a9ee118ce1b, type: 2}
+  - {fileID: 11400000, guid: b9aca38489d9df7479454d447beae4d0, type: 2}

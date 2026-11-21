@@ -69,8 +69,7 @@ public class EnemyMovement : MonoBehaviour
         if(!_state.IsAlive || _state.IsRestricted) return;
 
         // 경로의 다음 꺾이는 지점 쪽으로 이번 프레임 이동 거리만큼 간다. 지점을 지나치지 않게 남은 거리보다 멀리 가지 않는다.
-        Vector3 toCorner = _agent.steeringTarget - transform.position;
-        toCorner.y = 0f;
+        Vector3 toCorner = HorizontalVector.Between(transform.position, _agent.steeringTarget);
 
         float step = Mathf.Min(_speed * _state.Clock.DeltaTime, toCorner.magnitude);
         Vector3 moveDirection = toCorner.normalized;
@@ -89,7 +88,7 @@ public class EnemyMovement : MonoBehaviour
 
     private void TurnTowards(Vector3 direction)
     {
-        direction.y = 0f;
+        direction = HorizontalVector.Flatten(direction);
 
         if(direction == Vector3.zero) return;
 

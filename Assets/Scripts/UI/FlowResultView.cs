@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // 게임 흐름의 결과 화면. 웨이브 중 전멸과 보스전 결과(처치 · 시간 초과 · 전멸)를 보여주고, 버튼으로 다음 행동을 고른다.
-// 웨이브 전멸 : 제목과 전체 시간만 보여준다. 재시작(처음부터, 기록 지움) · 타이틀(저장 없음)
+// 구역 전투 전멸 : 제목과 전체 시간만 보여준다. 재시작(마지막으로 정리한 구역 뒤에서, 재시도 +1) · 타이틀(저장 없음)
 // 보스전 결과 : 전체 시간 · 보스 시간 · 재시도 횟수 · 점수 · 등급을 보여준다. 점수 · 등급은 점수 설정 에셋으로 계산한다.
 //   보스 시간은 처치면 걸린 시간, 시간 초과면 제한 시간, 전멸이면 [실패]다.
 //   재도전 : 실패 후(재시도 +1, 전체 시간 이어서) · 처치 후(재시도 유지, 전체 시간을 보스전 시작 값으로 되돌림)
@@ -104,7 +104,7 @@ public class FlowResultView : MonoBehaviour
     {
         _gameFlow.WaveWiped += OnWaveWiped;
         _gameFlow.BossPhaseEnded += OnBossPhaseEnded;
-        _restartButton.onClick.AddListener(_gameFlow.RestartRun);
+        _restartButton.onClick.AddListener(_gameFlow.RetryZone);
         _retryBossButton.onClick.AddListener(_gameFlow.RetryBoss);
         _titleButton.onClick.AddListener(OnTitleClicked);
     }
@@ -113,7 +113,7 @@ public class FlowResultView : MonoBehaviour
     {
         _gameFlow.WaveWiped -= OnWaveWiped;
         _gameFlow.BossPhaseEnded -= OnBossPhaseEnded;
-        _restartButton.onClick.RemoveListener(_gameFlow.RestartRun);
+        _restartButton.onClick.RemoveListener(_gameFlow.RetryZone);
         _retryBossButton.onClick.RemoveListener(_gameFlow.RetryBoss);
         _titleButton.onClick.RemoveListener(OnTitleClicked);
     }

@@ -380,8 +380,7 @@ public class PlayerController : MonoBehaviour
     //   중심 기준으로 정하면 큰 적(보스)일수록 몸 안까지 파고들기 때문이다.
     private float FaceAndGetApproachDistance(IEnemyTargetable target)
     {
-        Vector3 toTarget = target.transform.position - transform.position;
-        toTarget.y = 0f;
+        Vector3 toTarget = HorizontalVector.Between(transform.position, target.transform.position);
         FaceImmediately(toTarget);
 
         float stopDistance = BodyRadius.GetHorizontal(target.transform) + _characterController.radius + Common.AttackableDistance;

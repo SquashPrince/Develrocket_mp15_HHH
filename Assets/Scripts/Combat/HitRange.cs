@@ -79,7 +79,7 @@ public readonly struct HitRange
     // 부채꼴 조건에 맞는 콜라이더만 results 앞쪽에 남기고 남은 수를 돌려준다.
     private int FilterFan(Transform origin, Vector3 worldCenter, Collider[] results, int count)
     {
-        Vector3 forward = Flatten(origin.forward);
+        Vector3 forward = HorizontalVector.Flatten(origin.forward);
         float halfAngle = _angle * 0.5f;
         float bottom = worldCenter.y - _height * 0.5f;
         float top = worldCenter.y + _height * 0.5f;
@@ -88,7 +88,7 @@ public readonly struct HitRange
         for(int i = 0; i < count; i++)
         {
             Bounds bounds = results[i].bounds;
-            Vector3 toTarget = Flatten(bounds.center - worldCenter);
+            Vector3 toTarget = HorizontalVector.Flatten(bounds.center - worldCenter);
 
             if(bounds.max.y < bottom || bounds.min.y > top) continue;
             if(toTarget.magnitude < _innerRadius) continue;
@@ -127,7 +127,7 @@ public readonly struct HitRange
     // 부채꼴은 위 · 아래 면의 바깥 호 · 안쪽 호 · 양옆 선과, 네 모서리를 잇는 세로선으로 그린다.
     private void DrawFan(Transform origin, Vector3 worldCenter)
     {
-        Vector3 forward = Flatten(origin.forward);
+        Vector3 forward = HorizontalVector.Flatten(origin.forward);
         Vector3 up = Vector3.up * (_height * 0.5f);
 
         DrawFanFace(worldCenter + up, forward);
@@ -166,11 +166,5 @@ public readonly struct HitRange
             previousOuter = outer;
             previousInner = inner;
         }
-    }
-
-    private static Vector3 Flatten(Vector3 vector)
-    {
-        vector.y = 0f;
-        return vector;
     }
 }
