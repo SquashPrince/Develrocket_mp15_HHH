@@ -48,6 +48,8 @@ public class ComboSkillSelector : MonoBehaviour
     private int _closedFrame = -1;
 
     public bool IsSelecting => _state == ChainState.Selecting;
+    // 지금 연계의 대상 적. 연계가 없으면 null 이다. 콤보 선택 화면 효과가 대상 위치에 왜곡을 띄울 때 읽는다.
+    public IEnemyTargetable Target => _target;
     // 선택 중이거나 선택을 마친 프레임이면 플레이어 입력을 막는다.
     public bool IsBlockingInput => IsSelecting || _closedFrame == Time.frameCount;
     public float RemainingTime => _remainingTime;

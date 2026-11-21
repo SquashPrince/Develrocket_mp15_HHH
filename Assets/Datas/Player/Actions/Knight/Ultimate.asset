@@ -21,6 +21,7 @@ MonoBehaviour:
     _hitCount: 2
     _reactOnFirstHitOnly: 0
     _hitLagTime: 0.035
+    _hitLagOnFirstHitOnly: 0
     _hitShape: 3
     _hitCenter: {x: 0, y: 1, z: 1}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
@@ -41,6 +42,36 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 3ffd5bac966874fe6bfdad5ece325d8d, type: 3}
       - {fileID: 8300000, guid: a951e5d6c72414423b1f59c46b7854b4, type: 3}
       _volume: 1
+    _hitEffects:
+    - _prefab: {fileID: 3303146159454808010, guid: f5b7920747c252e46bf251a7a8957241, type: 3}
+      _rollAngle: 135
+      _rollRandom: 0
+    - _prefab: {fileID: 0}
+      _rollAngle: 0
+      _rollRandom: 0
+    - _prefab: {fileID: 3303146159454808010, guid: f5b7920747c252e46bf251a7a8957241, type: 3}
+      _rollAngle: 15
+      _rollRandom: 0
+    - _prefab: {fileID: 3303146159454808010, guid: f5b7920747c252e46bf251a7a8957241, type: 3}
+      _rollAngle: -15
+      _rollRandom: 0
+    _motionEffects:
+    - _prefab: {fileID: 4552895719542225792, guid: f65f8b33c43c38144af5839ec8a283bb, type: 3}
+      _position: {x: 0, y: 1, z: 0}
+      _rotation: {x: 0, y: 0, z: 135}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 7987803441382348541, guid: 8e4355468c87f9b40bbbe4454add792c, type: 3}
+      _position: {x: 0, y: 0.25, z: 1}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 4552895719542225792, guid: f65f8b33c43c38144af5839ec8a283bb, type: 3}
+      _position: {x: 0, y: 1, z: 0}
+      _rotation: {x: 0, y: 0, z: 15}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 4552895719542225792, guid: f65f8b33c43c38144af5839ec8a283bb, type: 3}
+      _position: {x: 0, y: 1, z: 0}
+      _rotation: {x: 0, y: 0, z: -15}
+      _scale: {x: 1, y: 1, z: 1}
   - _animationState: Ultimate 2
     _hitMode: 0
     _windowTiming: 1
@@ -48,6 +79,7 @@ MonoBehaviour:
     _hitCount: 3
     _reactOnFirstHitOnly: 0
     _hitLagTime: 0.035
+    _hitLagOnFirstHitOnly: 0
     _hitShape: 2
     _hitCenter: {x: 0, y: 1, z: 2}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
@@ -68,6 +100,51 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 4efeb35994dd14a1780ee01a6c7595eb, type: 3}
       - {fileID: 8300000, guid: e8ee5f242c7b04789a9fb37d55dde855, type: 3}
       _volume: 1
+    _hitEffects:
+    - _prefab: {fileID: 3303146159454808010, guid: 9ebfdf6e13d621c43ad5e0720d3640bd, type: 3}
+      _rollAngle: 165
+      _rollRandom: 0
+    - _prefab: {fileID: 3303146159454808010, guid: 9ebfdf6e13d621c43ad5e0720d3640bd, type: 3}
+      _rollAngle: 135
+      _rollRandom: 0
+    - _prefab: {fileID: 3303146159454808010, guid: 9ebfdf6e13d621c43ad5e0720d3640bd, type: 3}
+      _rollAngle: 225
+      _rollRandom: 0
+    - _prefab: {fileID: 0}
+      _rollAngle: 0
+      _rollRandom: 0
+    - _prefab: {fileID: 3303146159454808010, guid: 9ebfdf6e13d621c43ad5e0720d3640bd, type: 3}
+      _rollAngle: -70
+      _rollRandom: 0
+    _motionEffects:
+    - _prefab: {fileID: 4552895719542225792, guid: f65f8b33c43c38144af5839ec8a283bb, type: 3}
+      _position: {x: 0, y: 1, z: 0}
+      _rotation: {x: 0, y: 0, z: 165}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 4552895719542225792, guid: f65f8b33c43c38144af5839ec8a283bb, type: 3}
+      _position: {x: 0, y: 1, z: 0}
+      _rotation: {x: 0, y: 0, z: 135}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 4552895719542225792, guid: f65f8b33c43c38144af5839ec8a283bb, type: 3}
+      _position: {x: 0, y: 1, z: 0}
+      _rotation: {x: 0, y: 0, z: 225}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 7987803441382348541, guid: 8e4355468c87f9b40bbbe4454add792c, type: 3}
+      _position: {x: 0, y: 1, z: 0}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 4552895719542225792, guid: f65f8b33c43c38144af5839ec8a283bb, type: 3}
+      _position: {x: 0, y: 1, z: 0}
+      _rotation: {x: 0, y: 0, z: -70}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 7987803441382348541, guid: 8e4355468c87f9b40bbbe4454add792c, type: 3}
+      _position: {x: 0, y: 0.25, z: 1}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 7512964137062075931, guid: 302d9d86ce16d2b4ea2bddbd80119d5f, type: 3}
+      _position: {x: 0, y: 1, z: 0.75}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 2.5, y: 2.5, z: 2.5}
   _energyGain: 0
   _ultimateGaugeGain: 0
   _power: 5000

@@ -49,6 +49,7 @@ public class PlayerAttackState : PlayerState
     public override bool CanUseUltimate => _motion.Allows(ActionStep.Interrupt.Ultimate);
     public override bool CanSwap => Controller.ActionTrigger.AllowsSwap(_motion);
     public override ActionData CurrentAction => _action;
+    public override ActionStep CurrentStep => _motion;
 
     private bool IsSkill => _type == AttackType.Skill || _type == AttackType.SpecialSkill;
     // 콤보의 마지막 단계는 마무리 공격이다. 끝났다는 느낌을 주기 위해 후딜이 끝날 때까지 공격 입력을 받지 않는다.

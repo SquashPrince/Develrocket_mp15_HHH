@@ -20,7 +20,11 @@ MonoBehaviour:
   _baseStaggerResistLevel: 0
   _maxGroggy: 307
   _groggyTime: 12
+  _groggyDamageMultiplier: 1.5
   _maxComboChain: 1
+  _dissolveMaterial: {fileID: 2100000, guid: a0c432808903e8f469a0a33742290459, type: 2}
+  _dissolveDuration: 1
+  _deathEffectPrefab: {fileID: 7480542335047832011, guid: d2f98a091bc49f5429c3c48f5b6b63dc, type: 3}
   _moveSpeed: 3
   _turnSpeed: 540
   _repathDistance: 0.3

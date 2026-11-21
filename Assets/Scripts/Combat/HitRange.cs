@@ -30,6 +30,9 @@ public readonly struct HitRange
         _height = height;
     }
 
+    // 판정 범위의 중심 (공격하는 쪽 기준 위치). 적중 이펙트가 휘두르는 높이를 읽는다.
+    public Vector3 Center => _center;
+
     // 범위 안의 콜라이더를 results 에 담고 찾은 수를 돌려준다.
     public int Overlap(Transform origin, Collider[] results, int layers)
     {

@@ -17,6 +17,10 @@ public class CommonCharacterSettings : ScriptableObject
     [Tooltip("회피(백스텝)를 시작한 뒤 제자리에 있다가 전진을 시작하기까지의 시간(초). 회피 시간 안에 포함되므로 회피 시간보다 짧게 둔다")]
     [SerializeField, Min(0f)] private float _dodgeStartDelay;
 
+    [Header("적중 이펙트")]
+    [Tooltip("적중 이펙트를 맞은 자리에서 무작위로 비켜 띄우는 최대 거리 (x : 좌우, y : 위아래). 0 이면 비키지 않는다. 앞뒤로는 비키지 않아 적 표면에 붙어 있다")]
+    [SerializeField] private Vector2 _hitEffectSpread = new Vector2(0.3f, 0.3f);
+
     [Header("공격 간격")]
     [Tooltip("공격할 때 대상 앞에서 멈추거나 순간 이동할 때, 대상 몸 표면과 플레이어 몸 표면 사이를 이 간격만큼 띄운다. 중심 사이 거리는 대상 반지름 + 플레이어 반지름 + 간격이다")]
     [SerializeField, Min(0f)] private float _attackableDistance = 1.5f;
@@ -49,6 +53,22 @@ public class CommonCharacterSettings : ScriptableObject
     [Tooltip("슬로모션 동안 적의 시간 배율")]
     [SerializeField, Range(0.05f, 1f)] private float _slowMotionEnemyTimeScale = 0.5f;
 
+    [Header("완벽 회피 잔상")]
+    [Tooltip("잔상에 씌울 Material (투명 모드). 비워 두면 잔상을 남기지 않는다")]
+    [SerializeField] private Material _afterimageMaterial;
+    [Tooltip("알파를 바꿔 흐려지게 할 Material 의 색 프로퍼티 이름 (예 : _Color, _BaseColor)")]
+    [SerializeField] private string _afterimageFadeProperty = "_Color";
+    [Tooltip("잔상이 생길 때의 알파. 잔상이 사라지는 동안 이 값에서 끝 알파로 바뀐다")]
+    [SerializeField, Range(0f, 1f)] private float _afterimageStartValue = 1f;
+    [Tooltip("잔상이 다 사라졌을 때의 알파")]
+    [SerializeField, Range(0f, 1f)] private float _afterimageEndValue;
+    [Tooltip("완벽 회피 후 잔상을 계속 남기는 시간(초, 실제 시간)")]
+    [SerializeField, Min(0f)] private float _afterimageEmitTime = 0.4f;
+    [Tooltip("잔상을 하나씩 남기는 간격(초, 실제 시간)")]
+    [SerializeField, Min(0.01f)] private float _afterimageInterval = 0.05f;
+    [Tooltip("잔상 하나가 사라지는 데 걸리는 시간(초, 실제 시간)")]
+    [SerializeField, Min(0.01f)] private float _afterimageFadeTime = 0.3f;
+
     [Header("패링")]
     [Tooltip("패링 준비 자세를 유지하는 시간(초). 적 공격이 끊겨도 끝까지 유지한다")]
     [SerializeField, Min(0.01f)] private float _parryReadyTime = 1f;
@@ -56,10 +76,14 @@ public class CommonCharacterSettings : ScriptableObject
     [SerializeField, Min(0f)] private float _parryReactDistance = 2f;
     [Tooltip("패링 성공 후 반응 시간(초). 이 시간에 걸쳐 점점 느려지며 밀려나고, 이 동안 닿은 노란 공격은 자동으로 패링된다. 이 동안 공격 키를 누르면 끝난 뒤 추격 공격이 나간다")]
     [SerializeField, Min(0.01f)] private float _parryReactTime = 1f;
-    [Tooltip("[임시 표시] 적이 패링 공격 예고를 시작할 때, 교체할 대기 캐릭터가 있으면(패링 가능) 띄우는 Prefab. 적의 예고 위치에 붙인다")]
+    [Tooltip("적이 패링 공격 예고를 시작할 때, 교체할 대기 캐릭터가 있으면(패링 가능) 띄우는 Prefab. 적의 예고 위치에 붙인다")]
     [SerializeField] private GameObject _parryTelegraphPrefab;
-    [Tooltip("[임시 표시] 적이 패링 공격 예고를 시작할 때, 교체할 대기 캐릭터가 없으면(패링 불가) 띄우는 Prefab")]
+    [Tooltip("적이 패링 공격 예고를 시작할 때, 교체할 대기 캐릭터가 없으면(패링 불가) 띄우는 Prefab")]
     [SerializeField] private GameObject _unparryableTelegraphPrefab;
+    [Tooltip("패링에 성공할 때마다 캐릭터와 적의 중간에 띄우는 이펙트. 캐릭터에서 적을 바라보는 방향으로 띄운다. 비워 두면 띄우지 않는다")]
+    [SerializeField] private GameObject _parryEffectPrefab;
+    [Tooltip("패링 이펙트를 띄우는 높이 (캐릭터 발 기준)")]
+    [SerializeField] private float _parryEffectHeight = 1f;
 
     [Header("파티 교체")]
     [Tooltip("일반 교체의 최소 간격(초, 실제 시간). 마지막 교체(패링 · 빠른 지원 포함)부터 이 시간이 지나야 일반 교체를 할 수 있다. 빠른 지원 · 패링이 되는 교체는 막지 않는다")]
@@ -119,6 +143,7 @@ public class CommonCharacterSettings : ScriptableObject
     public LayerMask ObstacleLayers => _obstacleLayers;
     public float SightHeight => _sightHeight;
     public GameObject LockOnMarkerPrefab => _lockOnMarkerPrefab;
+    public Vector2 HitEffectSpread => _hitEffectSpread;
     public float AttackableDistance => _attackableDistance;
     public LayerMask TeleportBlockLayers => _teleportBlockLayers;
     public LayerMask TeleportGroundLayers => _teleportGroundLayers;
@@ -126,11 +151,20 @@ public class CommonCharacterSettings : ScriptableObject
     public float GroundSearchDepth => _groundSearchDepth;
     public float SlowMotionDuration => _slowMotionDuration;
     public float SlowMotionEnemyTimeScale => _slowMotionEnemyTimeScale;
+    public Material AfterimageMaterial => _afterimageMaterial;
+    public string AfterimageFadeProperty => _afterimageFadeProperty;
+    public float AfterimageStartValue => _afterimageStartValue;
+    public float AfterimageEndValue => _afterimageEndValue;
+    public float AfterimageEmitTime => _afterimageEmitTime;
+    public float AfterimageInterval => _afterimageInterval;
+    public float AfterimageFadeTime => _afterimageFadeTime;
     public float ParryReadyTime => _parryReadyTime;
     public float ParryReactDistance => _parryReactDistance;
     public float ParryReactTime => _parryReactTime;
     public GameObject ParryTelegraphPrefab => _parryTelegraphPrefab;
     public GameObject UnparryableTelegraphPrefab => _unparryableTelegraphPrefab;
+    public GameObject ParryEffectPrefab => _parryEffectPrefab;
+    public float ParryEffectHeight => _parryEffectHeight;
     public float SwapInTime => _swapInTime;
     public float SwapCooldown => _swapCooldown;
     public float SwapInAdvanceDistance => _swapInAdvanceDistance;

@@ -19291,7 +19291,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7564748934102648992
 Transform:
   m_ObjectHideFlags: 0
@@ -27048,7 +27048,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e48b212da23e60f49adb3521f2778457, type: 2}
+  - {fileID: 2100000, guid: 614b6163bbc15b84b9d5f5365357d6a2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -37588,6 +37588,7 @@ GameObject:
   - component: {fileID: 6715545007783438477}
   - component: {fileID: 4670862040014280236}
   - component: {fileID: 3126899296500088865}
+  - component: {fileID: 2085348062159276791}
   m_Layer: 7
   m_Name: Fighter
   m_TagString: Untagged
@@ -37741,6 +37742,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDebugger
   _rangeDisplayTime: 0.1
+--- !u!114 &2085348062159276791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8698875331694340960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57d57318340c5fb468b1d55491c04a4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PerfectDodgeAfterimage
+  _renderers:
+  - {fileID: 6078187313154859049}
+  - {fileID: 913662935273588264}
+  - {fileID: 8568161684121095821}
+  - {fileID: 3193782334355892111}
+  - {fileID: 2711234537048468505}
+  - {fileID: 6874441121747143998}
+  - {fileID: 5063623422843498556}
 --- !u!1 &8699109574677673571
 GameObject:
   m_ObjectHideFlags: 0

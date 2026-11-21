@@ -22,7 +22,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 3072
   _sightHeight: 1.2
-  _lockOnMarkerPrefab: {fileID: 6668375599957286743, guid: 86d476e8f4ecd2443bf6651d8d833efc, type: 3}
+  _lockOnMarkerPrefab: {fileID: 6269551623542804000, guid: cd6569d016c63fe409b55165c901081b, type: 3}
   _teleportBlockLayers:
     serializedVersion: 2
     m_Bits: 3328
@@ -33,11 +33,20 @@ MonoBehaviour:
   _groundSearchDepth: 2
   _slowMotionDuration: 1
   _slowMotionEnemyTimeScale: 0.25
+  _afterimageMaterial: {fileID: 2100000, guid: 8b7e9b0e4e44fb34da56f95f5fab9be1, type: 2}
+  _afterimageFadeProperty: _Color
+  _afterimageStartValue: 1
+  _afterimageEndValue: 0
+  _afterimageEmitTime: 0.35
+  _afterimageInterval: 0.05
+  _afterimageFadeTime: 0.35
   _parryReadyTime: 1
   _parryReactDistance: 3
   _parryReactTime: 1
-  _parryTelegraphPrefab: {fileID: 362406810184043471, guid: df2ca08c06889d340b79104967a64347, type: 3}
-  _unparryableTelegraphPrefab: {fileID: 362406810184043471, guid: 6d03919f2fbae284db26337abab6114e, type: 3}
+  _parryTelegraphPrefab: {fileID: 5199311003786235912, guid: 93398cfb6f2be5c45881b959efd0a405, type: 3}
+  _unparryableTelegraphPrefab: {fileID: 5199311003786235912, guid: 5718eb03ced533e44bf6ae33a114ce4d, type: 3}
+  _parryEffectPrefab: {fileID: 1610259402245616, guid: c37b4de6b48998e4993bf5c06d679825, type: 3}
+  _parryEffectHeight: 1.25
   _swapCooldown: 0.1
   _swapInTime: 0.5
   _swapInAdvanceDistance: 1.5
@@ -50,6 +59,7 @@ MonoBehaviour:
   _comboSelectTimeScale: 0.15
   _groggyHoldTime: 3
   _ultimateTargetSearchRange: 15
+  _ultimateGaugeShareRatio: 0.3
   _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _dashAction: {fileID: 504704208043311331, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
   _attackAction: {fileID: -2737370060291335809, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}

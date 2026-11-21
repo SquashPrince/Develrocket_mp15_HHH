@@ -21,6 +21,7 @@ MonoBehaviour:
     _hitCount: 3
     _reactOnFirstHitOnly: 1
     _hitLagTime: 0.035
+    _hitLagOnFirstHitOnly: 0
     _hitShape: 3
     _hitCenter: {x: 0, y: 1, z: 0.5}
     _hitSize: {x: 1.5, y: 1.5, z: 2}
@@ -41,6 +42,18 @@ MonoBehaviour:
       - {fileID: 8300000, guid: abf4caad1f5a24e49a317937ebf12163, type: 3}
       - {fileID: 8300000, guid: d637bacd075454147bb398300d59dc3e, type: 3}
       _volume: 0.5
+    _hitEffects:
+    - _prefab: {fileID: 1512448765768326326, guid: c3b2db7c0c207414993316f9fae75634, type: 3}
+      _rollAngle: 0
+      _rollRandom: 90
+    - _prefab: {fileID: 1341028232701450620, guid: 914eaee70a5d59843bf488615be2da69, type: 3}
+      _rollAngle: 0
+      _rollRandom: 90
+    _motionEffects:
+    - _prefab: {fileID: 3130843824445296154, guid: 5ce8a5e03ea10ca4c90f4997a1e714cd, type: 3}
+      _position: {x: 0, y: 1, z: 0}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
   _energyGain: 0
   _ultimateGaugeGain: 4.34
   _power: 8500

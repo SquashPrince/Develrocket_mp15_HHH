@@ -41,6 +41,11 @@ MonoBehaviour:
       - {fileID: 8300000, guid: abf4caad1f5a24e49a317937ebf12163, type: 3}
       - {fileID: 8300000, guid: d637bacd075454147bb398300d59dc3e, type: 3}
       _volume: 0.5
+    _hitEffects:
+    - _prefab: {fileID: 1341028232701450620, guid: 914eaee70a5d59843bf488615be2da69, type: 3}
+      _rollAngle: 0
+      _rollRandom: 90
+    _motionEffects: []
   _energyGain: 0.39
   _ultimateGaugeGain: 4.8
   _power: 1000
@@ -62,3 +67,4 @@ MonoBehaviour:
   _groggyGain: 3.096
   _teleport: {fileID: 0}
   _cameraShot: 0
+  _hitEffect: {fileID: 0}

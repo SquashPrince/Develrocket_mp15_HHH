@@ -56,6 +56,8 @@ public class ActionStep
     [SerializeField] private bool _reactOnFirstHitOnly;
     [Tooltip("적중할 때마다 공격한 캐릭터만 멈추는 시간(초, 실제 시간). 적은 멈추지 않는다. 0 이면 멈추지 않는다")]
     [SerializeField, Min(0f)] private float _hitLagTime;
+    [Tooltip("[구간] 켜면 히트렉은 판정 구간(판정 시작 한 번)에서 처음 적중한 타격에만 건다. 경직은 타격마다 그대로 건다. 펀치 러시처럼 다단히트마다 멈추면 늘어질 때 쓴다. 강타는 항상 히트렉을 건다")]
+    [SerializeField] private bool _hitLagOnFirstHitOnly;
 
     [Header("판정 범위")]
     [Tooltip("상자 : 중심 · 크기 / 구 : 중심 · 반지름 / 캡슐 : 중심 · 반지름 · 길이 (캐릭터 앞쪽으로 긴 막대) / 부채꼴 : 중심 · 반지름 · 각도 · 안쪽 반지름 · 높이")]
@@ -91,6 +93,12 @@ public class ActionStep
     [Tooltip("이 동작을 휘두를(시전할) 때 내는 소리. 적이 없어도 판정 시작(판정 시작이 없으면 강타 끝) 순간에 동작마다 한 번 낸다. 비워 두면 소리가 없다")]
     [SerializeField] private SoundGroup _swingSound;
 
+    [Header("이펙트")]
+    [Tooltip("휘두르기마다 고를 적중 이펙트 목록. 클립의 판정 시작(HitStart) · 강타 끝(ImpactEnd) 이벤트 Int 칸에 목록 번호(0 부터)를 넣는다. 구간 판정의 다단히트는 그 구간을 연 판정 시작의 번호를 쓴다. 비워 두면 적중 이펙트를 띄우지 않는다")]
+    [SerializeField] private HitEffectSetting[] _hitEffects = new HitEffectSetting[0];
+    [Tooltip("이 동작 중 띄울 이펙트 목록. 클립에 동작 이펙트(MotionEffect) 이벤트를 찍고 Int 칸에 목록 번호(0 부터)를 넣으면 그 순간 그 번호의 이펙트를 캐릭터에 붙여 띄운다.\nPrefab 이 반복(Looping) 이펙트면 판정 끝 · 강타 끝 이벤트가 오거나 이 동작이 끝날 때까지 반복한다")]
+    [SerializeField] private MotionEffectSetting[] _motionEffects = new MotionEffectSetting[0];
+
     public string AnimationState => _animationState;
     // 재생 · 이벤트 구분에 쓰는 상태 해시. 상태 이름으로 매번 계산한다.
     public int AnimationHash => Animator.StringToHash(_animationState);
@@ -100,6 +108,7 @@ public class ActionStep
     public int HitCount => _hitCount;
     public bool ReactOnFirstHitOnly => _reactOnFirstHitOnly;
     public float HitLagTime => _hitLagTime;
+    public bool HitLagOnFirstHitOnly => _hitLagOnFirstHitOnly;
     // 판정 범위. 찾기 · 그리기는 공용 판정 범위가 한다.
     public HitRange Range => new HitRange(_hitShape, _hitCenter, _hitSize, _hitRadius, _hitLength, _hitAngle, _hitInnerRadius, _hitHeight);
     public float AdvanceDistance => _advanceDistance;
@@ -109,4 +118,23 @@ public class ActionStep
 
     // 이 동작 중 interrupt 행동을 허용하는지
     public bool Allows(Interrupt interrupt) => (_interrupts & interrupt) != 0;
+
+    // 적중 이펙트 목록을 쓰는지. 비어 있으면 적중 이펙트를 띄우지 않는다.
+    public bool HasHitEffects => _hitEffects.Length > 0;
+
+    // index 번 적중 이펙트. 목록에 없는 번호면 null 이다.
+    public HitEffectSetting GetHitEffect(int index)
+    {
+        if(index < 0 || index >= _hitEffects.Length) return null;
+
+        return _hitEffects[index];
+    }
+
+    // index 번 동작 이펙트. 목록에 없는 번호면 null 이다.
+    public MotionEffectSetting GetMotionEffect(int index)
+    {
+        if(index < 0 || index >= _motionEffects.Length) return null;
+
+        return _motionEffects[index];
+    }
 }
