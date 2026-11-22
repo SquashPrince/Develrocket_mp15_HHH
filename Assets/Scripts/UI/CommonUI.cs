@@ -10,10 +10,12 @@ using UnityEngine;
 public class CommonUI : MonoBehaviour
 {
     [SerializeField] private SettingsView _settings;
+    [SerializeField] private SceneLoader _sceneLoader;
 
     public static CommonUI Instance { get; private set; }
 
     public SettingsView Settings => _settings;
+    public SceneLoader SceneLoader => _sceneLoader;
 
     private void Awake() => Init();
     private void OnDestroy()

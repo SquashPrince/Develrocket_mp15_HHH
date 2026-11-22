@@ -127,7 +127,7 @@ public class GameFlow : MonoBehaviour
     {
         RunRecord.ResetRun();
         PrepareSceneChange();
-        SceneManager.LoadScene(_titleScene.SceneName);
+        CommonUI.Instance.SceneLoader.Load(_titleScene.SceneName, false);
     }
 
     // 진행할 순서의 구역에 조작 중인 캐릭터가 들어오면 그 구역의 전투를 시작한다.
@@ -302,7 +302,7 @@ public class GameFlow : MonoBehaviour
     private void ReloadScene()
     {
         PrepareSceneChange();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        CommonUI.Instance.SceneLoader.Load(SceneManager.GetActiveScene().name, true);
     }
 
     // 씬이 바뀌어도 남는 정적 값을 처음 값으로 돌린다. 히트스톱 · 콤보 선택 · 슬로모션 중에 씬을 바꿀 수 있기 때문이다.

@@ -10,6 +10,8 @@ public class EnemyData : ScriptableObject
     [SerializeField] private EnemyGrade _grade;
 
     [Header("표시")]
+    [Tooltip("이름. 이름 글자를 연결한 막대(보스 바)에 보인다. 정체를 숨길 보스는 ??? 처럼 적는다. 비워 두면 에셋 이름을 쓴다")]
+    [SerializeField] private string _displayName;
     [Tooltip("[선택] 초상화 Image 를 연결한 막대(보스 바)에 띄울 초상화. 비워 두면 빈 Image 로 보인다")]
     [SerializeField] private Sprite _portrait;
 
@@ -77,6 +79,7 @@ public class EnemyData : ScriptableObject
     [SerializeField] private EnemyAttackData[] _attacks;
 
     public EnemyGrade Grade => _grade;
+    public string DisplayName => string.IsNullOrEmpty(_displayName) ? name : _displayName;
     public Sprite Portrait => _portrait;
     public float MaxHealth => _maxHealth;
     public bool CanDie => _canDie;

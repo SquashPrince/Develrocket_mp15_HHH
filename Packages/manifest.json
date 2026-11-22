@@ -2,6 +2,7 @@
   "dependencies": {
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
     "com.slenkerlab.switchcontrollerinput": "https://github.com/schlenger/JoyConUnityInputSystem.git?path=/Packages/com.slenkerlab.switchcontrollerinput",
+    "com.unity.2d.sprite": "1.0.0",
     "com.unity.ai.navigation": "2.0.10",
     "com.unity.behavior": "1.0.17",
     "com.unity.cinemachine": "3.1.7",

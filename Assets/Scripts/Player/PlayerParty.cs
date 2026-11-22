@@ -175,10 +175,12 @@ public class PlayerParty : MonoBehaviour
 
     // 판이 끝나면(보스 처치 · 시간 초과 · 전멸) 게임 흐름이 부른다.
     // 입력을 막아 결과 화면의 버튼을 누르는 클릭이 공격 입력으로 들어가지 않게 하고, 이후 적의 공격에 맞지 않게 한다.
+    // 적의 공격 대상도 비운다. 적 행동은 대상이 없으면 실패로 끝나, 쓰러진 채 남은 마지막 캐릭터를 쫓아와 공격하거나 몸으로 밀지 않는다.
     public void EndBattle()
     {
         _isInputLocked = true;
         IsBattleEnded = true;
+        RetargetEnemies();
     }
 
     // 모든 캐릭터를 point 위치 · 방향으로 옮긴다. 보스전 재도전으로 씬을 다시 불러왔을 때 시작하며 부른다.
@@ -199,8 +201,11 @@ public class PlayerParty : MonoBehaviour
     public void RegisterEnemy(BehaviorGraphAgent agent)
     {
         _enemyAgents.Add(agent);
-        agent.SetVariableValue(ENEMY_TARGET_VARIABLE, Controlled.transform);
+        agent.SetVariableValue(ENEMY_TARGET_VARIABLE, GetEnemyTarget());
     }
+
+    // 적에게 줄 공격 대상. 판이 끝났으면 대상이 없다.
+    private Transform GetEnemyTarget() => IsBattleEnded ? null : Controlled.transform;
 
     // 캐릭터의 쓰러짐 모션이 끝나면 쓰러짐 상태가 부른다. 그 캐릭터를 끄고, 조작 중이던 캐릭터면 다음 살아 있는 캐릭터로 넘긴다.
     // 퇴장 중에 쓰러진 이전 캐릭터는 끄기만 한다.
@@ -479,12 +484,14 @@ public class PlayerParty : MonoBehaviour
         ControlledChanged?.Invoke(Controlled);
     }
 
-    // 등록된 적 행동 그래프마다 공격 대상을 조작 중인 캐릭터로 바꾼다.
+    // 등록된 적 행동 그래프마다 공격 대상을 조작 중인 캐릭터로 바꾼다. 판이 끝났으면 비운다.
     private void RetargetEnemies()
     {
+        Transform target = GetEnemyTarget();
+
         for(int i = 0; i < _enemyAgents.Count; i++)
         {
-            _enemyAgents[i].SetVariableValue(ENEMY_TARGET_VARIABLE, Controlled.transform);
+            _enemyAgents[i].SetVariableValue(ENEMY_TARGET_VARIABLE, target);
         }
     }
 

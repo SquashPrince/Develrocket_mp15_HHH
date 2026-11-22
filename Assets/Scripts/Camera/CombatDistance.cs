@@ -3,7 +3,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 
 // 전투 상황에 따라 조작 카메라(일반 · 록온)의 거리를 늘려, 많은 적이나 큰 적을 화면에 담는다.
-// 조작 캐릭터 주변에 살아 있는 적이 정한 수 이상이면 · 보스가 있으면 추가 거리를 정하고, 둘 다면 더 먼 쪽을 쓴다.
+// 조작 캐릭터 주변에 살아 있는 적이 정한 수 이상이면 · 엘리트가 있으면 · 보스가 있으면 추가 거리를 정하고, 여럿이면 가장 먼 쪽을 쓴다.
 // 거리는 각 카메라 Orbital Follow 의 반지름(Radius)에 더한다. 마우스 휠 확대 · 축소는 반지름에 곱하는 배율(Radial Axis)이라 함께 적용된다.
 // 추가 거리는 실제 시간으로 서서히 바뀐다. 콤보 선택 감속 · 히트스톱 중에도 멈추지 않게 하기 위해서다.
 // 꺼지면 원래 반지름으로 되돌린다.
@@ -26,6 +26,10 @@ public class CombatDistance : MonoBehaviour
     [SerializeField, Min(1)] private int _crowdCount = 4;
     [Tooltip("적이 많을 때 더할 거리(m)")]
     [SerializeField, Min(0f)] private float _crowdDistance = 1f;
+
+    [Header("엘리트")]
+    [Tooltip("범위 안에 살아 있는 엘리트가 있을 때 더할 거리(m)")]
+    [SerializeField, Min(0f)] private float _eliteDistance = 1f;
 
     [Header("보스")]
     [Tooltip("범위 안에 살아 있는 보스가 있을 때 더할 거리(m)")]
@@ -50,10 +54,11 @@ public class CombatDistance : MonoBehaviour
         ApplyDistance(_currentDistance);
     }
 
-    // 범위 안의 살아 있는 적 수와 보스 여부로 추가 거리를 정한다. 콜라이더가 여러 개인 적도 한 번만 센다.
+    // 범위 안의 살아 있는 적 수와 엘리트 · 보스 여부로 추가 거리를 정한다. 콜라이더가 여러 개인 적도 한 번만 센다.
     private float GetTargetDistance()
     {
         int count = Physics.OverlapSphereNonAlloc(_party.Controlled.transform.position, _checkRange, _colliders, _enemyLayers, QueryTriggerInteraction.Ignore);
+        bool hasElite = false;
         bool hasBoss = false;
 
         _countedEnemies.Clear();
@@ -64,13 +69,15 @@ public class CombatDistance : MonoBehaviour
 
             if(enemy == null || !enemy.IsAlive || !_countedEnemies.Add(enemy)) continue;
 
-            if(enemy.Data.Grade == EnemyGrade.Boss) hasBoss = true;
+            if(enemy.Data.Grade == EnemyGrade.Elite) hasElite = true;
+            else if(enemy.Data.Grade == EnemyGrade.Boss) hasBoss = true;
         }
 
         float crowd = _countedEnemies.Count >= _crowdCount ? _crowdDistance : 0f;
+        float elite = hasElite ? _eliteDistance : 0f;
         float boss = hasBoss ? _bossDistance : 0f;
 
-        return Mathf.Max(crowd, boss);
+        return Mathf.Max(crowd, Mathf.Max(elite, boss));
     }
 
     private void ApplyDistance(float distance)

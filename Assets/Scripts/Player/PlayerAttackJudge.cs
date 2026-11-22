@@ -244,8 +244,11 @@ public class PlayerAttackJudge : MonoBehaviour
             // 이미 처치된 적(시체)은 맞지 않는다. 대미지 숫자 · 게이지 · 히트렉 · 적중 소리도 나오지 않는다.
             if(enemy == null || !enemy.IsAlive || !_hitTargets.Add(enemy)) continue;
 
-            ApplyHit(enemy, action, step, isImpact, canReact, canHitLag, ref comboSkillTarget, ref comboSkillGroggyable);
-            PlayHitEffect(step, _hitColliders[i]);
+            // 맞은 점은 한 번만 구해 대미지 숫자와 적중 이펙트가 같은 자리에 뜨게 한다.
+            Vector3 hitPoint = GetHitPoint(step, _hitColliders[i], out Quaternion hitRotation);
+
+            ApplyHit(enemy, action, step, isImpact, canReact, canHitLag, hitPoint, ref comboSkillTarget, ref comboSkillGroggyable);
+            PlayHitEffect(step, hitPoint, hitRotation);
             hasHit = true;
         }
 
@@ -275,14 +278,14 @@ public class PlayerAttackJudge : MonoBehaviour
     // 강타가 그로기 적에게 맞으면 콤보 스킬 대상으로 고른다. 한 번의 판정에서 콤보 스킬은 하나의 적에게만 발동한다.
     // 그로기를 쌓은 뒤 콤보 스킬을 확인하므로, 게이지를 채운 강타가 바로 콤보 스킬 선택을 연다.
     // 이 적중으로 그로기에 들어갔으면 콤보 스킬 선택에 알려 그로기 정지 시간을 걸게 한다.
-    private void ApplyHit(IEnemyDamageable enemy, ActionData action, ActionStep step, bool isImpact, bool canReact, bool canHitLag, ref IEnemyTargetable comboSkillTarget, ref IEnemyGroggyable comboSkillGroggyable)
+    private void ApplyHit(IEnemyDamageable enemy, ActionData action, ActionStep step, bool isImpact, bool canReact, bool canHitLag, Vector3 hitPoint, ref IEnemyTargetable comboSkillTarget, ref IEnemyGroggyable comboSkillGroggyable)
     {
         float damage = _controller.Character.RollDamage(action.Power, out bool isCritical);
 
         // 그로기 배율은 적이 적용하므로, 숫자는 적이 실제로 받은 대미지로 보여준다.
         float dealt = enemy.TakeDamage(damage, isImpact);
 
-        BattleFeedback.RaiseDamage(enemy.transform, dealt, isImpact, isCritical);
+        BattleFeedback.RaiseDamage(enemy.transform, hitPoint, dealt, isImpact, isCritical);
 
         // 이 타격으로 처치된 적은 경직 · 콤보 스킬 대상이 아니다. 그로기 적이 강타로 처치되면 콤보 스킬보다 처치가 먼저다.
         if(!enemy.IsAlive) return;
@@ -327,7 +330,23 @@ public class PlayerAttackJudge : MonoBehaviour
     // 위치 : 그 높이에서 캐릭터 쪽으로 가장 가까운 표면. 방향 : 캐릭터 → 적(수평).
     // 흩어짐 : 공통 설정의 범위 안에서 좌우 · 위아래로 무작위로 비켜, 다단히트가 한 점에 겹치지 않게 한다. 앞뒤로는 비키지 않는다.
     // 콜라이더가 여러 개인 적은 이번 찾기에서 처음 찾은 콜라이더를 쓴다.
-    private void PlayHitEffect(ActionStep step, Collider hitCollider)
+    // 맞은 점 : 맞은 콜라이더에서 공격한 캐릭터 쪽으로 가장 가까운 점. 높이는 판정 범위 중심 높이(콜라이더 안으로 제한)다.
+    // rotation : 공격 방향(캐릭터 → 적, 수평)을 바라보는 회전. 적중 이펙트가 쓴다.
+    private Vector3 GetHitPoint(ActionStep step, Collider hitCollider, out Quaternion rotation)
+    {
+        Bounds bounds = hitCollider.bounds;
+        float height = Mathf.Clamp(transform.TransformPoint(step.Range.Center).y, bounds.min.y, bounds.max.y);
+        Vector3 attackerPoint = new Vector3(transform.position.x, height, transform.position.z);
+        Vector3 direction = HorizontalVector.Between(attackerPoint, bounds.center);
+
+        // 캐릭터와 적의 중심이 겹치면 방향을 알 수 없으므로 캐릭터 정면을 쓴다.
+        if(direction == Vector3.zero) direction = transform.forward;
+
+        rotation = Quaternion.LookRotation(direction);
+        return hitCollider.ClosestPoint(attackerPoint);
+    }
+
+    private void PlayHitEffect(ActionStep step, Vector3 hitPoint, Quaternion rotation)
     {
         if(!step.HasHitEffects) return;
 
@@ -345,20 +364,11 @@ public class PlayerAttackJudge : MonoBehaviour
 
         if(prefab == null) return;
 
-        Bounds bounds = hitCollider.bounds;
-        float height = Mathf.Clamp(transform.TransformPoint(step.Range.Center).y, bounds.min.y, bounds.max.y);
-        Vector3 attackerPoint = new Vector3(transform.position.x, height, transform.position.z);
-        Vector3 direction = HorizontalVector.Between(attackerPoint, bounds.center);
-
-        // 캐릭터와 적의 중심이 겹치면 방향을 알 수 없으므로 캐릭터 정면을 쓴다.
-        if(direction == Vector3.zero) direction = transform.forward;
-
-        Quaternion rotation = Quaternion.LookRotation(direction);
         Vector2 spread = _controller.Common.HitEffectSpread;
         Vector3 offset = rotation * new Vector3(UnityEngine.Random.Range(-spread.x, spread.x), UnityEngine.Random.Range(-spread.y, spread.y), 0f);
 
         // 기울기는 공격 방향(이펙트의 앞쪽 축)을 축으로 돌린다.
-        BattleEffect.Play(prefab, hitCollider.ClosestPoint(attackerPoint) + offset, rotation * Quaternion.Euler(0f, 0f, setting.PickRollAngle()));
+        BattleEffect.Play(prefab, hitPoint + offset, rotation * Quaternion.Euler(0f, 0f, setting.PickRollAngle()));
     }
 
     private void CacheComponent()

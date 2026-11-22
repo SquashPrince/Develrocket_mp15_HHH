@@ -27,8 +27,8 @@ public class PlayerInputReader : MonoBehaviour
     public bool WasSkillPressed => WasPressed(Common.SkillAction);
     public bool WasUltimatePressed => WasPressed(Common.UltimateAction);
     private CommonCharacterSettings Common => _controller.Common;
-    // 조작 중이고, 파티가 콤보 스킬 캐릭터 선택으로 입력을 막고 있지 않을 때만 입력을 읽는다.
-    private bool CanRead => _isControlled && !_controller.Party.IsInputBlocked;
+    // 조작 중이고, 파티가 콤보 스킬 캐릭터 선택으로 입력을 막고 있지 않고, 씬 이동(로딩) 중이 아닐 때만 입력을 읽는다.
+    private bool CanRead => _isControlled && !_controller.Party.IsInputBlocked && !CommonUI.Instance.SceneLoader.IsLoading;
 
     private void Awake() => CacheComponent();
 

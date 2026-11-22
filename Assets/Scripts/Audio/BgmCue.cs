@@ -8,7 +8,13 @@ public class BgmCue : MonoBehaviour
 
     private void Start() => Init();
 
+    // 씬을 옮겨 온 경우에는 화면이 다 보인 뒤에 튼다.
     private void Init()
+    {
+        CommonUI.Instance.SceneLoader.WhenShown(PlayTrack);
+    }
+
+    private void PlayTrack()
     {
         BgmRequest.Play(_track);
     }
