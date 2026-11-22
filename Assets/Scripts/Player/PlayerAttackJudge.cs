@@ -26,8 +26,6 @@ public class PlayerAttackJudge : MonoBehaviour
 {
     // 한 번의 범위 찾기에서 검사할 수 있는 최대 콜라이더 수
     private const int MAX_HIT_COLLIDERS = 16;
-    // 타격 시점과 구간 끝을 비교할 때 허용하는 오차(초). 구간 끝 시점의 타격이 계산 오차로 빠지지 않게 한다.
-    private const float TIME_EPSILON = 0.0001f;
 
     private readonly HashSet<IEnemyDamageable> _hitTargets = new HashSet<IEnemyDamageable>();
     private readonly Collider[] _hitColliders = new Collider[MAX_HIT_COLLIDERS];
@@ -175,7 +173,7 @@ public class PlayerAttackJudge : MonoBehaviour
     // 구간 시작부터 elapsed(초)까지 지난 타격 시점 중 아직 하지 않은 타격을 순서대로 한다.
     private void HitDueTicks(float elapsed)
     {
-        while(IsWindowOpen && HasTick(_nextTickIndex) && GetTickTime(_nextTickIndex) <= elapsed + TIME_EPSILON)
+        while(IsWindowOpen && HasTick(_nextTickIndex) && GetTickTime(_nextTickIndex) <= elapsed + HitWindowTiming.TIME_EPSILON)
         {
             _nextTickIndex++;
 
@@ -188,37 +186,15 @@ public class PlayerAttackJudge : MonoBehaviour
         }
     }
 
-    // index 번째 타격이 이 구간에 있는지.
-    //   횟수 : 강타로 끝나면 끝 시점은 강타가 맡으므로 횟수보다 하나 적게, 아니면 횟수만큼 한다. 길이를 모르면 시작 시점 한 번만 한다.
-    //   간격 : 길이를 모르면 판정이 꺼질 때까지 계속, 알면 구간 끝(강타로 끝나면 끝 직전)까지만 한다.
-    private bool HasTick(int index)
-    {
-        if(_windowStep.Timing == ActionStep.WindowTiming.Count)
-        {
-            if(_windowLength < 0f) return index == 0;
+    // index 번째 타격이 이 구간에 있는지. 강타로 끝나면 끝 시점은 강타가 맡는다. (다단 타격 시점 계산)
+    private bool HasTick(int index) =>
+        HitWindowTiming.HasTick(IsIntervalWindow, _windowStep.HitInterval, _windowStep.HitCount, _windowLength, _windowEndsWithImpact, index);
 
-            int count = _windowEndsWithImpact ? _windowStep.HitCount - 1 : _windowStep.HitCount;
+    // index 번째 타격 시점(구간 시작부터 초). (다단 타격 시점 계산)
+    private float GetTickTime(int index) =>
+        HitWindowTiming.GetTickTime(IsIntervalWindow, _windowStep.HitInterval, _windowStep.HitCount, _windowLength, index);
 
-            return index < count;
-        }
-
-        if(_windowLength < 0f) return true;
-
-        float tickTime = GetTickTime(index);
-
-        return _windowEndsWithImpact ? tickTime < _windowLength - TIME_EPSILON : tickTime <= _windowLength + TIME_EPSILON;
-    }
-
-    // index 번째 타격 시점(구간 시작부터 초).
-    //   간격 : 간격 × 번호 / 횟수 : 시작과 끝을 포함해 구간을 (횟수 - 1) 칸으로 나눈 간격 × 번호. 1 타면 시작 시점이다
-    private float GetTickTime(int index)
-    {
-        if(_windowStep.Timing == ActionStep.WindowTiming.Interval) return _windowStep.HitInterval * index;
-
-        int gaps = _windowStep.HitCount - 1;
-
-        return gaps > 0 && _windowLength > 0f ? _windowLength / gaps * index : 0f;
-    }
+    private bool IsIntervalWindow => _windowStep.Timing == ActionStep.WindowTiming.Interval;
 
     // 판정 끝 · 강타 끝 이벤트가 왔을 때 남은 타격을 어디까지 할지. 구간 길이를 알면 그 길이, 모르면 지금까지 지난 시간이다.
     private float GetWindowEndTime() => _windowLength >= 0f ? _windowLength : _status.LocalTime - _windowStartTime;

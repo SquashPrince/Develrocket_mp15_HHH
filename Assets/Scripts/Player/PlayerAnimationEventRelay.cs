@@ -60,26 +60,9 @@ public class PlayerAnimationEventRelay : MonoBehaviour
     // 찾지 못하면 길이를 모르는 것(-1)으로 알린다. Animator 상태의 재생 속도 배수는 1 이라고 본다.
     private void PrepareHitWindow(AnimationEvent animationEvent)
     {
-        AnimationClip clip = animationEvent.animatorClipInfo.clip;
-        float length = -1f;
-        bool endsWithImpact = false;
+        float endTime = AnimationClipEvents.FindNextTime(animationEvent.animatorClipInfo.clip, animationEvent.time, HIT_END_FUNCTION, IMPACT_END_FUNCTION, out string endName);
+        float length = endTime >= 0f ? endTime - animationEvent.time : -1f;
 
-        if(clip != null)
-        {
-            float nearestEnd = float.MaxValue;
-
-            foreach(AnimationEvent clipEvent in clip.events)
-            {
-                if(clipEvent.time <= animationEvent.time || clipEvent.time >= nearestEnd) continue;
-                if(clipEvent.functionName != HIT_END_FUNCTION && clipEvent.functionName != IMPACT_END_FUNCTION) continue;
-
-                nearestEnd = clipEvent.time;
-                endsWithImpact = clipEvent.functionName == IMPACT_END_FUNCTION;
-            }
-
-            if(nearestEnd < float.MaxValue) length = nearestEnd - animationEvent.time;
-        }
-
-        _playerController.AttackJudge.PrepareWindow(length, endsWithImpact);
+        _playerController.AttackJudge.PrepareWindow(length, endName == IMPACT_END_FUNCTION);
     }
 }

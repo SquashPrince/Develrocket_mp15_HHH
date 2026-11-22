@@ -61,14 +61,8 @@ public class ActionButton : MonoBehaviour
         }
     }
 
-    // 남은 눌림 시간의 비율만큼 눌림 크기에서 원래 크기 쪽으로 돌아온다.
-    private void UpdatePressScale()
-    {
-        if(_pressTimer <= 0f) return;
-
-        _pressTimer = Mathf.Max(0f, _pressTimer - Time.unscaledDeltaTime);
-        _icon.transform.localScale = _baseScale * Mathf.Lerp(1f, _pressScale, _pressTimer / _pressDuration);
-    }
+    // 남은 눌림 시간의 비율만큼 눌림 크기에서 원래 크기 쪽으로 돌아온다. (크기 강조)
+    private void UpdatePressScale() => ScalePop.Tick(ref _pressTimer, _pressDuration, _pressScale, _icon.transform, _baseScale);
 
     private void CacheComponent()
     {

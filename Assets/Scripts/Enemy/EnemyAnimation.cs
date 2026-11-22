@@ -72,14 +72,7 @@ public class EnemyAnimation : MonoBehaviour
     public void PlayIdle() => SetMoving(false);
 
     // 지금 재생 중인 상태가 stateHash 이고 끝까지 재생되었으면 true 다. 다른 상태와 섞이는 중이면 false 다.
-    public bool IsStateFinished(int stateHash)
-    {
-        if(_animator.IsInTransition(0)) return false;
-
-        AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-
-        return stateInfo.shortNameHash == stateHash && stateInfo.normalizedTime >= 1f;
-    }
+    public bool IsStateFinished(int stateHash) => _animator.IsStateFinished(stateHash);
 
     // stateHash 상태의 재생 위치(0 = 처음, 1 = 끝)를 돌려준다. 그 상태로 섞여 들어가는 중이면 들어가는 쪽의 위치다.
     // 지금 재생 중이거나 섞여 들어가는 상태가 아니면 false 다.

@@ -7,7 +7,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // 씬 이동. 공용 UI 에 하나만 두고, 씬을 바꾸는 곳(타이틀 시작 · 재시작 · 타이틀로)은 모두 이것을 통한다.
-// 흐름 : 화면을 검게 덮음 → [로딩 화면 표시] → 새 씬을 비동기로 불러옴 → 새 씬이 맡긴 준비를 기다림 → 메모리 정리 → [최소 표시 시간 대기 · 로딩 화면 닫음] → 화면을 걷음 → 씬 표시 알림
+// 흐름 : 화면을 검게 덮음 → 로딩 화면 표시 → 새 씬을 비동기로 불러옴 → 새 씬이 맡긴 준비를 기다림 → 메모리 정리 → 최소 표시 시간 대기 · 로딩 화면 닫음 → 화면을 걷음 → 씬 표시 알림
+//   모든 씬 이동(타이틀 시작 · 재시작 · 재도전 · 타이틀로)에서 로딩 화면을 보여준다.
 //   로딩 화면을 열고 닫을 때도 검은 화면을 한 번 거쳐, 화면이 갑자기 바뀌지 않게 한다.
 // 배경음 : 다른 씬으로 갈 때는 덮는 동안 배경음을 끄고, 로딩 화면이 열리면 로딩 곡을 튼다. 새 씬의 곡은 화면이 다 보인 뒤에 나오게 한다.
 //   같은 씬을 다시 불러올 때(재시작 · 재도전)는 곡을 끊지 않는다. 새 씬도 같은 곡을 요청하므로 이어서 나온다.
@@ -44,12 +45,12 @@ public class SceneLoader : MonoBehaviour
 
     private void Awake() => Init();
 
-    // 씬을 불러온다. showLoading 이 꺼져 있으면 로딩 화면 없이 검은 화면만 거친다.
-    public void Load(string sceneName, bool showLoading)
+    // 씬을 불러온다.
+    public void Load(string sceneName)
     {
         if(IsLoading) return;
 
-        LoadAsync(sceneName, showLoading, destroyCancellationToken).Forget();
+        LoadAsync(sceneName, destroyCancellationToken).Forget();
     }
 
     // 화면이 다 보인 뒤 한 번 실행한다. 이동 중이 아니면 바로 실행한다.
@@ -66,7 +67,7 @@ public class SceneLoader : MonoBehaviour
         else preparation(destroyCancellationToken).Forget();
     }
 
-    private async UniTaskVoid LoadAsync(string sceneName, bool showLoading, CancellationToken token)
+    private async UniTaskVoid LoadAsync(string sceneName, CancellationToken token)
     {
         bool isSceneChange = sceneName != SceneManager.GetActiveScene().name;
 
@@ -80,28 +81,22 @@ public class SceneLoader : MonoBehaviour
 
         float shownTime = Time.unscaledTime;
 
-        if(showLoading)
-        {
-            if(isSceneChange) BgmRequest.Play(BgmTrack.Loading);
+        if(isSceneChange) BgmRequest.Play(BgmTrack.Loading);
 
-            ShowLoading();
-            await FadeAsync(0f, token);
-        }
+        ShowLoading();
+        await FadeAsync(0f, token);
 
         await LoadSceneAsync(sceneName, token);
         await RunPreparationsAsync(token);
         await Resources.UnloadUnusedAssets().ToUniTask(cancellationToken: token);
         GC.Collect();
 
-        if(showLoading)
-        {
-            float remain = _minLoadingTime - (Time.unscaledTime - shownTime);
+        float remain = _minLoadingTime - (Time.unscaledTime - shownTime);
 
-            if(remain > 0f) await UniTask.Delay(TimeSpan.FromSeconds(remain), DelayType.UnscaledDeltaTime, cancellationToken: token);
+        if(remain > 0f) await UniTask.Delay(TimeSpan.FromSeconds(remain), DelayType.UnscaledDeltaTime, cancellationToken: token);
 
-            await FadeAsync(1f, token);
-            _loadingRoot.SetActive(false);
-        }
+        await FadeAsync(1f, token);
+        _loadingRoot.SetActive(false);
 
         await FadeAsync(0f, token);
 
