@@ -27,7 +27,7 @@ public class TitleMenu : MonoBehaviour
             return;
         }
 
-        CommonUI.Instance.SceneLoader.Load(_gameScene.SceneName, true);
+        CommonUI.Instance.SceneLoader.Load(_gameScene.SceneName);
     }
 
     private void OnQuitClicked()

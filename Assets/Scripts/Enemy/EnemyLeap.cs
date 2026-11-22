@@ -58,7 +58,7 @@ public class EnemyLeap : MonoBehaviour
     public void Begin(Transform target, AnimationEvent leapStartEvent, float height, float overshootDistance)
     {
         AnimationClip clip = leapStartEvent.animatorClipInfo.clip;
-        float landTime = FindEventTime(clip, nameof(EnemyAnimationEventType.LeapEnd), leapStartEvent.time);
+        float landTime = AnimationClipEvents.FindNextTime(clip, leapStartEvent.time, nameof(EnemyAnimationEventType.LeapEnd));
 
         if(landTime <= leapStartEvent.time)
         {
@@ -196,20 +196,6 @@ public class EnemyLeap : MonoBehaviour
     private void SetMarkerActive(bool isActive)
     {
         if(_landingMarker != null) _landingMarker.SetActive(isActive);
-    }
-
-    // clip 에서 afterTime 이후에 있는 functionName 이벤트 중 가장 이른 시간을 찾는다. 없으면 -1 이다.
-    private static float FindEventTime(AnimationClip clip, string functionName, float afterTime)
-    {
-        float foundTime = -1f;
-
-        foreach(AnimationEvent clipEvent in clip.events)
-        {
-            if(clipEvent.functionName != functionName || clipEvent.time <= afterTime) continue;
-            if(foundTime < 0f || clipEvent.time < foundTime) foundTime = clipEvent.time;
-        }
-
-        return foundTime;
     }
 
     private void CacheComponent()

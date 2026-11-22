@@ -224,13 +224,12 @@ public class CharacterGauge : MonoBehaviour
         return tier;
     }
 
-    // 남은 강조 시간의 비율만큼 강조 크기에서 원래 크기 쪽으로 돌아온다.
+    // 남은 강조 시간의 비율만큼 강조 크기에서 원래 크기 쪽으로 돌아온다. (크기 강조)
     private void UpdateTierUpScale()
     {
         if(_tierUpTimer <= 0f) return;
 
-        _tierUpTimer = Mathf.Max(0f, _tierUpTimer - Time.unscaledDeltaTime);
-        _ultimateGaugeText.transform.localScale = _ultimateTextBaseScale * Mathf.Lerp(1f, _tierUpScale, _tierUpTimer / _tierUpDuration);
+        ScalePop.Tick(ref _tierUpTimer, _tierUpDuration, _tierUpScale, _ultimateGaugeText.transform, _ultimateTextBaseScale);
     }
 
     private void RefreshAll()

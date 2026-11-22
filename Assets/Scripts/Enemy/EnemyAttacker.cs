@@ -27,8 +27,6 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 {
     // 한 번의 판정에서 검사할 수 있는 최대 콜라이더 수
     private const int MAX_HIT_COLLIDERS = 8;
-    // 타격 시점과 구간 끝을 비교할 때 허용하는 오차(초). 구간 끝 시점의 타격이 계산 오차로 빠지지 않게 한다.
-    private const float TIME_EPSILON = 0.0001f;
 
     [Tooltip("판정에 걸릴 Layer (Player)")]
     [SerializeField] private LayerMask _targetLayers = ~0;
@@ -274,20 +272,9 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     // 적 모션은 적 전용 시간으로 재생하므로 클립 시간이 곧 적 전용 시간이다. Animator 상태의 재생 속도 배수는 1 이라고 본다.
     private static float FindWindowLength(AnimationEvent hitStart)
     {
-        AnimationClip clip = hitStart.animatorClipInfo.clip;
+        float endTime = AnimationClipEvents.FindNextTime(hitStart.animatorClipInfo.clip, hitStart.time, nameof(EnemyAnimationEventType.HitEnd));
 
-        if(clip == null) return -1f;
-
-        float nearestEnd = float.MaxValue;
-
-        foreach(AnimationEvent clipEvent in clip.events)
-        {
-            if(clipEvent.functionName != nameof(EnemyAnimationEventType.HitEnd) || clipEvent.time <= hitStart.time) continue;
-
-            nearestEnd = Mathf.Min(nearestEnd, clipEvent.time);
-        }
-
-        return nearestEnd < float.MaxValue ? nearestEnd - hitStart.time : -1f;
+        return endTime >= 0f ? endTime - hitStart.time : -1f;
     }
 
     // 구간 판정이 켜져 있으면 적 전용 시간을 더하고, 지금까지 지난 타격 시점의 타격을 한다.
@@ -315,7 +302,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     // 구간 시작부터 elapsed(초)까지 지난 타격 시점 중 아직 하지 않은 타격을 순서대로 한다. 횟수 방식의 마지막 타격은 막타다.
     private void HitDueTicks(float elapsed)
     {
-        while(IsAttacking && _isHitActive && HasTick(_nextTickIndex) && GetTickTime(_nextTickIndex) <= elapsed + TIME_EPSILON)
+        while(IsAttacking && _isHitActive && HasTick(_nextTickIndex) && GetTickTime(_nextTickIndex) <= elapsed + HitWindowTiming.TIME_EPSILON)
         {
             bool isFinal = CurrentStep.Timing == EnemyAttackStep.WindowTiming.Count && _windowLength >= 0f && _nextTickIndex == CurrentStep.HitCount - 1;
 
@@ -326,24 +313,15 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
     // index 번째 타격이 이 구간에 있는지.
     //   횟수 : 길이를 모르면 시작 시점 한 번만, 알면 횟수만큼 한다.
-    //   간격 : 길이를 모르면 판정이 꺼질 때까지 계속, 알면 구간 끝 직전까지만 한다. 끝 순간은 막타가 맡는다.
-    private bool HasTick(int index)
-    {
-        if(CurrentStep.Timing == EnemyAttackStep.WindowTiming.Count) return _windowLength < 0f ? index == 0 : index < CurrentStep.HitCount;
+    //   간격 : 길이를 모르면 판정이 꺼질 때까지 계속, 알면 구간 끝 직전까지만 한다. 끝 순간은 막타가 맡는다. (다단 타격 시점 계산)
+    private bool HasTick(int index) =>
+        HitWindowTiming.HasTick(IsIntervalWindow, CurrentStep.HitInterval, CurrentStep.HitCount, _windowLength, IsIntervalWindow, index);
 
-        return _windowLength < 0f || GetTickTime(index) < _windowLength - TIME_EPSILON;
-    }
+    // index 번째 타격 시점(구간 시작부터 초). (다단 타격 시점 계산)
+    private float GetTickTime(int index) =>
+        HitWindowTiming.GetTickTime(IsIntervalWindow, CurrentStep.HitInterval, CurrentStep.HitCount, _windowLength, index);
 
-    // index 번째 타격 시점(구간 시작부터 초).
-    //   간격 : 간격 × 번호 / 횟수 : 시작과 끝을 포함해 구간을 (횟수 - 1) 칸으로 나눈 간격 × 번호. 1 타면 시작 시점이다
-    private float GetTickTime(int index)
-    {
-        if(CurrentStep.Timing == EnemyAttackStep.WindowTiming.Interval) return CurrentStep.HitInterval * index;
-
-        int gaps = CurrentStep.HitCount - 1;
-
-        return gaps > 0 && _windowLength > 0f ? _windowLength / gaps * index : 0f;
-    }
+    private bool IsIntervalWindow => CurrentStep.Timing == EnemyAttackStep.WindowTiming.Interval;
 
     // 막타 반응. 동작이 막타 반응을 켰으면 그 반응, 아니면 공격의 반응이다.
     private EnemyAttackData.HitReaction GetFinalReaction() => CurrentStep.UseFinalReaction ? CurrentStep.FinalReaction : CurrentAttack.Reaction;
