@@ -20,6 +20,10 @@ public class ComboSelectionView : MonoBehaviour
     [SerializeField] private Image _previousPortrait;
     [Tooltip("다음 캐릭터 초상화 (다음 키 : Space · 우클릭 · E)")]
     [SerializeField] private Image _nextPortrait;
+    [Tooltip("[선택] 이전 캐릭터 상징색을 곱할 그래픽 (초상화 테두리 · 게이지 채움 등)")]
+    [SerializeField] private Graphic[] _previousThemeGraphics;
+    [Tooltip("[선택] 다음 캐릭터 상징색을 곱할 그래픽 (초상화 테두리 · 게이지 채움 등)")]
+    [SerializeField] private Graphic[] _nextThemeGraphics;
     [Tooltip("[선택] 남은 시간 숫자")]
     [SerializeField] private TMP_Text _timeText;
     [Tooltip("[선택] 남은 시간 막대 (Slider 0 ~ 1)")]
@@ -35,8 +39,15 @@ public class ComboSelectionView : MonoBehaviour
 
         if(!isSelecting) return;
 
-        _previousPortrait.sprite = _selector.PreviousCandidate.Character.Portrait;
-        _nextPortrait.sprite = _selector.NextCandidate.Character.Portrait;
+        CharacterData previous = _selector.PreviousCandidate.Character;
+        CharacterData next = _selector.NextCandidate.Character;
+
+        // 같은 값을 다시 넣으면 UI 는 다시 그리지 않으므로 매 프레임 넣어도 비용이 없다.
+        _previousPortrait.sprite = previous.Portrait;
+        _nextPortrait.sprite = next.Portrait;
+
+        SetThemeColor(_previousThemeGraphics, previous.ThemeColor);
+        SetThemeColor(_nextThemeGraphics, next.ThemeColor);
 
         if(_timeText != null) _timeText.text = FormatTime(Mathf.Max(0f, _selector.RemainingTime));
         if(_timeSlider != null) _timeSlider.value = _selector.RemainingRatio;
@@ -53,6 +64,14 @@ public class ComboSelectionView : MonoBehaviour
         }
 
         BattleHudVisibility.SetVisible(!isSelecting);
+    }
+
+    private static void SetThemeColor(Graphic[] graphics, Color color)
+    {
+        foreach(Graphic graphic in graphics)
+        {
+            graphic.color = color;
+        }
     }
 
     // 남은 시간을 "초 : 1/100 초 : 그 아래 두 자리" 로 보여준다. (예 : 2.5238 초 → 02:52:38)

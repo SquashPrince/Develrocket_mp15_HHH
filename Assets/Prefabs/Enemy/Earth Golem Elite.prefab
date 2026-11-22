@@ -227,7 +227,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   _data: {fileID: 11400000, guid: efead010857e43b47b5d51438c776b84, type: 2}
   _lockOnPoint: {fileID: 751685365407499861}
-  _gaugePrefab: {fileID: 2733090971236722397, guid: b3eada40883191b4cadb0edec6d622dc, type: 3}
+  _gaugePrefab: {fileID: 3416030952138435883, guid: f51ae86c94818f44aa76085364810006, type: 3}
   _hudRoot: {fileID: 4785054424094855250}
 --- !u!114 &4079339579516450329
 MonoBehaviour:

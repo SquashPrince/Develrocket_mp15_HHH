@@ -9,10 +9,12 @@ using UnityEngine;
 public class CharacterData : ScriptableObject
 {
     [Header("표시")]
-    [Tooltip("[예정] 캐릭터 이름. 결과 화면 등에서 쓸 값이다. 비워 두면 에셋 이름을 쓴다. 지금 전투 화면은 이름 대신 초상화를 보여준다")]
+    [Tooltip("캐릭터 이름. 전투 화면의 캐릭터 칸 이름표에 보인다. 비워 두면 에셋 이름을 쓴다")]
     [SerializeField] private string _displayName;
-    [Tooltip("화면(파티 HUD · 콤보 선택)에 보일 캐릭터 초상화")]
+    [Tooltip("화면(파티 HUD · 콤보 선택)에 보일 캐릭터 초상화. 상반신 이미지를 두고, 칸 모양 마스크 안에서 위치 · 크기로 구도를 맞춘다")]
     [SerializeField] private Sprite _portrait;
+    [Tooltip("캐릭터 상징색. 전투 화면의 캐릭터 칸 틀 · 이름표 · 체력 막대 등에 곱해 누구 칸인지 한눈에 보이게 한다")]
+    [SerializeField] private Color _themeColor = Color.white;
 
     [Header("능력치")]
     [SerializeField, Min(1f)] private float _maxHealth = 100f;
@@ -92,6 +94,7 @@ public class CharacterData : ScriptableObject
 
     public string DisplayName => string.IsNullOrEmpty(_displayName) ? name : _displayName;
     public Sprite Portrait => _portrait;
+    public Color ThemeColor => _themeColor;
     public float MaxHealth => _maxHealth;
     public float MaxEnergy => _maxEnergy;
     public float EnergyRegenPerSecond => _energyRegenPerSecond;

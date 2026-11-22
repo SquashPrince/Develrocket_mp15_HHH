@@ -48,12 +48,12 @@ public static class BattleFeedback
     public static event Action<Moment, Vector3> Occurred;
 
     // 플레이어 공격이 적에게 대미지를 줄 때마다 알린다. 대미지 숫자 표시가 쓴다.
-    // 맞은 적 · 대미지 · 강타 여부 · 크리티컬 여부. 한 번의 판정에서 여러 적을 맞히면 적마다 알린다.
-    public static event Action<Transform, float, bool, bool> DamageDealt;
+    // 맞은 적 · 맞은 위치(월드, 타격 이펙트와 같은 점) · 대미지 · 강타 여부 · 크리티컬 여부. 한 번의 판정에서 여러 적을 맞히면 적마다 알린다.
+    public static event Action<Transform, Vector3, float, bool, bool> DamageDealt;
 
     public static void Raise(Moment moment) => Raise(moment, Vector3.zero);
 
-    public static void RaiseDamage(Transform target, float amount, bool isImpact, bool isCritical) => DamageDealt?.Invoke(target, amount, isImpact, isCritical);
+    public static void RaiseDamage(Transform target, Vector3 hitPoint, float amount, bool isImpact, bool isCritical) => DamageDealt?.Invoke(target, hitPoint, amount, isImpact, isCritical);
 
     public static void Raise(Moment moment, Vector3 direction)
     {

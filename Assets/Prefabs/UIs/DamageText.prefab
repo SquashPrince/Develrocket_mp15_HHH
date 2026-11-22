@@ -66,10 +66,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 10000
+  m_text: 10000000
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4749cc7babdec554bb694d4542339f55, type: 2}
-  m_sharedMaterial: {fileID: -6742866742777168266, guid: 4749cc7babdec554bb694d4542339f55, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 7579298b6d1e0044cbf369f6ea08faa1, type: 2}
+  m_sharedMaterial: {fileID: -8327683848690817301, guid: 7579298b6d1e0044cbf369f6ea08faa1, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -77,14 +77,14 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4294967295
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
+  m_enableVertexGradient: 1
+  m_colorMode: 2
   m_fontColorGradient:
     topLeft: {r: 1, g: 1, b: 1, a: 1}
     topRight: {r: 1, g: 1, b: 1, a: 1}
     bottomLeft: {r: 1, g: 1, b: 1, a: 1}
     bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
+  m_fontColorGradientPreset: {fileID: 11400000, guid: b98a0f01b9d924e41acf7fc390c5e4a9, type: 2}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
@@ -93,13 +93,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 76
-  m_fontSizeBase: 76
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 2
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -110,7 +110,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -152,8 +152,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DamageText
   _lifetime: 0.25
   _riseHeight: 0.35
-  _normalColor: {r: 1, g: 1, b: 1, a: 1}
-  _impactColor: {r: 1, g: 0.8, b: 0.2, a: 1}
+  _normalGradient: {fileID: 11400000, guid: b98a0f01b9d924e41acf7fc390c5e4a9, type: 2}
+  _impactGradient: {fileID: 11400000, guid: 1a09785b720c8c949ae8b1d7d1dd172a, type: 2}
   _impactScale: 1.25
-  _criticalColor: {r: 1, g: 0.3, b: 0.2, a: 1}
+  _criticalGradient: {fileID: 11400000, guid: 7303f22c4a2371a4e8602a0cbe1c7418, type: 2}
   _criticalScale: 1.5

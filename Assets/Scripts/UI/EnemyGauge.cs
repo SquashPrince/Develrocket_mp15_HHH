@@ -17,13 +17,17 @@ using UnityEngine.UI;
 //   깜빡임 · 순환은 실제 시간으로 잰다. 콤보 선택으로 게임 시간이 느려져도 같은 속도로 바뀐다.
 // 체력 막대 뒤의 잔상 막대는 맞아서 줄어든 체력만 잔상으로 남긴다. 처음 그릴 때는 잔상 없이 바로 맞춘다.
 // 대상이 처치되거나, 콤보 스킬 선택으로 전투 HUD 를 숨기는 동안(BattleHudVisibility) 막대 묶음을 숨긴다.
-// 초상화 : 초상화 Image 를 연결한 막대(보스 바)만 적 데이터의 초상화를 띄운다. 비워 두면 초상화 없이 동작한다 (일반 적 머리 위 바).
+// 초상화 · 이름 · 체력 숫자 : 연결한 막대(보스 바)만 적 데이터의 초상화 · 이름과 현재 / 최대 체력을 띄운다. 비워 두면 없이 동작한다 (일반 적 머리 위 바).
 public class EnemyGauge : MonoBehaviour
 {
     [Tooltip("처치되거나 콤보 스킬 선택 중일 때 숨길 막대 묶음")]
     [SerializeField] private GameObject _root;
     [Tooltip("[선택] 적 데이터의 초상화를 띄울 Image. 비워 두면 초상화 없이 동작한다")]
     [SerializeField] private Image _portraitImage;
+    [Tooltip("[선택] 적 데이터의 이름을 띄울 글자")]
+    [SerializeField] private TMP_Text _nameText;
+    [Tooltip("[선택] 현재 / 최대 체력 숫자. 소수점 아래는 올려서 보여준다")]
+    [SerializeField] private TMP_Text _healthText;
     [SerializeField] private Slider _healthSlider;
     [Tooltip("체력 막대 뒤에 겹친 잔상 막대")]
     [SerializeField] private GaugeTrail _healthTrail;
@@ -47,7 +51,7 @@ public class EnemyGauge : MonoBehaviour
     // 보여줄 적. 바를 만든 적이 넘겨준다.
     private EnemyState _target;
     // 그로기 막대 채움 영역의 이미지와 원래 색
-    private RawImage _groggyFillImage;
+    private Graphic _groggyFillImage;
     private Color _normalFillColor;
 
     // HUD 숨김 알림은 바가 있는 동안 내내 받는다. 막대 묶음이 바 자신이면 숨길 때 이 컴포넌트도 꺼지므로, 켜짐 · 꺼짐에 묶으면 다시 보여 달라는 알림을 받지 못한다.
@@ -87,6 +91,9 @@ public class EnemyGauge : MonoBehaviour
     {
         float ratio = _target.CurrentHealth / _target.MaxHealth;
         _healthSlider.value = ratio;
+
+        // 올림 : 체력이 조금이라도 남았는데 0 으로 보이지 않게 한다. 숫자를 문자열로 바꾸지 않아 맞을 때마다 문자열이 생기지 않는다.
+        if(_healthText != null) _healthText.SetText("{0} / {1}", Mathf.CeilToInt(_target.CurrentHealth), Mathf.CeilToInt(_target.MaxHealth));
 
         if(isSnap) _healthTrail.Snap(ratio);
         else _healthTrail.SetValue(ratio);
@@ -145,9 +152,12 @@ public class EnemyGauge : MonoBehaviour
         RefreshGroggyTime();
     }
 
-    private void RefreshPortrait()
+    private void RefreshIdentity()
     {
-        if(_portraitImage != null) _portraitImage.sprite = _target.GetComponent<EnemyController>().Data.Portrait;
+        EnemyData data = _target.GetComponent<EnemyController>().Data;
+
+        if(_portraitImage != null) _portraitImage.sprite = data.Portrait;
+        if(_nameText != null) _nameText.text = data.DisplayName;
     }
 
     // 처치된 적이거나 전투 HUD 를 숨기는 중(콤보 스킬 선택)이면 막대 묶음을 숨긴다. 대상을 넘겨받기 전에는 그리지 않는다.
@@ -170,7 +180,7 @@ public class EnemyGauge : MonoBehaviour
     private void RefreshAll()
     {
         RefreshVisibility();
-        RefreshPortrait();
+        RefreshIdentity();
         RefreshHealth(true);
         RefreshGroggyState();
     }
@@ -221,10 +231,10 @@ public class EnemyGauge : MonoBehaviour
         return gradient;
     }
 
-    // 채움은 RawImage 다. 지금은 색만 바꾸므로 Image 여도 되지만, 기존 막대 Prefab 을 그대로 쓰기 위해 둔다.
+    // 채움은 색만 바꾸므로 Image · RawImage 의 공통 부모(Graphic)로 찾는다. 9-slice 막대(Image)와 예전 막대(RawImage) 모두 쓸 수 있다.
     private void CacheComponent()
     {
-        _groggyFillImage = _groggySlider.fillRect.GetComponent<RawImage>();
+        _groggyFillImage = _groggySlider.fillRect.GetComponent<Graphic>();
         _normalFillColor = _groggyFillImage.color;
     }
 }

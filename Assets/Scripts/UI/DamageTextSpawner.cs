@@ -6,7 +6,7 @@ using UnityEngine;
 // 합치기 : 같은 적이 정한 시간 안에 다시 맞으면 새 숫자를 띄우지 않고 떠 있는 숫자에 더한다. 다단 히트로 숫자가 쏟아지지 않고 읽기 쉽게 하기 위해서다.
 // 상한 : 동시에 떠 있는 숫자가 상한에 닿으면 가장 오래된 숫자를 거둬 다시 쓴다.
 // 갱신 : 떠 있는 숫자만 모아 여기서 한 번에 갱신한다. 숫자마다 Update 를 돌리지 않기 위해서다.
-// 위치 : 적의 록온 표시 위치(머리 · 가슴)를 쓰고, 없으면 적 기준점에서 정한 높이만큼 위다.
+// 위치 : 적중 이펙트와 같은 맞은 점(공격한 캐릭터 쪽 적 표면)이다.
 //   같은 순간 여러 숫자가 겹치지 않게 화면에서 조금씩 무작위로 비켜 놓는다(월드 수평 방향).
 // 숫자 전용 화면 공간(Overlay) Canvas 아래에 둔다. 숫자들은 이 오브젝트의 자식으로 만든다.
 //   전투 HUD 와 같은 Canvas 에 두면 숫자가 움직일 때마다 HUD 전체를 다시 묶어(Rebatch) 그리기 때문이다.
@@ -22,8 +22,6 @@ public class DamageTextSpawner : MonoBehaviour
     [SerializeField, Min(1)] private int _maxActive = 40;
     [Tooltip("같은 적이 이 시간(초) 안에 다시 맞으면 떠 있는 숫자에 더한다. 0 이면 합치지 않는다")]
     [SerializeField, Min(0f)] private float _mergeTime = 0.15f;
-    [Tooltip("록온 표시 위치가 없는 적의 숫자 높이(m, 적 기준점 위)")]
-    [SerializeField, Min(0f)] private float _defaultHeight = 2f;
     [Tooltip("숫자를 무작위로 비켜 놓는 최대 거리(m, 월드 수평)")]
     [SerializeField, Min(0f)] private float _randomOffset = 0.3f;
 
@@ -35,7 +33,7 @@ public class DamageTextSpawner : MonoBehaviour
     private void OnDisable() => UnbindFeedbackEvent();
     private void Update() => UpdateActive();
 
-    private void OnDamageDealt(Transform target, float amount, bool isImpact, bool isCritical)
+    private void OnDamageDealt(Transform target, Vector3 hitPoint, float amount, bool isImpact, bool isCritical)
     {
         DamageText merged = FindMergeable(target);
 
@@ -49,7 +47,7 @@ public class DamageTextSpawner : MonoBehaviour
         }
 
         Vector2 offset = Random.insideUnitCircle * _randomOffset;
-        Vector3 position = GetAnchorPosition(target) + new Vector3(offset.x, 0f, offset.y);
+        Vector3 position = hitPoint + new Vector3(offset.x, 0f, offset.y);
         DamageText text = GetText();
 
         text.Show(_camera, target, position, amount, isImpact, isCritical);
@@ -88,13 +86,6 @@ public class DamageTextSpawner : MonoBehaviour
         {
             if(_active[i].Tick(deltaTime)) _active.RemoveAt(i);
         }
-    }
-
-    private Vector3 GetAnchorPosition(Transform target)
-    {
-        if(target.TryGetComponent(out IEnemyTargetable targetable) && targetable.LockOnPoint != null) return targetable.LockOnPoint.position;
-
-        return target.position + Vector3.up * _defaultHeight;
     }
 
     // 상한에 닿았으면 가장 오래된 숫자를 거둬 쓰고, 아니면 꺼져 있는 숫자를 꺼낸다. 없으면 하나 더 만든다.
