@@ -5589,6 +5589,14 @@ PrefabInstance:
       propertyPath: _party
       value: 
       objectReference: {fileID: 1781024354}
+    - target: {fileID: 7248021018146518648, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461265259855345253, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7696233905489155284, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -5661,6 +5669,10 @@ PrefabInstance:
       propertyPath: _gameFlow
       value: 
       objectReference: {fileID: 1521699988}
+    - target: {fileID: 8773254157487465039, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.15
+      objectReference: {fileID: 0}
     - target: {fileID: 8976867311028617509, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
       propertyPath: _gameFlow
       value: 
