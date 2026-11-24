@@ -2,11 +2,8 @@ using System;
 using System.IO;
 using UnityEngine;
 
-// 설정값을 들고 있고, JSON 파일로 불러오고 저장한다. 씬이 바뀌어도 같은 값을 쓰도록 정적 클래스로 둔다.
-// 처음 값을 읽을 때 파일에서 불러온다. 파일이 없거나 읽을 수 없으면 기본값으로 시작한다.
-// 값을 바꾸면 바로 알린다. 감도 · 볼륨을 적용하는 기능이 알림을 받아 다시 반영한다.
-// 저장은 설정 화면을 닫을 때 한다. 슬라이더를 움직일 때마다 파일에 쓰지 않기 위해서다.
-// 저장 위치는 실행 환경마다 정해진 사용자 데이터 폴더(Application.persistentDataPath)다.
+// 설정값을 persistentDataPath 의 JSON 파일로 불러오고 저장한다. 씬이 바뀌어도 같은 값을 쓰도록 정적 클래스로 둔다.
+// 값을 바꾸면 바로 알리고, 슬라이더를 움직일 때마다 파일에 쓰지 않도록 저장은 설정 화면을 닫을 때 한다.
 public static class SettingsStore
 {
     private const string FILE_NAME = "settings.json";
