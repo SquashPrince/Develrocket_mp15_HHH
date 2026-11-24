@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 704d3d9974da3fe47a72125690715b6e, type: 3}
+  m_Name: Ultimate
+  m_EditorClassIdentifier: Assembly-CSharp::ActionData
+  _actionType: 7
+  _steps:
+  - _animationState: Ultimate 1
+    _hitMode: 0
+    _windowTiming: 0
+    _hitInterval: 0.035
+    _hitCount: 1
+    _reactOnFirstHitOnly: 0
+    _hitLagTime: 0.07
+    _hitLagOnFirstHitOnly: 1
+    _hitShape: 2
+    _hitCenter: {x: 0, y: 1, z: 6.5}
+    _hitSize: {x: 1.5, y: 1.5, z: 2}
+    _hitRadius: 4
+    _hitLength: 20
+    _hitAngle: 270
+    _hitInnerRadius: 0
+    _hitHeight: 2
+    _advanceDistance: 9
+    _advanceDuration: 0.325
+    _fadeTime: 0.1
+    _interrupts: 0
+    _swingSound:
+      _clips:
+      - {fileID: 8300000, guid: ab38c8f953789430691b634dd685119b, type: 3}
+      - {fileID: 8300000, guid: 7cbfafc671f0e4426a71d276a8bb71ec, type: 3}
+      - {fileID: 8300000, guid: e945ae282c1c548c3bb168b0606333ba, type: 3}
+      - {fileID: 8300000, guid: abf4caad1f5a24e49a317937ebf12163, type: 3}
+      - {fileID: 8300000, guid: d637bacd075454147bb398300d59dc3e, type: 3}
+      _volume: 0.5
+    _hitEffects: []
+    _motionEffects:
+    - _prefab: {fileID: 2467737335998847484, guid: 73c5e994ce6e6254cb1c78f5cd779f60, type: 3}
+      _position: {x: 0, y: 0, z: 0}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 7234133273005209295, guid: 57d7e3e973755f8499a6a24c5e144faa, type: 3}
+      _position: {x: 0, y: 0, z: 0}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 6026402882057818298, guid: 90db1ce567bc07b4195254428eb3b568, type: 3}
+      _position: {x: 0, y: 0, z: 0}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 6415120298723679436, guid: f5fba31d5480dec4799885f53452d5af, type: 3}
+      _position: {x: 0, y: 0, z: 0}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
+    - _prefab: {fileID: 6250487219886748819, guid: 336480c7cd64a7d4fb599c38b8011264, type: 3}
+      _position: {x: 0, y: 0, z: 0}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
+  _energyGain: 0
+  _ultimateGaugeGain: 0
+  _power: 10000
+  _staggerLevel: 3
+  _staggerTime: 1.5
+  _hitSound:
+    _clips:
+    - {fileID: 8300000, guid: a44cce8c584164d4d9b85f4aac1c97fb, type: 3}
+    - {fileID: 8300000, guid: 4f9a19fc9a4e42f469f81302b7d7f26a, type: 3}
+    - {fileID: 8300000, guid: edffb2d082bc6d64e981077bd9ea258a, type: 3}
+    - {fileID: 8300000, guid: 6e85af8a62ee1d24a89bb8e0a12bb485, type: 3}
+    _volume: 1
+  _energyCost: 0
+  _chargeTime: 0.6
+  _inputBuffer: 0.4
+  _useLegRun: 0
+  _alwaysLegRun: 0
+  _isInvincibleOnSwing: 1
+  _groggyGain: 7.23475
+  _teleport: {fileID: 11400000, guid: c555635f73488104bba4f75bacd32a01, type: 2}
+  _cameraShot: 3

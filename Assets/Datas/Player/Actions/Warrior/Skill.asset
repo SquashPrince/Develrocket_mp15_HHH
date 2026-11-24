@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 704d3d9974da3fe47a72125690715b6e, type: 3}
+  m_Name: Skill
+  m_EditorClassIdentifier: Assembly-CSharp::ActionData
+  _actionType: 5
+  _steps:
+  - _animationState: Skill
+    _hitMode: 0
+    _windowTiming: 1
+    _hitInterval: 0.05
+    _hitCount: 5
+    _reactOnFirstHitOnly: 0
+    _hitLagTime: 0.1
+    _hitLagOnFirstHitOnly: 0
+    _hitShape: 1
+    _hitCenter: {x: 0, y: 1, z: 1}
+    _hitSize: {x: 1.5, y: 1.5, z: 3}
+    _hitRadius: 3
+    _hitLength: 3
+    _hitAngle: 90
+    _hitInnerRadius: 0
+    _hitHeight: 2
+    _advanceDistance: 1.5
+    _advanceDuration: 0.6
+    _fadeTime: 0.1
+    _interrupts: -1
+    _swingSound:
+      _clips:
+      - {fileID: 8300000, guid: 3bbec08078d52a3418a1519fbac546c6, type: 3}
+      - {fileID: 8300000, guid: d9e8d8a344c3d4843b63c5390c64cf83, type: 3}
+      - {fileID: 8300000, guid: 1cd720f285a4336428e3dbf834fdf558, type: 3}
+      - {fileID: 8300000, guid: 8ba1e1ff351e8f5439d2126fab265552, type: 3}
+      _volume: 1
+    _hitEffects:
+    - _prefab: {fileID: 8471836630667197198, guid: b0523a7c89225cb43a6dd77437f9d4c4, type: 3}
+      _rollAngle: 90
+      _rollRandom: 15
+    _motionEffects:
+    - _prefab: {fileID: 4887844207729044534, guid: f77bfc0fb62cd1647b0e1e1b7e8c2b31, type: 3}
+      _position: {x: 0, y: 0, z: 0}
+      _rotation: {x: 0, y: 0, z: 0}
+      _scale: {x: 1, y: 1, z: 1}
+  _energyGain: 1
+  _ultimateGaugeGain: 13.5
+  _power: 10000
+  _staggerLevel: 1
+  _staggerTime: 0.25
+  _hitSound:
+    _clips:
+    - {fileID: 8300000, guid: a815a1f4905bdd7428e38e737e2b11b6, type: 3}
+    - {fileID: 8300000, guid: c9d2efc00286df049aa2df7be14c8aa2, type: 3}
+    - {fileID: 8300000, guid: 47f06ff11f5df3e4183ef0b51fb83015, type: 3}
+    - {fileID: 8300000, guid: a5585b0e52d226945adc7ba8f49036ab, type: 3}
+    - {fileID: 8300000, guid: dd999322399563f429f63668de18a5bd, type: 3}
+    _volume: 1
+  _energyCost: 0
+  _chargeTime: 0.6
+  _inputBuffer: 0.4
+  _useLegRun: 1
+  _alwaysLegRun: 0
+  _isInvincibleOnSwing: 0
+  _groggyGain: 5.75
+  _teleport: {fileID: 0}
+  _cameraShot: 0

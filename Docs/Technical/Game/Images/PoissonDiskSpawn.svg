@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500" font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+  <defs>
+    <clipPath id="leftArea">
+      <circle cx="230" cy="260" r="170"/>
+    </clipPath>
+  </defs>
+
+  <!-- 배경 -->
+  <rect x="0" y="0" width="900" height="500" fill="#ffffff"/>
+
+  <!-- ===== 왼쪽 : Bridson 으로 채우기 ===== -->
+  <text x="230" y="34" font-size="17" font-weight="bold" fill="#1f2933" text-anchor="middle">1. 원 안을 고르게 채우기 (Bridson)</text>
+  <text x="230" y="56" font-size="12" fill="#52606d" text-anchor="middle">활성 점 둘레 고리에서 후보를 뽑고, 주변 칸의 점과만 거리를 비교</text>
+
+  <!-- 생성 영역 -->
+  <circle cx="230" cy="260" r="170" fill="#f5f7fa" stroke="#9aa5b1" stroke-width="1.5"/>
+
+  <!-- 격자 (칸 크기 = 최소 거리 / √2) -->
+  <g clip-path="url(#leftArea)" stroke="#d9e2ec" stroke-width="1">
+    <line x1="90" y1="90" x2="90" y2="430"/>
+    <line x1="120" y1="90" x2="120" y2="430"/>
+    <line x1="150" y1="90" x2="150" y2="430"/>
+    <line x1="180" y1="90" x2="180" y2="430"/>
+    <line x1="210" y1="90" x2="210" y2="430"/>
+    <line x1="240" y1="90" x2="240" y2="430"/>
+    <line x1="270" y1="90" x2="270" y2="430"/>
+    <line x1="300" y1="90" x2="300" y2="430"/>
+    <line x1="330" y1="90" x2="330" y2="430"/>
+    <line x1="360" y1="90" x2="360" y2="430"/>
+    <line x1="390" y1="90" x2="390" y2="430"/>
+    <line x1="60" y1="120" x2="400" y2="120"/>
+    <line x1="60" y1="150" x2="400" y2="150"/>
+    <line x1="60" y1="180" x2="400" y2="180"/>
+    <line x1="60" y1="210" x2="400" y2="210"/>
+    <line x1="60" y1="240" x2="400" y2="240"/>
+    <line x1="60" y1="270" x2="400" y2="270"/>
+    <line x1="60" y1="300" x2="400" y2="300"/>
+    <line x1="60" y1="330" x2="400" y2="330"/>
+    <line x1="60" y1="360" x2="400" y2="360"/>
+    <line x1="60" y1="390" x2="400" y2="390"/>
+  </g>
+
+  <!-- 받아들인 후보 주변 5 x 5 칸 : 이 칸들의 점과만 비교 -->
+  <rect x="270" y="180" width="150" height="150" fill="#2ca02c" fill-opacity="0.08" stroke="#2ca02c" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <text x="345" y="346" font-size="11" fill="#1e7b1e" text-anchor="middle">주변 칸만 검사</text>
+
+  <!-- 활성 점 둘레 후보 고리 (최소 거리 ~ 2배) -->
+  <circle cx="272" cy="256" r="84" fill="none" stroke="#f58518" stroke-width="1.2" stroke-dasharray="6 4"/>
+  <circle cx="272" cy="256" r="42" fill="none" stroke="#f58518" stroke-width="1.2" stroke-dasharray="6 4"/>
+
+  <!-- 이미 놓인 점 -->
+  <circle cx="230" cy="260" r="6" fill="#4c78a8"/>
+  <circle cx="200" cy="225" r="6" fill="#4c78a8"/>
+  <circle cx="250" cy="215" r="6" fill="#4c78a8"/>
+  <circle cx="190" cy="285" r="6" fill="#4c78a8"/>
+  <circle cx="238" cy="305" r="6" fill="#4c78a8"/>
+
+  <text x="178" y="305" font-size="11" fill="#2d5a87" text-anchor="end">놓인 점</text>
+
+  <!-- 활성 점 -->
+  <circle cx="272" cy="256" r="7" fill="#f58518" stroke="#ffffff" stroke-width="1.5"/>
+  <text x="280" y="284" font-size="11" fill="#b35f0b">활성 점</text>
+
+  <!-- 버린 후보 : 이미 놓인 점과 너무 가까움 -->
+  <line x1="270" y1="210" x2="250" y2="215" stroke="#d62728" stroke-width="1.2" stroke-dasharray="3 3"/>
+  <g stroke="#d62728" stroke-width="2.4" stroke-linecap="round">
+    <line x1="265" y1="205" x2="275" y2="215"/>
+    <line x1="275" y1="205" x2="265" y2="215"/>
+  </g>
+  <text x="283" y="160" font-size="11" fill="#b31d1e">너무 가까움 → 버림</text>
+
+  <!-- 받아들인 후보 -->
+  <circle cx="332" cy="266" r="7" fill="#2ca02c" stroke="#ffffff" stroke-width="1.5"/>
+  <text x="344" y="270" font-size="11" fill="#1e7b1e">새 점</text>
+
+  <!-- 고리 설명 -->
+  <text x="230" y="460" font-size="12" fill="#52606d" text-anchor="middle">점선 고리 : 활성 점에서 최소 거리 ~ 2배 사이</text>
+  <text x="230" y="478" font-size="12" fill="#52606d" text-anchor="middle">후보를 다 버리면 그 점은 활성 목록에서 뺌 → 목록이 비면 끝</text>
+
+  <!-- 구분선 -->
+  <line x1="450" y1="20" x2="450" y2="480" stroke="#e4e7eb" stroke-width="1.5"/>
+
+  <!-- ===== 오른쪽 : 섞어서 고르기 ===== -->
+  <text x="670" y="34" font-size="17" font-weight="bold" fill="#1f2933" text-anchor="middle">2. 섞어서 조건에 맞는 자리 고르기</text>
+  <text x="670" y="56" font-size="12" fill="#52606d" text-anchor="middle">NavMesh 위로 맞춘 뒤 보스 위치 · 플레이어와 거리를 다시 확인</text>
+
+  <circle cx="670" cy="260" r="170" fill="#f5f7fa" stroke="#9aa5b1" stroke-width="1.5"/>
+
+  <!-- 보스 위치 · 플레이어 주변 제외 영역 -->
+  <circle cx="705" cy="150" r="42" fill="#8e44ad" fill-opacity="0.10" stroke="#8e44ad" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <circle cx="600" cy="310" r="68" fill="#17becf" fill-opacity="0.10" stroke="#17becf" stroke-width="1.2" stroke-dasharray="5 4"/>
+
+  <!-- 채운 점 중 고르지 않은 후보 -->
+  <g fill="#b0b7c3">
+    <circle cx="745" cy="175" r="5"/>
+    <circle cx="595" cy="175" r="5"/>
+    <circle cx="645" cy="175" r="5"/>
+    <circle cx="520" cy="220" r="5"/>
+    <circle cx="570" cy="220" r="5"/>
+    <circle cx="620" cy="220" r="5"/>
+    <circle cx="670" cy="220" r="5"/>
+    <circle cx="720" cy="220" r="5"/>
+    <circle cx="820" cy="220" r="5"/>
+    <circle cx="545" cy="265" r="5"/>
+    <circle cx="695" cy="265" r="5"/>
+    <circle cx="745" cy="265" r="5"/>
+    <circle cx="795" cy="265" r="5"/>
+    <circle cx="520" cy="310" r="5"/>
+    <circle cx="670" cy="310" r="5"/>
+    <circle cx="720" cy="310" r="5"/>
+    <circle cx="770" cy="310" r="5"/>
+    <circle cx="545" cy="355" r="5"/>
+    <circle cx="695" cy="355" r="5"/>
+    <circle cx="620" cy="400" r="5"/>
+    <circle cx="720" cy="400" r="5"/>
+  </g>
+
+  <!-- 제외된 점 (보스 · 플레이어와 너무 가까움) -->
+  <g stroke="#7b8794" stroke-width="2" stroke-linecap="round">
+    <line x1="715" y1="125" x2="725" y2="135"/><line x1="725" y1="125" x2="715" y2="135"/>
+    <line x1="665" y1="125" x2="675" y2="135"/><line x1="675" y1="125" x2="665" y2="135"/>
+    <line x1="690" y1="170" x2="700" y2="180"/><line x1="700" y1="170" x2="690" y2="180"/>
+    <line x1="565" y1="305" x2="575" y2="315"/><line x1="575" y1="305" x2="565" y2="315"/>
+    <line x1="615" y1="305" x2="625" y2="315"/><line x1="625" y1="305" x2="615" y2="315"/>
+    <line x1="590" y1="260" x2="600" y2="270"/><line x1="600" y1="260" x2="590" y2="270"/>
+    <line x1="640" y1="260" x2="650" y2="270"/><line x1="650" y1="260" x2="640" y2="270"/>
+    <line x1="590" y1="350" x2="600" y2="360"/><line x1="600" y1="350" x2="590" y2="360"/>
+    <line x1="640" y1="350" x2="650" y2="360"/><line x1="650" y1="350" x2="640" y2="360"/>
+  </g>
+
+  <!-- 보스 위치 -->
+  <rect x="697" y="142" width="16" height="16" fill="#8e44ad" stroke="#ffffff" stroke-width="1.5"/>
+  <text x="752" y="147" font-size="11" fill="#6c3483">보스 위치</text>
+
+  <!-- 플레이어 -->
+  <polygon points="600,300 610,318 590,318" fill="#17becf" stroke="#ffffff" stroke-width="1.5"/>
+  <text x="600" y="392" font-size="11" fill="#0e7c86" text-anchor="middle">플레이어</text>
+
+  <!-- 최종 생성 위치 (섞은 순서대로 필요한 수만큼) -->
+  <g font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">
+    <circle cx="770" cy="220" r="10" fill="#2ca02c"/><text x="770" y="224">1</text>
+    <circle cx="545" cy="175" r="10" fill="#2ca02c"/><text x="545" y="179">2</text>
+    <circle cx="745" cy="355" r="10" fill="#2ca02c"/><text x="745" y="359">3</text>
+    <circle cx="670" cy="400" r="10" fill="#2ca02c"/><text x="670" y="404">4</text>
+  </g>
+
+  <text x="670" y="460" font-size="12" fill="#52606d" text-anchor="middle">섞은 순서로 보며 조건에 맞는 자리를 필요한 수만큼 고름</text>
+  <text x="670" y="478" font-size="12" fill="#52606d" text-anchor="middle">처음부터 다 채우고 고르므로 한쪽에 몰리지 않음</text>
+</svg>

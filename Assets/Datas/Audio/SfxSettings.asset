@@ -1,0 +1,130 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b1389568cfbe9d44a1c18fa62c109a1, type: 3}
+  m_Name: SfxSettings
+  m_EditorClassIdentifier: Assembly-CSharp::SfxSettings
+  _momentSounds:
+  - _moment: 3
+    _sound:
+      _clips:
+      - {fileID: 8300000, guid: b9d6d398ec3f6445cb459e990efadc7e, type: 3}
+      _volume: 1
+    _extraLayers: []
+  - _moment: 6
+    _sound:
+      _clips:
+      - {fileID: 8300000, guid: 88399684de17b4ea982e17f0643aabac, type: 3}
+      - {fileID: 8300000, guid: b1dfe14772fa54b1f8e65d99a92d7464, type: 3}
+      - {fileID: 8300000, guid: 34af291334498484e8fa149b21d78fcd, type: 3}
+      - {fileID: 8300000, guid: 6db4055ac15344241ad280c5ca2d2981, type: 3}
+      - {fileID: 8300000, guid: 10edaed6f02ff40f09520cd89de5131a, type: 3}
+      _volume: 1
+    _extraLayers: []
+  - _moment: 4
+    _sound:
+      _clips:
+      - {fileID: 8300000, guid: de8a568b4cfe5495f9cf57345e611c0c, type: 3}
+      - {fileID: 8300000, guid: 3b7e85ac180274db5bb41b64d1bbb5d3, type: 3}
+      - {fileID: 8300000, guid: 658de2b3320204745b23094a99ae919a, type: 3}
+      _volume: 1
+    _extraLayers: []
+  - _moment: 7
+    _sound:
+      _clips:
+      - {fileID: 8300000, guid: c05443b58595f40bfb185939c78d0721, type: 3}
+      - {fileID: 8300000, guid: a4b2377a306d64478a50d871691b968c, type: 3}
+      - {fileID: 8300000, guid: 3a03fe6268533402c81603f0095f93a0, type: 3}
+      _volume: 1
+    _extraLayers: []
+  - _moment: 1
+    _sound:
+      _clips:
+      - {fileID: 8300000, guid: bea8b93b635f1474daa7a1eaba539936, type: 3}
+      - {fileID: 8300000, guid: 68082d08db51046c2a08232034f720eb, type: 3}
+      - {fileID: 8300000, guid: 302ba9cfd5ebb4f6cafc9ac06519cc70, type: 3}
+      _volume: 1
+    _extraLayers: []
+  - _moment: 2
+    _sound:
+      _clips:
+      - {fileID: 8300000, guid: 1a477e5204a408c4196ed35ce7c05f9b, type: 3}
+      _volume: 0.75
+    _extraLayers:
+    - _clips:
+      - {fileID: 8300000, guid: b35e61779183d774699b978f7a8e8d26, type: 3}
+      _volume: 1
+    - _clips:
+      - {fileID: 8300000, guid: 3cddf700d588e6843a722e7ccfc83e43, type: 3}
+      _volume: 1
+    - _clips:
+      - {fileID: 8300000, guid: 652f3203e89a359499906678fa1869ac, type: 3}
+      _volume: 1
+    - _clips:
+      - {fileID: 8300000, guid: 4bda65f0d4a2cce4d9674611aa2858e1, type: 3}
+      _volume: 1
+  - _moment: 8
+    _sound:
+      _clips:
+      - {fileID: 8300000, guid: 4fae115d22d7e4b7cb3e4a17de3ada4c, type: 3}
+      - {fileID: 8300000, guid: 39e085cf9c17040b2869a7d4176d2fa9, type: 3}
+      - {fileID: 8300000, guid: 0872a3ed81a4b44ad8d26ecdc198d219, type: 3}
+      _volume: 1
+    _extraLayers: []
+  - _moment: 9
+    _sound:
+      _clips:
+      - {fileID: 8300000, guid: 4fae115d22d7e4b7cb3e4a17de3ada4c, type: 3}
+      - {fileID: 8300000, guid: 39e085cf9c17040b2869a7d4176d2fa9, type: 3}
+      - {fileID: 8300000, guid: 0872a3ed81a4b44ad8d26ecdc198d219, type: 3}
+      _volume: 1
+    _extraLayers: []
+  - _moment: 10
+    _sound:
+      _clips:
+      - {fileID: 8300000, guid: d4aec371a6fc94baebb49616ca8d5450, type: 3}
+      - {fileID: 8300000, guid: 1d566ee0f8d0749e0b5550b3123e037c, type: 3}
+      - {fileID: 8300000, guid: c2a977956676a43d3a7366de9b78899f, type: 3}
+      - {fileID: 8300000, guid: 7633c9dcbb3864bafbdb2d73f4b3ae18, type: 3}
+      - {fileID: 8300000, guid: b03e8589f7bf4435aadd944755772ab3, type: 3}
+      - {fileID: 8300000, guid: 32badca741b304ba28a9b6f11b76caba, type: 3}
+      - {fileID: 8300000, guid: 67542d97928f2488fab2dbc27c80bc12, type: 3}
+      - {fileID: 8300000, guid: d4882de0daffc43bc82442ccad7ae906, type: 3}
+      - {fileID: 8300000, guid: ee6dc2a107d834bb980257818d1c1aec, type: 3}
+      - {fileID: 8300000, guid: 2cc7da9d571ef4158aef29158153c193, type: 3}
+      _volume: 1
+    _extraLayers: []
+  - _moment: 11
+    _sound:
+      _clips:
+      - {fileID: 8300000, guid: afebb615b16964343bc99b88a3447abb, type: 3}
+      - {fileID: 8300000, guid: 2617efad9f3d1e44cb36979d32faa18e, type: 3}
+      _volume: 1
+    _extraLayers: []
+  - _moment: 13
+    _sound:
+      _clips:
+      - {fileID: 8300000, guid: ca1b4101b55d3d843885571b28fe98b3, type: 3}
+      _volume: 1
+    _extraLayers:
+    - _clips:
+      - {fileID: 8300000, guid: 9caafea7542e4e7408c77c39a65cfca2, type: 3}
+      _volume: 0.5
+    - _clips:
+      - {fileID: 8300000, guid: 5fab6ae7f3d923c40b993c9dbe0e5829, type: 3}
+      _volume: 0.25
+    - _clips:
+      - {fileID: 8300000, guid: cda096cf3343aa042803242bd51bb89e, type: 3}
+      _volume: 0.075
+  _buttonClick:
+    _clips:
+    - {fileID: 8300000, guid: 808f050eeb62b4a90baab9b9fcb910e9, type: 3}
+    _volume: 1

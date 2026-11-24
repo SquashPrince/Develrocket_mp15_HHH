@@ -1,0 +1,18 @@
+[
+  {
+    "request": "화면 효과 Volume 서서히 켜고 끄기 공용화 (슬로모션 화면 효과 · 콤보 선택 화면 효과가 같은 Weight 페이드를 각자 구현)",
+    "targets": ["Assets/Scripts/Battle/SlowMotionScreenEffect.cs", "Assets/Scripts/Battle/ComboSelectScreenEffect.cs"],
+    "recorded": "2026-11-21",
+    "note": "전투 연출 기술 문서의 '두 번째 화면 효과가 생기면 상황 목록 방식으로 넓힌다' 항목"
+  },
+  {
+    "request": "적 대상 쪽으로 천천히 돌기 공용화 (적 이동 · 적 공격의 같은 회전 식)",
+    "targets": ["Assets/Scripts/Enemy/EnemyMovement.cs", "Assets/Scripts/Enemy/EnemyAttacker.cs"],
+    "recorded": "2026-11-21"
+  },
+  {
+    "request": "플레이어 동작 이펙트(재생 · 반복 멈춤 · 동작 변경 감지)를 PlayerController 에서 별도 기능으로 분리",
+    "targets": ["Assets/Scripts/Player/PlayerController.cs", "Assets/Scripts/Player/PlayerAnimationEventRelay.cs"],
+    "recorded": "2026-11-21"
+  }
+]

@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f378e03f84f1b64489b73e88c4479f2, type: 3}
+  m_Name: CommonCharacterSettings
+  m_EditorClassIdentifier: Assembly-CSharp::CommonCharacterSettings
+  _gravity: -20
+  _dashStartDelay: 0.1
+  _dodgeStartDelay: 0.1
+  _attackableDistance: 0
+  _attackRange: 10
+  _lockOnRange: 15
+  _obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 3072
+  _sightHeight: 1.2
+  _lockOnMarkerPrefab: {fileID: 6269551623542804000, guid: cd6569d016c63fe409b55165c901081b, type: 3}
+  _teleportBlockLayers:
+    serializedVersion: 2
+    m_Bits: 3328
+  _teleportGroundLayers:
+    serializedVersion: 2
+    m_Bits: 1024
+  _groundSearchHeight: 2
+  _groundSearchDepth: 2
+  _slowMotionDuration: 1
+  _slowMotionEnemyTimeScale: 0.25
+  _afterimageMaterial: {fileID: 2100000, guid: 8b7e9b0e4e44fb34da56f95f5fab9be1, type: 2}
+  _afterimageFadeProperty: _Color
+  _afterimageStartValue: 1
+  _afterimageEndValue: 0
+  _afterimageEmitTime: 0.35
+  _afterimageInterval: 0.05
+  _afterimageFadeTime: 0.35
+  _parryReadyTime: 1
+  _parryReactDistance: 3
+  _parryReactTime: 1
+  _parryTelegraphPrefab: {fileID: 5199311003786235912, guid: 93398cfb6f2be5c45881b959efd0a405, type: 3}
+  _unparryableTelegraphPrefab: {fileID: 5199311003786235912, guid: 5718eb03ced533e44bf6ae33a114ce4d, type: 3}
+  _parryEffectPrefab: {fileID: 1610259402245616, guid: c37b4de6b48998e4993bf5c06d679825, type: 3}
+  _parryEffectHeight: 1.25
+  _swapCooldown: 0.1
+  _swapInTime: 0.5
+  _swapInAdvanceDistance: 1.5
+  _swapInActionDelay: 0.25
+  _swapOutTime: 0.75
+  _swapOutRunDelay: 0.375
+  _quickSupportInputTime: 2
+  _standbyEnergyRegenRate: 1
+  _comboSelectTime: 3
+  _comboSelectTimeScale: 0.15
+  _groggyHoldTime: 3
+  _ultimateTargetSearchRange: 15
+  _ultimateGaugeShareRatio: 0.3
+  _moveAction: {fileID: -1680190386980627800, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _dashAction: {fileID: 504704208043311331, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _attackAction: {fileID: -2737370060291335809, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _skillAction: {fileID: -3361557722714098977, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _ultimateAction: {fileID: 6644543871057390047, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _parryPreviousAction: {fileID: -3882990654037931100, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _parryNextAction: {fileID: 3151153704128378850, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _lockOnAction: {fileID: 694580335105051867, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}
+  _comboCancelAction: {fileID: 7690360551188721490, guid: 195789a3afcb591468dcdbd4d47d9043, type: 3}

@@ -1,0 +1,23 @@
+{
+  "enabledMcpjsonServers": [
+    "ai-game-developer"
+  ],
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "t=$(date +%H%M); if [ \"$t\" -lt 1730 ] || [ \"$t\" -ge 1800 ]; then exit 0; fi; u=$(gh api user --jq .login 2>/dev/null); if [ -z \"$u\" ]; then echo \"[작업 일지 알림] 작업 일지 작성 시간(17:30~18:00)이지만 GitHub 계정명을 확인하지 못했습니다(gh api user 실패). 일지 경로(Docs/DailyLogs/<계정명>/)를 정할 수 없으니 사용자에게 이 사실과 gh 로그인 상태(gh auth status) 확인이 필요하다고 보고하세요.\"; exit 0; fi; f=\"Docs/DailyLogs/$u/$(date +%F).md\"; if [ ! -f \"$CLAUDE_PROJECT_DIR/$f\" ]; then echo \"[작업 일지 알림] 현재 $(date +%H:%M), 작업 일지 작성 시간(17:30~18:00)이며 오늘 일지($f)가 아직 없습니다. 진행 중인 작업이 있더라도 worklog 스킬의 '작성 시간 권유' 멘트로 사용자에게 일지 작성을 먼저 건의하세요.\"; fi; exit 0",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/idle-check.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

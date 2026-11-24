@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5738e84ba5848c09dac4e7a54a12e96, type: 3}
+  m_Name: Warrior
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  _displayName: Luke
+  _portrait: {fileID: 21300000, guid: 1b45f94a84e7e834697cc88a611dca53, type: 3}
+  _themeColor: {r: 1, g: 0.47843137, b: 0.101960786, a: 1}
+  _maxHealth: 4342
+  _maxEnergy: 120
+  _energyRegenPerSecond: 0.6
+  _maxUltimateGauge: 3000
+  _parryGaugeGain: 275
+  _perfectDodgeGaugeGain: 45
+  _damageVariance: 0.2
+  _criticalChance: 0.35
+  _criticalMultiplier: 2
+  _walkSpeed: 5
+  _runSpeed: 10
+  _turnTime: 0.1
+  _autoRunDelay: 1
+  _dashDistance: 3
+  _dashDuration: 0.35
+  _dodgeDistance: 3
+  _dodgeDuration: 0.35
+  _dashCooldown: 1
+  _dashChainInterval: 0.25
+  _dashInvincibleTime: 0.35
+  _comboSteps:
+  - {fileID: 11400000, guid: e1bee6db36f8eec4ba5f91f8df1fcebc, type: 2}
+  - {fileID: 11400000, guid: 54261223457d4ed48b68f583edd6ad2b, type: 2}
+  - {fileID: 11400000, guid: ce8e42d133715b24aaa0710e9a4ee9a6, type: 2}
+  _heavyAttack: {fileID: 11400000, guid: d6e0695e6b0ba154b8ece6efbb08164d, type: 2}
+  _dashAttack: {fileID: 11400000, guid: 9841643ea2c6d8a48b04efdf45625498, type: 2}
+  _dodgeCounter: {fileID: 11400000, guid: e9362c7615bd65145a0bd26a3578b9ae, type: 2}
+  _parry: {fileID: 11400000, guid: ae82d0ee6c2a2784c80c37e879f75343, type: 2}
+  _parryChase: {fileID: 11400000, guid: 9537c5861bf5d6c49b58cc1db4930d9c, type: 2}
+  _quickSupport: {fileID: 11400000, guid: 2010d2f6b10cf3d489c76a9eca65687f, type: 2}
+  _swapInBodyPart: 2
+  _swapOutBodyPart: 2
+  _skill: {fileID: 11400000, guid: 087273cc921bc2e44b14aa5c21c9d2d9, type: 2}
+  _specialSkill: {fileID: 11400000, guid: 3e32e3f98fce81949837ea8275d22c40, type: 2}
+  _ultimate: {fileID: 11400000, guid: dbe60abcd9c60ef46a246afb1674cb33, type: 2}
+  _comboSkill: {fileID: 11400000, guid: b3cddaf714bf35e4f85c0f4eb7011791, type: 2}

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 360" width="1000" height="360" font-family="'Malgun Gothic','Apple SD Gothic Neo',sans-serif">
+  <rect x="0" y="0" width="1000" height="360" rx="18" fill="#15171E"/>
+  <text x="36" y="48" font-size="22" font-weight="bold" fill="#F5F5F7">그로기 = 프리딜 타임, 최대 몇 초?</text>
+  <text x="36" y="72" font-size="12" fill="#9BA1AE">기본 12s · 최대 15s · 콤보 시전 시작 1s는 타이머 정지 (최대치 계산 제외)</text>
+
+  <!-- 타임라인 한 줄 -->
+  <rect x="40" y="110" width="810" height="56" rx="10" fill="#2A2E3A"/>
+  <!-- 감소 구간과 정지 구간을 실제 순서처럼 섞어서 표시 -->
+  <rect x="40"  y="110" width="180" height="56" rx="10" fill="#FF5C7A"/>
+  <rect x="220" y="110" width="45"  height="56" fill="#6C8CFF"/>
+  <rect x="265" y="110" width="180" height="56" fill="#FF5C7A"/>
+  <rect x="445" y="110" width="45"  height="56" fill="#6C8CFF"/>
+  <rect x="490" y="110" width="180" height="56" fill="#FF5C7A"/>
+  <rect x="670" y="110" width="45"  height="56" fill="#6C8CFF"/>
+  <rect x="715" y="110" width="135" height="56" rx="10" fill="#FF9F43"/>
+  <text x="130" y="143" font-size="13" fill="#FFFFFF" text-anchor="middle">기본 4s</text>
+  <text x="355" y="143" font-size="13" fill="#FFFFFF" text-anchor="middle">기본 4s</text>
+  <text x="580" y="143" font-size="13" fill="#FFFFFF" text-anchor="middle">기본 4s</text>
+  <text x="242" y="143" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">⏸1</text>
+  <text x="467" y="143" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">⏸2</text>
+  <text x="692" y="143" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">⏸3</text>
+  <text x="782" y="143" font-size="13" fill="#2B1500" text-anchor="middle">특수 스킬 +3s</text>
+  <text x="900" y="143" font-size="18" font-weight="bold" fill="#F5F5F7" text-anchor="middle">= 18s</text>
+
+  <!-- 범례 -->
+  <rect x="40" y="200" width="16" height="16" rx="3" fill="#FF5C7A"/>
+  <text x="64" y="213" font-size="13" fill="#F5F5F7">기본 12s (나눠서 표시, 발동 위치는 예시)</text>
+  <rect x="40" y="228" width="16" height="16" rx="3" fill="#6C8CFF"/>
+  <text x="64" y="241" font-size="13" fill="#F5F5F7">콤보 스킬 시전 시작 1s × 3명 — 시간이 줄지 않음, 최대치 계산에서 제외</text>
+  <rect x="40" y="256" width="16" height="16" rx="3" fill="#FF9F43"/>
+  <text x="64" y="269" font-size="13" fill="#F5F5F7">캐릭터 특수 스킬로 연장 — 최대 15s까지</text>
+
+  <text x="40" y="312" font-size="13" fill="#9BA1AE">최대치 계산: 12 + 3 = 15s  |  실제 체감: 15 + 정지 3 = 18s  |  끝나면 게이지 0부터 다시</text>
+</svg>

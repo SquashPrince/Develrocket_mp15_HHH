@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5738e84ba5848c09dac4e7a54a12e96, type: 3}
+  m_Name: Knight
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  _displayName: Astar
+  _portrait: {fileID: 21300000, guid: d076a8597ddb4f045a649c43e9be2ee2, type: 3}
+  _themeColor: {r: 0.36078432, g: 1, b: 1, a: 1}
+  _maxHealth: 6024
+  _maxEnergy: 120
+  _energyRegenPerSecond: 0.78
+  _maxUltimateGauge: 3000
+  _parryGaugeGain: 225
+  _perfectDodgeGaugeGain: 25
+  _damageVariance: 0.1
+  _criticalChance: 0.15
+  _criticalMultiplier: 1.5
+  _walkSpeed: 5
+  _runSpeed: 10
+  _turnTime: 0.1
+  _autoRunDelay: 1
+  _dashDistance: 3
+  _dashDuration: 0.35
+  _dodgeDistance: 3
+  _dodgeDuration: 0.35
+  _dashCooldown: 1
+  _dashChainInterval: 0.25
+  _dashInvincibleTime: 0.35
+  _comboSteps:
+  - {fileID: 11400000, guid: 93303de25de2b8f4ea5136a350a910dc, type: 2}
+  - {fileID: 11400000, guid: 2970188ec2b589d4f8f5433152c43089, type: 2}
+  - {fileID: 11400000, guid: b28c38c94effc7a49854434aa1ab9471, type: 2}
+  - {fileID: 11400000, guid: 85a73f62beb99754e82d9053e2b8629d, type: 2}
+  _heavyAttack: {fileID: 11400000, guid: f773703db46f5554d8d9360dea30b06c, type: 2}
+  _dashAttack: {fileID: 11400000, guid: ccce58ff6566432448c61b02f814b8aa, type: 2}
+  _dodgeCounter: {fileID: 11400000, guid: 7c9f1b42c8f76454b9b7ef18fa66dade, type: 2}
+  _parry: {fileID: 11400000, guid: 245cfa88779af1142ae3127cf07cff01, type: 2}
+  _parryChase: {fileID: 11400000, guid: b5a05a13b34420d419af1baa5ae70419, type: 2}
+  _quickSupport: {fileID: 11400000, guid: 7c9f1b42c8f76454b9b7ef18fa66dade, type: 2}
+  _swapInBodyPart: 3
+  _swapOutBodyPart: 2
+  _skill: {fileID: 11400000, guid: 62b06afbcec4f8e479af815fa5626ccd, type: 2}
+  _specialSkill: {fileID: 11400000, guid: f05ac55301ad78f48b7a19d2246d98b3, type: 2}
+  _ultimate: {fileID: 11400000, guid: 3f3e055a9bc21424da70ffce463356c1, type: 2}
+  _comboSkill: {fileID: 11400000, guid: bb322d00682be914abca4dcf7c37583f, type: 2}
