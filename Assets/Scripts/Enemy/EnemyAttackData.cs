@@ -1,15 +1,10 @@
 using UnityEngine;
 
-// 적 공격 하나의 값. 공격 하나 = 에셋 하나이며, 적 데이터가 이 적이 쓰는 공격 목록을 가진다.
-// 공격 전체에 같은 값(선택 · 회전 · 도약 · 위력 · 저항 · 플레이어 반응)은 여기에, 모션마다 달라지는 값은 동작(EnemyAttackStep) 목록에 둔다.
-// 공격 이름은 에셋 이름을 쓴다. 같은 공격을 여러 적이 함께 쓸 수 있다.
-// 에셋은 적마다 폴더를 나눠 둔다. (예 : Datas/Enemy/Attacks/Earth Golem/)
+// 적 공격 하나의 값. 공격 전체에 같은 값은 여기에, 모션마다 다른 값은 동작(EnemyAttackStep) 목록에 둔다.
 [CreateAssetMenu(fileName = "NewEnemyAttackData", menuName = "HHH/Enemy Attack Data")]
 public class EnemyAttackData : ScriptableObject
 {
-    // 플레이어가 맞았을 때의 반응. 피격은 제자리 경직, 넉백은 밀려난 뒤 일어난다.
-    // 큰 피격은 피격과 같이 경직 · 밀림 값을 쓰고 모션만 큰 피격 모션으로 나온다. (강공격)
-    // Inspector 에 저장된 값은 순서 번호이므로, 새 반응은 항상 맨 뒤에 추가한다.
+    // Inspector 에 순서 번호로 저장되므로, 새 반응은 항상 맨 뒤에 추가한다.
     public enum HitReaction
     {
         Hit,
