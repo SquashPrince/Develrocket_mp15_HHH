@@ -3,23 +3,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// 캐릭터 칸 하나. 초상화 · 체력 · 에너지 막대와 [선택] 필살기 게이지 숫자를 보여준다. 조작 캐릭터 칸과 대기 캐릭터 칸이 함께 쓴다.
-// [선택] 이름 · 체력 숫자 · 에너지 숫자 글자와, 캐릭터 상징색을 곱할 이미지(칸 틀 · 이름표 등)를 둘 수 있다. 맡은 캐릭터가 바뀌면 함께 바뀐다.
-// 체력 · 필살기 게이지는 상태 기능의 알림이 올 때만 다시 그리고, 에너지는 시간이 지나며 계속 차므로 매 프레임 읽는다.
-// 쓰러진 캐릭터는 초상화를 회색으로 어둡게 보여준다. 체력이 바뀔 때 함께 정하므로, 교체로 칸의 캐릭터가 바뀌어도 맞게 보인다.
-// 맡은 캐릭터가 바뀌면 이전 캐릭터의 알림을 해제하고 새 캐릭터의 알림을 구독한다. 해제하지 않으면 다른 캐릭터의 값으로 그려지기 때문이다.
-// 막대는 Slider(0 ~ 1)로 그린다. 채움 영역은 사선 마스크(Mask)로 쓰고, 그 안의 채움 이미지는 막대 전체 길이로 고정한다.
-// 채움 영역이 줄면 이미지가 찌그러지지 않고 사선으로 잘려, 0 에 가까워도 뒤의 틀과 모양이 맞는다.
-// 체력 막대 뒤의 잔상 막대는 맞아서 줄어든 체력만 잔상으로 남긴다. 맡은 캐릭터가 바뀌거나 처음 그릴 때는 잔상 없이 바로 맞춘다.
-// 필살기 게이지는 막대 대신 현재 값을 1 의 자리까지 숫자로 보여준다. 조작 캐릭터 칸에만 두어, 교체하면 필드에 있는 캐릭터의 값으로 바뀐다.
-// 필살기 숫자는 게이지 값이 단계 기준을 넘을 때마다 단계 색 그라데이션(TMP Color Gradient)으로 바뀌고, 단계가 오르는 순간 잠깐 커졌다 돌아온다.
-// 단계 기준은 게이지 값 그대로(예 : 1000)라, 화면에 보이는 숫자와 같은 기준으로 정한다.
-// 맡은 캐릭터가 바뀌거나 처음 그릴 때는 그 값의 단계 색만 칠하고 강조하지 않는다. 강조 연출은 실제 시간으로 흐른다.
-// 에너지 : 특수 스킬을 쓸 만큼 에너지가 찼으면 막대 채움 색을 스킬 사용 가능 색으로 덮는다. 버튼 HUD 의 스킬 아이콘과 같은 기준이다.
-//   [선택] 눈금을 연결하면 맡은 캐릭터의 특수 스킬 에너지 요구량 위치에 놓는다. 캐릭터마다 요구량이 달라 맡은 캐릭터가 바뀔 때 다시 놓는다.
+// 캐릭터 칸 하나. 초상화 · 체력 · 에너지 막대와 필살기 게이지 숫자를 보여준다. 조작 · 대기 캐릭터 칸이 함께 쓴다.
+// 체력 · 필살기 게이지는 알림이 올 때만, 에너지는 계속 차므로 매 프레임 그린다.
+// 막대 채움 영역을 사선 마스크로 쓰고 채움 이미지는 전체 길이로 고정해, 줄어들어도 찌그러지지 않고 사선으로 잘린다.
+// 자세한 흐름 : Docs/Technical/UI/BattleHud.md
 public class CharacterGauge : MonoBehaviour
 {
-    // 필살기 숫자 단계 하나. 게이지 값이 기준 이상이면 이 단계다.
     [Serializable]
     private class UltimateGaugeTier
     {
@@ -70,28 +59,24 @@ public class CharacterGauge : MonoBehaviour
 
     private PlayerController _character;
     private PlayerStatus _status;
-    // 초상화의 원래 색. 쓰러지지 않은 캐릭터에 쓴다.
     private Color _portraitBaseColor;
-    // 에너지 막대 채움 이미지의 원래 색
     private Color _energyBaseFillColor;
-    // 지금 보여주는 필살기 숫자 단계 번호. 단계 목록에서 기준을 넘은 마지막 단계이며, 어느 단계도 넘지 않았으면 -1 이다.
+    // 어느 단계도 넘지 않았으면 -1
     private int _ultimateTier = -1;
-    // 필살기 숫자의 원래 색 · 크기. 어느 단계도 넘지 않았을 때와 강조가 끝났을 때 쓴다.
+    // 어느 단계에도 못 미칠 때 되돌릴 원래 모양
     private Color _ultimateTextBaseColor;
-    // 필살기 숫자의 원래 그라데이션 설정. 어느 단계에도 못 미칠 때 되돌린다.
     private TMP_ColorGradient _ultimateTextBaseGradient;
     private bool _ultimateTextBaseGradientEnabled;
     private Vector3 _ultimateTextBaseScale;
     private float _tierUpTimer;
-    // 지금 보여주는 에너지 숫자. 에너지는 매 프레임 읽으므로, 보이는 숫자가 바뀔 때만 글자를 다시 쓴다.
+    // 보이는 숫자가 바뀔 때만 글자를 다시 쓴다.
     private int _shownEnergy = -1;
 
-    // 맡은 캐릭터의 특수 스킬 에너지 요구량
     private float SkillEnergyCost => _character.Character.SpecialSkill.EnergyCost;
 
     private void Awake() => CacheComponent();
     private void OnEnable() => BindStatusEvent();
-    // 다른 오브젝트의 Awake 가 모두 끝난 뒤 처음 값을 한 번 더 그린다. OnEnable 이 캐릭터의 처음 값보다 먼저 돌 수 있기 때문이다.
+    // OnEnable 이 캐릭터의 처음 값보다 먼저 돌 수 있어 Start 에서 한 번 더 그린다.
     private void Start() => RefreshAll();
     private void OnDisable() => UnbindStatusEvent();
     private void Update()
@@ -100,7 +85,7 @@ public class CharacterGauge : MonoBehaviour
         UpdateTierUpScale();
     }
 
-    // 이 칸이 보여줄 캐릭터를 정한다. 이전 캐릭터의 알림은 해제하고 새 캐릭터 값으로 바로 그린다.
+    // 이전 캐릭터의 알림을 해제하지 않으면 다른 캐릭터의 값으로 그려진다.
     public void Bind(PlayerController character)
     {
         UnbindStatusEvent();
@@ -117,11 +102,12 @@ public class CharacterGauge : MonoBehaviour
 
     private void OnHealthChanged() => RefreshHealth(false);
 
-    // isSnap : 잔상 없이 바로 맞출지. 체력 변경 알림이 아닌 처음 그리기 · 캐릭터 바뀜에서 켠다.
+    // isSnap : 처음 그리기 · 캐릭터 바뀜에서 잔상 없이 바로 맞춘다.
     private void RefreshHealth(bool isSnap)
     {
         float ratio = _status.CurrentHealth / _status.MaxHealth;
         _healthSlider.value = ratio;
+        // 체력과 함께 정해, 교체로 칸의 캐릭터가 바뀌어도 쓰러짐이 맞게 보인다.
         _portraitImage.color = _status.IsDowned ? _downedPortraitColor : _portraitBaseColor;
 
         if(isSnap) _healthTrail.Snap(ratio);
@@ -136,11 +122,11 @@ public class CharacterGauge : MonoBehaviour
         if(_status == null) return;
 
         _energySlider.value = _status.CurrentEnergy / _status.MaxEnergy;
+        // 버튼 HUD 의 스킬 아이콘과 같은 기준이다.
         _energyFillImage.color = _status.CurrentEnergy >= SkillEnergyCost ? _skillReadyFillColor : _energyBaseFillColor;
         RefreshEnergyText();
     }
 
-    // 소수점 아래를 버린 숫자가 바뀔 때만 다시 쓴다. 에너지는 매 프레임 조금씩 차기 때문이다.
     private void RefreshEnergyText()
     {
         if(_energyText == null) return;
@@ -153,7 +139,6 @@ public class CharacterGauge : MonoBehaviour
         _energyText.SetText("{0} / {1}", energy, Mathf.FloorToInt(_status.MaxEnergy));
     }
 
-    // 맡은 캐릭터의 이름과 상징색을 칠한다.
     private void RefreshIdentity()
     {
         if(_nameText != null) _nameText.text = _character.Character.DisplayName;
@@ -166,7 +151,7 @@ public class CharacterGauge : MonoBehaviour
         }
     }
 
-    // 눈금을 맡은 캐릭터의 특수 스킬 에너지 요구량 위치(막대 비율)에 놓는다.
+    // 캐릭터마다 요구량이 달라 맡은 캐릭터가 바뀔 때 다시 놓는다.
     private void RefreshEnergyCostMarker()
     {
         if(_energyCostMarker == null) return;
@@ -180,9 +165,8 @@ public class CharacterGauge : MonoBehaviour
 
     private void OnUltimateGaugeChanged() => RefreshUltimateGauge(false);
 
-    // 현재 값을 소수점 아래를 버리고 1 의 자리까지 보여준다.
-    // 조작 중인 캐릭터일 때만 그린다. 교체되어 나가는 캐릭터가 필드에 남아 공격하면 그 캐릭터의 게이지가 차는데, 그 값으로 덮어 그리지 않기 위해서다.
-    // isSnap : 단계가 올라도 강조하지 않을지. 게이지 변경 알림이 아닌 처음 그리기 · 캐릭터 바뀜에서 켠다.
+    // 퇴장 중인 이전 캐릭터가 공격해 찬 게이지로 덮어 그리지 않게 조작 중인 캐릭터일 때만 그린다.
+    // isSnap : 처음 그리기 · 캐릭터 바뀜에서는 단계가 올라도 강조하지 않는다.
     private void RefreshUltimateGauge(bool isSnap)
     {
         if(_ultimateGaugeText == null || _character != _character.Party.Controlled) return;
@@ -191,8 +175,6 @@ public class CharacterGauge : MonoBehaviour
         RefreshUltimateTier(isSnap);
     }
 
-    // 게이지 값으로 단계를 다시 정하고 단계 그라데이션을 씌운다. 어느 단계도 넘지 않았으면 원래 색으로 돌린다.
-    // 단계가 올랐고 강조할 때면 크기 강조를 처음부터 시작한다.
     private void RefreshUltimateTier(bool isSnap)
     {
         if(_ultimateTiers == null || _ultimateTiers.Length == 0) return;
@@ -203,7 +185,7 @@ public class CharacterGauge : MonoBehaviour
 
         _ultimateTier = tier;
 
-        // 단계 안 : 글자 색을 흰색으로 두고 그라데이션을 씌운다(그라데이션에 글자 색이 곱해지기 때문). 단계 밖 : 원래 색 · 그라데이션으로 돌린다.
+        // 그라데이션에 글자 색이 곱해지므로 단계 안에서는 글자 색을 흰색으로 둔다.
         bool isInTier = tier >= 0;
 
         _ultimateGaugeText.color = isInTier ? Color.white : _ultimateTextBaseColor;
@@ -211,7 +193,6 @@ public class CharacterGauge : MonoBehaviour
         _ultimateGaugeText.enableVertexGradient = isInTier || _ultimateTextBaseGradientEnabled;
     }
 
-    // value 가 기준을 넘은 마지막 단계 번호. 어느 단계도 넘지 않았으면 -1 이다.
     private int FindUltimateTier(float value)
     {
         int tier = -1;
@@ -224,7 +205,6 @@ public class CharacterGauge : MonoBehaviour
         return tier;
     }
 
-    // 남은 강조 시간의 비율만큼 강조 크기에서 원래 크기 쪽으로 돌아온다. (크기 강조)
     private void UpdateTierUpScale()
     {
         if(_tierUpTimer <= 0f) return;
@@ -242,7 +222,7 @@ public class CharacterGauge : MonoBehaviour
         RefreshEnergyCostMarker();
     }
 
-    // 구독할 때 현재 값으로 한 번 그려, 알림이 오기 전에도 막대가 맞게 보이게 한다.
+    // 알림이 오기 전에도 맞게 보이도록 구독할 때 한 번 그린다.
     private void BindStatusEvent()
     {
         if(_status == null) return;

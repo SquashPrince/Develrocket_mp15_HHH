@@ -4,19 +4,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// 게임 흐름의 결과 화면. 웨이브 중 전멸과 보스전 결과(처치 · 시간 초과 · 전멸)를 보여주고, 버튼으로 다음 행동을 고른다.
-// 구역 전투 전멸 : 제목과 전체 시간만 보여준다. 재시작(마지막으로 정리한 구역 뒤에서, 재시도 +1) · 타이틀(저장 없음)
-// 보스전 결과 : 전체 시간 · 보스 시간 · 재시도 횟수 · 점수 · 등급을 보여준다. 점수 · 등급은 점수 설정 에셋으로 계산한다.
-//   보스 시간은 처치면 걸린 시간, 시간 초과면 제한 시간, 전멸이면 [실패]다.
-//   재도전 : 실패 후(재시도 +1, 전체 시간 이어서) · 처치 후(재시도 유지, 전체 시간을 보스전 시작 값으로 되돌림)
-//   타이틀 : 이번 점수가 최고 기록보다 높으면 저장하고 타이틀로 간다.
-// 시간은 분:초:1/100초 형식이다. 점수는 소수점 아래를 버린 정수로 보여준다.
-// 각 값은 Inspector 의 문구 형식({0} 자리에 값)으로 한 줄을 만들어 보여준다. (예 : "총 클리어 시간 : {0}")
-// 화면이 뜨면 버튼을 누를 수 있게 커서를 풀어 보여준다. 씬을 다시 불러오면 일시정지 기능이 다시 잠근다.
-// 표시 묶음은 이 컴포넌트가 붙은 오브젝트의 자식으로 둔다. 이 오브젝트를 끄면 게임 흐름의 알림을 받지 못한다.
-// 보여주기 연출 : 열림 애니메이션을 기다린 뒤 값 글자를 전체 시간 → 보스 시간 → 재시도 → 점수 순서로 한 글자씩 드러낸다.
-//   등급은 잠깐 뜸을 들인 뒤 한 번에 보여주고, 그 뒤 정한 시간이 지나면 버튼 묶음을 보여준다. 문구까지 한 줄 전체를 타이핑한다.
-//   실제 시간으로 재서, 결과 화면이 뜰 때 게임 시간이 멈추거나 느려져 있어도 같은 속도로 나온다. 씬이 바뀌어 사라지면 멈춘다.
+// 게임 흐름의 결과 화면. 구역 전투 전멸과 보스전 결과(처치 · 시간 초과 · 전멸)를 보여주고 버튼으로 다음 행동을 고른다.
+// 값을 한 줄씩 타이핑하듯 드러낸 뒤 버튼을 보여준다. 게임 시간이 멈춰 있어도 같은 속도로 나오게 실제 시간으로 잰다.
+// 이 오브젝트를 끄면 게임 흐름의 알림을 받지 못하므로 표시 묶음은 자식으로 둔다.
+// 자세한 흐름 : Docs/Technical/Game/GameFlow.md
 public class FlowResultView : MonoBehaviour
 {
     private const string FAILED_TEXT = "[실패]";
@@ -61,7 +52,7 @@ public class FlowResultView : MonoBehaviour
     [Tooltip("마지막 값을 보여준 뒤 버튼이 나올 때까지의 시간(초)")]
     [SerializeField, Min(0f)] private float _buttonDelay = 2f;
 
-    // 이번 보스전 결과로 만든 기록. 타이틀로 갈 때 최고 기록 저장을 시도한다. 웨이브 전멸이면 없다.
+    // 타이틀로 갈 때 최고 기록 저장을 시도한다. 구역 전투 전멸이면 없다.
     private BestRecord _record;
 
     private void Start() => Init();
@@ -104,7 +95,6 @@ public class FlowResultView : MonoBehaviour
         Show(false, true);
     }
 
-    // 보스전 결과면 최고 기록 저장을 시도한 뒤 타이틀로 간다. 웨이브 전멸이면 저장하지 않는다.
     private void OnTitleClicked()
     {
         if(_record != null) BestRecordStore.TrySave(_record);
@@ -117,12 +107,13 @@ public class FlowResultView : MonoBehaviour
         _restartButton.gameObject.SetActive(canRestart);
         _retryBossButton.gameObject.SetActive(canRetryBoss);
         _root.SetActive(true);
+        // 씬을 다시 불러오면 일시정지 기능이 다시 잠근다.
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         RevealAsync(destroyCancellationToken).Forget();
     }
 
-    // 값을 모두 숨긴 뒤 순서대로 드러내고, 마지막에 버튼을 보여준다. 보스 기록 묶음이 숨겨져 있으면 전체 시간만 보여준다.
+    // 등급은 뜸을 들인 뒤 한 번에 보여준다.
     private async UniTaskVoid RevealAsync(CancellationToken token)
     {
         bool hasBossRecord = _bossRecordGroup.activeSelf;
@@ -155,7 +146,7 @@ public class FlowResultView : MonoBehaviour
 
     private static void HideText(TMP_Text text) => text.maxVisibleCharacters = 0;
 
-    // 글자를 한 개씩 드러낸다. 글자 위치는 처음부터 정해져 있어 줄이 흔들리지 않는다.
+    // 보이는 글자 수만 늘려 글자 위치가 처음부터 정해져 있어 줄이 흔들리지 않는다.
     private async UniTask TypeAsync(TMP_Text text, CancellationToken token)
     {
         text.ForceMeshUpdate();
