@@ -1,10 +1,8 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-// 완벽 회피 슬로모션 동안 화면 효과(같은 오브젝트의 Volume, 예 : 색 보정 · 비네트)를 켠다.
-// 슬로모션이 켜져 있는 동안 Volume 의 Weight 를 1 로, 끝나면 0 으로 서서히 바꾼다. 회피 반격으로 일찍 끝나도 같은 방식으로 사라진다.
-// 슬로모션은 적만 느려지고 히트스톱 · 콤보 선택은 게임 시간을 바꾸므로, 효과의 전환은 실제 시간으로 잰다.
-// 효과의 색 · 세기는 Volume Profile 에서 정한다.
+// 완벽 회피 슬로모션 동안 같은 오브젝트의 Volume Weight 를 서서히 1 로 올린다. 색 · 세기는 Volume Profile 에서 정한다.
+// 히트스톱 · 콤보 선택이 게임 시간을 바꾸므로 전환은 실제 시간으로 잰다.
 [RequireComponent(typeof(Volume))]
 public class SlowMotionScreenEffect : MonoBehaviour
 {

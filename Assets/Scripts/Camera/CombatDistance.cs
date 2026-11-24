@@ -2,14 +2,10 @@ using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 
-// 전투 상황에 따라 조작 카메라(일반 · 록온)의 거리를 늘려, 많은 적이나 큰 적을 화면에 담는다.
-// 조작 캐릭터 주변에 살아 있는 적이 정한 수 이상이면 · 엘리트가 있으면 · 보스가 있으면 추가 거리를 정하고, 여럿이면 가장 먼 쪽을 쓴다.
-// 거리는 각 카메라 Orbital Follow 의 반지름(Radius)에 더한다. 마우스 휠 확대 · 축소는 반지름에 곱하는 배율(Radial Axis)이라 함께 적용된다.
-// 추가 거리는 실제 시간으로 서서히 바뀐다. 콤보 선택 감속 · 히트스톱 중에도 멈추지 않게 하기 위해서다.
-// 꺼지면 원래 반지름으로 되돌린다.
+// 주변 적 수 · 엘리트 · 보스에 따라 조작 카메라의 거리를 늘려 많은 적이나 큰 적을 화면에 담는다. 여럿이면 가장 먼 쪽을 쓴다.
+// Orbital Follow 의 반지름에 더하므로 마우스 휠 배율(Radial Axis)과 함께 적용된다. 실제 시간으로 서서히 바뀐다.
 public class CombatDistance : MonoBehaviour
 {
-    // 한 번의 찾기에서 검사할 수 있는 최대 콜라이더 수
     private const int MAX_COLLIDERS = 64;
 
     [Tooltip("조작 중인 캐릭터를 읽을 파티")]
