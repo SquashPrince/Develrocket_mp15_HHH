@@ -4,11 +4,8 @@ using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 
-// 게임 씬의 로딩 준비. 로딩 화면이 덮고 있는 동안, 전투 중 처음 나올 때 끊기는 것들을 미리 만들고 한 번 그려 둔다.
-// 셰이더 : 기록 파일(GraphicsStateTracer 로 기록)의 셰이더 · 그리기 상태를 미리 컴파일한다. 적 · 캐릭터처럼 미리 만들기 어려운 것도 여기서 준비된다.
-// 대미지 숫자 : 정한 수만큼 미리 만든다.
-// 이펙트 : 미리 만들 목록의 이펙트를 카메라 앞에 모두 켜서 몇 프레임 그린 뒤 거둔다. 처음 그릴 때의 셰이더 · 파티클 준비가 여기서 끝난다.
-// 씬 이동이 이 준비를 기다린 뒤 로딩 화면을 닫는다. 에디터에서 게임 씬을 바로 플레이하면 덮는 화면 없이 바로 준비한다.
+// 게임 씬의 로딩 준비. 로딩 화면이 덮고 있는 동안 전투 중 처음 나올 때 끊기는 것들(셰이더 · 대미지 숫자 · 이펙트)을 미리 준비한다.
+// 자세한 흐름 : Docs/Technical/Game/SceneLoading.md
 public class ScenePreparer : MonoBehaviour
 {
     [Tooltip("셰이더 예열 기록 파일. 비워 두면 예열하지 않는다")]

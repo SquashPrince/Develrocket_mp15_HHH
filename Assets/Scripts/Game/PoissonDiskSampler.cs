@@ -1,18 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Bridson 푸아송 디스크 샘플링. 원 안을 어떤 두 점도 최소 거리보다 가깝지 않게, 더 놓을 자리가 없을 때까지 고르게 채운다.
-// 격자 : 칸 크기를 최소 거리 / √2 로 두면 한 칸에 점이 하나만 들어간다. 그래서 가까운 점 검사는 주변 칸(앞뒤 2칸)만 보면 된다.
-//   이미 놓은 모든 점과 비교하는 방식(점 하나마다 O(n))과 달리 점 하나마다 O(1) 이라, 전체가 놓은 점 수에 비례한다.
-// 활성 목록 : 주변에 새 점을 놓을 수 있을지 모르는 점들. 활성 점 하나를 골라 그 주변 고리(최소 거리 ~ 2배)에서 후보를 정해진 횟수만큼 뽑고,
-//   하나라도 놓이면 새 점도 활성 목록에 넣는다. 모두 실패하면 그 점은 주변이 찼다고 보고 활성 목록에서 뺀다. 목록이 비면 끝난다.
-// 결과는 원의 중심 기준 좌표다. 월드에 놓을 때는 x 를 x, y 를 z 로 쓴다.
+// Bridson 푸아송 디스크 샘플링. 원 안을 최소 거리 간격으로, 더 놓을 자리가 없을 때까지 고르게 채운다.
+// 칸 크기를 최소 거리 / √2 로 두면 한 칸에 점이 하나만 들어가, 가까운 점 검사는 주변 칸만 보면 된다(점마다 O(1)).
+// 결과는 원의 중심 기준 좌표다. 월드에 놓을 때는 y 를 z 로 쓴다.
 public static class PoissonDiskSampler
 {
-    // 활성 점 하나에서 후보를 뽑는 횟수. Bridson 논문의 기본값이다.
+    // Bridson 논문의 기본값
     private const int DEFAULT_ATTEMPTS = 30;
 
-    // radius 원 안을 minDistance 간격으로 채운 점 목록을 돌려준다.
+    // 활성 점 주변 고리에서 후보를 뽑아 하나라도 놓이면 새 점도 활성으로, 모두 실패하면 그 점을 활성에서 뺀다.
     public static List<Vector2> SampleCircle(float radius, float minDistance, int attempts = DEFAULT_ATTEMPTS)
     {
         List<Vector2> points = new List<Vector2>();
