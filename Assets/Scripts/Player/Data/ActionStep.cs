@@ -1,34 +1,26 @@
 using System;
 using UnityEngine;
 
-// 액션을 이루는 동작(모션) 하나의 값. 액션은 동작 목록을 가지며, 1개면 한 동작, 여러 개면 순서대로 이어 재생한다.
-// 모션마다 달라지는 값(재생할 Animator 상태, 판정 방식 · 범위, 전진, 섞는 시간)을 담는다. 위력 · 게이지 같은 타격 값은 액션 공통이다.
-// MonoBehaviour 가 아닌 일반 클래스이므로 [Serializable] 을 붙여야 Inspector 에 펼쳐서 보인다.
+// 액션을 이루는 동작(모션) 하나의 값. 재생할 Animator 상태 · 판정 방식과 범위 · 전진처럼 모션마다 다른 값을 담는다.
+// 위력 · 게이지 같은 타격 값은 액션 공통이다.
 [Serializable]
 public class ActionStep
 {
-    // 판정 방식. Inspector 에 저장된 값은 순서 번호이므로, 새 방식은 항상 맨 뒤에 추가한다.
-    //   구간 : 판정 시작(HitStart) ~ 판정 끝(HitEnd) · 강타 끝(ImpactEnd) 사이에 타격 시점을 두고, 시점마다 범위 안의 적을 모두 맞힌다
-    //   한 순간 : 판정 시작(HitStart) 순간에 한 번만 판정한다
-    // 어느 방식이든 강타 끝(ImpactEnd) 순간에 강타 판정을 한 번 하고 판정을 끝낸다.
+    // Inspector 에 순서 번호로 저장되므로, 새 방식은 항상 맨 뒤에 추가한다.
     public enum HitMode
     {
         Window,
         Instant
     }
 
-    // 구간 판정의 타격 시점 정하기. Inspector 에 저장된 값은 순서 번호이므로, 새 방식은 항상 맨 뒤에 추가한다.
-    //   간격 : 판정 시작부터 간격마다 타격한다. 구간 끝을 넘어가는 타격은 하지 않는다
-    //   횟수 : 구간을 횟수로 나눠 간격을 정한다. 시작과 끝 시점을 모두 포함한다 (예 : 3타면 시작 · 가운데 · 끝)
-    // 강타 끝으로 끝나는 구간은 끝 시점의 타격이 강타다. 횟수 방식에서는 강타가 횟수의 마지막 1타다.
+    // Inspector 에 순서 번호로 저장되므로, 새 방식은 항상 맨 뒤에 추가한다.
     public enum WindowTiming
     {
         Interval,
         Count
     }
 
-    // 이 동작 중 끼어들 수 있는 행동. 여러 개를 함께 고르는 값이라 각 항목이 비트 하나를 차지한다.
-    // Inspector 에 저장된 값은 비트를 더한 숫자이므로, 새 항목은 항상 맨 뒤에 다음 비트로 추가한다.
+    // Inspector 에 비트를 더한 숫자로 저장되므로, 새 항목은 항상 맨 뒤에 다음 비트로 추가한다.
     [Flags]
     public enum Interrupt
     {
@@ -36,7 +28,7 @@ public class ActionStep
         Dash = 1 << 0,
         Ultimate = 1 << 1,
         Swap = 1 << 2,
-        // 적이 패링 가능 시간을 열어 교체가 지원 패링이 될 때만 교체를 허용한다. 연속 패링을 받아칠 때 쓴다.
+        // 교체가 지원 패링이 될 때만 허용한다. 연속 패링을 받아칠 때 쓴다.
         ParrySwap = 1 << 3
     }
 
@@ -100,7 +92,6 @@ public class ActionStep
     [SerializeField] private MotionEffectSetting[] _motionEffects = new MotionEffectSetting[0];
 
     public string AnimationState => _animationState;
-    // 재생 · 이벤트 구분에 쓰는 상태 해시. 상태 이름으로 매번 계산한다.
     public int AnimationHash => Animator.StringToHash(_animationState);
     public HitMode Mode => _hitMode;
     public float HitInterval => _hitInterval;
@@ -109,20 +100,17 @@ public class ActionStep
     public bool ReactOnFirstHitOnly => _reactOnFirstHitOnly;
     public float HitLagTime => _hitLagTime;
     public bool HitLagOnFirstHitOnly => _hitLagOnFirstHitOnly;
-    // 판정 범위. 찾기 · 그리기는 공용 판정 범위가 한다.
     public HitRange Range => new HitRange(_hitShape, _hitCenter, _hitSize, _hitRadius, _hitLength, _hitAngle, _hitInnerRadius, _hitHeight);
     public float AdvanceDistance => _advanceDistance;
     public float AdvanceDuration => _advanceDuration;
     public float FadeTime => _fadeTime;
     public SoundGroup SwingSound => _swingSound;
 
-    // 이 동작 중 interrupt 행동을 허용하는지
     public bool Allows(Interrupt interrupt) => (_interrupts & interrupt) != 0;
 
-    // 적중 이펙트 목록을 쓰는지. 비어 있으면 적중 이펙트를 띄우지 않는다.
     public bool HasHitEffects => _hitEffects.Length > 0;
 
-    // index 번 적중 이펙트. 목록에 없는 번호면 null 이다.
+    // 목록에 없는 번호면 null 이다.
     public HitEffectSetting GetHitEffect(int index)
     {
         if(index < 0 || index >= _hitEffects.Length) return null;
@@ -130,7 +118,7 @@ public class ActionStep
         return _hitEffects[index];
     }
 
-    // index 번 동작 이펙트. 목록에 없는 번호면 null 이다.
+    // 목록에 없는 번호면 null 이다.
     public MotionEffectSetting GetMotionEffect(int index)
     {
         if(index < 0 || index >= _motionEffects.Length) return null;
