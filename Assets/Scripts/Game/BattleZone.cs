@@ -1,11 +1,7 @@
 using UnityEngine;
 
-// 전투 구역. 맵 위의 한 영역으로, 조작 중인 캐릭터가 들어오면 게임 흐름에 알리고, 전투 동안 막는 벽을 켠다.
-// 구역은 진입 감지 · 벽 · 구역 설정(웨이브 구성 · 생성 영역 · 보스 위치 · 다시 시작 지점)만 가진다. 구역 순서와 웨이브 진행은 게임 흐름이 맡는다.
-// 진입 : 이 오브젝트의 트리거 Collider 에 캐릭터가 들어오면 알린다. 조작 중인 캐릭터인지 · 지금 진행할 구역인지는 게임 흐름이 확인한다.
-//   트리거 Collider 의 Layer 는 캐릭터와 충돌하도록 둔다.
-// 벽 : 전투가 시작되면 켜고 정리되면 끈다. 씬에 저장된 상태와 상관없이 꺼진 채로 시작한다.
-// 다시 시작 지점 : 이 구역을 정리한 뒤 전멸 · 재도전하면 파티가 설 위치 · 방향이다. 다음 구역 입구 앞에 둔다.
+// 전투 구역. 진입 감지 · 벽 · 구역 설정만 가지고, 구역 순서와 웨이브 진행은 게임 흐름이 맡는다.
+// 트리거 Collider 의 Layer 는 캐릭터와 충돌하도록 둔다. 벽은 씬에 저장된 상태와 상관없이 꺼진 채로 시작한다.
 [RequireComponent(typeof(Collider))]
 public class BattleZone : MonoBehaviour
 {
@@ -32,7 +28,7 @@ public class BattleZone : MonoBehaviour
     public Vector3 BossSpawnPosition => _bossSpawnPoint.position;
     public Transform RestartPoint => _restartPoint;
 
-    // 캐릭터가 이 구역에 들어오면 알린다. 전달 값 : 이 구역, 들어온 캐릭터
+    // 조작 중인 캐릭터인지 · 진행할 구역인지는 게임 흐름이 확인한다.
     public event System.Action<BattleZone, PlayerController> Entered;
 
     private void Awake() => SetWalls(false);

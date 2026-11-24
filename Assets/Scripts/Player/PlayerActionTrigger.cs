@@ -1,18 +1,7 @@
 using UnityEngine;
 
-// 특수 행동(패링 · 필살기 · 콤보 스킬)을 언제 시작할지 판단하고, 각 행동의 상태를 들고 있다.
-// 일반 공격 · 스킬과 달리 이 행동들은 지금 상태와 상관없이 끼어들거나(패링 · 필살기), 판정 기능이 밖에서 시작시킨다(콤보 스킬).
-// 각 행동의 액션은 캐릭터 데이터에서, 패링 수치 · 필살기 대상 찾는 거리는 공통 설정에서 읽는다.
-//
-// 패링 : 현재 캐릭터가 직접 하지 않는다. 적이 패링 가능 시간을 열었을 때 교체 키를 누르면, 교체로 나온 캐릭터가 패링 상태로 들어간다(지원 공격, 파티가 시작시킨다).
-//        이미 패링 중이거나, 시전 중 무적인 공격(패링 추격 · 필살기 포함) 중이면 시작하지 않는다.
-//        록온 사거리 안에 패링 가능 시간을 연 적이 없으면 시작하지 않는다.
-//        패링 공격을 하는 적이 여럿이면 공격 대상 기준(록온 대상 → 자동 조준 대상)을 따르고, 둘 다 아니면 록온 사거리 안에서 가장 최근에 예고를 시작한 적을 고른다.
-// 필살기 : 게이지가 가득 차 있고 현재 상태가 필살기를 허용할 때 필살기 키를 누르면 게이지를 전부 소모하고 필살기 상태로 넘긴다.
-//          패링(준비 · 반응)과 추격 중에는 상태가 필살기를 허용하지 않아 쓸 수 없다.
-// 콤보 스킬 : 언제 누가 쓸지는 파티의 콤보 스킬 선택이 정하고(전투 공통 규칙), 이 기능은 고른 캐릭터의 콤보 스킬 상태를 시작한다.
-//             한 번의 콤보 스킬은 단계(동작) 여러 개를 순서대로 이어 쓴다. 단계 수와 연계 수는 관계없다.
-//             콤보 스킬 중 강타가 맞으면 콤보 스킬 선택에 알려, 연계가 남았으면 다음 캐릭터를 고르게 한다.
+// 지금 상태와 상관없이 끼어드는 특수 행동(패링 · 필살기 · 콤보 스킬)의 시작을 판단하고, 각 행동의 상태를 들고 있다.
+// 패링은 현재 캐릭터가 직접 하지 않고, 교체로 나온 캐릭터가 한다(지원 공격). 콤보 스킬은 파티의 콤보 스킬 선택이 시작시킨다.
 [RequireComponent(typeof(PlayerController), typeof(PlayerTargeting), typeof(PlayerInputReader))]
 public class PlayerActionTrigger : MonoBehaviour
 {
@@ -22,7 +11,7 @@ public class PlayerActionTrigger : MonoBehaviour
     private PlayerParryState _parryState;
     private PlayerUltimateState _ultimateState;
     private PlayerComboSkillState _comboSkillState;
-    // 패링 키를 누른 순간 고른 패링 대상. 패링 상태에 들어가며 이 적 앞으로 순간 이동한다.
+    // 패링 상태에 들어가며 이 적 앞으로 순간 이동한다.
     private IEnemyParryable _selectedParryAttacker;
 
     public ActionData ParryAction => _controller.Character.Parry;
@@ -36,21 +25,16 @@ public class PlayerActionTrigger : MonoBehaviour
     public IEnemyParryable SelectedParryAttacker => _selectedParryAttacker;
     // 콤보 스킬 중에는 다른 그로기 적에게 강타가 맞아도 다시 발동하지 않는다.
     public bool CanStartComboSkill => !_comboSkillState.IsActive;
-    // 지금 교체하면 지원 패링이 되는지. 이 캐릭터 기준 록온 사거리 안에 패링 가능 시간을 연 적이 있으면 true 다.
-    // 교체로 나오는 캐릭터는 이 캐릭터 옆에 나오므로, 이 캐릭터 기준으로 본다.
+    // 교체로 나오는 캐릭터는 이 캐릭터 옆에 나오므로, 이 캐릭터 기준으로 지원 패링이 되는지 본다.
     public bool HasParryTarget => SelectParryAttacker() != null;
 
     private void Awake() => CacheComponent();
     private void Start() => Init();
-    // 패링은 현재 캐릭터가 직접 하지 않는다. 파티 전투에서 교체 키로 나온 캐릭터가 패링한다(지원 공격).
     private void Update() => TryStartUltimate();
 
-    // 지금 이 동작이 닿으면 패링이 되는지. 패링 준비 중이고 노란 동작(패링할 수 있는 동작)이면 true 다.
     public bool CanParry(EnemyAttackStep step) => _parryState.IsActive && step.IsParryable;
 
-    // 패링 준비 · 반응 중 노란 동작(패링할 수 있는 동작)이 닿으면 패링 성공으로 처리하고 true 를 돌려준다. 상태 기능이 맞았을 때 부른다.
-    // 적에게는 패링당했다고 알리기만 한다. 경직할지 다음 동작으로 이어갈지는 적이 지금 동작 설정으로 정한다.
-    // 그로기 · 필살기 게이지 · 패링 추격은 패링할 때마다 얻는다. 이어가는 공격이면 추격할지 다음 패링을 할지 플레이어가 고른다.
+    // 경직할지 다음 동작으로 이어갈지는 적이 지금 동작 설정으로 정한다.
     public bool TryParry(EnemyAttackData attack, EnemyAttackStep step, IEnemyParryable attacker)
     {
         if(!CanParry(step)) return false;
@@ -61,7 +45,6 @@ public class PlayerActionTrigger : MonoBehaviour
 
         attacker.OnParried();
 
-        // 이 패링으로 그로기에 들어갔으면 콤보 스킬 선택에 알려 그로기 정지 시간을 걸게 한다.
         if(attacker.transform.TryGetComponent(out IEnemyGroggyable groggyable) && groggyable.AddGroggy(ParryAction.GroggyGain)) _controller.Party.ComboSelector.OnGroggyEntered(groggyable);
 
         _controller.Status.AddParryGauge();
@@ -70,10 +53,8 @@ public class PlayerActionTrigger : MonoBehaviour
         return true;
     }
 
-    // 공격 대상 기준(록온 대상 → 공통 설정의 찾는 거리 안의 자동 조준 대상)으로 필살기 대상을 고른다. 없으면 null 이다.
     public IEnemyTargetable FindUltimateTarget() => _targeting.FindAttackTarget(_controller.Common.UltimateTargetSearchRange);
 
-    // 그로기 적을 대상으로 콤보 스킬 상태로 넘긴다. 콤보 스킬 선택에서 고른 캐릭터에게 파티가 부른다.
     public void BeginComboSkill(IEnemyTargetable target)
     {
 #if UNITY_EDITOR
@@ -84,14 +65,11 @@ public class PlayerActionTrigger : MonoBehaviour
         _controller.EnterState(_comboSkillState);
     }
 
-    // 콤보 스킬 중 강타가 맞은 적을 콤보 스킬 선택에 알린다. 연계 대상이고 연계가 남았으면 다음 캐릭터를 고르는 단계가 열린다.
     public void OnComboSkillImpactHit(IEnemyDamageable enemy) => _controller.Party.ComboSelector.RequestNextChain(_controller, enemy.transform);
 
-    // 동작 step 중에 교체 키를 받을지. 교체를 허용하거나, 패링 교체를 허용하고 지금 교체가 지원 패링이 될 때다.
     public bool AllowsSwap(ActionStep step) => step.Allows(ActionStep.Interrupt.Swap) || (step.Allows(ActionStep.Interrupt.ParrySwap) && HasParryTarget);
 
-    // 지원 공격 : 교체로 막 들어온 이 캐릭터가 패링을 시작한다. 파티가 교체할 때 부르고, 패링을 시작했으면 true 를 돌려준다.
-    // 록온 사거리 안에 패링 가능 시간을 연 적이 없으면 시작하지 않고 false 를 돌려준다. 이때 파티는 보통 입장으로 교체한다.
+    // 패링 대상이 없으면 false 라 파티가 보통 입장으로 교체한다.
     public bool TryStartSupportParry()
     {
         if(_parryState.IsActive || _controller.Status.IsAttackInvincible) return false;
@@ -100,8 +78,7 @@ public class PlayerActionTrigger : MonoBehaviour
 
         if(_selectedParryAttacker == null) return false;
 
-        // 패링 액션이 연결되지 않았으면 패링을 시작하지 않는다. 상태에 들어간 뒤 멈추면 준비 모션 없이 패링 판정만 켜져,
-        // 준비 성공 → 반응 → 추격 순서가 깨지기 때문이다. 패링 액션에 준비 · 반응 두 동작이 없을 때도 같은 이유로 막는다.
+        // 준비 · 반응 동작 없이 들어가면 패링 판정만 켜져 준비 → 반응 → 추격 순서가 깨진다.
         if(ParryAction == null || ParryAction.StepCount <= PlayerParryState.REACT_STEP)
         {
 #if UNITY_EDITOR
@@ -110,13 +87,12 @@ public class PlayerActionTrigger : MonoBehaviour
             return false;
         }
 
-        // 이 예고는 이 캐릭터가 패링한다고 기록해, 같은 예고에 다른 캐릭터가 겹쳐 패링하지 않게 한다.
+        // 같은 예고에 다른 캐릭터가 겹쳐 패링하지 않게 기록한다.
         _controller.Party.ClaimParry(_selectedParryAttacker);
         _controller.EnterState(_parryState);
         return true;
     }
 
-    // 진행 중이던 강공격 차지는 상태를 넘길 때 끊긴다.
     private void TryStartUltimate()
     {
         if(!_input.WasUltimatePressed) return;
@@ -126,10 +102,8 @@ public class PlayerActionTrigger : MonoBehaviour
         _controller.EnterState(_ultimateState);
     }
 
-    // 록온 사거리 안에서 패링 가능 시간을 연 적 중 공격 대상 기준으로 고른다. 록온 대상 → 자동 조준 대상 → 가장 최근에 예고를 시작한 적 순서다.
-    // 록온 사거리는 록온이 풀리는 거리와 같아, 록온할 수 있는 거리의 적만 패링할 수 있다. 없으면 null 이다.
-    // 공통 타겟팅 클래스(PlayerTargeting 의 공격 대상 고르기)를 쓰지 않고 패링만의 로직을 사용한다.
-    // 이유는 후보마다 패링 가능 시간을 열었는지 확인하고, 열지 않았으면 다음 후보로 넘어가야 하기 때문이다.
+    // 우선순위 : 록온 대상 → 자동 조준 대상 → 록온 사거리 안에서 가장 최근에 예고를 시작한 적.
+    // 후보마다 패링 가능 시간을 열었는지 보고 다음 후보로 넘어가야 해서 공통 공격 대상 고르기를 쓰지 않는다.
     private IEnemyParryable SelectParryAttacker()
     {
         IEnemyParryable lockAttacker = GetOpenParryAttacker(_targeting.LockTarget);
@@ -141,8 +115,6 @@ public class PlayerActionTrigger : MonoBehaviour
         return aimAttacker != null ? aimAttacker : ParryWindow.FindLatestWithin(transform.position, _targeting.LockOnRange, _controller.Party.CanStartParry);
     }
 
-    // 대상이 록온 사거리 안에서 패링 가능 시간을 연 적이고 패링할 수 있으면 그 적을, 아니면 null 을 돌려준다.
-    // 예고가 뜬 순간 패링 불가(빨간 예고)였던 적은 그 뒤 대기 캐릭터가 생겨도 고르지 않는다. 이미 다른 캐릭터가 패링을 시작한 예고도 고르지 않는다.
     private IEnemyParryable GetOpenParryAttacker(IEnemyTargetable target)
     {
         if(target == null) return null;

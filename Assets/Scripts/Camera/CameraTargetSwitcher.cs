@@ -1,10 +1,8 @@
 using Unity.Cinemachine;
 using UnityEngine;
 
-// 조작 중인 캐릭터가 바뀌면 카메라가 따라갈 대상을 새 캐릭터로 바꾼다.
-// 파티는 "조작 캐릭터가 바뀌었다" 는 것만 알리고, 어떤 카메라를 어떻게 바꿀지는 이 기능이 맡는다.
-// 일반 · 록온 Cinemachine 카메라의 Tracking Target 과 록온 카메라가 보는 Target Group 의 플레이어를 바꾼다.
-// 퇴장하는 이전 캐릭터는 바로 대상에서 빠지므로 카메라가 담지 않는다.
+// 조작 캐릭터가 바뀌면 카메라들의 Tracking Target 과 Target Group 의 플레이어를 새 캐릭터로 바꾼다.
+// 파티는 바뀌었다는 것만 알리고, 어떤 카메라를 바꿀지는 이 기능이 맡는다.
 public class CameraTargetSwitcher : MonoBehaviour
 {
     [SerializeField] private PlayerParty _party;

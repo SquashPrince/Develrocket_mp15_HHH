@@ -3,11 +3,9 @@ using System.Globalization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// 카메라 회전(Look) 입력의 감도를 마우스와 스틱으로 나눠 정한다.
-// 마우스와 스틱이 같은 Look 액션과 Cinemachine 감도를 함께 쓰는데, 마우스는 한 프레임에 수~수십씩 움직이고 스틱은 최대 1이라 같은 감도로는 맞출 수 없다.
-// 그래서 Look 액션의 바인딩마다 컨트롤 스킴에 맞는 배율 Processor 를 덮어쓴다.
-// 마우스 감도는 설정(SettingsStore)의 저장값을 쓴다. 시작할 때 불러오고, 설정 화면에서 바뀌면 알림을 받아 바로 다시 반영한다.
-// 스틱 감도는 아직 설정 화면에 없어 Inspector 값을 쓴다.
+// 카메라 회전(Look) 감도를 마우스와 스틱으로 나눠 정한다. 마우스는 프레임당 수~수십, 스틱은 최대 1 이라 같은 감도로 맞출 수 없어
+// Look 액션의 바인딩마다 컨트롤 스킴에 맞는 배율 Processor 를 덮어쓴다.
+// 마우스 감도는 설정 저장값, 스틱 감도는 Inspector 값을 쓴다.
 public class LookSensitivity : MonoBehaviour
 {
     // 입력 에셋의 컨트롤 스킴 이름과 같아야 한다.

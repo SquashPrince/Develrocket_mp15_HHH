@@ -4,9 +4,7 @@ using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
 
-// [행동 그래프 행동] 공격 사거리까지 대상에게 다가간 뒤 공격 하나를 하고, 공격이 끝나면 성공한다.
-// 쓸 수 있는 공격이 없거나(모두 쿨타임) 대상이 없으면 실패한다. 공격이 경직 · 그로기 · 처치로 끊겨도 실패한다.
-// 어떤 공격을 할지는 적 공격 기능이 고른다.
+// [행동 그래프 행동] 공격 사거리까지 다가간 뒤 공격 하나를 한다. 공격이 경직 · 그로기 · 처치로 끊기면 실패한다.
 [Serializable, GeneratePropertyBag]
 [NodeDescription(
     name: "Attack Target",

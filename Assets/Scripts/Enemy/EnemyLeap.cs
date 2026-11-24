@@ -1,16 +1,10 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-// 적 도약 · 돌진 공격의 이동. 공격 클립의 LeapStart 이벤트부터 같은 클립의 LeapEnd 이벤트(착지 · 도착)까지 출발 위치에서 목표 지점으로 옮긴다.
-// 진행도는 흐른 시간이 아니라 클립 재생 위치로 정한다. 슬로모션 · 속도 곡선으로 재생 속도가 바뀌어도 LeapEnd 이벤트 순간에 목표 지점에 닿는다.
-//   그래서 이동 속도는 LeapStart ~ LeapEnd 사이 클립 구간 길이(와 그 구간의 재생 속도)로 조절한다.
-// 판정은 이동과 별개로 Hit 이벤트가 정한다. 도약은 LeapEnd 와 같거나 조금 뒤에, 돌진은 이동 시작 쪽에 Hit 을 두고 지속 판정을 쓴다.
-// 목표 지점은 LeapLock 이벤트 전까지 대상을 따라가고, 그 뒤에는 고정된다. LeapLock 이벤트가 없으면 LeapEnd 까지 따라간다.
-// 목표 지점은 대상 위치에서 출발 위치 반대쪽으로 지나치는 거리만큼 더 간 곳이다. NavMesh 밖이면 출발 위치에서 가는 선 위의 NavMesh 경계 지점으로 바꾼다.
-// 높이가 0 이면 땅을 따라 직선으로 돌진한다. 0 보다 크면 외형(Visual)만 포물선으로 띄운다.
-//   루트는 NavMesh 위치 맞춤을 따라야 하므로 띄우지 않는다. 공중에 있는 동안은 콜라이더를 꺼 맞지 않게 한다.
-//   내려오면 콜라이더를 바로 켜 공격(회피 반격 등)에 맞게 하되, 대상과 겹쳐 있으면 겹침이 풀릴 때까지 대상과의 충돌만 무시한다.
-//   겹친 채 충돌을 켜면 대상의 CharacterController 가 겹침을 풀며 바닥 아래로 밀려날 수 있기 때문이다.
+// 적 도약 · 돌진 공격의 이동. LeapStart ~ LeapEnd 이벤트 사이에 출발 위치에서 목표 지점으로 옮긴다.
+// 진행도를 흐른 시간이 아닌 클립 재생 위치로 정해, 재생 속도가 바뀌어도 LeapEnd 순간에 목표 지점에 닿는다.
+// 루트는 NavMesh 위치 맞춤을 따라야 하므로 도약 높이는 외형(Visual)만 띄운다.
+// 자세한 흐름 : Docs/Technical/Enemy/EnemyLeap.md
 [RequireComponent(typeof(NavMeshAgent), typeof(Collider), typeof(EnemyAnimation))]
 public class EnemyLeap : MonoBehaviour
 {
@@ -24,7 +18,7 @@ public class EnemyLeap : MonoBehaviour
     private EnemyAnimation _animation;
     private GameObject _landingMarker;
     private Transform _target;
-    // 내려온 뒤 겹침이 풀릴 때까지 충돌을 무시하고 있는 대상의 콜라이더. 없으면 null 이다.
+    // 내려온 뒤 겹침이 풀릴 때까지 충돌을 무시하는 대상
     private Collider _ignoredCollider;
     private Vector3 _startPosition;
     private Vector3 _landingPosition;
@@ -32,7 +26,7 @@ public class EnemyLeap : MonoBehaviour
     private float _height;
     private float _overshootDistance;
     private int _stateHash;
-    // 클립 기준 이륙 · 착지 시간(초)과 클립 길이. 재생 위치를 클립 시간으로 바꿔 진행도를 구한다.
+    // 클립 시간 기준
     private float _startTime;
     private float _landTime;
     private float _clipLength;
@@ -53,8 +47,8 @@ public class EnemyLeap : MonoBehaviour
         UpdateSeparation();
     }
 
-    // LeapStart 이벤트에서 부른다. 같은 클립에서 이 이벤트 뒤에 LeapEnd 이벤트가 없으면 도착 시점을 알 수 없어 이동하지 않는다.
-    // height : 외형이 떠오르는 최고 높이. 0 이면 돌진. overshootDistance : 대상 위치보다 더 지나칠 거리.
+    // 같은 클립에 LeapEnd 가 없으면 도착 시점을 알 수 없어 이동하지 않는다.
+    // height : 0 이면 땅을 따라 돌진. 공중에 있는 동안은 콜라이더를 꺼 맞지 않게 한다.
     public void Begin(Transform target, AnimationEvent leapStartEvent, float height, float overshootDistance)
     {
         AnimationClip clip = leapStartEvent.animatorClipInfo.clip;
@@ -85,7 +79,7 @@ public class EnemyLeap : MonoBehaviour
         SetMarkerActive(true);
     }
 
-    // LeapLock 이벤트에서 부른다. 이 순간의 대상 위치로 목표 지점을 고정한다.
+    // LeapLock 이 없으면 LeapEnd 까지 대상을 따라간다.
     public void Lock()
     {
         if(!IsLeaping || _isLocked) return;
@@ -94,7 +88,6 @@ public class EnemyLeap : MonoBehaviour
         _isLocked = true;
     }
 
-    // LeapEnd 이벤트에서 부른다. 목표 지점에 내려놓는다.
     public void Land()
     {
         if(!IsLeaping) return;
@@ -103,7 +96,7 @@ public class EnemyLeap : MonoBehaviour
         Stop();
     }
 
-    // 착지하거나 공격이 끊기면 도약을 끝낸다. 끊긴 경우 그 자리에 내려온다. 외형 높이 · 콜라이더 · 표시를 되돌린다.
+    // 공격이 끊긴 경우 그 자리에 내려온다.
     public void Stop()
     {
         if(!IsLeaping) return;
@@ -115,7 +108,8 @@ public class EnemyLeap : MonoBehaviour
         if(_height > 0f) EnableColliderAfterLanding();
     }
 
-    // 콜라이더를 켜고, 대상과 겹쳐 있으면 겹침이 풀릴 때까지 대상과의 충돌만 무시한다. 공격 판정은 콜라이더로 찾으므로 그대로 맞는다.
+    // 겹친 채 충돌을 켜면 대상의 CharacterController 가 겹침을 풀며 바닥 아래로 밀려날 수 있어, 겹침이 풀릴 때까지 대상과의 충돌만 무시한다.
+    // 공격 판정은 콜라이더로 찾으므로 그대로 맞는다.
     private void EnableColliderAfterLanding()
     {
         _collider.enabled = true;
@@ -161,9 +155,7 @@ public class EnemyLeap : MonoBehaviour
         SetVisualHeight(4f * _height * progress * (1f - progress));
     }
 
-    // 대상 위치에서 출발 위치 반대쪽으로 지나치는 거리만큼 더 간 곳을 목표 지점으로 삼는다.
-    // 출발 위치에서 그 지점까지 가는 길에 NavMesh 경계가 있으면 경계 지점으로 바꾼다.
-    // NavMesh.Raycast 는 경계에 막히면 막힌 지점을, 막히지 않으면 도착 지점을 돌려준다.
+    // 대상 위치에서 지나치는 거리만큼 더 간 곳. NavMesh.Raycast 는 경계에 막히면 막힌 지점을, 아니면 도착 지점을 돌려준다.
     private void UpdateLandingPosition()
     {
         if(_target == null) return;
@@ -205,7 +197,7 @@ public class EnemyLeap : MonoBehaviour
         _animation = GetComponent<EnemyAnimation>();
     }
 
-    // 외형의 원래 높이를 기억해 둔다. 착지 표시는 적을 따라 움직이지 않도록 부모 없이 한 번 만들어 꺼 둔다. 프리팹은 넣지 않아도 된다.
+    // 착지 표시는 적을 따라 움직이지 않도록 부모 없이 만든다.
     private void Init()
     {
         _visualBaseHeight = _visual.localPosition.y;

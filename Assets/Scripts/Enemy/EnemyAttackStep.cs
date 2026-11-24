@@ -1,25 +1,19 @@
 using System;
 using UnityEngine;
 
-// 적 공격을 이루는 동작(모션) 하나의 값. 공격은 동작 목록을 가지며 순서대로 이어 재생한다.
-// 모션마다 달라지는 값(재생할 Animator 상태, 판정 방식 · 타격 시점 · 범위, 막타, 추적, 패링)을 담는다. 위력 · 플레이어 반응 같은 값은 공격 공통이다.
-// MonoBehaviour 가 아닌 일반 클래스이므로 [Serializable] 을 붙여야 Inspector 에 펼쳐서 보인다.
+// 적 공격을 이루는 동작(모션) 하나의 값. 재생할 Animator 상태 · 판정 · 막타 · 추적 · 패링처럼 모션마다 다른 값을 담는다.
+// 위력 · 플레이어 반응 같은 값은 공격 공통이다.
 [Serializable]
 public class EnemyAttackStep
 {
-    // 판정 방식. Inspector 에 저장된 값은 순서 번호이므로, 새 방식은 항상 맨 뒤에 추가한다.
-    //   구간 : 판정 시작(HitStart) ~ 판정 끝(HitEnd) 사이의 타격 시점마다 범위 안의 캐릭터를 맞힌다. 판정 끝이 없으면 동작이 끝날 때까지 간격마다 맞힌다
-    //   한 순간 : 판정 시작(HitStart) 순간에 한 번 판정한다
-    // 타격마다 대미지 · 경직 · 완벽 회피 · 패링을 따로 판정한다. 한 타격에서는 캐릭터마다 한 번만 맞는다.
+    // Inspector 에 순서 번호로 저장되므로, 새 방식은 항상 맨 뒤에 추가한다.
     public enum HitMode
     {
         Window,
         Instant
     }
 
-    // 구간 판정의 타격 시점 정하기. Inspector 에 저장된 값은 순서 번호이므로, 새 방식은 항상 맨 뒤에 추가한다.
-    //   간격 : 판정 시작부터 간격마다 타격한다. 판정 끝 순간에 막타를 한 번 더 한다
-    //   횟수 : 구간을 횟수로 나눠 타격한다. 시작과 끝 시점을 모두 포함하고, 끝 시점의 타격이 막타다 (예 : 3 타면 시작 · 가운데 · 끝)
+    // Inspector 에 순서 번호로 저장되므로, 새 방식은 항상 맨 뒤에 추가한다.
     public enum WindowTiming
     {
         Interval,
@@ -85,7 +79,6 @@ public class EnemyAttackStep
     public int HitCount => _hitCount;
     public bool UseFinalReaction => _useFinalReaction;
     public EnemyAttackData.HitReaction FinalReaction => _finalReaction;
-    // 판정 범위. 찾기 · 그리기는 공용 판정 범위가 한다.
     public HitRange Range => new HitRange(_hitShape, _hitCenter, _hitSize, _hitRadius, _hitLength, _hitAngle, _hitInnerRadius, _hitHeight);
     public bool FollowsTarget => _followsTarget;
     public float FollowSpeedRate => _followSpeedRate;

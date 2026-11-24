@@ -1,10 +1,7 @@
 using UnityEngine;
 
-// 캐릭터 하나의 값. 캐릭터마다 다른 능력치 · 이동 · 대시 수치와 캐릭터가 쓰는 액션(ActionData)을 카테고리별로 모은다.
-// 카테고리는 일반 공격 / 회피 공격 / 교체 · 패링 / 스킬 / 필살기 / 콤보 스킬 순서로, 스킬창처럼 한눈에 보이게 한다.
-// 캐릭터가 바뀌어도 같은 규칙(중력 · 입력 · 타겟팅 사거리 · 공격 간격 · 패링 타이밍 · 슬로모션 · 순간 이동 등)은 공통 설정(CommonCharacterSettings)에 둔다.
-// 액션 하나에만 쓰는 값(강공격 차지 시간 · 특수스킬 에너지 비용 등)은 그 액션 데이터에 둔다.
-// 액션 에셋은 캐릭터마다 폴더를 나눠 둔다. (예: Datas/Player/Actions/Knight/)
+// 캐릭터마다 다른 능력치 · 이동 · 대시 수치와 쓰는 액션. 모든 캐릭터가 같은 규칙은 CommonCharacterSettings 에,
+// 액션 하나에만 쓰는 값은 그 ActionData 에 둔다.
 [CreateAssetMenu(fileName = "NewCharacterData", menuName = "HHH/Character Data")]
 public class CharacterData : ScriptableObject
 {
