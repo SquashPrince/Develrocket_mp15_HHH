@@ -4,8 +4,7 @@ using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
 
-// [행동 그래프 행동] 대상에게 유지 거리까지 다가간다. 유지 거리 안에 들어오면 멈추고 성공한다.
-// 대상이 없으면 실패한다. 이동 속도는 적 이동 기능, 유지 거리는 적 행동 설정의 값을 쓴다.
+// [행동 그래프 행동] 대상에게 유지 거리까지 다가간다.
 [Serializable, GeneratePropertyBag]
 [NodeDescription(
     name: "Chase Target",
@@ -43,7 +42,6 @@ public partial class ChaseTargetAction : Action
         return Status.Running;
     }
 
-    // 성공 · 실패 · 중단 어느 경우든 이동을 멈춘다.
     protected override void OnEnd()
     {
         if(_movement != null) _movement.Stop();

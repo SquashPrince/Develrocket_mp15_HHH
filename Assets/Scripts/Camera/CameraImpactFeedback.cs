@@ -3,16 +3,9 @@ using Unity.Cinemachine;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-// 전투 연출 알림을 받아 카메라를 흔들고, FOV 를 잠깐 바꾼다.
-// 흔들림 : 흔드는 순간(강타 · 패링 · 넉백)마다 Impulse Source 를 따로 연결하고, 비워 두면 흔들지 않는다.
-//   흔들림 모양 · 길이 · 세기(Default Velocity 의 크기)는 각 Impulse Source 에서 정한다. 방향만 여기서 정한다.
-//   충격 방향이 있는 순간(패링) : 그 방향으로 밀리는 반동 / 없는 순간 : 화면 기준 상하좌우 무작위
-//   각 Cinemachine 카메라의 Impulse Listener 가 받으며, Listener 의 Use Camera Space 가 켜져 있어야 방향이 화면 기준이 된다.
-// FOV : 순간 줌과 유지 줌을 더한 값을 만든다. 각 Cinemachine 카메라의 CameraFovOffset 이 이 값을 최종 렌즈에 더한다.
-//   순간 줌 : 패링 시작 · 패링 성공 · 웨이브 마지막 적 처치 · 보스 처치 때 곡선대로 바뀐다. 새 효과가 오면 진행 중인 효과를 끝내고 새로 시작한다.
-//   유지 줌 : 콤보 선택 화면이 열려 있는 동안 · 완벽 회피 슬로모션 동안 서서히 줌 인하고, 끝나면 서서히 돌아온다. 겹치면 가장 많이 당기는 쪽을 쓴다.
-//     판 실패(전멸 · 시간 초과) 뒤에는 씬이 바뀔 때까지 줌 인을 유지한다.
-//   둘 다 히트스톱 · 슬로모션 · 콤보 선택 감속과 상관없이 실제 시간으로 흐른다.
+// 전투 연출 알림을 받아 카메라를 흔들고 FOV 를 바꾼다. 게임 시간 감속과 상관없이 실제 시간으로 흐른다.
+// 흔들림 모양 · 세기는 각 Impulse Source 가 정하고 여기서는 방향만 정한다. Listener 의 Use Camera Space 가 켜져 있어야 화면 기준이 된다.
+// FOV 는 순간 줌 + 유지 줌을 만들고, 각 카메라의 CameraFovOffset 이 렌즈에 더한다.
 public class CameraImpactFeedback : MonoBehaviour
 {
     // 순간 하나의 FOV 변화. 곡선 값(시간 0 ~ 1) × 변화량만큼 FOV 를 바꾼다.

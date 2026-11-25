@@ -1,16 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// 대미지 숫자 표시. 플레이어 공격이 적에게 대미지를 줄 때마다 맞은 적 위에 숫자를 띄운다.
-// 숫자는 미리 만들어 두고 다시 쓴다(풀링). 꺼져 있는 숫자가 없으면 하나 더 만든다. 미리 만들기는 씬 준비(로딩 중)가 맡는다.
-// 합치기 : 같은 적이 정한 시간 안에 다시 맞으면 새 숫자를 띄우지 않고 떠 있는 숫자에 더한다. 다단 히트로 숫자가 쏟아지지 않고 읽기 쉽게 하기 위해서다.
-// 상한 : 동시에 떠 있는 숫자가 상한에 닿으면 가장 오래된 숫자를 거둬 다시 쓴다.
-// 갱신 : 떠 있는 숫자만 모아 여기서 한 번에 갱신한다. 숫자마다 Update 를 돌리지 않기 위해서다.
-// 위치 : 적중 이펙트와 같은 맞은 점(공격한 캐릭터 쪽 적 표면)이다.
-//   같은 순간 여러 숫자가 겹치지 않게 화면에서 조금씩 무작위로 비켜 놓는다(월드 수평 방향).
-// 숫자 전용 화면 공간(Overlay) Canvas 아래에 둔다. 숫자들은 이 오브젝트의 자식으로 만든다.
-//   전투 HUD 와 같은 Canvas 에 두면 숫자가 움직일 때마다 HUD 전체를 다시 묶어(Rebatch) 그리기 때문이다.
-// 게임 시간으로 갱신해 일시정지 중에는 멈춘다.
+// 대미지 숫자 표시. 풀링한 숫자를 맞은 점에 띄우고, 떠 있는 숫자만 모아 한 번에 갱신한다.
+// 다단 히트로 숫자가 쏟아지지 않게 같은 적이 짧은 사이에 다시 맞으면 떠 있는 숫자에 더한다.
+// 숫자가 움직일 때마다 전투 HUD 전체가 다시 묶이지(Rebatch) 않게 숫자 전용 Canvas 아래에 둔다.
+// 자세한 흐름 : Docs/Technical/UI/BattleHud.md
 public class DamageTextSpawner : MonoBehaviour
 {
     [SerializeField] private DamageText _prefab;
@@ -46,6 +40,7 @@ public class DamageTextSpawner : MonoBehaviour
             return;
         }
 
+        // 같은 순간 여러 숫자가 겹치지 않게 월드 수평으로 조금씩 비켜 놓는다.
         Vector2 offset = Random.insideUnitCircle * _randomOffset;
         Vector3 position = hitPoint + new Vector3(offset.x, 0f, offset.y);
         DamageText text = GetText();
@@ -54,7 +49,7 @@ public class DamageTextSpawner : MonoBehaviour
         _active.Add(text);
     }
 
-    // 정한 수가 될 때까지 숫자를 미리 만든다. 씬 준비(로딩 중)에서 부른다.
+    // 씬 준비(로딩 중)에서 부른다.
     public void Prewarm()
     {
         while(_pool.Count < _initialCount)
@@ -63,7 +58,6 @@ public class DamageTextSpawner : MonoBehaviour
         }
     }
 
-    // 같은 적에게 합치기 시간 안에 띄운 숫자. 가장 최근 것부터 본다.
     private DamageText FindMergeable(Transform target)
     {
         if(_mergeTime <= 0f) return null;
@@ -78,6 +72,7 @@ public class DamageTextSpawner : MonoBehaviour
         return null;
     }
 
+    // 게임 시간으로 갱신해 일시정지 중에는 멈춘다.
     private void UpdateActive()
     {
         float deltaTime = Time.deltaTime;
@@ -88,7 +83,7 @@ public class DamageTextSpawner : MonoBehaviour
         }
     }
 
-    // 상한에 닿았으면 가장 오래된 숫자를 거둬 쓰고, 아니면 꺼져 있는 숫자를 꺼낸다. 없으면 하나 더 만든다.
+    // 상한에 닿았으면 가장 오래된 숫자를 거둬 쓴다.
     private DamageText GetText()
     {
         if(_active.Count >= _maxActive)

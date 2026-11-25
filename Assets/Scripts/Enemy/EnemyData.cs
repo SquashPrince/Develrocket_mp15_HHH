@@ -1,8 +1,6 @@
 using UnityEngine;
 
-// 적 한 종류의 값. 같은 종류의 적은 이 에셋 하나를 함께 쓴다.
-// 사람이 조정하는 값만 둔다. 오브젝트 참조(록온 표시 위치 · 예고 위치 · Animator 등)와 실행 중 현재값은 Prefab 에 남긴다.
-// 이 적이 쓰는 공격은 공격 데이터 에셋 목록으로 가진다. 같은 공격을 여러 적이 함께 쓸 수 있다.
+// 적 한 종류의 조정값. 오브젝트 참조(록온 표시 위치 · 예고 위치 · Animator 등)와 실행 중 현재값은 Prefab 에 둔다.
 [CreateAssetMenu(fileName = "NewEnemyData", menuName = "HHH/Enemy Data")]
 public class EnemyData : ScriptableObject
 {

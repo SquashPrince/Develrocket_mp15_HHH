@@ -1,16 +1,12 @@
 using System;
 using UnityEngine;
 
-// 전투 이펙트 재생 요청. 이펙트 Prefab 을 들고 있는 쪽(액션 · 공통 설정 등)이 "이 위치에 이 이펙트를 띄워 줘" 라고 알리면, 씬의 이펙트 풀이 받아서 띄운다.
-// 띄우는 쪽이 풀을 몰라도 되게 하고, 풀이 없는 테스트 씬에서도 오류 없이 이펙트만 나오지 않게 하기 위해서다.
-// 효과음 재생 요청과 같은 공용 알림 방식이다.
+// 전투 이펙트 재생 요청. 띄우는 쪽이 풀을 몰라도 되고, 풀이 없는 테스트 씬에서도 오류 없이 이펙트만 나오지 않게 공용 알림으로 둔다.
 public static class BattleEffect
 {
-    // 띄울 이펙트 Prefab · 월드 위치 · 월드 회전을 알린다. 구독하는 쪽은 꺼질 때 반드시 해제한다.
+    // 구독하는 쪽은 꺼질 때 반드시 해제한다.
     public static event Action<GameObject, Vector3, Quaternion> Requested;
-    // 띄울 이펙트 Prefab · 붙일 부모 · 부모 기준 위치 · 회전 · 크기 배수를 알린다. 이펙트는 부모를 따라 움직인다.
     public static event Action<GameObject, Transform, Vector3, Quaternion, Vector3> AttachedRequested;
-    // 이 부모에 붙어 반복 재생 중인 이펙트를 멈추라고 알린다. 전달 값 : 부모
     public static event Action<Transform> LoopStopRequested;
 
     // 비워 둔(null) 이펙트는 알리지 않는다.
@@ -21,7 +17,7 @@ public static class BattleEffect
         Requested?.Invoke(prefab, position, rotation);
     }
 
-    // 부모에 붙여 띄운다. 베기처럼 캐릭터를 따라가야 하는 이펙트에 쓴다. 비워 둔(null) 이펙트는 알리지 않는다.
+    // 베기처럼 캐릭터를 따라가야 하는 이펙트에 쓴다.
     public static void PlayAttached(GameObject prefab, Transform parent, Vector3 localPosition, Quaternion localRotation, Vector3 localScale)
     {
         if(prefab == null) return;
@@ -29,8 +25,7 @@ public static class BattleEffect
         AttachedRequested?.Invoke(prefab, parent, localPosition, localRotation, localScale);
     }
 
-    // 부모에 붙어 반복 재생 중인 이펙트의 새 파티클 생성을 멈춘다. 이미 나온 파티클은 수명대로 사라진 뒤 회수된다.
-    // 반복하지 않는 이펙트는 그대로 끝까지 재생한다.
+    // 새 파티클 생성만 멈추고, 이미 나온 파티클은 수명대로 사라진 뒤 회수된다.
     public static void StopLoop(Transform parent)
     {
         LoopStopRequested?.Invoke(parent);

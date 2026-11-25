@@ -1,15 +1,9 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-// 콤보 스킬 캐릭터 선택 동안 화면 효과를 켠다. 색 번짐(같은 오브젝트의 Volume)과 화면 왜곡(카메라 앞에 놓은 왜곡 Renderer)을 함께 쓴다.
-// 선택이 열리면 효과 비율을 1 로, 닫히면 0 으로 서서히 바꾼다. 연계로 선택이 다시 열리면 그 자리에서 다시 1 로 간다.
-// 콤보 선택 중에는 게임 시간이 느려지므로 전환은 실제 시간으로 잰다.
-// 색 번짐 : Volume 의 Weight 를 비율로 바꾼다. 효과의 종류 · 세기는 Volume Profile 에서 정한다.
-// 왜곡 : 왜곡 세기(_Distorsion)를 비율 × 최대 왜곡 세기로 넣는다. MaterialPropertyBlock 으로 넣어 Material 에셋은 바꾸지 않는다.
-//   켜져 있는 동안 왜곡 Renderer 를 연계 대상 적의 패링 예고 위치(없으면 적 위치)로 옮긴다. 회전은 부모(카메라)를 따른다.
-//   선택이 닫히며 대상이 비워져도, 사라지는 동안은 마지막 위치에 남는다.
-//   비율이 0 이면 Renderer 를 꺼, 효과가 없는 동안 화면을 한 번 더 그리지 않게 한다.
-//   왜곡 셰이더는 화면 색을 읽으므로 URP 설정의 Opaque Texture 가 켜져 있어야 한다.
+// 콤보 스킬 캐릭터 선택 동안 색 번짐(Volume Weight)과 화면 왜곡을 켠다. 게임 시간이 느려지므로 전환은 실제 시간으로 잰다.
+// 왜곡 셰이더는 화면 색을 읽으므로 URP 설정의 Opaque Texture 가 켜져 있어야 한다.
+// 비율이 0 이면 왜곡 Renderer 를 꺼, 효과가 없는 동안 화면을 한 번 더 그리지 않게 한다.
 [RequireComponent(typeof(Volume))]
 public class ComboSelectScreenEffect : MonoBehaviour
 {

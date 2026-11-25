@@ -1,13 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-// Esc 메뉴. 일시정지되면 열고, 이어가면 닫는다.
-// 버튼 : 계속하기 · 설정 · 처음부터 재시작 · 보스전부터 다시 · 타이틀로
-//   보스전부터 다시는 보스전 중에만 보인다. 재시도 횟수가 1 오른다. (게임 흐름의 재도전과 같다)
-//   처음부터 재시작은 기록을 지우고 처음부터 한다. 타이틀로는 기록을 남기지 않고 간다.
-// 설정 : 공용 UI 의 설정 화면을 열고, 그동안 메뉴 버튼은 숨긴다. 설정을 닫으면 메뉴로 돌아온다.
-//   설정을 연 채 Esc 로 이어가면 설정을 닫고(저장) 메뉴도 닫는다.
-// 표시 묶음은 이 컴포넌트가 붙은 오브젝트의 자식으로 둔다. 이 오브젝트를 끄면 일시정지 알림을 받지 못한다.
+// Esc 메뉴. 일시정지되면 열고, 이어가면 닫는다. 보스전부터 다시는 보스전 중에만 보인다.
+// 이 오브젝트를 끄면 일시정지 알림을 받지 못하므로 표시 묶음은 자식으로 둔다.
 public class PauseMenuView : MonoBehaviour
 {
     [SerializeField] private GamePause _gamePause;
@@ -38,6 +33,7 @@ public class PauseMenuView : MonoBehaviour
 
         _root.SetActive(false);
 
+        // 설정을 연 채 이어가면 설정도 닫는다(저장).
         if(Settings.IsOpen) Settings.Close();
     }
 

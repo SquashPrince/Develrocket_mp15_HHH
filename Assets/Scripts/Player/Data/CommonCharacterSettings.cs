@@ -1,10 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// 캐릭터가 바뀌어도 같은 규칙 값. 캐릭터마다 다른 값은 캐릭터 데이터(CharacterData)에, 모든 캐릭터가 같이 쓰는 값은 여기에 둔다.
-// 에셋 하나를 모든 캐릭터가 함께 쓴다. 캐릭터 목록을 가진 파티(PlayerParty)가 이 에셋을 들고, 각 캐릭터의 기능은 컨트롤러를 통해 꺼내 쓴다.
-// 실행 중 계산한 값(예: 파티에서 가장 큰 캐릭터 기준 값)은 이 에셋에 쓰지 않는다. 에디터에서 실행 중 바꾼 에셋 값은 실행을 멈춰도 남기 때문이다.
-// 씬 안의 오브젝트(카메라 등)는 에셋이 참조할 수 없으므로 각 기능에 연결한다.
+// 모든 캐릭터가 함께 쓰는 규칙 값. 파티가 에셋 하나를 들고 캐릭터는 컨트롤러를 통해 꺼내 쓴다.
+// 에디터에서 실행 중 바꾼 에셋 값은 멈춰도 남으므로, 실행 중 계산한 값은 이 에셋에 쓰지 않는다.
 [CreateAssetMenu(fileName = "NewCommonCharacterSettings", menuName = "HHH/Common Character Settings")]
 public class CommonCharacterSettings : ScriptableObject
 {

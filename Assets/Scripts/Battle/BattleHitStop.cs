@@ -1,9 +1,7 @@
 using UnityEngine;
 
-// 전투 연출 알림을 받아 게임 전체를 아주 잠깐 멈춘다(히트스톱). 지금은 패링 성공에만 쓴다.
-// 적은 개별로 멈출 수 없어 Unity 전체 시간(Time.timeScale)을 0 으로 한다. 정지 시간은 실제 시간으로 잰다.
-// 카메라 흔들림 · FOV 효과가 정지 중에도 보이려면 Cinemachine Brain 의 Ignore Time Scale 을 켜야 한다.
-// 정지 중 다른 기능(콤보 선택 등)이 시간 배율을 바꿨다면 그 값을 따르고 되돌리지 않는다.
+// 패링 성공 때 게임 전체를 아주 잠깐 멈춘다(Time.timeScale 0). 정지 시간은 실제 시간으로 잰다.
+// 카메라 효과가 정지 중에도 보이려면 Cinemachine Brain 의 Ignore Time Scale 을 켜야 한다.
 public class BattleHitStop : MonoBehaviour
 {
     [Tooltip("패링 성공 때 멈추는 시간(실제 시간, 초). 0 이면 멈추지 않는다")]

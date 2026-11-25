@@ -5,17 +5,8 @@ using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Random = UnityEngine.Random;
 
-// [행동 그래프 행동] 대상과 거리를 유지한다. 시작할 때 확률을 한 번 뽑아 백스텝 · 제자리 대기 · 좌 · 우 돌기 중 하나를 한다.
-//   뽑은 값이 백스텝 확률 안이면 백스텝, 그다음 대기 확률 구간이면 제자리 대기, 나머지는 좌 · 우 돌기다.
-// 백스텝 : 대상을 바라본 채 BackStep 모션을 재생하며 대상 반대쪽으로 물러난다. 모션이 끝나면 멈추고 성공한다.
-//          Animator 에 BackStep 상태가 없으면 좌 · 우 돌기로 대신한다.
-// 제자리 대기 : 거리 유지 시간 동안 움직이지 않고 대상 쪽으로 몸만 돌린다. 그동안 대상이 다가오거나 멀어져도 거리를 맞추지 않는다.
-// 좌 · 우 돌기 : 정해진 시간 동안 대상을 바라보며 대상 둘레의 유지 거리 위를 돈다. 시간이 지나면 멈추고 성공한다.
-//   목적지는 대상을 중심으로 유지 거리만큼 떨어진 원 위에서, 지금 위치보다 도는 방향으로 조금 앞선 지점이다.
-//   그래서 거리가 맞으면 옆으로 돌고, 멀어지거나 가까워지면 원 쪽으로 다가가거나 물러나며 거리를 맞춘다.
-//   유지 거리보다 허용 범위 이상 멀어지면 추적 속도로, 그 밖에는 도는 속도로 움직인다.
-//   도는 방향(왼쪽 · 오른쪽)은 시작할 때마다 무작위로 정한다.
-// 대상이 없으면 실패한다.
+// [행동 그래프 행동] 대상과 거리를 유지한다. 시작할 때 확률로 백스텝 · 제자리 대기 · 좌우 돌기 중 하나를 고른다.
+// 자세한 흐름 : Docs/Technical/Enemy/EnemyBehavior.md
 [Serializable, GeneratePropertyBag]
 [NodeDescription(
     name: "Keep Distance",
@@ -32,9 +23,9 @@ public partial class KeepDistanceAction : Action
         Idle
     }
 
-    // 목적지를 지금 위치보다 도는 방향으로 이 각도만큼 앞선 지점으로 잡는다.
+    // 목적지를 유지 거리의 원 위에서 이 각도만큼 앞선 지점으로 잡아, 거리가 맞으면 옆으로 돌고 아니면 원 쪽으로 다가가거나 물러난다.
     private const float STRAFE_LEAD_ANGLE = 30f;
-    // 백스텝 목적지를 지금 위치에서 이 거리만큼 뒤로 잡는다. 실제로 물러나는 거리는 속도 × 모션 길이가 정한다.
+    // 실제로 물러나는 거리는 속도 × 모션 길이가 정한다.
     private const float BACK_STEP_LOOK_AHEAD = 6f;
 
     [SerializeReference] public BlackboardVariable<Transform> Target;
@@ -76,14 +67,12 @@ public partial class KeepDistanceAction : Action
         }
     }
 
-    // 성공 · 실패 · 중단 어느 경우든 이동을 멈춘다.
     protected override void OnEnd()
     {
         if(_movement != null) _movement.Stop();
     }
 
-    // 확률을 한 번 뽑아 [0, 백스텝 확률) 은 백스텝, [백스텝 확률, 백스텝 + 대기 확률) 은 제자리 대기, 나머지는 좌 · 우 돌기로 정한다.
-    // 백스텝 구간이 뽑혔지만 백스텝 모션을 재생할 수 없으면 좌 · 우 돌기로 대신한다.
+    // 백스텝 모션을 재생할 수 없으면 좌우 돌기로 대신한다.
     private Mode PickMode()
     {
         float roll = Random.value;
@@ -94,7 +83,7 @@ public partial class KeepDistanceAction : Action
         return Mode.Strafe;
     }
 
-    // 속도 0 으로 지금 위치를 목적지로 넘겨, 움직이지 않고 대상 쪽으로 몸만 돌린다. 방향 모션은 (0, 0) 이라 제자리 모션이 나온다.
+    // 속도 0 으로 넘겨 대상 쪽으로 몸만 돌린다. 대상이 다가오거나 멀어져도 거리를 맞추지 않는다.
     private Status UpdateIdle()
     {
         _timer -= _clock.DeltaTime;
@@ -135,7 +124,7 @@ public partial class KeepDistanceAction : Action
         return Status.Running;
     }
 
-    // 대상에서 이 적 쪽으로 향하는 수평 방향. 대상과 위치가 겹치면 방향을 정할 수 없으므로 대상 앞쪽을 기준으로 삼는다.
+    // 대상과 위치가 겹치면 대상 앞쪽을 기준으로 삼는다.
     private Vector3 GetDirectionFromTarget()
     {
         Vector3 fromTarget = HorizontalVector.Between(Target.Value.position, GameObject.transform.position);

@@ -1,13 +1,11 @@
 using System;
 using UnityEngine;
 
-// 웨이브 구성. 웨이브마다 생성할 적 종류(Prefab)와 마리 수를 들고, 목록 순서대로 진행한다.
-// 적 데이터가 아닌 Prefab 을 넣는 이유 : Prefab 이 적 데이터를 들고 있어, 데이터만으로는 무엇을 생성할지 알 수 없기 때문이다.
-// 웨이브 사이 대기 시간과 생성 위치 간격도 여기서 정한다. 실행 중 바꾼 값이 플레이를 끝내도 남아 조정하기 쉽다.
+// 구역 하나의 웨이브 구성과 웨이브 사이 대기 시간 · 생성 간격.
+// 적 데이터만으로는 무엇을 생성할지 알 수 없어 적 Prefab 을 넣는다.
 [CreateAssetMenu(fileName = "NewWaveData", menuName = "HHH/Wave Data")]
 public class WaveData : ScriptableObject
 {
-    // 한 웨이브에 생성할 적 한 종류
     [Serializable]
     public class SpawnEntry
     {
@@ -18,9 +16,7 @@ public class WaveData : ScriptableObject
         public int Count => _count;
     }
 
-    // 웨이브 하나. 제한 시간을 쓰는 웨이브가 보스전이다. 스테이지의 마지막 웨이브 하나에만 켠다.
-    //   보스전은 웨이브가 나오는 순간 제한 시간을 재기 시작하고, 그 안에 보스 등급 적을 모두 처치해야 한다.
-    //   중간 보스처럼 제한 시간 없이 보스만 나오는 웨이브는 끈 채로 둔다.
+    // 제한 시간을 쓰는 웨이브가 보스전이다. 보스 구역의 마지막 웨이브에만 켜고, 중간 보스 웨이브는 끈 채로 둔다.
     [Serializable]
     public class Wave
     {
