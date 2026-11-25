@@ -154,7 +154,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -171, y: 76.00003}
+  m_AnchoredPosition: {x: -170.99994, y: 76.00003}
   m_SizeDelta: {x: 1024, y: 1024}
   m_Pivot: {x: 0, y: 1}
 --- !u!95 &15386429
@@ -268,7 +268,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
   m_AspectMode: 0
-  m_AspectRatio: 1.7763157
+  m_AspectRatio: 1.7780173
 --- !u!114 &38617474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1865,7 +1865,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 41, y: -475}
+  m_AnchoredPosition: {x: 41, y: -475.00003}
   m_SizeDelta: {x: 1024, y: 1024}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &950314045
@@ -2081,7 +2081,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -60, y: 350}
+  m_AnchoredPosition: {x: -60, y: 350.00003}
   m_SizeDelta: {x: 1024, y: 1024}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1016034246
@@ -2492,7 +2492,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -85.00006, y: -456}
+  m_AnchoredPosition: {x: -85.00006, y: -456.00003}
   m_SizeDelta: {x: 1024, y: 1024}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1349053654
@@ -3158,6 +3158,10 @@ PrefabInstance:
       propertyPath: m_hasFontAssetChanged
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1919475805170959819, guid: 8816b397304ba16458fa6536fffddeed, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2138156787431138628, guid: 8816b397304ba16458fa6536fffddeed, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -3481,6 +3485,10 @@ PrefabInstance:
     - target: {fileID: 8904459644313468621, guid: 8816b397304ba16458fa6536fffddeed, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -688.025
+      objectReference: {fileID: 0}
+    - target: {fileID: 8963257015614026462, guid: 8816b397304ba16458fa6536fffddeed, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
