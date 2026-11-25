@@ -15,7 +15,7 @@
 <details>
   <summary>플레이 영상</summary>
   
-  [![Youtube](http://i.ytimg.com/vi/wdAf5GuQr1U&feature=youtu.be/1.jpg)](https://www.youtube.com/watch?app=desktop&v=wdAf5GuQr1U&feature=youtu.be)
+  [![Youtube](http://i.ytimg.com/vi/wdAf5GuQr1U/0.jpg)](https://www.youtube.com/watch?app=desktop&v=wdAf5GuQr1U&feature=youtu.be)
   
 </details>
 
