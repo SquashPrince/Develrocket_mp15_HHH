@@ -1,5 +1,26 @@
 # Project : Hollow Horizon Hunter
 
+<img width="1577" height="884" alt="image" src="https://github.com/user-attachments/assets/5041b656-6214-4f74-8811-af797da08a68" />
+
+### 시놉시스
+
+***어느 날 공허**(HOLLOW)* ***속에서 나타난 몬스터들에 의해 폐허가 된 도시.***
+
+***가까스로 살아남은 그들은 과거의 영광**(HORIZON)**를 되찾기 위해***
+
+***몬스터를 사냥하러**(HUNTER) **다니고 있다.***
+
+---
+
+<details>
+  <summary>플레이 영상</summary>
+  
+  [![Youtube](http://i.ytimg.com/vi/wdAf5GuQr1U&feature=youtu.be/1.jpg)](https://www.youtube.com/watch?app=desktop&v=wdAf5GuQr1U&feature=youtu.be)
+  
+</details>
+
+
+
 ## 스토리
 
 어느 날 공허(**Hollow**) 속에서 나타난 몬스터들에 의해 폐허가 된 도시.
