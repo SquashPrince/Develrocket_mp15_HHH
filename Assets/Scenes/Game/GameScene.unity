@@ -204,7 +204,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 66121799}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Obstacle (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -243,7 +243,7 @@ GameObject:
   - component: {fileID: 87927408}
   - component: {fileID: 87927407}
   - component: {fileID: 87927406}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -654,7 +654,7 @@ GameObject:
   - component: {fileID: 174764899}
   - component: {fileID: 174764898}
   - component: {fileID: 174764897}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -783,7 +783,7 @@ GameObject:
   - component: {fileID: 204980341}
   - component: {fileID: 204980340}
   - component: {fileID: 204980339}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -923,7 +923,7 @@ GameObject:
   - component: {fileID: 269866881}
   - component: {fileID: 269866880}
   - component: {fileID: 269866879}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: InnerWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1197,7 +1197,7 @@ GameObject:
   - component: {fileID: 304106902}
   - component: {fileID: 304106901}
   - component: {fileID: 304106900}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1497,7 +1497,7 @@ GameObject:
   - component: {fileID: 360029315}
   - component: {fileID: 360029314}
   - component: {fileID: 360029313}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1626,7 +1626,7 @@ GameObject:
   - component: {fileID: 432267536}
   - component: {fileID: 432267535}
   - component: {fileID: 432267534}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1933,7 +1933,7 @@ GameObject:
   - component: {fileID: 474876641}
   - component: {fileID: 474876640}
   - component: {fileID: 474876639}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2172,7 +2172,7 @@ GameObject:
   - component: {fileID: 547834923}
   - component: {fileID: 547834922}
   - component: {fileID: 547834921}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2373,7 +2373,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 738200454}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Obstacle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2523,7 +2523,7 @@ GameObject:
   - component: {fileID: 979309095}
   - component: {fileID: 979309094}
   - component: {fileID: 979309093}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2648,7 +2648,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1021087058}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Obstacle (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2687,7 +2687,7 @@ GameObject:
   - component: {fileID: 1032586218}
   - component: {fileID: 1032586217}
   - component: {fileID: 1032586216}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: InnerWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3502,7 +3502,7 @@ GameObject:
   - component: {fileID: 1776826345}
   - component: {fileID: 1776826344}
   - component: {fileID: 1776826343}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3996,7 +3996,7 @@ GameObject:
   - component: {fileID: 2049375092}
   - component: {fileID: 2049375091}
   - component: {fileID: 2049375090}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4125,7 +4125,7 @@ GameObject:
   - component: {fileID: 2119194294}
   - component: {fileID: 2119194293}
   - component: {fileID: 2119194292}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4254,7 +4254,7 @@ GameObject:
   - component: {fileID: 2119712133}
   - component: {fileID: 2119712132}
   - component: {fileID: 2119712131}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: InnerWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5421,6 +5421,30 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -250
       objectReference: {fileID: 0}
+    - target: {fileID: 1534943735793937294, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534943735793937294, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1826348552195713081, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1826348552195713081, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1975602558723981925, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1975602558723981925, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2526325409089272876, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -5462,6 +5486,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3470127352920705793, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3742648668357578800, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3742648668357578800, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
@@ -5641,11 +5673,27 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7996850316393732795, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7996850316393732795, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8125531133796423816, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8125531133796423816, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8300261215351872703, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8300261215351872703, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
@@ -5672,6 +5720,14 @@ PrefabInstance:
     - target: {fileID: 8773254157487465039, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8778222352850082201, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8778222352850082201, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8976867311028617509, guid: 06d88bb19919cf14494cf1da4c670934, type: 3}
       propertyPath: _gameFlow
