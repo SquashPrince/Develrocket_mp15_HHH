@@ -8,13 +8,13 @@ public class PlayerSwapOutState : PlayerState
     private static readonly int SWAP_OUT_ANIMATION = Animator.StringToHash("SwapOut");
     private static readonly int MOVE_ANIMATION = Animator.StringToHash("Move");
 
-    private readonly DitherFade _ditherFade;
+    private readonly BodyRenderer _bodyRenderer;
     private float _timer;
     private bool _isRunning;
 
     public PlayerSwapOutState(PlayerController controller) : base(controller)
     {
-        _ditherFade = controller.GetComponent<DitherFade>();
+        _bodyRenderer = controller.GetComponent<BodyRenderer>();
     }
 
     public override void Enter()
@@ -31,7 +31,7 @@ public class PlayerSwapOutState : PlayerState
     {
         Controller.Animation.EndBodyPart();
 
-        if(_ditherFade != null) _ditherFade.SetSwapOutVisibility(1f);
+        if(_bodyRenderer != null) _bodyRenderer.SetSwapOutVisibility(1f);
     }
 
     public override void Tick()
@@ -50,10 +50,10 @@ public class PlayerSwapOutState : PlayerState
 
         Controller.Animation.SetMoveSpeed(Controller.RunSpeed);
 
-        if(_ditherFade == null) return;
+        if(_bodyRenderer == null) return;
 
         float progress = Mathf.InverseLerp(Controller.Common.SwapOutRunDelay, Controller.Common.SwapOutTime, _timer);
-        _ditherFade.SetSwapOutVisibility(1f - progress);
+        _bodyRenderer.SetSwapOutVisibility(1f - progress);
     }
 
     // 퇴장 모션은 모델만 뒤돌고 캐릭터 방향은 그대로라, 캐릭터를 반대로 돌려야 돌아선 자세 그대로 달려 나간다.

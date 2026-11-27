@@ -144,6 +144,7 @@ GameObject:
   - component: {fileID: 7500533871444140376}
   - component: {fileID: 6892805522329183486}
   - component: {fileID: 4079339579516450329}
+  - component: {fileID: 6469856652301179921}
   m_Layer: 8
   m_Name: Earth Golem Elite
   m_TagString: Untagged
@@ -322,8 +323,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61e49906bd6d21847b707d0faab7b8d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDissolve
+--- !u!114 &6469856652301179921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1014979457245420274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09c475dbf4ca4249a75fba497b68dc03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyRenderer
   _renderers:
   - {fileID: 5954472650681629776}
+  _fadeStartDistance: 3
+  _fadeEndDistance: 1
+  _centerHeight: 1
 --- !u!1 &1936456082417818932
 GameObject:
   m_ObjectHideFlags: 0
@@ -968,7 +984,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ae72906c97bc824429aa4cea5ca5d9d9, type: 2}
+  - {fileID: 2100000, guid: 3a7f083249d943f38c3d2d6fa8e4ad58, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

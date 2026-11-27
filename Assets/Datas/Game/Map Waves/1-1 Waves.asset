@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WaveData
   _waves:
   - _entries:
-    - _prefab: {fileID: 7810074939736527391, guid: 89fe4c7998efe594fbe9aa4c2efdc352, type: 3}
+    - _prefab: {fileID: 6714013248425762633, guid: 7f44b491c887ebc40b4a66d85e2aeeeb, type: 3}
       _count: 7
     _useTimeLimit: 0
     _timeLimit: 180

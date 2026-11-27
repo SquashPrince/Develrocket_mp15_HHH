@@ -7096,6 +7096,7 @@ GameObject:
   - component: {fileID: 4670862040014280236}
   - component: {fileID: 3126899296500088865}
   - component: {fileID: 2085348062159276791}
+  - component: {fileID: 6237626997343508053}
   m_Layer: 7
   m_Name: Fighter
   m_TagString: Untagged
@@ -7261,6 +7262,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57d57318340c5fb468b1d55491c04a4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerfectDodgeAfterimage
+--- !u!114 &6237626997343508053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8698875331694340960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09c475dbf4ca4249a75fba497b68dc03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyRenderer
   _renderers:
   - {fileID: 6078187313154859049}
   - {fileID: 913662935273588264}
@@ -7269,6 +7282,9 @@ MonoBehaviour:
   - {fileID: 2711234537048468505}
   - {fileID: 6874441121747143998}
   - {fileID: 5063623422843498556}
+  _fadeStartDistance: 2
+  _fadeEndDistance: 0.8
+  _centerHeight: 1
 --- !u!1 &8795346707650663418
 GameObject:
   m_ObjectHideFlags: 0
