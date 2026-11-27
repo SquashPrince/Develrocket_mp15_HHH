@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,6 +9,7 @@ public class WaveSpawner : MonoBehaviour
     private const float NAVMESH_SEARCH_DISTANCE = 2f;
 
     [SerializeField] private PlayerParty _party;
+    [SerializeField] private BattleManager _battleManager;
     [Tooltip("보스 바를 띄울 화면 Canvas")]
     [SerializeField] private Transform _bossHudRoot;
 
@@ -99,7 +99,7 @@ public class WaveSpawner : MonoBehaviour
         }
     }
 
-    // 조작 중인 캐릭터를 바라보게 만들고, 파티에 등록해 공격 대상을 받는다.
+    // 조작 중인 캐릭터를 바라보게 만들고, 배틀 매니저에 등록해 공격 대상을 받는다.
     private EnemyController Spawn(EnemyController prefab, Vector3 position)
     {
         Vector3 toPlayer = HorizontalVector.Between(position, _party.Controlled.transform.position);
@@ -107,7 +107,7 @@ public class WaveSpawner : MonoBehaviour
         Quaternion rotation = toPlayer == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(toPlayer);
         EnemyController enemy = Instantiate(prefab, position, rotation);
 
-        _party.RegisterEnemy(enemy.GetComponent<BehaviorGraphAgent>());
+        _battleManager.Register(enemy);
         return enemy;
     }
 

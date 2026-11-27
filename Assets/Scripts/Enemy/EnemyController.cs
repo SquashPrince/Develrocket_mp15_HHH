@@ -26,6 +26,8 @@ public class EnemyController : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
 
     public EnemyData Data => _data;
     public EnemyState State => _state;
+    // 공격 권한 · 판정 Layer · 다른 적 목록을 묻는 곳. 배틀 매니저가 등록할 때 넣어 준다.
+    public BattleManager Battle { get; private set; }
     public bool IsAlive => _state.IsAlive;
     public float Radius => _radius;
     public Transform LockOnPoint => _lockOnPoint;
@@ -47,6 +49,8 @@ public class EnemyController : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     public void ClearComboChain() => _state.ClearComboChain();
     public void HoldGroggy(float duration) => _state.HoldGroggy(duration);
     public void SetGroggyPaused(bool isPaused) => _state.SetGroggyPaused(isPaused);
+
+    public void JoinBattle(BattleManager battle) => Battle = battle;
 
     // Prefab 에는 씬의 Canvas 를 연결할 수 없어, 실행 중 생성한 보스는 생성한 쪽이 넘겨준다.
     public void SetHudRoot(Transform hudRoot)

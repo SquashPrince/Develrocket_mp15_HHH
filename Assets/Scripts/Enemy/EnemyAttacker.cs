@@ -9,8 +9,6 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 {
     private const int MAX_HIT_COLLIDERS = 8;
 
-    [Tooltip("판정에 걸릴 Layer (Player)")]
-    [SerializeField] private LayerMask _targetLayers = ~0;
     [Tooltip("패링 공격 예고 표시를 띄울 위치. 록온 표시와 겹치지 않도록 적 안에 따로 둔 자식. 표시는 플레이어 쪽이 띄운다")]
     [SerializeField] private Transform _telegraphPoint;
 
@@ -372,7 +370,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     {
         EnemyAttackData attack = CurrentAttack;
         EnemyAttackStep step = CurrentStep;
-        int count = step.Range.Overlap(transform, _hitColliders, _targetLayers);
+        int count = step.Range.Overlap(transform, _hitColliders, _controller.Battle.PlayerLayers);
         PlayerStatus parrier = null;
 
         _landedTargets.Clear();
@@ -409,11 +407,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     {
         if(_target == null) return;
 
-        Vector3 toTarget = HorizontalVector.Between(transform.position, _target.position);
-
-        if(toTarget == Vector3.zero) return;
-
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(toTarget), CurrentAttack.TurnSpeed * _state.Clock.DeltaTime);
+        _movement.TurnTowards(_target.position - transform.position, CurrentAttack.TurnSpeed);
     }
 
     private void StartLeap(AnimationEvent animationEvent)
