@@ -4964,6 +4964,7 @@ GameObject:
   - component: {fileID: 3495393291802485486}
   - component: {fileID: 4500917182947509189}
   - component: {fileID: 3765386493765953358}
+  - component: {fileID: 7179595270609402632}
   m_Layer: 7
   m_Name: Knight
   m_TagString: Untagged
@@ -5129,6 +5130,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57d57318340c5fb468b1d55491c04a4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerfectDodgeAfterimage
+--- !u!114 &7179595270609402632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7306029376340620380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09c475dbf4ca4249a75fba497b68dc03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyRenderer
   _renderers:
   - {fileID: 4358187619031993863}
   - {fileID: 56250384077176807}
@@ -5139,6 +5152,9 @@ MonoBehaviour:
   - {fileID: 4371721072779865058}
   - {fileID: 6420739475055945978}
   - {fileID: 1755500756296794755}
+  _fadeStartDistance: 2
+  _fadeEndDistance: 0.8
+  _centerHeight: 1
 --- !u!1 &7320020932046485997
 GameObject:
   m_ObjectHideFlags: 0

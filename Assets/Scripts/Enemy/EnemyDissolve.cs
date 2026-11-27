@@ -2,21 +2,13 @@ using UnityEngine;
 
 // 처치된 적의 시체를 녹여 없애고, 녹기 시작할 때 처치 이펙트를 띄운다.
 // 시체 시간이 끝나는 순간 다 녹도록 그보다 디졸브 시간만큼 먼저 시작하고, 시체 시간과 같은 적 전용 시간으로 흐른다.
-// 같은 Material 을 쓰는 다른 적에 영향이 없게 녹는 정도는 MaterialPropertyBlock 으로 넣는다.
-// 처치된 적은 꺼진 뒤 웨이브 생성기가 다시 꺼내 쓰므로, 그때 바꾼 Material 과 녹은 정도를 처음으로 되돌린다.
 [RequireComponent(typeof(EnemyController))]
+[RequireComponent(typeof(BodyRenderer))]
 public class EnemyDissolve : MonoBehaviour
 {
-    private static readonly int DISSOLVE_AMOUNT_ID = Shader.PropertyToID("_DissolveAmount");
-
-    [Tooltip("녹일 Renderer (몸 · 무기). 예고 표시처럼 몸이 아닌 Renderer 는 넣지 않는다")]
-    [SerializeField] private Renderer[] _renderers;
-
-    // Renderer 마다 처음 Material 목록
-    private Material[][] _originalMaterials;
-    private MaterialPropertyBlock _propertyBlock;
     private EnemyState _state;
     private EnemyData _data;
+    private BodyRenderer _bodyRenderer;
     // 모두 적 전용 시간
     private float _timer;
     private float _delay;
@@ -25,7 +17,6 @@ public class EnemyDissolve : MonoBehaviour
     private bool _isDissolving;
 
     private void Awake() => CacheComponent();
-    private void Start() => Init();
     private void OnEnable() => BindDiedEvent();
     private void OnDisable() => UnbindDiedEvent();
     private void Update() => UpdateDissolve();
@@ -51,11 +42,7 @@ public class EnemyDissolve : MonoBehaviour
         _isDying = false;
         _isDissolving = false;
 
-        for(int i = 0; i < _renderers.Length; i++)
-        {
-            _renderers[i].sharedMaterials = _originalMaterials[i];
-            _renderers[i].SetPropertyBlock(null);
-        }
+        _bodyRenderer.RestoreMaterials();
     }
 
     private void UpdateDissolve()
@@ -68,7 +55,7 @@ public class EnemyDissolve : MonoBehaviour
 
         if(!_isDissolving) BeginDissolve();
 
-        if(_data.DissolveMaterial != null) SetDissolveAmount(Mathf.Clamp01((_timer - _delay) / _duration));
+        if(_data.DissolveMaterial != null) _bodyRenderer.SetDissolveAmount(Mathf.Clamp01((_timer - _delay) / _duration));
     }
 
     private void BeginDissolve()
@@ -76,29 +63,7 @@ public class EnemyDissolve : MonoBehaviour
         _isDissolving = true;
         BattleEffect.Play(_data.DeathEffectPrefab, transform.position, transform.rotation);
 
-        if(_data.DissolveMaterial == null) return;
-
-        foreach(Renderer target in _renderers)
-        {
-            Material[] materials = new Material[target.sharedMaterials.Length];
-
-            for(int i = 0; i < materials.Length; i++)
-            {
-                materials[i] = _data.DissolveMaterial;
-            }
-
-            target.sharedMaterials = materials;
-        }
-    }
-
-    private void SetDissolveAmount(float amount)
-    {
-        foreach(Renderer target in _renderers)
-        {
-            target.GetPropertyBlock(_propertyBlock);
-            _propertyBlock.SetFloat(DISSOLVE_AMOUNT_ID, amount);
-            target.SetPropertyBlock(_propertyBlock);
-        }
+        if(_data.DissolveMaterial != null) _bodyRenderer.BeginDissolve(_data.DissolveMaterial);
     }
 
     // 처치 알림은 EnemyState 가 가진다. EnemyController 의 Awake 보다 먼저 켜질 수 있어, 컨트롤러를 거치지 않고 직접 찾는다.
@@ -106,17 +71,7 @@ public class EnemyDissolve : MonoBehaviour
     {
         _state = GetComponent<EnemyState>();
         _data = GetComponent<EnemyController>().Data;
-        _originalMaterials = new Material[_renderers.Length][];
-
-        for(int i = 0; i < _renderers.Length; i++)
-        {
-            _originalMaterials[i] = _renderers[i].sharedMaterials;
-        }
-    }
-
-    private void Init()
-    {
-        _propertyBlock = new MaterialPropertyBlock();
+        _bodyRenderer = GetComponent<BodyRenderer>();
     }
 
     private void BindDiedEvent()

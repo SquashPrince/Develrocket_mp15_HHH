@@ -98,7 +98,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6dde8a74ee2c4433b62a4c9b27a167f1, type: 2}
+  - {fileID: 2100000, guid: 287fcb7ee210ed34fb86847a4991cc28, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -249,7 +249,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6dde8a74ee2c4433b62a4c9b27a167f1, type: 2}
+  - {fileID: 2100000, guid: 287fcb7ee210ed34fb86847a4991cc28, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1492,7 +1492,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6dde8a74ee2c4433b62a4c9b27a167f1, type: 2}
+  - {fileID: 2100000, guid: 287fcb7ee210ed34fb86847a4991cc28, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2207,6 +2207,7 @@ GameObject:
   - component: {fileID: 372588920400552806}
   - component: {fileID: 6714013248425762633}
   - component: {fileID: 3904245299445549236}
+  - component: {fileID: 7338109603743091751}
   m_Layer: 8
   m_Name: Boss_Black Knight
   m_TagString: Untagged
@@ -2408,7 +2409,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61e49906bd6d21847b707d0faab7b8d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDissolve
+--- !u!114 &7338109603743091751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8592957830441349726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09c475dbf4ca4249a75fba497b68dc03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyRenderer
   _renderers:
   - {fileID: 2241258730352054176}
   - {fileID: 2241258730355334240}
   - {fileID: 2241258730355334242}
+  _fadeStartDistance: 8
+  _fadeEndDistance: 1
+  _centerHeight: 1

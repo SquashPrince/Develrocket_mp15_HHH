@@ -8,11 +8,13 @@ public class PlayerSwapOutState : PlayerState
     private static readonly int SWAP_OUT_ANIMATION = Animator.StringToHash("SwapOut");
     private static readonly int MOVE_ANIMATION = Animator.StringToHash("Move");
 
+    private readonly BodyRenderer _bodyRenderer;
     private float _timer;
     private bool _isRunning;
 
     public PlayerSwapOutState(PlayerController controller) : base(controller)
     {
+        _bodyRenderer = controller.GetComponent<BodyRenderer>();
     }
 
     public override void Enter()
@@ -25,7 +27,12 @@ public class PlayerSwapOutState : PlayerState
     }
 
     // 꺼진 채로 다음 교체를 기다리다 다시 들어올 때 이 상태를 나가며 부위 덮기 레이어를 끈다.
-    public override void Exit() => Controller.Animation.EndBodyPart();
+    public override void Exit()
+    {
+        Controller.Animation.EndBodyPart();
+
+        if(_bodyRenderer != null) _bodyRenderer.SetSwapOutVisibility(1f);
+    }
 
     public override void Tick()
     {
@@ -39,7 +46,14 @@ public class PlayerSwapOutState : PlayerState
 
         if(!_isRunning && _timer >= Controller.Common.SwapOutRunDelay) BeginRun();
 
-        if(_isRunning) Controller.Animation.SetMoveSpeed(Controller.RunSpeed);
+        if(!_isRunning) return;
+
+        Controller.Animation.SetMoveSpeed(Controller.RunSpeed);
+
+        if(_bodyRenderer == null) return;
+
+        float progress = Mathf.InverseLerp(Controller.Common.SwapOutRunDelay, Controller.Common.SwapOutTime, _timer);
+        _bodyRenderer.SetSwapOutVisibility(1f - progress);
     }
 
     // 퇴장 모션은 모델만 뒤돌고 캐릭터 방향은 그대로라, 캐릭터를 반대로 돌려야 돌아선 자세 그대로 달려 나간다.
