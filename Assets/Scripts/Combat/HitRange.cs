@@ -50,6 +50,28 @@ public readonly struct HitRange
         }
     }
 
+    // 한 점이 범위 안인지 본다. 패링 순간 이동이 적 공격 범위 안의 자리를 고를 때 쓴다.
+    // 콜라이더 찾기와 같은 모양 · 방향 기준이다. 부채꼴은 점 하나라 경계 대신 점의 높이 · 거리 · 각도를 본다.
+    public bool Contains(Transform origin, Vector3 point)
+    {
+        Vector3 worldCenter = origin.TransformPoint(_center);
+
+        switch(_shape)
+        {
+            case HitShape.Sphere:
+                return (point - worldCenter).sqrMagnitude <= _radius * _radius;
+            case HitShape.Capsule:
+                GetCapsulePoints(origin, out Vector3 start, out Vector3 end);
+                return GetSqrDistanceToSegment(point, start, end) <= _radius * _radius;
+            case HitShape.Fan:
+                return IsInFan(origin, worldCenter, point);
+            default:
+                Vector3 local = Quaternion.Inverse(origin.rotation) * (point - worldCenter);
+                Vector3 half = _size * 0.5f;
+                return Mathf.Abs(local.x) <= half.x && Mathf.Abs(local.y) <= half.y && Mathf.Abs(local.z) <= half.z;
+        }
+    }
+
     // Scene 창에 범위를 그린다. 색은 부르는 쪽이 정한다.
     public void DrawGizmos(Transform origin)
     {
@@ -97,6 +119,28 @@ public readonly struct HitRange
         }
 
         return kept;
+    }
+
+    // 찾기용 구(바깥 반지름) 안이면서, 높이 범위 · 안쪽 반지름 · 정면 기준 수평 각도 조건을 콜라이더 거르기와 같게 본다.
+    private bool IsInFan(Transform origin, Vector3 worldCenter, Vector3 point)
+    {
+        if((point - worldCenter).sqrMagnitude > _radius * _radius) return false;
+        if(Mathf.Abs(point.y - worldCenter.y) > _height * 0.5f) return false;
+
+        Vector3 toPoint = HorizontalVector.Flatten(point - worldCenter);
+
+        if(toPoint.magnitude < _innerRadius) return false;
+
+        return toPoint == Vector3.zero || Vector3.Angle(HorizontalVector.Flatten(origin.forward), toPoint) <= _angle * 0.5f;
+    }
+
+    private static float GetSqrDistanceToSegment(Vector3 point, Vector3 start, Vector3 end)
+    {
+        Vector3 segment = end - start;
+        float sqrLength = segment.sqrMagnitude;
+        float t = sqrLength > 0f ? Mathf.Clamp01(Vector3.Dot(point - start, segment) / sqrLength) : 0f;
+
+        return (point - (start + segment * t)).sqrMagnitude;
     }
 
     // 캡슐의 양 끝 구 중심. 앞쪽 방향으로 전체 길이만큼 뻗고, 길이가 반지름의 두 배보다 짧으면 두 점이 겹쳐 구가 된다.
