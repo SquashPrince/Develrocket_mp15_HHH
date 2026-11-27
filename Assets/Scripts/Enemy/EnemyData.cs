@@ -71,6 +71,8 @@ public class EnemyData : ScriptableObject
     [Header("행동 : 공격")]
     [Tooltip("이 거리 안에 들어오면 공격을 시작한다. 밖이면 이 거리까지 다가간다")]
     [SerializeField, Min(0f)] private float _attackRange = 2f;
+    [Tooltip("공격 권한을 받고 다가가는 시간의 상한(초, 적 전용 시간). 넘기면 사거리 밖에서 쓸 수 있는 공격(추격 공격)을 하고, 없으면 공격을 포기한다. 0 이면 상한 없이 끝까지 다가간다")]
+    [SerializeField, Min(0f)] private float _approachTimeLimit = 3f;
     [Tooltip("공격을 마친 뒤 다음 행동까지 기다리는 시간(초, 적 전용 시간)")]
     [SerializeField, Min(0f)] private float _attackInterval = 2f;
     [Tooltip("이 적이 쓰는 공격 목록 (적 공격 데이터 에셋)")]
@@ -101,6 +103,7 @@ public class EnemyData : ScriptableObject
     public float IdleChance => _idleChance;
     public float BackStepSpeedRate => _backStepSpeedRate;
     public float AttackRange => _attackRange;
+    public float ApproachTimeLimit => _approachTimeLimit;
     public float AttackInterval => _attackInterval;
     public EnemyAttackData[] Attacks => _attacks;
 

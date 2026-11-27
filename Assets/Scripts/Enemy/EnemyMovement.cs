@@ -1,13 +1,18 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 // 적 이동. NavMeshAgent 는 경로 계산에만 쓰고 이동 · 회전은 직접 한다.
 // Agent 가 스스로 움직이면 가속도 설정의 영향을 받고 적 전용 시간(슬로모션 · 필살기 연출)을 따르지 않기 때문이다.
-// 적끼리 피하는 기능(Agent 회피)은 쓰지 않는다.
+// 적끼리 피하는 기능(Agent 회피)은 쓰지 않고, 한 걸음 옮기기 전에 다른 적의 몸 반지름과 겹치지 않게 직접 밀어낸다.
 [RequireComponent(typeof(NavMeshAgent), typeof(EnemyState))]
 [RequireComponent(typeof(EnemyAnimation))]
 public class EnemyMovement : MonoBehaviour
 {
+    // 이보다 덜 움직였으면 제자리로 보고 방향 모션을 (0, 0) 으로 둔다.
+    private const float MIN_MOVED_DISTANCE = 0.0001f;
+
+    private EnemyController _controller;
     private EnemyData _data;
     private NavMeshAgent _agent;
     private EnemyState _state;
@@ -70,31 +75,63 @@ public class EnemyMovement : MonoBehaviour
         float step = Mathf.Min(_speed * _state.Clock.DeltaTime, toCorner.magnitude);
         Vector3 moveDirection = toCorner.normalized;
 
+        Vector3 previousPosition = transform.position;
+
         // Agent 의 위치를 먼저 옮기면 NavMesh 위로 맞춰지므로, 맞춰진 위치를 실제 위치로 쓴다.
-        _agent.nextPosition = transform.position + moveDirection * step;
+        _agent.nextPosition = KeepApartFromEnemies(previousPosition + moveDirection * step);
         transform.position = _agent.nextPosition;
 
-        // 방향 모션용. 움직이지 않았으면 (0, 0) 이라 제자리 모션이 나온다.
-        Vector3 localDirection = step > 0f ? transform.InverseTransformDirection(moveDirection) : Vector3.zero;
+        // 방향 모션용. 다른 적에 밀려 옆으로 미끄러질 수 있어 실제로 움직인 방향을 쓴다. 움직이지 않았으면 (0, 0) 이라 제자리 모션이 나온다.
+        Vector3 moved = HorizontalVector.Between(previousPosition, transform.position);
+        Vector3 localDirection = moved.sqrMagnitude > MIN_MOVED_DISTANCE * MIN_MOVED_DISTANCE ? transform.InverseTransformDirection(moved.normalized) : Vector3.zero;
         _animation.SetMoveDirection(localDirection);
 
         Vector3 lookDirection = _lookTarget != null ? _lookTarget.position - transform.position : moveDirection;
-        TurnTowards(lookDirection);
+        TurnTowards(lookDirection, _data.TurnSpeed);
     }
 
-    private void TurnTowards(Vector3 direction)
+    // 높이는 무시하고 적 전용 시간으로 돈다. 이동 중에는 이동 기능이, 공격 중에는 공격 기능이 공격별 회전 속도로 부른다.
+    // turnSpeed : 초당 회전 각도
+    public void TurnTowards(Vector3 direction, float turnSpeed)
     {
         direction = HorizontalVector.Flatten(direction);
 
         if(direction == Vector3.zero) return;
 
         Quaternion targetRotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _data.TurnSpeed * _state.Clock.DeltaTime);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * _state.Clock.DeltaTime);
+    }
+
+    // 다른 적의 몸에 들어간 만큼 수평으로 밀어낸다. 다가가던 방향의 겹친 성분만 빠지므로 다른 적을 옆으로 미끄러지며 돌아간다.
+    // 서 있는 적은 밀지 않고 움직이는 쪽만 비켜 간다. 시체 · 꺼진 적은 막지 않는다. 완전히 같은 자리면 밀 방향이 없어 그대로 둔다.
+    private Vector3 KeepApartFromEnemies(Vector3 position)
+    {
+        IReadOnlyList<EnemyController> enemies = _controller.Battle.Enemies;
+
+        for(int i = 0; i < enemies.Count; i++)
+        {
+            EnemyController other = enemies[i];
+
+            if(other == _controller || !other.IsAlive || !other.gameObject.activeInHierarchy) continue;
+
+            Vector3 otherPosition = other.transform.position;
+            Vector3 fromOther = HorizontalVector.Between(otherPosition, position);
+            float minDistance = _controller.Radius + other.Radius;
+
+            if(fromOther == Vector3.zero || fromOther.sqrMagnitude >= minDistance * minDistance) continue;
+
+            Vector3 pushed = otherPosition + fromOther.normalized * minDistance;
+            position.x = pushed.x;
+            position.z = pushed.z;
+        }
+
+        return position;
     }
 
     private void CacheComponent()
     {
-        _data = GetComponent<EnemyController>().Data;
+        _controller = GetComponent<EnemyController>();
+        _data = _controller.Data;
         _agent = GetComponent<NavMeshAgent>();
         _state = GetComponent<EnemyState>();
         _animation = GetComponent<EnemyAnimation>();

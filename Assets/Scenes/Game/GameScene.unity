@@ -3130,6 +3130,7 @@ GameObject:
   - component: {fileID: 1521699987}
   - component: {fileID: 1521699990}
   - component: {fileID: 1521699991}
+  - component: {fileID: 1521699993}
   - component: {fileID: 1521699992}
   m_Layer: 0
   m_Name: GameFlow
@@ -3151,6 +3152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveSpawner
   _party: {fileID: 1781024354}
+  _battleManager: {fileID: 1521699993}
   _bossHudRoot: {fileID: 831951382}
 --- !u!114 &1521699988
 MonoBehaviour:
@@ -3238,6 +3240,23 @@ MonoBehaviour:
   _bossFinishOrbit: {fileID: 1939380163}
   _bossOrbitSpeed: 15
   _mainCamera: {fileID: 330585545}
+--- !u!114 &1521699993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1521699986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d046c3d515e64dd4cb2bc3c757dbf7c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleManager
+  _party: {fileID: 1781024354}
+  _maxMeleeAttackers: 3
+  _playerLayers:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!114 &1574066564 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7713882913630503258, guid: e574429062f4b83499904c80d5bc163f, type: 3}
