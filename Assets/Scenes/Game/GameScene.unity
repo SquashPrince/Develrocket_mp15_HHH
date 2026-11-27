@@ -5176,6 +5176,10 @@ PrefabInstance:
       value: Post Processings
       objectReference: {fileID: 0}
     - target: {fileID: 7086453449044595682, guid: 1f73754b3162915478403a2df6a6012a, type: 3}
+      propertyPath: _waveSpawner
+      value: 
+      objectReference: {fileID: 1521699987}
+    - target: {fileID: 7086453449044595682, guid: 1f73754b3162915478403a2df6a6012a, type: 3}
       propertyPath: _damageTextSpawner
       value: 
       objectReference: {fileID: 1574066564}

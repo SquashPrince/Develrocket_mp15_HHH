@@ -18,6 +18,9 @@ public class EnemyClock
         _hitStopTimer = Mathf.Max(_hitStopTimer, duration);
     }
 
+    // 풀에서 다시 꺼낸 적이 이전 히트스톱을 이어받지 않게 한다.
+    public void ClearHitStop() => _hitStopTimer = 0f;
+
     // 플레이어 히트렉과 같은 게임 시간으로 재야 둘이 함께 멈췄다 함께 풀리고, 일시정지 중에는 함께 멈춘다.
     public void Tick()
     {

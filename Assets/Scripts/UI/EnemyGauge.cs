@@ -41,14 +41,18 @@ public class EnemyGauge : MonoBehaviour
     private Graphic _groggyFillImage;
     private Color _normalFillColor;
 
-    // 막대 묶음이 바 자신이면 숨길 때 이 컴포넌트도 꺼지므로, HUD 숨김 알림은 켜짐 · 꺼짐이 아닌 바가 있는 동안 내내 받는다.
+    // 막대 묶음이 바 자신이면 숨길 때 이 컴포넌트도 꺼지므로, HUD 숨김 · 다시 살아남 알림은 켜짐 · 꺼짐이 아닌 바가 있는 동안 내내 받는다.
     private void Awake()
     {
         CacheComponent();
         BindHudVisibilityEvent();
     }
 
-    private void OnDestroy() => UnbindHudVisibilityEvent();
+    private void OnDestroy()
+    {
+        UnbindHudVisibilityEvent();
+        UnbindReviveEvent();
+    }
     // 처음 켜질 때는 대상이 없어 SetTarget 에서 구독하고, 다시 켜질 때는 여기서 구독한다.
     private void OnEnable()
     {
@@ -69,9 +73,17 @@ public class EnemyGauge : MonoBehaviour
     {
         _target = target;
         BindEnemyEvent();
+        BindReviveEvent();
     }
 
     private void OnDamaged(bool isImpact) => RefreshHealth(false);
+
+    // 처치되어 숨긴 바를 다시 보이고 처음 값으로 그린다. 막대 묶음이 바 자신이면 다시 켜지며 적 알림도 다시 구독한다.
+    private void OnRevived()
+    {
+        RefreshVisibility();
+        RefreshAll();
+    }
 
     // isSnap : 처음 그리기에서 잔상 없이 바로 맞춘다.
     private void RefreshHealth(bool isSnap)
@@ -172,6 +184,17 @@ public class EnemyGauge : MonoBehaviour
         _target.GroggyGaugeChanged -= RefreshGroggyGauge;
         _target.GroggyEntered -= RefreshGroggyState;
         _target.Recovered -= RefreshGroggyState;
+    }
+
+    // 다시 살아남 알림은 바가 꺼져 있을 때도 받아야 하므로 바가 있는 동안 내내 구독한다.
+    private void BindReviveEvent()
+    {
+        _target.Revived += OnRevived;
+    }
+
+    private void UnbindReviveEvent()
+    {
+        if(_target != null) _target.Revived -= OnRevived;
     }
 
     private void BindHudVisibilityEvent()

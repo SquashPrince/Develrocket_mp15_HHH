@@ -3,7 +3,7 @@ using UnityEngine;
 // 처치된 적의 시체를 녹여 없애고, 녹기 시작할 때 처치 이펙트를 띄운다.
 // 시체 시간이 끝나는 순간 다 녹도록 그보다 디졸브 시간만큼 먼저 시작하고, 시체 시간과 같은 적 전용 시간으로 흐른다.
 // 같은 Material 을 쓰는 다른 적에 영향이 없게 녹는 정도는 MaterialPropertyBlock 으로 넣는다.
-// 처치된 적은 비활성화만 하고 다시 쓰지 않으므로, 바꾼 Material 은 되돌리지 않는다.
+// 처치된 적은 꺼진 뒤 웨이브 생성기가 다시 꺼내 쓰므로, 그때 바꾼 Material 과 녹은 정도를 처음으로 되돌린다.
 [RequireComponent(typeof(EnemyController))]
 public class EnemyDissolve : MonoBehaviour
 {
@@ -12,6 +12,8 @@ public class EnemyDissolve : MonoBehaviour
     [Tooltip("녹일 Renderer (몸 · 무기). 예고 표시처럼 몸이 아닌 Renderer 는 넣지 않는다")]
     [SerializeField] private Renderer[] _renderers;
 
+    // Renderer 마다 처음 Material 목록
+    private Material[][] _originalMaterials;
     private MaterialPropertyBlock _propertyBlock;
     private EnemyState _state;
     private EnemyData _data;
@@ -41,6 +43,19 @@ public class EnemyDissolve : MonoBehaviour
         _timer = 0f;
         _isDying = true;
         _isDissolving = false;
+    }
+
+    // 풀에서 다시 꺼낼 때 생성기를 거쳐 부른다. 녹는 중이었으면 멈추고, 처음 Material 로 바꾸고, 녹은 정도를 지운다.
+    public void Restore()
+    {
+        _isDying = false;
+        _isDissolving = false;
+
+        for(int i = 0; i < _renderers.Length; i++)
+        {
+            _renderers[i].sharedMaterials = _originalMaterials[i];
+            _renderers[i].SetPropertyBlock(null);
+        }
     }
 
     private void UpdateDissolve()
@@ -91,6 +106,12 @@ public class EnemyDissolve : MonoBehaviour
     {
         _state = GetComponent<EnemyState>();
         _data = GetComponent<EnemyController>().Data;
+        _originalMaterials = new Material[_renderers.Length][];
+
+        for(int i = 0; i < _renderers.Length; i++)
+        {
+            _originalMaterials[i] = _renderers[i].sharedMaterials;
+        }
     }
 
     private void Init()

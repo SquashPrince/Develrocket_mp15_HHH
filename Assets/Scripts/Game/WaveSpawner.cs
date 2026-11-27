@@ -4,6 +4,7 @@ using UnityEngine.AI;
 
 // 웨이브 적 생성. 구역의 웨이브 하나를 만들고, 적 · 보스가 모두 처치되면 알린다.
 // 보스는 보스 생성 위치에 만들고(한 웨이브에 한 마리로 가정), 일반 · 엘리트는 생성 영역 안에 겹치지 않게 만든다.
+// 적은 프리팹마다 모아 두고 처치되어 꺼진 적을 다시 꺼내 쓴다. 모아 둔 적은 이 오브젝트 아래에 둔다.
 public class WaveSpawner : MonoBehaviour
 {
     private const float NAVMESH_SEARCH_DISTANCE = 2f;
@@ -15,6 +16,10 @@ public class WaveSpawner : MonoBehaviour
 
     private BattleZone _zone;
 
+    // 프리팹마다 만든 적. 꺼진 적이 다시 꺼낼 수 있는 적이다.
+    private readonly Dictionary<EnemyController, List<EnemyController>> _pools = new Dictionary<EnemyController, List<EnemyController>>();
+    // 로딩 중 미리 만들어 켜 둔 적. 미리 그리기가 끝나면 끈다.
+    private readonly List<EnemyController> _prewarmed = new List<EnemyController>();
     private readonly List<EnemyState> _waveEnemies = new List<EnemyState>();
     private readonly List<EnemyState> _waveBosses = new List<EnemyState>();
     private int _remainingCount;
@@ -67,6 +72,36 @@ public class WaveSpawner : MonoBehaviour
 #endif
     }
 
+    // 로딩 화면이 덮고 있는 동안 씬의 모든 구역에 나올 적을 프리팹마다 한 웨이브의 최대 수만큼 만들어 position 에 켜 둔다.
+    // 화면에 한 번 그려야 셰이더가 준비되어, 처음 나올 때 끊기거나 에디터에서 하늘색 임시 셰이더로 보이지 않는다.
+    // 배틀 매니저에 등록하지 않아 공격 대상이 없으므로 움직이거나 공격하지 않는다.
+    public void Prewarm(Vector3 position, Quaternion rotation)
+    {
+        foreach(KeyValuePair<EnemyController, int> pair in CountMaxPerWave())
+        {
+            List<EnemyController> pool = GetPool(pair.Key);
+
+            while(pool.Count < pair.Value)
+            {
+                EnemyController enemy = Instantiate(pair.Key, position, rotation, transform);
+
+                pool.Add(enemy);
+                _prewarmed.Add(enemy);
+            }
+        }
+    }
+
+    // 미리 그리기가 끝나면 끈다. 꺼진 적은 웨이브에서 다시 꺼낼 때 처음 상태로 돌린다.
+    public void RecallPrewarmed()
+    {
+        foreach(EnemyController enemy in _prewarmed)
+        {
+            enemy.gameObject.SetActive(false);
+        }
+
+        _prewarmed.Clear();
+    }
+
     // 보스가 여러 마리면 최대 체력 합 기준이다. 웨이브의 적이 모두 처치되면 목록을 비우므로, 보스전이 끝나는 순간에 읽는다.
     public float GetBossDamageRatio()
     {
@@ -105,10 +140,70 @@ public class WaveSpawner : MonoBehaviour
         Vector3 toPlayer = HorizontalVector.Between(position, _party.Controlled.transform.position);
 
         Quaternion rotation = toPlayer == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(toPlayer);
-        EnemyController enemy = Instantiate(prefab, position, rotation);
+        EnemyController enemy = TakeFromPool(prefab, position, rotation);
 
         _battleManager.Register(enemy);
         return enemy;
+    }
+
+    // 꺼진 적이 있으면 처음 상태로 돌려 꺼내고, 없으면 새로 만든다. 시체가 남아 있는 동안은 켜져 있어 꺼내지 않는다.
+    private EnemyController TakeFromPool(EnemyController prefab, Vector3 position, Quaternion rotation)
+    {
+        List<EnemyController> pool = GetPool(prefab);
+
+        foreach(EnemyController pooled in pool)
+        {
+            if(pooled.gameObject.activeSelf) continue;
+
+            pooled.Respawn(position, rotation);
+            return pooled;
+        }
+
+        EnemyController created = Instantiate(prefab, position, rotation, transform);
+
+        pool.Add(created);
+        return created;
+    }
+
+    private List<EnemyController> GetPool(EnemyController prefab)
+    {
+        if(!_pools.TryGetValue(prefab, out List<EnemyController> pool))
+        {
+            pool = new List<EnemyController>();
+            _pools.Add(prefab, pool);
+        }
+
+        return pool;
+    }
+
+    // 웨이브는 앞 웨이브를 모두 처치해야 나오므로, 프리팹마다 한 웨이브에 나오는 가장 많은 수만큼 미리 만든다.
+    // 앞 웨이브의 시체가 아직 켜져 있으면 그만큼은 웨이브 중에 새로 만든다. 구역 목록은 로딩 중 한 번만 쓰므로 씬에서 찾는다.
+    private static Dictionary<EnemyController, int> CountMaxPerWave()
+    {
+        Dictionary<EnemyController, int> maxCounts = new Dictionary<EnemyController, int>();
+        Dictionary<EnemyController, int> waveCounts = new Dictionary<EnemyController, int>();
+
+        foreach(BattleZone zone in FindObjectsByType<BattleZone>(FindObjectsSortMode.None))
+        {
+            for(int i = 0; i < zone.Waves.WaveCount; i++)
+            {
+                waveCounts.Clear();
+
+                foreach(WaveData.SpawnEntry entry in zone.Waves.GetWave(i).Entries)
+                {
+                    waveCounts.TryGetValue(entry.Prefab, out int count);
+                    waveCounts[entry.Prefab] = count + entry.Count;
+                }
+
+                foreach(KeyValuePair<EnemyController, int> pair in waveCounts)
+                {
+                    maxCounts.TryGetValue(pair.Key, out int max);
+                    maxCounts[pair.Key] = Mathf.Max(max, pair.Value);
+                }
+            }
+        }
+
+        return maxCounts;
     }
 
     private void Track(EnemyController enemy)

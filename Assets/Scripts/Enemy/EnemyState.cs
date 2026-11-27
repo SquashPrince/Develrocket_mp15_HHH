@@ -3,6 +3,7 @@ using UnityEngine;
 
 // 적의 체력 · 경직 · 그로기 · 처치 상태와 이 적의 시간(Clock). 다른 기능은 EnemyController 의 인터페이스로 접근한다.
 // 처치된 적은 파괴하지 않고 비활성화한다. 플레이어 기능이 인터페이스로 들고 있어 파괴하면 Unity 의 null 판정을 받지 못한다.
+// 꺼진 적은 웨이브 생성기가 다시 꺼내 쓰며, 그때 처음 상태로 돌린다.
 // 자식인 체력 막대가 OnEnable 에서 값을 읽기 전에 데이터를 읽도록 실행 순서를 앞당긴다.
 // 자세한 흐름 : Docs/Technical/Enemy/EnemyCommon.md
 [DefaultExecutionOrder(-10)]
@@ -59,6 +60,8 @@ public class EnemyState : MonoBehaviour
     public event Action GroggyEntered;
     public event Action Recovered;
     public event Action GroggyGaugeChanged;
+    // 풀에서 다시 꺼내 처음 상태로 돌아왔을 때. 화면 Canvas 의 보스 바처럼 적과 함께 켜지지 않는 기능이 다시 그린다.
+    public event Action Revived;
 
     // 다른 기능이 Start 에서 읽어도 값이 준비되어 있게 Awake 에서 정한다.
     private void Awake()
@@ -149,6 +152,25 @@ public class EnemyState : MonoBehaviour
     {
         _hasComboSkillChance = false;
         _remainingComboChain = 0;
+    }
+
+    // 풀에서 다시 꺼낸 적을 처음 상태로 돌린다. 생성기가 적을 켜기 전에 부른다.
+    public void Revive()
+    {
+        _reaction = Reaction.None;
+        _corpseTimer = 0f;
+        _reactionTimer = 0f;
+        _groggyHoldTimer = 0f;
+        _groggyRatioBase = 0f;
+        _attackStaggerResistLevel = 0;
+        _remainingComboChain = 0;
+        _isDead = false;
+        _hasComboSkillChance = false;
+        _isGroggyPaused = false;
+        _clock.ClearHitStop();
+        Init();
+
+        Revived?.Invoke();
     }
 
     private void Die()
