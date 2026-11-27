@@ -39,6 +39,7 @@ public class DitherFade : MonoBehaviour
     private Transform _camera;
     // 1 이면 다 보임, 0 이면 다 사라짐
     private float _appliedVisibility = 1f;
+    private float _swapOutVisibility = 1f;
 
     private void Awake()
     {
@@ -46,8 +47,16 @@ public class DitherFade : MonoBehaviour
         Init();
     }
 
-    private void OnDisable() => ApplyVisibility(1f);
-    private void LateUpdate() => ApplyVisibility(GetCameraVisibility());
+    private void OnDisable() => ResetVisibility();
+    private void LateUpdate() => ApplyVisibility(Mathf.Min(GetCameraVisibility(), _swapOutVisibility));
+
+    public void SetSwapOutVisibility(float visibility) => _swapOutVisibility = Mathf.Clamp01(visibility);
+
+    private void ResetVisibility()
+    {
+        _swapOutVisibility = 1f;
+        ApplyVisibility(1f);
+    }
 
     // 시작 거리에서 1, 끝 거리에서 0 이 되게 선형으로 줄인다.
     private float GetCameraVisibility()
@@ -62,7 +71,8 @@ public class DitherFade : MonoBehaviour
 
     private void ApplyVisibility(float visibility)
     {
-        if(Mathf.Abs(visibility - _appliedVisibility) < VISIBILITY_EPSILON) return;
+        if(visibility == _appliedVisibility) return;
+        if(visibility > 0f && visibility < 1f && Mathf.Abs(visibility - _appliedVisibility) < VISIBILITY_EPSILON) return;
 
         _appliedVisibility = visibility;
 
