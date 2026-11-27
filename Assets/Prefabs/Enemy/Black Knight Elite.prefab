@@ -309,15 +309,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraphAgent
   m_Graph: {fileID: -7177865755538880784, guid: d186cd75315da66488f56195d8cae8e8, type: 2}
   m_BlackboardVariableOverridesList:
-  - rid: 3269081437570334789
-  - rid: 3269081437570334790
+  - rid: 3269081778365136984
   m_OriginalGraph: {fileID: -7177865755538880784, guid: d186cd75315da66488f56195d8cae8e8, type: 2}
   m_IsInitialised: 0
   m_IsStarted: 0
   references:
     version: 2
     RefIds:
-    - rid: 3269081437570334789
+    - rid: 3269081778365136984
       type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -325,15 +324,6 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 8592957830441349726}
-    - rid: 3269081437570334790
-      type: {class: 'SharedBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 4669506101125595082
-          m_Value1: 4632716313943138127
-        Name: Target
-        m_Value: {fileID: 0}
-        m_SharedVariablesRuntimeAsset: {fileID: -6863159812667662349, guid: d186cd75315da66488f56195d8cae8e8, type: 2}
 --- !u!114 &127120365638968199
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -371,9 +361,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4342dbdbef2beb84697b11527d013837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttacker
-  _targetLayers:
-    serializedVersion: 2
-    m_Bits: 128
   _telegraphPoint: {fileID: 6288933616598289340}
 --- !u!114 &2111374454688834338
 MonoBehaviour:

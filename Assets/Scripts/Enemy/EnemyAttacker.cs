@@ -105,6 +105,13 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
         return true;
     }
 
+    // 풀에서 다시 꺼낸 적이 새로 나온 적처럼 행동하게 쿨타임 · 가중치 누적을 지운다.
+    public void ResetCooldowns()
+    {
+        System.Array.Clear(_cooldownTimers, 0, _cooldownTimers.Length);
+        System.Array.Clear(_skipCounts, 0, _skipCounts.Length);
+    }
+
     // 이어가기 동작은 공격을 끊지 않고 판정만 멈춘다. 아니면 공격의 저항 레벨로 경직을 걸어 항상 경직된다.
     public void OnParried()
     {
