@@ -1,6 +1,7 @@
 using UnityEngine;
 
-// 대상 앞으로 순간 이동하는 공통 규칙. 패링 · 필살기 · 콤보 스킬 · 빠른 지원이 같은 계산과 간격을 쓴다.
+// 대상 앞으로 순간 이동하는 공통 규칙. 필살기 · 콤보 스킬 · 빠른 지원이 같은 계산과 간격을 쓴다.
+// 교체 패링은 공격이 들어와야 성립하므로 따로 적의 공격 범위 안에서 자리를 고른다.
 // 실제로 다가가면 벽 등에 걸리므로 위치를 바로 옮기고, 서려던 자리가 막혀 있으면 같은 거리의 둘레에서 빈자리를 찾는다.
 // 기억하는 값이 없는 계산이라 static 클래스로 둔다.
 public static class TeleportManager
@@ -8,6 +9,9 @@ public static class TeleportManager
     // 최대 각도면 대상의 반대편까지 본다.
     private const float SEARCH_ANGLE_STEP = 20f;
     private const float SEARCH_ANGLE_MAX = 180f;
+
+    // 교체 패링 후보의 좌우 간격 (몸 지름 배수). 가운데부터 좌우로 넓힌다.
+    private static readonly float[] PARRY_SIDE_OFFSETS = { 0f, 1f, -1f, 2f, -2f };
 
     // 옵션이 비어 있으면(순간 이동하지 않는 액션) false 를 돌려준다.
     public static bool TryTeleportTo(PlayerController character, Transform target, TeleportOption option)
@@ -38,14 +42,75 @@ public static class TeleportManager
             return false;
         }
 
-        // CharacterController 가 켜져 있으면 위치를 직접 바꿔도 덮어쓰므로 잠깐 끄고 옮긴다.
+        PlaceAt(character, destination, targetPosition);
+        return true;
+    }
+
+    // 교체 패링 : 이전 조작 캐릭터(guarded) 바로 앞에서 적 쪽으로 몸 반지름만큼씩 나아가며, 좌우 후보까지 보고 처음으로 맞는 자리에 선다.
+    // 조건 : 몸 중심이 적의 지금 공격 범위 안, 바닥이 있음, 막히지 않음, 적 몸과 겹치지 않음.
+    // 이전 캐릭터와 적 사이에 서서 막아 주는 모습이 되고, 범위 안이라 공격이 들어와 패링이 성립한다. 맞는 자리가 없으면 이전 캐릭터 위치에 선다.
+    public static void TeleportForParry(PlayerController character, Transform guarded, IEnemyParryable attacker)
+    {
+        Vector3 attackerPosition = attacker.transform.position;
+        Vector3 destination = TryFindParrySpot(character, guarded.position, attacker, out Vector3 spot) ? spot : guarded.position;
+
+        PlaceAt(character, destination, attackerPosition);
+    }
+
+    private static bool TryFindParrySpot(PlayerController character, Vector3 guardedPosition, IEnemyParryable attacker, out Vector3 spot)
+    {
+        CommonCharacterSettings common = character.Common;
+        CharacterController body = character.Body;
+        Vector3 attackerPosition = attacker.transform.position;
+        Vector3 toAttacker = HorizontalVector.Between(guardedPosition, attackerPosition);
+        float minAttackerDistance = BodyRadius.GetHorizontal(attacker.transform) + body.radius;
+        float diameter = body.radius * 2f;
+
+        spot = Vector3.zero;
+
+        if(toAttacker == Vector3.zero || body.radius <= 0f) return false;
+
+        Vector3 forward = toAttacker.normalized;
+        Vector3 side = Vector3.Cross(Vector3.up, forward);
+
+        // 이전 캐릭터와 겹치지 않는 바로 앞부터 적 몸에 닿기 전까지 본다.
+        for(float distance = diameter; distance <= toAttacker.magnitude - minAttackerDistance; distance += body.radius)
+        {
+            foreach(float sideOffset in PARRY_SIDE_OFFSETS)
+            {
+                Vector3 candidate = guardedPosition + forward * distance + side * (sideOffset * diameter);
+
+                if(IsParrySpot(common, body, attacker, attackerPosition, minAttackerDistance, ref candidate))
+                {
+                    spot = candidate;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // 바닥에 맞춘 뒤의 위치로 범위 · 막힘을 본다.
+    private static bool IsParrySpot(CommonCharacterSettings common, CharacterController body, IEnemyParryable attacker, Vector3 attackerPosition, float minAttackerDistance, ref Vector3 candidate)
+    {
+        if(HorizontalVector.Between(attackerPosition, candidate).sqrMagnitude < minAttackerDistance * minAttackerDistance) return false;
+        if(!TrySnapToGround(common, ref candidate)) return false;
+        if(!attacker.IsInAttackRange(GetCenter(body, candidate))) return false;
+
+        return !IsBlocked(common, body, attackerPosition, candidate);
+    }
+
+    // CharacterController 가 켜져 있으면 위치를 직접 바꿔도 덮어쓰므로 잠깐 끄고 옮긴다.
+    private static void PlaceAt(PlayerController character, Vector3 destination, Vector3 lookPosition)
+    {
+        CharacterController body = character.Body;
+
         body.enabled = false;
         character.transform.position = destination;
         body.enabled = true;
 
-        character.FaceImmediately(HorizontalVector.Between(destination, targetPosition));
-
-        return true;
+        character.FaceImmediately(HorizontalVector.Between(destination, lookPosition));
     }
 
     // 순서 : 0° → +20° → -20° → +40° → -40° … → 180° (firstSign 이 -1 이면 - 쪽 먼저). 180° 는 양쪽이 같은 자리라 한 번만 본다.

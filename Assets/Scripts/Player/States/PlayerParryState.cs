@@ -38,8 +38,8 @@ public class PlayerParryState : PlayerState
         _phase = Phase.Ready;
         _timer = 0f;
 
-        // 도착 지점이 막혀 있으면 제자리에서 패링한다.
-        TeleportManager.TryTeleportTo(Controller, _trigger.SelectedParryAttacker.transform, _trigger.ParryAction.Teleport);
+        // 들어오는 순간 파티의 조작 캐릭터는 아직 이전 캐릭터다. 그 앞에서 적 공격 범위 안의 자리를 고른다.
+        TeleportManager.TeleportForParry(Controller, Controller.Party.Controlled.transform, _trigger.SelectedParryAttacker);
 
         // 패링에 실패해도 록온은 남는다.
         if(_trigger.SelectedParryAttacker.transform.TryGetComponent(out IEnemyTargetable parryTarget)) Controller.Party.LockOn.LockOnTo(parryTarget);
@@ -80,11 +80,13 @@ public class PlayerParryState : PlayerState
         else UpdateReact();
     }
 
+    // 예고는 준비 동작에서 뜨고 타격은 다음 동작에서 오는 공격이 있어, 준비 시간이 지나도 고른 적의 패링 가능 시간이 열려 있으면 기다린다.
+    // 패링 가능 시간은 타격 순간에 닫히고 같은 순간 판정이 이어지므로, 시전했으면 그 타격을 받는다. 준비 시간은 최소 시간으로만 쓴다.
     private void UpdateReady()
     {
         Controller.HorizontalVelocity = Vector3.zero;
 
-        if(_timer >= _trigger.ParryReadyTime) Controller.EnterLocomotion(false);
+        if(_timer >= _trigger.ParryReadyTime && !_trigger.SelectedParryAttacker.IsParryWindowOpen) Controller.EnterLocomotion(false);
     }
 
     private void UpdateReact()
