@@ -9,8 +9,6 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 {
     private const int MAX_HIT_COLLIDERS = 8;
 
-    [Tooltip("판정에 걸릴 Layer (Player)")]
-    [SerializeField] private LayerMask _targetLayers = ~0;
     [Tooltip("패링 공격 예고 표시를 띄울 위치. 록온 표시와 겹치지 않도록 적 안에 따로 둔 자식. 표시는 플레이어 쪽이 띄운다")]
     [SerializeField] private Transform _telegraphPoint;
 
@@ -105,6 +103,30 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
 
         StartNextStep();
         return true;
+    }
+
+    // 풀에서 다시 꺼낸 적이 새로 나온 적처럼 행동하게 쿨타임 · 가중치 누적을 지운다.
+    public void ResetCooldowns()
+    {
+        System.Array.Clear(_cooldownTimers, 0, _cooldownTimers.Length);
+        System.Array.Clear(_skipCounts, 0, _skipCounts.Length);
+    }
+
+    // 예고는 준비 동작에서 뜨고 타격은 다음 동작에서 오는 공격이 있어, 지금 동작부터 처음 패링 가능한 동작의 범위로 본다.
+    // 범위는 적이 바라보는 방향 기준이라, 순간 이동 뒤 적이 대상 쪽으로 돌면 조금 어긋날 수 있다.
+    public bool IsInAttackRange(Vector3 point) => IsAttacking && GetUpcomingParryStep().Range.Contains(transform, point);
+
+    // 패링 가능한 동작이 남아 있지 않으면 지금 동작을 쓴다.
+    private EnemyAttackStep GetUpcomingParryStep()
+    {
+        for(int i = Mathf.Max(0, _stepIndex); i < CurrentAttack.StepCount; i++)
+        {
+            EnemyAttackStep step = CurrentAttack.GetStep(i);
+
+            if(step.IsParryable) return step;
+        }
+
+        return CurrentStep;
     }
 
     // 이어가기 동작은 공격을 끊지 않고 판정만 멈춘다. 아니면 공격의 저항 레벨로 경직을 걸어 항상 경직된다.
@@ -372,7 +394,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     {
         EnemyAttackData attack = CurrentAttack;
         EnemyAttackStep step = CurrentStep;
-        int count = step.Range.Overlap(transform, _hitColliders, _targetLayers);
+        int count = step.Range.Overlap(transform, _hitColliders, _controller.Battle.PlayerLayers);
         PlayerStatus parrier = null;
 
         _landedTargets.Clear();
@@ -409,11 +431,7 @@ public class EnemyAttacker : MonoBehaviour, IEnemyParryable
     {
         if(_target == null) return;
 
-        Vector3 toTarget = HorizontalVector.Between(transform.position, _target.position);
-
-        if(toTarget == Vector3.zero) return;
-
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(toTarget), CurrentAttack.TurnSpeed * _state.Clock.DeltaTime);
+        _movement.TurnTowards(_target.position - transform.position, CurrentAttack.TurnSpeed);
     }
 
     private void StartLeap(AnimationEvent animationEvent)

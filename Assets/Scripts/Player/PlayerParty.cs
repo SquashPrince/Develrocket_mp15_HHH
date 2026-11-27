@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.Behavior;
 using UnityEngine;
 
 // 파티 캐릭터 목록 · 공통 설정을 들고, 조작 캐릭터 교체(지원 공격 · 빠른 지원 · 콤보 스킬 이어받기)와 쓰러짐 · 전멸을 맡는다.
@@ -12,8 +11,6 @@ public class PlayerParty : MonoBehaviour
 {
     private const int PREVIOUS = -1;
     private const int NEXT = 1;
-    // 적 행동 그래프 Blackboard 의 공격 대상 변수 이름 (일반 적 · 보스 공통)
-    private const string ENEMY_TARGET_VARIABLE = "Target";
 
     [Tooltip("파티 캐릭터 목록. 씬에 놓인 캐릭터를 넣는다. 이 순서대로 교체하고, 첫 번째 캐릭터를 조작하며 시작한다")]
     [SerializeField] private PlayerController[] _members;
@@ -26,8 +23,6 @@ public class PlayerParty : MonoBehaviour
     private readonly Dictionary<IEnemyParryable, bool> _parryableAtOpen = new Dictionary<IEnemyParryable, bool>();
     // 예고 하나에 캐릭터 하나만 패링하게, 이미 패링을 시작한 적을 기록한다.
     private readonly HashSet<IEnemyParryable> _claimedParryAttackers = new HashSet<IEnemyParryable>();
-    // 처치되어 꺼진 적도 남겨 둔다. 꺼진 그래프에 값을 넣어도 문제없다.
-    private readonly List<BehaviorGraphAgent> _enemyAgents = new List<BehaviorGraphAgent>();
     // 빠른 지원 : 넉백된 캐릭터와 넉백시킨 적
     private PlayerController _quickSupportSource;
     private Transform _quickSupportTarget;
@@ -57,8 +52,10 @@ public class PlayerParty : MonoBehaviour
 
     // 시작할 때도 첫 캐릭터로 한 번 알린다.
     public event Action<PlayerController> ControlledChanged;
-    // 마지막 살아 있는 캐릭터의 쓰러짐 모션이 끝나면 알린다. Unity.Behavior 의 Action 과 구분하려고 System 을 붙인다.
-    public event System.Action Wiped;
+    // 결과 화면으로 넘어가며 전투가 끝나면 알린다.
+    public event Action BattleEnded;
+    // 마지막 살아 있는 캐릭터의 쓰러짐 모션이 끝나면 알린다.
+    public event Action Wiped;
 
     // 캐릭터 기능이 Start 에서 공통 설정을 읽으므로 Awake 에서 파티를 알려 준다.
     private void Awake()
@@ -136,12 +133,11 @@ public class PlayerParty : MonoBehaviour
     }
 
     // 결과 화면 클릭이 공격 입력으로 들어가지 않게 입력을 막는다.
-    // 적의 대상도 비워, 쓰러진 마지막 캐릭터를 쫓아와 공격하거나 밀지 않게 한다.
     public void EndBattle()
     {
         _isInputLocked = true;
         IsBattleEnded = true;
-        RetargetEnemies();
+        BattleEnded?.Invoke();
     }
 
     // CharacterController 가 켜져 있으면 위치를 덮어쓰므로 잠깐 끄고 옮긴다.
@@ -156,15 +152,6 @@ public class PlayerParty : MonoBehaviour
             body.enabled = true;
         }
     }
-
-    // 실행 중 생성한 적을 등록한다. 씬에 미리 놓인 적은 Awake 에서 찾는다.
-    public void RegisterEnemy(BehaviorGraphAgent agent)
-    {
-        _enemyAgents.Add(agent);
-        agent.SetVariableValue(ENEMY_TARGET_VARIABLE, GetEnemyTarget());
-    }
-
-    private Transform GetEnemyTarget() => IsBattleEnded ? null : Controlled.transform;
 
     // 쓰러짐 모션이 끝나면 부른다. 넘길 캐릭터가 없으면 쓰러진 모습 그대로 두고 전멸을 알린다.
     public void OnMemberDowned(PlayerController member)
@@ -418,28 +405,14 @@ public class PlayerParty : MonoBehaviour
             _members[i].Input.IsControlled = i == index;
         }
 
-        RetargetEnemies();
         ControlledChanged?.Invoke(Controlled);
     }
 
-    // 적은 공격을 시작할 때 대상을 따로 저장하므로, 진행 중인 공격은 이전 캐릭터 위치로 끝까지 시전한다.
-    private void RetargetEnemies()
-    {
-        Transform target = GetEnemyTarget();
-
-        for(int i = 0; i < _enemyAgents.Count; i++)
-        {
-            _enemyAgents[i].SetVariableValue(ENEMY_TARGET_VARIABLE, target);
-        }
-    }
-
-    // 생성기가 Start 에서 등록하는 적과 겹치지 않게, 씬에 놓인 적은 Awake 에서 찾는다.
     private void CacheComponent()
     {
         SlowMotion = GetComponent<BattleSlowMotion>();
         LockOn = GetComponent<PlayerLockOn>();
         ComboSelector = GetComponent<ComboSkillSelector>();
-        _enemyAgents.AddRange(FindObjectsByType<BehaviorGraphAgent>(FindObjectsSortMode.None));
     }
 
     private void Init()

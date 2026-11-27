@@ -11,5 +11,8 @@ public interface IEnemyParryable
     // 표시 색은 플레이어 쪽이 정해 띄운다.
     Transform TelegraphPoint { get; }
 
+    // 지금 동작의 판정 범위 안에 이 위치가 들어가는지. 공격 중이 아니면 false. 교체 패링이 맞을 수 있는 자리를 고를 때 쓴다.
+    bool IsInAttackRange(Vector3 point);
+
     void OnParried();
 }

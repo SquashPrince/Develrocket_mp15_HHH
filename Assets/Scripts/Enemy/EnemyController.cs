@@ -1,3 +1,4 @@
+using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -20,12 +21,18 @@ public class EnemyController : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     [SerializeField] private Transform _hudRoot;
 
     private EnemyState _state;
+    private EnemyAttacker _attacker;
+    private BehaviorGraphAgent _agent;
+    // 녹는 연출이 없는 적은 null
+    private EnemyDissolve _dissolve;
     // 다시 켜질 때 또 만들지 않도록 들고 있는다.
     private EnemyGauge _gauge;
     private float _radius;
 
     public EnemyData Data => _data;
     public EnemyState State => _state;
+    // 공격 권한 · 판정 Layer · 다른 적 목록을 묻는 곳. 배틀 매니저가 등록할 때 넣어 준다.
+    public BattleManager Battle { get; private set; }
     public bool IsAlive => _state.IsAlive;
     public float Radius => _radius;
     public Transform LockOnPoint => _lockOnPoint;
@@ -48,6 +55,21 @@ public class EnemyController : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     public void HoldGroggy(float duration) => _state.HoldGroggy(duration);
     public void SetGroggyPaused(bool isPaused) => _state.SetGroggyPaused(isPaused);
 
+    public void JoinBattle(BattleManager battle) => Battle = battle;
+
+    // 웨이브 생성기가 꺼진 적을 다시 꺼낼 때 부른다. 꺼진 동안 옮겨야 NavMeshAgent 가 켜지는 순간 새 위치에서 시작한다.
+    // 상태 · 녹는 연출 · 공격 쿨타임을 처음으로 돌린 뒤 켜고, 처치된 뒤 회복 대기에 멈춰 있던 행동 그래프를 처음부터 다시 돌린다.
+    public void Respawn(Vector3 position, Quaternion rotation)
+    {
+        transform.SetPositionAndRotation(position, rotation);
+        _state.Revive();
+        if(_dissolve != null) _dissolve.Restore();
+        _attacker.ResetCooldowns();
+
+        gameObject.SetActive(true);
+        _agent.Restart();
+    }
+
     // Prefab 에는 씬의 Canvas 를 연결할 수 없어, 실행 중 생성한 보스는 생성한 쪽이 넘겨준다.
     public void SetHudRoot(Transform hudRoot)
     {
@@ -67,6 +89,9 @@ public class EnemyController : MonoBehaviour, IEnemyTargetable, IEnemyDamageable
     private void CacheComponent()
     {
         _state = GetComponent<EnemyState>();
+        _attacker = GetComponent<EnemyAttacker>();
+        _agent = GetComponent<BehaviorGraphAgent>();
+        _dissolve = GetComponent<EnemyDissolve>();
     }
 
     private void Init()

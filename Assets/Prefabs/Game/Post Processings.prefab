@@ -112,6 +112,7 @@ MonoBehaviour:
   _graphicsStates: {fileID: -6766982352335285333, guid: c1da186158c22c74bb30f82804cb8789, type: 3}
   _effectPool: {fileID: 6461531195641690}
   _damageTextSpawner: {fileID: 0}
+  _waveSpawner: {fileID: 0}
   _warmDistance: 5
   _warmFrames: 3
 --- !u!1 &3211398223351348321

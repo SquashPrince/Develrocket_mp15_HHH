@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 // 잔상마다 GameObject 를 만들지 않고 구운 Mesh 를 매 프레임 직접 그리며(Graphics.RenderMesh), 다 사라진 잔상은 재사용한다.
 // 슬로모션 · 히트스톱과 상관없이 실제 시간으로 흐른다.
 [RequireComponent(typeof(PlayerController))]
+[RequireComponent(typeof(BodyRenderer))]
 public class PerfectDodgeAfterimage : MonoBehaviour
 {
     // Renderer 목록과 같은 순서의 칸. 스킨 메시 칸은 이 잔상이 구운 Mesh, 나머지 칸은 원본 Mesh 를 가리킨다.
@@ -18,11 +19,9 @@ public class PerfectDodgeAfterimage : MonoBehaviour
         public float Elapsed;
     }
 
-    [Tooltip("잔상으로 남길 Renderer (몸 스킨 메시 · 무기)")]
-    [SerializeField] private Renderer[] _renderers;
-
     private readonly List<Afterimage> _active = new List<Afterimage>();
     private readonly List<Afterimage> _free = new List<Afterimage>();
+    private IReadOnlyList<Renderer> _renderers;
     private MeshFilter[] _meshFilters;
     private PlayerController _controller;
     private float _emitTimer;
@@ -132,7 +131,7 @@ public class PerfectDodgeAfterimage : MonoBehaviour
     {
         Afterimage afterimage = GetAfterimage();
 
-        for(int i = 0; i < _renderers.Length; i++)
+        for(int i = 0; i < _renderers.Count; i++)
         {
             Renderer source = _renderers[i];
 
@@ -170,9 +169,9 @@ public class PerfectDodgeAfterimage : MonoBehaviour
 
         return new Afterimage
         {
-            Meshes = new Mesh[_renderers.Length],
-            Matrices = new Matrix4x4[_renderers.Length],
-            IsVisible = new bool[_renderers.Length],
+            Meshes = new Mesh[_renderers.Count],
+            Matrices = new Matrix4x4[_renderers.Count],
+            IsVisible = new bool[_renderers.Count],
             PropertyBlock = new MaterialPropertyBlock()
         };
     }
@@ -192,7 +191,7 @@ public class PerfectDodgeAfterimage : MonoBehaviour
 
         foreach(Afterimage afterimage in _free)
         {
-            for(int i = 0; i < _renderers.Length; i++)
+            for(int i = 0; i < _renderers.Count; i++)
             {
                 if(_renderers[i] is SkinnedMeshRenderer && afterimage.Meshes[i] != null) Destroy(afterimage.Meshes[i]);
             }
@@ -204,9 +203,10 @@ public class PerfectDodgeAfterimage : MonoBehaviour
     private void CacheComponent()
     {
         _controller = GetComponent<PlayerController>();
-        _meshFilters = new MeshFilter[_renderers.Length];
+        _renderers = GetComponent<BodyRenderer>().Renderers;
+        _meshFilters = new MeshFilter[_renderers.Count];
 
-        for(int i = 0; i < _renderers.Length; i++)
+        for(int i = 0; i < _renderers.Count; i++)
         {
             if(!(_renderers[i] is SkinnedMeshRenderer)) _meshFilters[i] = _renderers[i].GetComponent<MeshFilter>();
         }
