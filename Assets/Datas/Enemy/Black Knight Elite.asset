@@ -15,15 +15,15 @@ MonoBehaviour:
   _grade: 1
   _displayName: 
   _portrait: {fileID: 0}
-  _maxHealth: 5000000
+  _maxHealth: 630000
   _canDie: 1
   _corpseDuration: 3
   _baseStaggerResistLevel: 2
-  _maxGroggy: 1823
+  _maxGroggy: 1932
   _groggyTime: 12
   _groggyDamageMultiplier: 2
   _maxComboChain: 3
-  _dissolveMaterial: {fileID: 2100000, guid: 31084353f6dcd884489a8469814dc896, type: 2}
+  _dissolveMaterial: {fileID: 2100000, guid: 4b8d4288f87319a4aa92672d0776e6a6, type: 2}
   _dissolveDuration: 1
   _deathEffectPrefab: {fileID: 7480542335047832011, guid: d2f98a091bc49f5429c3c48f5b6b63dc, type: 3}
   _moveSpeed: 4.5
