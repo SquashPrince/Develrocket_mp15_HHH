@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   _grade: 1
   _portrait: {fileID: 0}
-  _maxHealth: 588000
+  _maxHealth: 262500
   _canDie: 1
   _corpseDuration: 2
   _baseStaggerResistLevel: 1
-  _maxGroggy: 662
+  _maxGroggy: 1400
   _groggyTime: 12
   _groggyDamageMultiplier: 1.75
   _maxComboChain: 2

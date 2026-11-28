@@ -45,9 +45,9 @@ MonoBehaviour:
       _rollAngle: 0
       _rollRandom: 0
     _motionEffects: []
-  _energyGain: 0.6
+  _energyGain: 1.5
   _ultimateGaugeGain: 18
-  _power: 1000
+  _power: 4315
   _staggerLevel: 1
   _staggerTime: 0.25
   _hitSound:
@@ -63,6 +63,6 @@ MonoBehaviour:
   _useLegRun: 0
   _alwaysLegRun: 0
   _isInvincibleOnSwing: 1
-  _groggyGain: 5.75
+  _groggyGain: 14.4
   _teleport: {fileID: 11400000, guid: 7263e82ed97087141b501f4c8dba8526, type: 2}
   _cameraShot: 0

@@ -51,8 +51,8 @@ MonoBehaviour:
       _rotation: {x: 0, y: 0, z: 0}
       _scale: {x: 1, y: 1, z: 1}
   _energyGain: 0.8
-  _ultimateGaugeGain: 22.5
-  _power: 4000
+  _ultimateGaugeGain: 11.19
+  _power: 1750
   _staggerLevel: 1
   _staggerTime: 0.15
   _hitSound:
