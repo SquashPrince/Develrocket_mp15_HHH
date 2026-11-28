@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Prefabs/Player/Ult.meta
 guid: 6c0eba507f97d2b4c8c66153f51c4cab
+========
+guid: 8f048a6b100c4fb44b44318583ac9007
+>>>>>>>> origin/main:Assets/Resources.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

@@ -1,8 +1,12 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Animations/Player/Timeline/KnightCutscene.playable.meta
 guid: b910500229d41034b9e70a2dafd7e0d4
+========
+guid: 287fcb7ee210ed34fb86847a4991cc28
+>>>>>>>> origin/main:Assets/Materials/Black Knight lilToon Dither.mat.meta
 NativeFormatImporter:
   externalObjects: {}
-  mainObjectFileID: 11400000
+  mainObjectFileID: 2100000
   userData: 
   assetBundleName: 
   assetBundleVariant: 

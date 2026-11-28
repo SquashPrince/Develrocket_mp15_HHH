@@ -1,6 +1,11 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Imports/UI/Layer Lab/GUI Pro-FantasyHero/Prefabs/Prefabs_Component_Sliders/ComboSelection L.prefab.meta
 guid: f0a3923b41969f042aa7d0df82743d4c
 PrefabImporter:
+========
+guid: 6de0cab71afbabe458c43adfc599f185
+TextScriptImporter:
+>>>>>>>> origin/main:Assets/Resources/PerformanceTestRunSettings.json.meta
   externalObjects: {}
   userData: 
   assetBundleName: 
