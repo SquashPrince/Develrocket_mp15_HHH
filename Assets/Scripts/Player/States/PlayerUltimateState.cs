@@ -10,6 +10,8 @@ public class PlayerUltimateState : PlayerState
     private static readonly int CUTSCENE_ANIMATION = Animator.StringToHash("UltimateCutscene");
 
     private readonly PlayerActionTrigger _trigger;
+    private PlayerUltimateCutscene _cutscene;
+    private bool _isActive;
     private IEnemyTargetable _target;
     private Vector3 _advanceVelocity;
     private float _advanceTimer;
@@ -28,6 +30,7 @@ public class PlayerUltimateState : PlayerState
 
     public override void Enter()
     {
+        _isActive = true;
         _step = CUTSCENE_STEP;
         _animationHash = CUTSCENE_ANIMATION;
         _advanceVelocity = Vector3.zero;
@@ -50,23 +53,61 @@ public class PlayerUltimateState : PlayerState
         if(_target != null) TeleportManager.TryTeleportTo(Controller, _target.transform, _trigger.UltimateAction.Teleport);
 
         Controller.HorizontalVelocity = Vector3.zero;
-        Controller.Animation.Play(CUTSCENE_ANIMATION);
+        _cutscene = _trigger.CreateUltimateCutscene();
+        if(_cutscene != null) _cutscene.Begin(Controller.Party.MainCamera);
+        else Controller.Animation.Play(CUTSCENE_ANIMATION);
     }
 
     // 어떤 경우에도 적 · 다른 파티원이 멈춘 채 남지 않도록 나갈 때도 돌린다.
     public override void Exit()
     {
+        if(!_isActive) return;
+        _isActive = false;
+        EndCutscene();
         Controller.AttackJudge.EndHit();
         ResumeOthers();
         Controller.Status.SetAttackInvincible(false);
     }
 
-    public override void Tick() => Controller.HorizontalVelocity = UpdateAdvance();
+    public override void Tick()
+    {
+        if(!_isActive) return;
+
+        if(_cutscene != null && Controller.Party.IsBattleEnded)
+        {
+            CancelCutscene();
+            return;
+        }
+
+        if(_cutscene != null && _cutscene.Advance(Time.deltaTime))
+        {
+            EndCutscene();
+            StartNextStep();
+            return;
+        }
+
+        Controller.HorizontalVelocity = UpdateAdvance();
+    }
+
+    public void CancelCutscene()
+    {
+        if(_cutscene != null) Controller.EnterLocomotion(false);
+    }
+
+    private void EndCutscene()
+    {
+        if(_cutscene == null) return;
+
+        _cutscene.End();
+        _cutscene.gameObject.SetActive(false);
+        Object.Destroy(_cutscene.gameObject);
+        _cutscene = null;
+    }
 
     public override void OnAnimationEvent(PlayerAnimationEventType type, int stateHash)
     {
         // 이전 구간 클립과 섞이는 동안 들어오는 이전 클립의 이벤트는 무시한다.
-        if(stateHash != _animationHash) return;
+        if(!_isActive || _cutscene != null || stateHash != _animationHash) return;
 
         switch(type)
         {

@@ -52,7 +52,7 @@ MonoBehaviour:
       _scale: {x: 1.25, y: 1.25, z: 1.25}
   _energyGain: 0.54
   _ultimateGaugeGain: 4
-  _power: 500
+  _power: 350
   _staggerLevel: 1
   _staggerTime: 0.25
   _hitSound:

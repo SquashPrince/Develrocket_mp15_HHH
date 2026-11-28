@@ -46,9 +46,9 @@ MonoBehaviour:
       _rollAngle: 0
       _rollRandom: 90
     _motionEffects: []
-  _energyGain: 0.39
-  _ultimateGaugeGain: 4.8
-  _power: 1500
+  _energyGain: 0.65
+  _ultimateGaugeGain: 8.81
+  _power: 1100
   _staggerLevel: 1
   _staggerTime: 0.35
   _hitSound:

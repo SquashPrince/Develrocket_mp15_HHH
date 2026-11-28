@@ -47,7 +47,7 @@ MonoBehaviour:
     _motionEffects: []
   _energyGain: 0.6
   _ultimateGaugeGain: 18
-  _power: 1000
+  _power: 3680
   _staggerLevel: 1
   _staggerTime: 0.25
   _hitSound:
@@ -63,6 +63,6 @@ MonoBehaviour:
   _useLegRun: 0
   _alwaysLegRun: 0
   _isInvincibleOnSwing: 0
-  _groggyGain: 5.75
+  _groggyGain: 17.5
   _teleport: {fileID: 0}
   _cameraShot: 0

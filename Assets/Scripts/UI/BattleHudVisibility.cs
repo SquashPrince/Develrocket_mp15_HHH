@@ -8,13 +8,23 @@ public static class BattleHudVisibility
     // 구독하는 쪽은 꺼질 때 반드시 해제한다.
     public static event Action Changed;
 
-    public static bool IsVisible { get; private set; } = true;
+    private static bool _isVisible = true;
+    private static bool _isCutsceneActive;
+
+    public static bool IsVisible => _isVisible && !_isCutsceneActive;
 
     public static void SetVisible(bool isVisible)
     {
-        if(IsVisible == isVisible) return;
+        if(_isVisible == isVisible) return;
 
-        IsVisible = isVisible;
+        _isVisible = isVisible;
+        Changed?.Invoke();
+    }
+
+    public static void SetCutsceneActive(bool isActive)
+    {
+        if(_isCutsceneActive == isActive) return;
+        _isCutsceneActive = isActive;
         Changed?.Invoke();
     }
 
@@ -22,7 +32,8 @@ public static class BattleHudVisibility
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Reset()
     {
-        IsVisible = true;
+        _isVisible = true;
+        _isCutsceneActive = false;
         Changed = null;
     }
 }

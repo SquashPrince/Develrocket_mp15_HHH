@@ -58,8 +58,8 @@ MonoBehaviour:
       _rotation: {x: 0, y: 0, z: 0}
       _scale: {x: 1, y: 1, z: 1}
   _energyGain: 0
-  _ultimateGaugeGain: 13.5
-  _power: 10000
+  _ultimateGaugeGain: 24
+  _power: 2665
   _staggerLevel: 1
   _staggerTime: 0.5
   _hitSound:
@@ -76,6 +76,6 @@ MonoBehaviour:
   _useLegRun: 0
   _alwaysLegRun: 0
   _isInvincibleOnSwing: 1
-  _groggyGain: 4.3125
+  _groggyGain: 3.234375
   _teleport: {fileID: 0}
   _cameraShot: 2

@@ -5,6 +5,9 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerController), typeof(PlayerTargeting), typeof(PlayerInputReader))]
 public class PlayerActionTrigger : MonoBehaviour
 {
+    [Tooltip("필살기 연출 무대. 비어 있으면 기존 준비 모션을 재생한다")]
+    [SerializeField] private PlayerUltimateCutscene _ultimateCutscene;
+
     private PlayerController _controller;
     private PlayerTargeting _targeting;
     private PlayerInputReader _input;
@@ -31,6 +34,9 @@ public class PlayerActionTrigger : MonoBehaviour
     private void Awake() => CacheComponent();
     private void Start() => Init();
     private void Update() => TryStartUltimate();
+    private void OnDisable() => _ultimateState?.CancelCutscene();
+
+    public PlayerUltimateCutscene CreateUltimateCutscene() => _ultimateCutscene != null ? Instantiate(_ultimateCutscene) : null;
 
     public bool CanParry(EnemyAttackStep step) => _parryState.IsActive && step.IsParryable;
 
